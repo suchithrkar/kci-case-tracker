@@ -170,7 +170,64 @@
   <!-- Toast -->
   <div class="toast" id="toast">Copied!</div>
 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+    // 🔧 Replace these with your Firebase project’s actual values
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY_HERE",
+      authDomain: "kci-case-tracker.firebaseapp.com",
+      projectId: "kci-case-tracker",
+      storageBucket: "kci-case-tracker.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let ADMIN_EMAIL = null;
+
+    async function getAdminEmail() {
+      const snap = await getDoc(doc(db, "settings", "access"));
+      ADMIN_EMAIL = snap.exists() ? snap.data().adminEmail : null;
+    }
+
+    // 🔐 Access Control Logic
+    onAuthStateChanged(auth, async (user) => {
+      await getAdminEmail();
+
+      if (!user) {
+        alert("Please log in to access the tracker.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      // ✅ Admin bypass
+      if (user.email === ADMIN_EMAIL) {
+        console.log("Admin access granted for:", user.email);
+        return;
+      }
+
+      // 🔍 Check Firestore user approval
+      const userDoc = await getDoc(doc(db, "users", user.email));
+      if (!userDoc.exists() || !userDoc.data().approved) {
+        alert("Your account is pending admin approval.");
+        await signOut(auth);
+        window.location.href = "login.html";
+        return;
+      }
+
+      console.log("✅ Access granted for approved user:", user.email);
+    });
+  </script>
+
+  <!-- 🧠 Main tracker logic -->
   <script src="script.js"></script>
 
 </body>
+
 </html>

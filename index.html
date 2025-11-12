@@ -193,6 +193,7 @@
   const appBody = document.getElementById("appBody");
   const loading = document.getElementById("loading");
   let ADMIN_EMAIL = null;
+  let authChecked = false;
 
   async function getAdminEmail() {
     try {
@@ -204,9 +205,16 @@
     }
   }
 
+  // ✅ Auth guard with initialization delay
   onAuthStateChanged(auth, async (user) => {
     try {
+      if (authChecked) return; // prevent multiple runs
+      authChecked = true;
+
       await getAdminEmail();
+
+      // wait a bit for Firebase Auth token restoration
+      await new Promise(res => setTimeout(res, 1500));
 
       if (!user) {
         console.log("No user logged in → redirecting");
@@ -214,7 +222,7 @@
         return;
       }
 
-      // admin bypass
+      // ✅ Admin bypass
       if (user.email === ADMIN_EMAIL) {
         console.log("Admin logged in:", user.email);
         loading?.remove();
@@ -230,7 +238,7 @@
         return;
       }
 
-      console.log("Approved user logged in:", user.email);
+      console.log("✅ Access granted for approved user:", user.email);
       loading?.remove();
       appBody.style.display = "block";
     } catch (err) {
@@ -243,13 +251,13 @@
 </script>
 
 
-
   <!-- 🧠 Main tracker logic -->
   <script src="script.js"></script>
 
 </body>
 
 </html>
+
 
 
 

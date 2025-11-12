@@ -61,12 +61,14 @@ loginBtn.addEventListener("click", async () => {
       // Use email as document ID (encoded safely for Firestore)
       const safeEmail = emailVal.replace(/\./g, "(dot)").replace(/@/g, "(at)");
 
-      await setDoc(doc(db, "users", safeEmail), {
+      // No encoding needed
+      await setDoc(doc(db, "users", emailVal), {
         email: emailVal,
         approved: false,
         role: "user",
         createdOn: new Date().toISOString()
       });
+
 
       console.log("✅ Firestore document created for:", uid);
 
@@ -78,7 +80,7 @@ loginBtn.addEventListener("click", async () => {
       const userCred = await signInWithEmailAndPassword(auth, emailVal, passVal);
       const safeEmail = emailVal.replace(/\./g, "(dot)").replace(/@/g, "(at)");
 
-      const ref = doc(db, "users", safeEmail);
+      const ref = doc(db, "users", emailVal);
 
       const snap = await getDoc(ref);
       if (!snap.exists()) {
@@ -115,6 +117,7 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 });
+
 
 
 

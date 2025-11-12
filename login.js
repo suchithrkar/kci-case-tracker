@@ -58,15 +58,16 @@ loginBtn.addEventListener("click", async () => {
       const userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
       console.log("✅ Auth account created:", userCred.user.uid, userCred.user.email);
 
-      const uid = userCred.user.uid;
+      // Use email as document ID (encoded safely for Firestore)
+      const safeEmail = emailVal.replace(/\./g, "(dot)").replace(/@/g, "(at)");
 
-      console.log("Attempting to write Firestore doc...");
-      await setDoc(doc(db, "users", uid), {
+      await setDoc(doc(db, "users", safeEmail), {
         email: emailVal,
         approved: false,
         role: "user",
         createdOn: new Date().toISOString()
       });
+
       console.log("✅ Firestore document created for:", uid);
 
       alert("✅ Account created! Wait for admin approval before you can log in.");
@@ -75,9 +76,10 @@ loginBtn.addEventListener("click", async () => {
     } else {
       console.log("Attempting login...");
       const userCred = await signInWithEmailAndPassword(auth, emailVal, passVal);
-      const uid = userCred.user.uid;
+      const safeEmail = emailVal.replace(/\./g, "(dot)").replace(/@/g, "(at)");
 
-      const ref = doc(db, "users", uid);
+      const ref = doc(db, "users", safeEmail);
+
       const snap = await getDoc(ref);
       if (!snap.exists()) {
         alert("No user record found. Contact admin.");
@@ -113,5 +115,6 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 });
+
 
 

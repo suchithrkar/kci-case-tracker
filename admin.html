@@ -5,7 +5,6 @@
   <title>KCI Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
@@ -26,8 +25,10 @@
     const auth = getAuth(app);
 
     let ADMIN_EMAIL = null;
+    let allUsers = []; // store all users globally
+    let currentFilter = "all"; // all | approved | pending
 
-    // ===== Load Admin Email from Firestore =====
+    // ===== Load Admin Email =====
     async function getAdminEmail() {
       try {
         const snap = await getDoc(doc(db, "settings", "access"));
@@ -44,14 +45,12 @@
 
     // ===== Auth Protection =====
     onAuthStateChanged(auth, async (user) => {
-      await getAdminEmail(); // Load admin first
-
+      await getAdminEmail();
       if (!user) {
         alert("Please sign in first.");
         window.location.href = "login.html";
         return;
       }
-
       if (user.email !== ADMIN_EMAIL) {
         alert("Access denied. Admins only.");
         await signOut(auth);
@@ -63,32 +62,41 @@
       loadUsers();
     });
 
-    // ===== Load All Users =====
+    // ===== Load Users =====
     async function loadUsers() {
       const tbody = document.getElementById("tbody");
       tbody.innerHTML = "<tr><td colspan='5' style='text-align:center'>Loading...</td></tr>";
 
       const snap = await getDocs(collection(db, "users"));
-      const users = [];
-      snap.forEach(docSnap => users.push({ id: docSnap.id, ...docSnap.data() }));
+      allUsers = [];
+      snap.forEach(docSnap => allUsers.push({ id: docSnap.id, ...docSnap.data() }));
 
-      renderUsers(users);
+      updateCounts();
+      renderUsers();
     }
 
-    // ===== Render Users Table =====
-    function renderUsers(users) {
+    // ===== Render Table =====
+    function renderUsers() {
       const tbody = document.getElementById("tbody");
-      tbody.innerHTML = "";
+      const q = document.getElementById("searchInput").value.toLowerCase();
 
-      if (users.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;color:var(--muted)'>No users found</td></tr>";
+      let filtered = allUsers.filter(u =>
+        u.email.toLowerCase().includes(q) ||
+        (u.role || "").toLowerCase().includes(q)
+      );
+
+      if (currentFilter === "approved") filtered = filtered.filter(u => u.approved);
+      else if (currentFilter === "pending") filtered = filtered.filter(u => !u.approved);
+
+      tbody.innerHTML = "";
+      if (filtered.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;color:var(--muted)'>No matching users found</td></tr>";
         return;
       }
 
-      // Sort: pending first, then approved
-      users.sort((a, b) => (a.approved === b.approved) ? 0 : a.approved ? 1 : -1);
+      filtered.sort((a, b) => (a.approved === b.approved) ? 0 : a.approved ? 1 : -1);
 
-      users.forEach(u => {
+      filtered.forEach(u => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${u.email}</td>
@@ -104,13 +112,21 @@
         tbody.appendChild(tr);
       });
 
-      // Attach event listeners
       document.querySelectorAll(".btn.approve").forEach(btn => btn.addEventListener("click", () => updateUser(btn.dataset.email, true)));
       document.querySelectorAll(".btn.revoke").forEach(btn => btn.addEventListener("click", () => updateUser(btn.dataset.email, false)));
       document.querySelectorAll(".btn.delete").forEach(btn => btn.addEventListener("click", () => deleteUser(btn.dataset.email)));
     }
 
-    // ===== Approve / Revoke User =====
+    // ===== Update Counts =====
+    function updateCounts() {
+      const approved = allUsers.filter(u => u.approved).length;
+      const pending = allUsers.filter(u => !u.approved).length;
+      document.getElementById("countApproved").textContent = approved;
+      document.getElementById("countPending").textContent = pending;
+      document.getElementById("countTotal").textContent = allUsers.length;
+    }
+
+    // ===== Approve / Revoke =====
     async function updateUser(email, approved) {
       if (!confirm(`${approved ? "Approve" : "Revoke"} ${email}?`)) return;
       const ref = doc(db, "users", email);
@@ -119,7 +135,7 @@
       loadUsers();
     }
 
-    // ===== Delete User =====
+    // ===== Delete =====
     async function deleteUser(email) {
       if (!confirm(`Delete ${email}? This cannot be undone.`)) return;
       const ref = doc(db, "users", email);
@@ -128,16 +144,25 @@
       loadUsers();
     }
 
-    // ===== Logout =====
+    // ===== Search & Filters =====
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("btnLogout").addEventListener("click", async () => {
         await signOut(auth);
         window.location.href = "login.html";
       });
+
+      document.getElementById("searchInput").addEventListener("input", renderUsers);
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentFilter = btn.dataset.filter;
+          document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          renderUsers();
+        });
+      });
     });
   </script>
 
-  <!-- ===== Styles ===== -->
   <style>
     :root {
       --bg:#0f1115; --panel:#151923; --panel-2:#1A1F2B;
@@ -149,7 +174,13 @@
     h1 { margin:0; font-size:20px; }
     .logout { background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:.4rem .9rem; cursor:pointer; }
     .logout:hover { filter:brightness(1.1); }
-    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    .container { padding:1rem 1.5rem; }
+    .controls { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; flex-wrap:wrap; }
+    .search { background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:.5rem .8rem; color:var(--text); width:240px; }
+    .filter-group { display:flex; gap:.5rem; }
+    .filter-btn { background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:.4rem .8rem; cursor:pointer; }
+    .filter-btn.active { background:var(--accent); border-color:var(--accent); }
+    table { width:100%; border-collapse:collapse; }
     th, td { padding:.75rem 1rem; border-bottom:1px solid var(--border); }
     th { text-align:left; background:var(--panel-2); text-transform:uppercase; font-size:13px; letter-spacing:.5px; }
     .btn { border:none; padding:.4rem .8rem; border-radius:8px; cursor:pointer; color:white; font-weight:500; }
@@ -157,8 +188,8 @@
     .revoke { background:var(--warn); color:black; }
     .delete { background:var(--danger); }
     .actions { white-space:nowrap; display:flex; gap:.4rem; }
-    .container { padding:1rem 1.5rem; }
-    .info { margin-top:.5rem; font-size:13px; color:var(--muted); }
+    .stats { margin-bottom:.5rem; font-size:13px; color:var(--muted); }
+    .stats span { margin-right:1rem; }
   </style>
 </head>
 
@@ -172,6 +203,15 @@
   </header>
 
   <div class="container">
+    <div class="controls">
+      <input id="searchInput" class="search" placeholder="Search by email or role...">
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">All (<span id="countTotal">0</span>)</button>
+        <button class="filter-btn" data-filter="pending">Pending (<span id="countPending">0</span>)</button>
+        <button class="filter-btn" data-filter="approved">Approved (<span id="countApproved">0</span>)</button>
+      </div>
+    </div>
+
     <table>
       <thead>
         <tr>
@@ -184,7 +224,6 @@
       </thead>
       <tbody id="tbody"></tbody>
     </table>
-    <div class="info">Tip: Only approved users can log in to the main tracker.</div>
   </div>
 </body>
 </html>

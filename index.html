@@ -27,7 +27,9 @@
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
-<body style="display:none;" id="appBody">
+<body id="appBody" style="display:none;">
+  <div id="loading" style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
+    <span>🔐 Checking login...</span>
   <!-- Header -->
   <header class="header">
     <button class="hamburger" id="btnHamburger" title="Primary Filters">☰</button>
@@ -171,7 +173,7 @@
   <div class="toast" id="toast">Copied!</div>
 
   <!-- 🔒 Access Control -->
-<script type="module">
+<script type="module" id="auth-guard">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
@@ -188,44 +190,58 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
-
   const appBody = document.getElementById("appBody");
+  const loading = document.getElementById("loading");
   let ADMIN_EMAIL = null;
 
   async function getAdminEmail() {
-    const snap = await getDoc(doc(db, "settings", "access"));
-    ADMIN_EMAIL = snap.exists() ? snap.data().adminEmail : null;
+    try {
+      const snap = await getDoc(doc(db, "settings", "access"));
+      if (snap.exists()) ADMIN_EMAIL = snap.data().adminEmail;
+      console.log("Admin email:", ADMIN_EMAIL);
+    } catch (err) {
+      console.error("Error loading admin email:", err);
+    }
   }
 
   onAuthStateChanged(auth, async (user) => {
-    await getAdminEmail();
+    try {
+      await getAdminEmail();
 
-    if (!user) {
-      alert("Please log in to access the tracker.");
-      window.location.href = "login.html";
-      return;
-    }
+      if (!user) {
+        console.log("No user logged in → redirecting");
+        window.location.replace("login.html");
+        return;
+      }
 
-    // ✅ Admin always allowed
-    if (user.email === ADMIN_EMAIL) {
-      console.log("Admin access granted:", user.email);
+      // admin bypass
+      if (user.email === ADMIN_EMAIL) {
+        console.log("Admin logged in:", user.email);
+        loading?.remove();
+        appBody.style.display = "block";
+        return;
+      }
+
+      const userDoc = await getDoc(doc(db, "users", user.email));
+      if (!userDoc.exists() || !userDoc.data().approved) {
+        alert("Your account is pending admin approval.");
+        await signOut(auth);
+        window.location.replace("login.html");
+        return;
+      }
+
+      console.log("Approved user logged in:", user.email);
+      loading?.remove();
       appBody.style.display = "block";
-      return;
+    } catch (err) {
+      console.error("Auth guard error:", err);
+      // Fail-safe: show page for debug
+      loading?.remove();
+      appBody.style.display = "block";
     }
-
-    // 🔍 Check Firestore user approval
-    const userDoc = await getDoc(doc(db, "users", user.email));
-    if (!userDoc.exists() || !userDoc.data().approved) {
-      alert("Your account is pending admin approval.");
-      await signOut(auth);
-      window.location.href = "login.html";
-      return;
-    }
-
-    console.log("✅ Access granted for approved user:", user.email);
-    appBody.style.display = "block"; // ✅ finally show page
   });
 </script>
+
 
 
   <!-- 🧠 Main tracker logic -->
@@ -234,5 +250,6 @@
 </body>
 
 </html>
+
 
 

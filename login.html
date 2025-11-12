@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KCI Case Tracker – Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: var(--bg);
+    }
+    .login-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      width: min(400px, 90vw);
+    }
+    .login-card h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+    }
+    .field label {
+      font-size: 14px;
+      margin-bottom: 0.4rem;
+    }
+    .field input {
+      padding: 0.6rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+    }
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn:hover {
+      filter: brightness(1.1);
+    }
+    .switch-mode {
+      text-align: center;
+      margin-top: 1rem;
+      color: var(--accent);
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-card">
+    <h1>KCI Case Tracker</h1>
+    <div id="authForm">
+      <div class="field">
+        <label>Email</label>
+        <input id="email" type="email" placeholder="Enter your work email" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="password" type="password" placeholder="Enter your password" />
+      </div>
+      <button id="loginBtn" class="btn">Login</button>
+      <p class="switch-mode" id="toggleMode">Don’t have an account? Sign up</p>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module" src="login.js"></script>
+</body>
+</html>

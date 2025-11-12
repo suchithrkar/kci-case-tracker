@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>KCI Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // ====== Firebase imports ======
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+// ====== Firebase config ======
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "kci-case-tracker.firebaseapp.com",
+  projectId: "kci-case-tracker",
+  storageBucket: "kci-case-tracker.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// ====== Init ======
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let ADMIN_EMAIL = null;
+
+// ====== Load Admin Email from Firestore ======
+async function getAdminEmail() {
+  try {
+    const snap = await getDoc(doc(db, "settings", "access"));
+    if (snap.exists()) {
+      ADMIN_EMAIL = snap.data().adminEmail;
+      console.log("Admin email loaded:", ADMIN_EMAIL);
+    } else {
+      alert("⚠️ Admin email not found in Firestore (settings/access)");
+    }
+  } catch (err) {
+    console.error("Failed to load admin email:", err);
+  }
+}
+
+// ====== Auth protection ======
+onAuthStateChanged(auth, async (user) => {
+  await getAdminEmail(); // load admin from Firestore first
+
+  if (!user) {
+    alert("Please sign in first.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (user.email !== ADMIN_EMAIL) {
+    alert("Access denied. Admins only.");
+    await signOut(auth);
+    window.location.href = "login.html";
+    return;
+  }
+
+  document.getElementById("adminEmail").textContent = user.email;
+  loadUsers();
+});
+
+  </script>
+
+  <!-- Styles -->
+  <style>
+    :root {
+      --bg:#0f1115; --panel:#151923; --panel-2:#1A1F2B;
+      --muted:#9aa4b2; --text:#e6ebf3; --border:#2a2f3a;
+      --accent:#4F8CF0; --ok:#38d9a9; --warn:#ffd166; --danger:#ff6b6b;
+    }
+    body { font-family:system-ui, sans-serif; margin:0; background:var(--bg); color:var(--text); }
+    header { background:var(--panel); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+    h1 { margin:0; font-size:20px; }
+    .logout { background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:.4rem .9rem; cursor:pointer; }
+    .logout:hover { filter:brightness(1.1); }
+    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    th, td { padding:.75rem 1rem; border-bottom:1px solid var(--border); }
+    th { text-align:left; background:var(--panel-2); text-transform:uppercase; font-size:13px; letter-spacing:.5px; }
+    .btn { border:none; padding:.4rem .8rem; border-radius:8px; cursor:pointer; color:white; font-weight:500; }
+    .approve { background:var(--ok); }
+    .revoke { background:var(--warn); color:black; }
+    .delete { background:var(--danger); }
+    .actions { white-space:nowrap; display:flex; gap:.4rem; }
+    .container { padding:1rem 1.5rem; }
+    .info { margin-top:.5rem; font-size:13px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>KCI Admin Dashboard</h1>
+    <div>
+      <span id="adminEmail" style="margin-right:1rem;opacity:0.8"></span>
+      <button id="btnLogout" class="logout">Logout</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="info">Tip: Only approved users can log in to the main tracker.</div>
+  </div>
+</body>
+</html>

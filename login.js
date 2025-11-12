@@ -51,17 +51,28 @@ loginBtn.addEventListener("click", async () => {
   try {
     let userCred;
     if (isSignUp) {
-      // New user signup
-      userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
-      await setDoc(doc(db, "users", emailVal), {
-        email: emailVal,
-        approved: false,
-        role: "user",
-        createdOn: new Date().toISOString()
-      });
-      alert("Account created! Wait for admin approval before you can log in.");
-      await signOut(auth);
-    } else {
+  try {
+    // New user signup
+    userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
+
+    // Firestore document key: user.uid instead of raw email
+    const uid = userCred.user.uid;
+    await setDoc(doc(db, "users", uid), {
+      email: emailVal,
+      approved: false,
+      role: "user",
+      createdOn: new Date().toISOString()
+    });
+
+    alert("✅ Account created! Wait for admin approval before you can log in.");
+    console.log("User record written to Firestore:", uid, emailVal);
+
+    await signOut(auth);
+  } catch (err) {
+    console.error("Firestore write failed:", err);
+    alert("Firestore write failed: " + err.message);
+  }
+} else {
       // Existing user login
       userCred = await signInWithEmailAndPassword(auth, emailVal, passVal);
       const ref = doc(db, "users", emailVal);
@@ -98,3 +109,4 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 });
+

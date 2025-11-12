@@ -43,45 +43,48 @@ toggleMode.addEventListener("click", () => {
 loginBtn.addEventListener("click", async () => {
   const emailVal = email.value.trim();
   const passVal = password.value.trim();
+
   if (!emailVal || !passVal) {
     alert("Please fill in both fields");
     return;
   }
 
+  console.log("Button clicked. Mode:", isSignUp ? "SignUp" : "Login");
+
   try {
-    let userCred;
     if (isSignUp) {
-  try {
-    // New user signup
-    userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
+      console.log("Attempting to create account in Firebase Auth...");
 
-    // Firestore document key: user.uid instead of raw email
-    const uid = userCred.user.uid;
-    await setDoc(doc(db, "users", uid), {
-      email: emailVal,
-      approved: false,
-      role: "user",
-      createdOn: new Date().toISOString()
-    });
+      const userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
+      console.log("✅ Auth account created:", userCred.user.uid, userCred.user.email);
 
-    alert("✅ Account created! Wait for admin approval before you can log in.");
-    console.log("User record written to Firestore:", uid, emailVal);
+      const uid = userCred.user.uid;
 
-    await signOut(auth);
-  } catch (err) {
-    console.error("Firestore write failed:", err);
-    alert("Firestore write failed: " + err.message);
-  }
-} else {
-      // Existing user login
-      userCred = await signInWithEmailAndPassword(auth, emailVal, passVal);
-      const ref = doc(db, "users", emailVal);
+      console.log("Attempting to write Firestore doc...");
+      await setDoc(doc(db, "users", uid), {
+        email: emailVal,
+        approved: false,
+        role: "user",
+        createdOn: new Date().toISOString()
+      });
+      console.log("✅ Firestore document created for:", uid);
+
+      alert("✅ Account created! Wait for admin approval before you can log in.");
+      await signOut(auth);
+      console.log("Signed out after registration.");
+    } else {
+      console.log("Attempting login...");
+      const userCred = await signInWithEmailAndPassword(auth, emailVal, passVal);
+      const uid = userCred.user.uid;
+
+      const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
       if (!snap.exists()) {
         alert("No user record found. Contact admin.");
         await signOut(auth);
         return;
       }
+
       const data = snap.data();
       if (!data.approved) {
         alert("Access pending admin approval.");
@@ -89,11 +92,12 @@ loginBtn.addEventListener("click", async () => {
         return;
       }
 
-      // ✅ Approved user → redirect
+      console.log("✅ Login success. Redirecting...");
       window.location.href = "index.html";
     }
   } catch (err) {
-    alert(err.message);
+    console.error("❌ Error in Auth or Firestore:", err);
+    alert("Error: " + err.message);
   }
 });
 
@@ -109,4 +113,5 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 });
+
 

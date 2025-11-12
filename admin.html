@@ -7,67 +7,137 @@
 
   <!-- Firebase SDKs -->
   <script type="module">
-    // ====== Firebase imports ======
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-// ====== Firebase config ======
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY_HERE",
-  authDomain: "kci-case-tracker.firebaseapp.com",
-  projectId: "kci-case-tracker",
-  storageBucket: "kci-case-tracker.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+    // ===== Firebase Config =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyCkVHlYHa8aEbXvOHK0UJmOv5zVx_Kcsx0",
+      authDomain: "kci-case-tracker.firebaseapp.com",
+      projectId: "kci-case-tracker",
+      storageBucket: "kci-case-tracker.appspot.com",
+      messagingSenderId: "554993696883",
+      appId: "1:554993696883:web:5a0fe904443c7279f7aa06"
+    };
 
-// ====== Init ======
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-let ADMIN_EMAIL = null;
+    let ADMIN_EMAIL = null;
 
-// ====== Load Admin Email from Firestore ======
-async function getAdminEmail() {
-  try {
-    const snap = await getDoc(doc(db, "settings", "access"));
-    if (snap.exists()) {
-      ADMIN_EMAIL = snap.data().adminEmail;
-      console.log("Admin email loaded:", ADMIN_EMAIL);
-    } else {
-      alert("⚠️ Admin email not found in Firestore (settings/access)");
+    // ===== Load Admin Email from Firestore =====
+    async function getAdminEmail() {
+      try {
+        const snap = await getDoc(doc(db, "settings", "access"));
+        if (snap.exists()) {
+          ADMIN_EMAIL = snap.data().adminEmail;
+          console.log("Admin email loaded:", ADMIN_EMAIL);
+        } else {
+          alert("⚠️ Admin email not found in Firestore (settings/access)");
+        }
+      } catch (err) {
+        console.error("Failed to load admin email:", err);
+      }
     }
-  } catch (err) {
-    console.error("Failed to load admin email:", err);
-  }
-}
 
-// ====== Auth protection ======
-onAuthStateChanged(auth, async (user) => {
-  await getAdminEmail(); // load admin from Firestore first
+    // ===== Auth Protection =====
+    onAuthStateChanged(auth, async (user) => {
+      await getAdminEmail(); // Load admin first
 
-  if (!user) {
-    alert("Please sign in first.");
-    window.location.href = "login.html";
-    return;
-  }
+      if (!user) {
+        alert("Please sign in first.");
+        window.location.href = "login.html";
+        return;
+      }
 
-  if (user.email !== ADMIN_EMAIL) {
-    alert("Access denied. Admins only.");
-    await signOut(auth);
-    window.location.href = "login.html";
-    return;
-  }
+      if (user.email !== ADMIN_EMAIL) {
+        alert("Access denied. Admins only.");
+        await signOut(auth);
+        window.location.href = "login.html";
+        return;
+      }
 
-  document.getElementById("adminEmail").textContent = user.email;
-  loadUsers();
-});
+      document.getElementById("adminEmail").textContent = user.email;
+      loadUsers();
+    });
 
+    // ===== Load All Users =====
+    async function loadUsers() {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = "<tr><td colspan='5' style='text-align:center'>Loading...</td></tr>";
+
+      const snap = await getDocs(collection(db, "users"));
+      const users = [];
+      snap.forEach(docSnap => users.push({ id: docSnap.id, ...docSnap.data() }));
+
+      renderUsers(users);
+    }
+
+    // ===== Render Users Table =====
+    function renderUsers(users) {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = "";
+
+      if (users.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;color:var(--muted)'>No users found</td></tr>";
+        return;
+      }
+
+      // Sort: pending first, then approved
+      users.sort((a, b) => (a.approved === b.approved) ? 0 : a.approved ? 1 : -1);
+
+      users.forEach(u => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${u.email}</td>
+          <td>${u.role || 'user'}</td>
+          <td>${u.approved ? "✅ Approved" : "⏳ Pending"}</td>
+          <td>${u.createdOn ? new Date(u.createdOn).toLocaleString() : "—"}</td>
+          <td class="actions">
+            ${u.approved
+              ? `<button class="btn revoke" data-email="${u.email}">Revoke</button>`
+              : `<button class="btn approve" data-email="${u.email}">Approve</button>`}
+            <button class="btn delete" data-email="${u.email}">🗑 Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+
+      // Attach event listeners
+      document.querySelectorAll(".btn.approve").forEach(btn => btn.addEventListener("click", () => updateUser(btn.dataset.email, true)));
+      document.querySelectorAll(".btn.revoke").forEach(btn => btn.addEventListener("click", () => updateUser(btn.dataset.email, false)));
+      document.querySelectorAll(".btn.delete").forEach(btn => btn.addEventListener("click", () => deleteUser(btn.dataset.email)));
+    }
+
+    // ===== Approve / Revoke User =====
+    async function updateUser(email, approved) {
+      if (!confirm(`${approved ? "Approve" : "Revoke"} ${email}?`)) return;
+      const ref = doc(db, "users", email);
+      await updateDoc(ref, { approved });
+      alert(`${email} ${approved ? "approved" : "revoked"}.`);
+      loadUsers();
+    }
+
+    // ===== Delete User =====
+    async function deleteUser(email) {
+      if (!confirm(`Delete ${email}? This cannot be undone.`)) return;
+      const ref = doc(db, "users", email);
+      await deleteDoc(ref);
+      alert(`${email} deleted.`);
+      loadUsers();
+    }
+
+    // ===== Logout =====
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("btnLogout").addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+      });
+    });
   </script>
 
-  <!-- Styles -->
+  <!-- ===== Styles ===== -->
   <style>
     :root {
       --bg:#0f1115; --panel:#151923; --panel-2:#1A1F2B;
@@ -91,6 +161,7 @@ onAuthStateChanged(auth, async (user) => {
     .info { margin-top:.5rem; font-size:13px; color:var(--muted); }
   </style>
 </head>
+
 <body>
   <header>
     <h1>KCI Admin Dashboard</h1>

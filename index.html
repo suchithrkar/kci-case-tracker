@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KCI Case Tracker — Full Single-File App</title>
+  <!--
+    HOW TO USE
+    1) Save as KCI_Case_Tracker.html and open locally in Chrome.
+    2) 100% local. Data stored in localStorage under key KCI_CASES_V1.
+    3) For native .xlsx, paste SheetJS (xlsx.mini.min.js or xlsx.full.min.js) into the <script id="sheetjs"> tag below.
+       Without it, the app will ask you to upload CSV instead.
+
+    This build includes:
+    • Excel/CSV upload + merge (add/update) + delete closed
+    • Status select, ⚙️ modal (follow-up date, flag, notes) with normalized date storage
+    • Edge-to-edge layout, sticky header, no horizontal scroll, fixed right dead space
+    • Set 1 (search, status, date range, apply/clear)
+    • Set 2 (📅 Due Today, 🚩 Flagged, 👥 Repeating, 🕑 Sort by Created Date) with tooltips (smart edge handling)
+    • Primary Filters in overlay sidebar with locks + Apply
+    • Badges for Due Today & Flagged computed from localStorage (fresh)
+    • Row highlighting: yellow = due today, red = flagged
+    • Persistent memory: filters, locks, sort mode, theme
+    • Light/Dark theme toggle ☀️/🌙
+    • Double-click Case ID to copy + toast
+  -->
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <button class="hamburger" id="btnHamburger" title="Primary Filters">☰</button>
+    <div class="title">KCI Case Tracker</div>
+    <div class="grow"></div>
+    <button class="theme-toggle" id="btnTheme" title="Toggle Theme">🌙</button>
+    <input id="fileInput" type="file" class="hidden" accept=".xlsx,.csv" />
+    <button class="upload-btn" id="btnUpload">Upload Excel</button>
+<button class="upload-btn" id="btnExport">Export Backup</button>
+<input id="importBackupInput" type="file" class="hidden" accept=".json" />
+<button class="upload-btn" id="btnImport">Import Backup</button>
+
+  </header>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="set1">
+      <div class="search-wrap">
+        <span class="icon">🔎</span>
+        <input id="txtSearch" class="input search" placeholder="Search Case ID or any text.." />
+      </div>
+      <select id="ddlStatusFilter" class="input">
+        <option value="">All Statuses</option>
+        <option>Closed</option>
+        <option>NCM 1</option>
+        <option>NCM 2</option>
+        <option>PNS</option>
+        <option>Service Pending</option>
+        <option>Monitoring</option>
+      </select>
+      <input id="dateFrom" type="date" class="input" title="Created On From" />
+      <input id="dateTo" type="date" class="input" title="Created On To" />
+      <button class="btn" id="btnApply">Apply</button>
+      <button class="btn" id="btnClear">Clear</button>
+    </div>
+    <div class="set2">
+      <button class="icon-btn" id="btnDueToday" title="Due Today">
+        <span>📅</span>
+        <span class="badge" id="badgeDue">0</span>
+        <span class="tooltip">Due Today</span>
+      </button>
+      <button class="icon-btn" id="btnFlagged" title="Flagged Cases">
+        <span>🚩</span>
+        <span class="badge" id="badgeFlag">0</span>
+        <span class="tooltip">Flagged Cases</span>
+      </button>
+      <button class="icon-btn" id="btnRepeating" title="Show Repeating Customers">
+        <span>👥</span>
+        <span class="tooltip">Repeating Customers</span>
+      </button>
+      <button class="icon-btn" id="btnSortDate" title="Sort by Case Creation Date">
+        <span>🕑</span>
+        <span class="tooltip">Sort by Creation Date</span>
+      </button>
+<button class="icon-btn" id="btnUnupdated" title="Show Unupdated Cases">
+  <span>📝</span>
+  <span class="tooltip">Unupdated Cases</span>
+</button>
+
+    </div>
+  </div>
+
+  <!-- Sidebar (overlay) with Primary Filters -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="side-head">
+      <button class="side-btn" id="btnSideApply">Apply</button>
+      <button class="side-btn" id="btnSideClose">Close</button>
+    </div>
+    <div class="side">
+      <div id="filtersContainer"></div>
+    </div>
+  </aside>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th class="sno">S.No</th>
+          <th>Case Id</th>
+          <th>Customer Name</th>
+          <th>Country</th>
+          <th>Case Resolution Code</th>
+          <th>Case Owner</th>
+          <th>CA Group</th>
+          <th>SBD</th>
+          <th>Status</th>
+          <th class="right">Action</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal: Case Options -->
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title" id="modalTitle">Case Options</div>
+        <button class="btn" id="btnModalClose">Close</button>
+      </div>
+      <div class="modal-body">
+
+  <!-- Last Actioned On -->
+  <div class="row">
+    <div>Last Actioned On</div>
+    <div id="optLastActioned" style="white-space:nowrap;font-weight:500;">—</div>
+  </div>
+
+  <!-- Follow-up Date -->
+  <div class="row">
+    <div>Follow-up Date</div>
+    <div class="date-wrap">
+      <span style="font-size:18px;padding:.25rem .35rem;border:1px solid var(--border);border-radius:10px;">📅</span>
+      <input id="optDate" type="date" />
+    </div>
+  </div>
+
+  <!-- Flag Case -->
+  <div class="row">
+    <div>Flag Case</div>
+    <div><div id="optFlag" class="switch" role="switch" aria-checked="false" tabindex="0"></div></div>
+  </div>
+
+  <!-- Notes -->
+  <div class="row" style="align-items:start">
+    <div>Notes</div>
+    <textarea id="optNotes" class="notes" placeholder="Add any notes..."></textarea>
+  </div>
+
+</div>
+
+      <div class="modal-foot">
+        <button class="btn" id="btnModalSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Copied!</div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>

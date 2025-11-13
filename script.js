@@ -1,13 +1,14 @@
 // ======================= FIRESTORE-SYNCED TRACKER LOGIC =======================
 
 // --- Firebase imports ---
-import { 
-  getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc 
+import {
+  getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+import { app } from "./firebase-init.js";
 
-// --- Firebase init (shared from index.html) ---
-import { app } from "./firebase-init.js";  // optional modularization (you can inline config if preferred)
+// --- Firebase init ---
 const db = getFirestore(app);
 const auth = getAuth(app);
 
@@ -93,10 +94,10 @@ function renderTable(cases) {
     sel.addEventListener("change", async (e) => {
       const id = e.target.getAttribute("data-id");
       const newStatus = e.target.value;
-      await updateCase(id, { 
-        status: newStatus, 
-        lastActionedOn: getToday(), 
-        updatedBy: auth.currentUser?.email || "unknown" 
+      await updateCase(id, {
+        status: newStatus,
+        lastActionedOn: getToday(),
+        updatedBy: auth.currentUser?.email || "unknown"
       });
     });
   });
@@ -180,9 +181,6 @@ loadAllCases();
 
 // ==================== ADMIN EXCEL → FIRESTORE SYNC ====================
 
-import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
-import { deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
 const fileInput = document.getElementById("fileInput");
 const uploadBtn = document.getElementById("btnUpload");
 
@@ -234,7 +232,7 @@ async function handleExcelUpload(e) {
         onsiteRFC: r["Onsite RFC Status"] || "",
         csrRFC: r["CSR RFC Status"] || "",
         benchRFC: r["Bench RFC Status"] || "",
-        status: "", // preserved by merge if already set
+        status: "",
         followDate: null,
         flagged: false,
         notes: "",
@@ -255,16 +253,16 @@ async function handleExcelUpload(e) {
     }
 
     alert(`✅ Import complete!\n${rows.length} total cases processed.\n${deletedCount} removed (closed).`);
-    await loadAllCases(); // refresh view
+    await loadAllCases();
   } catch (err) {
     console.error("❌ Error importing Excel:", err);
     alert("Error importing Excel: " + err.message);
   } finally {
-    fileInput.value = ""; // reset input
+    fileInput.value = "";
   }
 }
 
-// Helper: Excel → ISO date
+// ==================== Helper: Excel → ISO date ====================
 function formatExcelDate(val) {
   if (!val) return "";
   if (typeof val === "number") {
@@ -274,4 +272,3 @@ function formatExcelDate(val) {
   if (typeof val === "string" && val.includes("-")) return val.split(" ")[0];
   return "";
 }
-

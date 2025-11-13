@@ -3,34 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KCI Case Tracker — Full Single-File App</title>
-  <!--
-    HOW TO USE
-    1) Save as KCI_Case_Tracker.html and open locally in Chrome.
-    2) 100% local. Data stored in localStorage under key KCI_CASES_V1.
-    3) For native .xlsx, paste SheetJS (xlsx.mini.min.js or xlsx.full.min.js) into the <script id="sheetjs"> tag below.
-       Without it, the app will ask you to upload CSV instead.
-
-    This build includes:
-    • Excel/CSV upload + merge (add/update) + delete closed
-    • Status select, ⚙️ modal (follow-up date, flag, notes) with normalized date storage
-    • Edge-to-edge layout, sticky header, no horizontal scroll, fixed right dead space
-    • Set 1 (search, status, date range, apply/clear)
-    • Set 2 (📅 Due Today, 🚩 Flagged, 👥 Repeating, 🕑 Sort by Created Date) with tooltips (smart edge handling)
-    • Primary Filters in overlay sidebar with locks + Apply
-    • Badges for Due Today & Flagged computed from localStorage (fresh)
-    • Row highlighting: yellow = due today, red = flagged
-    • Persistent memory: filters, locks, sort mode, theme
-    • Light/Dark theme toggle ☀️/🌙
-    • Double-click Case ID to copy + toast
-  -->
+  <title>KCI Case Tracker</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Load global SheetJS (XLSX) for Excel parsing (non-module global) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body id="appBody" style="display:none;">
   <div id="loading" style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-  <span>🔐 Checking login...</span>
-</div>
+    <span>🔐 Checking login...</span>
+  </div>
 
   <!-- Header -->
   <header class="header">
@@ -38,16 +19,17 @@
     <div class="title">KCI Case Tracker</div>
     <div class="grow"></div>
     <button class="theme-toggle" id="btnTheme" title="Toggle Theme">🌙</button>
+
     <input id="fileInput" type="file" class="hidden" accept=".xlsx,.csv" />
     <button class="upload-btn" id="btnUpload">Upload Excel</button>
     <button class="upload-btn" id="btnExport">Export Backup</button>
     <input id="importBackupInput" type="file" class="hidden" accept=".json" />
     <button class="upload-btn" id="btnImport">Import Backup</button>
-    <button class="upload-btn" id="btnLogout">Sign Out</button>
 
+    <button class="upload-btn" id="btnLogout">Sign Out</button>
   </header>
 
-  <!-- Controls -->
+  <!-- Controls (same UI you used) -->
   <div class="controls">
     <div class="set1">
       <div class="search-wrap">
@@ -87,15 +69,14 @@
         <span>🕑</span>
         <span class="tooltip">Sort by Creation Date</span>
       </button>
-<button class="icon-btn" id="btnUnupdated" title="Show Unupdated Cases">
-  <span>📝</span>
-  <span class="tooltip">Unupdated Cases</span>
-</button>
-
+      <button class="icon-btn" id="btnUnupdated" title="Show Unupdated Cases">
+        <span>📝</span>
+        <span class="tooltip">Unupdated Cases</span>
+      </button>
     </div>
   </div>
 
-  <!-- Sidebar (overlay) with Primary Filters -->
+  <!-- Overlay & Sidebar -->
   <div class="overlay" id="overlay"></div>
   <aside class="sidebar" id="sidebar">
     <div class="side-head">
@@ -136,36 +117,26 @@
         <button class="btn" id="btnModalClose">Close</button>
       </div>
       <div class="modal-body">
-
-  <!-- Last Actioned On -->
-  <div class="row">
-    <div>Last Actioned On</div>
-    <div id="optLastActioned" style="white-space:nowrap;font-weight:500;">—</div>
-  </div>
-
-  <!-- Follow-up Date -->
-  <div class="row">
-    <div>Follow-up Date</div>
-    <div class="date-wrap">
-      <span style="font-size:18px;padding:.25rem .35rem;border:1px solid var(--border);border-radius:10px;">📅</span>
-      <input id="optDate" type="date" />
-    </div>
-  </div>
-
-  <!-- Flag Case -->
-  <div class="row">
-    <div>Flag Case</div>
-    <div><div id="optFlag" class="switch" role="switch" aria-checked="false" tabindex="0"></div></div>
-  </div>
-
-  <!-- Notes -->
-  <div class="row" style="align-items:start">
-    <div>Notes</div>
-    <textarea id="optNotes" class="notes" placeholder="Add any notes..."></textarea>
-  </div>
-
-</div>
-
+        <div class="row">
+          <div>Last Actioned On</div>
+          <div id="optLastActioned" style="white-space:nowrap;font-weight:500;">—</div>
+        </div>
+        <div class="row">
+          <div>Follow-up Date</div>
+          <div class="date-wrap">
+            <span style="font-size:18px;padding:.25rem .35rem;border:1px solid var(--border);border-radius:10px;">📅</span>
+            <input id="optDate" type="date" />
+          </div>
+        </div>
+        <div class="row">
+          <div>Flag Case</div>
+          <div><div id="optFlag" class="switch" role="switch" aria-checked="false" tabindex="0"></div></div>
+        </div>
+        <div class="row" style="align-items:start">
+          <div>Notes</div>
+          <textarea id="optNotes" class="notes" placeholder="Add any notes..."></textarea>
+        </div>
+      </div>
       <div class="modal-foot">
         <button class="btn" id="btnModalSave">Save</button>
       </div>
@@ -175,148 +146,82 @@
   <!-- Toast -->
   <div class="toast" id="toast">Copied!</div>
 
-  <!-- 🔒 Access Control -->
-<!-- 🔒 Access Control + Role Handling -->
-<!-- 🔒 Access Control + Role Handling -->
-<script type="module" id="auth-guard">
-  // ======== Firebase Imports ========
-  import { app } from "./firebase-init.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  <!-- Auth guard + role handling -->
+  <script type="module">
+    import { app } from "./firebase-init.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-  // ======== Firebase Init ========
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-  // ======== DOM Elements ========
-  const appBody = document.getElementById("appBody");
-  const loading = document.getElementById("loading");
+    const appBody = document.getElementById("appBody");
+    const loading = document.getElementById("loading");
 
-  let ADMIN_EMAIL = null;
-  let authChecked = false;
+    let ADMIN_EMAIL = null;
+    let authChecked = false;
 
-  // ======== Fetch Admin Email ========
-  async function getAdminEmail() {
-    try {
-      const snap = await getDoc(doc(db, "settings", "access"));
-      if (snap.exists()) ADMIN_EMAIL = snap.data().adminEmail;
-      console.log("Admin email:", ADMIN_EMAIL);
-    } catch (err) {
-      console.error("Error loading admin email:", err);
+    async function getAdminEmail(){
+      try{
+        const snap = await getDoc(doc(db, "settings", "access"));
+        if (snap.exists()) ADMIN_EMAIL = snap.data().adminEmail;
+        console.log("Admin email:", ADMIN_EMAIL);
+      } catch(err){
+        console.error("Error loading admin email:", err);
+      }
     }
-  }
 
-  // ======== Load Tracker Script (after auth verified) ========
-  function loadTrackerScript() {
-    if (!document.getElementById("trackerScript")) {
+    function loadTrackerScript(){
+      if (document.getElementById("trackerScript")) return;
       const trackerScript = document.createElement("script");
       trackerScript.id = "trackerScript";
-      trackerScript.type = "module"; // ✅ required for ES imports
+      trackerScript.type = "module";
       trackerScript.src = "./script.js";
       document.body.appendChild(trackerScript);
-
-      trackerScript.onload = () => {
-        const uploadBtn = document.getElementById("btnUpload");
-        const exportBtn = document.getElementById("btnExport");
-        const importBtn = document.getElementById("btnImport");
-        const logoutBtn = document.getElementById("btnLogout");
-
-        // ======== Admin Dashboard Button ========
-        if (auth.currentUser.email === ADMIN_EMAIL) {
-          setTimeout(() => {
-            const header = document.querySelector(".header");
-            if (!header) return;
-
-            const adminBtn = document.createElement("button");
-            adminBtn.className = "upload-btn";
-            adminBtn.textContent = "Admin Dashboard";
-            adminBtn.title = "Go to Admin Panel";
-            adminBtn.style.marginLeft = "0.5rem";
-            adminBtn.addEventListener("click", () => {
-              window.location.href = "admin.html";
-            });
-
-            // Insert before theme toggle
-            const themeBtn = document.getElementById("btnTheme");
-            header.insertBefore(adminBtn, themeBtn);
-          }, 500);
-        }
-
-        // ======== Hide Admin-only Buttons for Non-admins ========
-        if (auth.currentUser.email !== ADMIN_EMAIL) {
-          [uploadBtn, exportBtn, importBtn].forEach(btn => {
-            if (!btn) return;
-            btn.setAttribute("disabled", "true");
-            btn.style.display = "none";
-            btn.title = "Admin-only feature";
-          });
-        }
-
-        // ======== Logout ========
-        logoutBtn?.addEventListener("click", async () => {
-          await signOut(auth);
-          localStorage.clear();
-          const trackerScript = document.getElementById("trackerScript");
-          if (trackerScript) trackerScript.remove();
-          window.location.replace("login.html");
-        });
-      };
     }
-  }
 
-  // ======== Auth Guard ========
-  onAuthStateChanged(auth, async (user) => {
-    try {
-      if (authChecked) return;
-      authChecked = true;
+    onAuthStateChanged(auth, async (user) => {
+      try{
+        if (authChecked) return;
+        authChecked = true;
 
-      await getAdminEmail();
-      await new Promise(res => setTimeout(res, 1200)); // allow Firebase token restore
+        await getAdminEmail();
+        await new Promise(r=>setTimeout(r, 700));
 
-      if (!user) {
-        console.log("No user logged in → redirecting");
-        window.location.replace("login.html");
-        return;
-      }
+        if (!user){
+          window.location.replace("login.html");
+          return;
+        }
 
-      const showApp = () => {
+        // Admin
+        if (user.email === ADMIN_EMAIL){
+          loading?.remove();
+          appBody.style.display = "block";
+          loadTrackerScript();
+          return;
+        }
+
+        // non-admin: check users doc
+        const userDoc = await getDoc(doc(db, "users", user.email));
+        if (!userDoc.exists() || !userDoc.data().approved){
+          alert("Your account is pending admin approval.");
+          await signOut(auth);
+          window.location.replace("login.html");
+          return;
+        }
+
         loading?.remove();
         appBody.style.display = "block";
         loadTrackerScript();
-      };
-
-      // ======== Admin Bypass ========
-      if (user.email === ADMIN_EMAIL) {
-        console.log("Admin logged in:", user.email);
-        showApp();
-        return;
+      } catch(err){
+        console.error("Auth guard error:", err);
+        // show page for debugging fallback
+        loading?.remove();
+        appBody.style.display = "block";
+        loadTrackerScript();
       }
-
-      // ======== Check User Approval ========
-      const userDoc = await getDoc(doc(db, "users", user.email));
-      if (!userDoc.exists() || !userDoc.data().approved) {
-        alert("Access pending admin approval.");
-        await signOut(auth);
-        window.location.replace("login.html");
-        return;
-      }
-
-      console.log("✅ Access granted for approved user:", user.email);
-      showApp();
-
-    } catch (err) {
-      console.error("Auth guard error:", err);
-      loading?.remove();
-      appBody.style.display = "block";
-    }
-  });
-</script>
-
-
-  <!-- 🧠 Main tracker logic -->
-
+    });
+  </script>
 
 </body>
-
 </html>
-

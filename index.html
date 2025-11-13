@@ -177,12 +177,13 @@
 
   <!-- 🔒 Access Control -->
 <!-- 🔒 Access Control + Role Handling -->
+<!-- 🔒 Access Control + Role Handling -->
 <script type="module" id="auth-guard">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
 
-  // 🧠 Firebase Project Config (make sure this matches your project)
+  // 🧠 Firebase Project Config
   const firebaseConfig = {
     apiKey: "AIzaSyCkVHlYHa8aEbXvOHK0UJmOv5zVx_Kcsx0",
     authDomain: "kci-case-tracker.firebaseapp.com",
@@ -195,6 +196,7 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
+
   const appBody = document.getElementById("appBody");
   const loading = document.getElementById("loading");
 
@@ -209,6 +211,44 @@
       console.log("Admin email:", ADMIN_EMAIL);
     } catch (err) {
       console.error("Error loading admin email:", err);
+    }
+  }
+
+  // 🧩 Helper: Safe tracker script loader
+  function loadTrackerScript() {
+    if (!document.getElementById("trackerScript")) {
+      const trackerScript = document.createElement("script");
+      trackerScript.id = "trackerScript";
+      trackerScript.src = "script.js";
+      document.body.appendChild(trackerScript);
+
+      trackerScript.onload = () => {
+        const uploadBtn = document.getElementById("btnUpload");
+        const exportBtn = document.getElementById("btnExport");
+        const importBtn = document.getElementById("btnImport");
+        const logoutBtn = document.getElementById("btnLogout");
+
+        // ✅ Hide admin-only buttons for non-admins
+        if (auth.currentUser.email !== ADMIN_EMAIL) {
+          [uploadBtn, exportBtn, importBtn].forEach(btn => {
+            if (!btn) return;
+            btn.setAttribute("disabled", "true");
+            btn.style.opacity = "0.4";
+            btn.style.cursor = "not-allowed";
+            btn.title = "Admin-only feature";
+            if (btn) btn.style.display = "none";
+          });
+        }
+
+        // ✅ Logout functionality
+        logoutBtn?.addEventListener("click", async () => {
+          await signOut(auth);
+          localStorage.clear();
+          const trackerScript = document.getElementById("trackerScript");
+          if (trackerScript) trackerScript.remove();
+          window.location.replace("login.html");
+        });
+      };
     }
   }
 
@@ -227,61 +267,30 @@
         return;
       }
 
-      const loadTracker = () => {
-        // Hide loading, show app
+      const showApp = () => {
         loading?.remove();
         appBody.style.display = "block";
-
-        // ✅ Dynamically load main tracker logic
-        const trackerScript = document.createElement("script");
-        trackerScript.src = "script.js";
-        document.body.appendChild(trackerScript);
-
-        // Once tracker is added, set up button restrictions and logout
-        trackerScript.onload = () => {
-          const uploadBtn = document.getElementById("btnUpload");
-          const exportBtn = document.getElementById("btnExport");
-          const importBtn = document.getElementById("btnImport");
-          const logoutBtn = document.getElementById("btnLogout");
-
-          // Restrict admin-only features
-          if (user.email !== ADMIN_EMAIL) {
-            [uploadBtn, exportBtn, importBtn].forEach(btn => {
-              if (!btn) return;
-              btn.setAttribute("disabled", "true");
-              btn.style.opacity = "0.4";
-              btn.style.cursor = "not-allowed";
-              btn.title = "Admin-only feature";
-            });
-          }
-
-          // Logout button functionality
-          logoutBtn?.addEventListener("click", async () => {
-            await signOut(auth);
-            localStorage.clear();
-            window.location.replace("login.html");
-          });
-        };
+        loadTrackerScript();
       };
 
       // ✅ Admin bypass
       if (user.email === ADMIN_EMAIL) {
         console.log("Admin logged in:", user.email);
-        loadTracker();
+        showApp();
         return;
       }
 
       // ✅ Check if approved user
       const userDoc = await getDoc(doc(db, "users", user.email));
       if (!userDoc.exists() || !userDoc.data().approved) {
-        alert("Your account is pending admin approval.");
+        alert("Access pending admin approval.");
         await signOut(auth);
         window.location.replace("login.html");
         return;
       }
 
       console.log("✅ Access granted for approved user:", user.email);
-      loadTracker();
+      showApp();
 
     } catch (err) {
       console.error("Auth guard error:", err);
@@ -292,13 +301,13 @@
 </script>
 
 
-
   <!-- 🧠 Main tracker logic -->
   <script src="script.js"></script>
 
 </body>
 
 </html>
+
 
 
 

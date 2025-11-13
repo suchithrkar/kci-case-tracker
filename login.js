@@ -5,7 +5,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut
+  signOut,
+  sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import {
   getFirestore,
@@ -34,6 +35,7 @@ const email = document.getElementById("email");
 const password = document.getElementById("password");
 const loginBtn = document.getElementById("loginBtn");
 const toggleMode = document.getElementById("toggleMode");
+const forgotPassword = document.getElementById("forgotPassword");
 
 let isSignUp = false;
 
@@ -44,6 +46,22 @@ toggleMode.addEventListener("click", () => {
   toggleMode.textContent = isSignUp
     ? "Already have an account? Login"
     : "Don’t have an account? Sign up";
+});
+
+// ============ Forgot Password ============
+forgotPassword.addEventListener("click", async () => {
+  const emailVal = email.value.trim();
+  if (!emailVal) {
+    alert("Please enter your email above first.");
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, emailVal);
+    alert(`📧 Password reset email sent to ${emailVal}. Check your inbox.`);
+  } catch (err) {
+    console.error("Reset error:", err);
+    alert("Error sending reset email: " + err.message);
+  }
 });
 
 // ============ Login / Signup ============
@@ -61,14 +79,9 @@ loginBtn.addEventListener("click", async () => {
   try {
     if (isSignUp) {
       console.log("Attempting to create account in Firebase Auth...");
-
-      // ✅ Create new Auth account
       const userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
       const user = userCred.user;
 
-      console.log("✅ Auth account created:", user.email);
-
-      // ✅ Create Firestore user record (same email ID)
       await setDoc(doc(db, "users", user.email), {
         email: user.email,
         approved: false,
@@ -76,15 +89,9 @@ loginBtn.addEventListener("click", async () => {
         createdOn: new Date().toISOString()
       });
 
-      console.log("✅ Firestore doc created for:", user.email);
-
       alert("✅ Account created! Wait for admin approval before you can log in.");
       await signOut(auth);
-      console.log("Signed out after registration.");
     } else {
-      console.log("Attempting login...");
-
-      // ✅ Login existing user
       const userCred = await signInWithEmailAndPassword(auth, emailVal, passVal);
       const user = userCred.user;
 

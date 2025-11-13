@@ -177,3 +177,101 @@ function getToday() {
 
 // ==================== INITIAL LOAD ====================
 loadAllCases();
+
+// ==================== ADMIN EXCEL → FIRESTORE SYNC ====================
+
+import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+import { deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+const fileInput = document.getElementById("fileInput");
+const uploadBtn = document.getElementById("btnUpload");
+
+if (uploadBtn && fileInput) {
+  uploadBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", handleExcelUpload);
+}
+
+async function handleExcelUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const user = auth.currentUser;
+  if (!user) return alert("Please log in first.");
+  if (user.email !== "suchith.raichurkar@hp.com") {
+    return alert("Only the admin can upload Excel files.");
+  }
+
+  try {
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    console.log(`📘 Parsed ${rows.length} rows from Excel.`);
+
+    const excelIds = new Set();
+
+    // Fetch existing case IDs
+    const existingSnap = await getDocs(collection(db, CASES_COLLECTION));
+    const existingIds = new Set();
+    existingSnap.forEach((d) => existingIds.add(d.id));
+
+    // Upload/update each case
+    for (const r of rows) {
+      const id = String(r["Case ID"]).trim();
+      if (!id) continue;
+      excelIds.add(id);
+
+      const caseDoc = {
+        id,
+        customerName: r["Full Name (Primary Contact) (Contact)"] || "",
+        createdOn: formatExcelDate(r["Created On"]),
+        createdBy: r["Created By"] || "",
+        country: r["Country"] || "",
+        caseResolutionCode: r["Case Resolution Code"] || "",
+        caseOwner: r["Full Name (Owning User) (User)"] || "",
+        caGroup: r["CA Group"] || "",
+        sbd: r["SBD"] || "",
+        onsiteRFC: r["Onsite RFC Status"] || "",
+        csrRFC: r["CSR RFC Status"] || "",
+        benchRFC: r["Bench RFC Status"] || "",
+        status: "", // preserved by merge if already set
+        followDate: null,
+        flagged: false,
+        notes: "",
+        lastActionedOn: null,
+        updatedBy: "",
+      };
+
+      await setDoc(doc(db, CASES_COLLECTION, id), caseDoc, { merge: true });
+    }
+
+    // Delete old cases missing in Excel
+    let deletedCount = 0;
+    for (const oldId of existingIds) {
+      if (!excelIds.has(oldId)) {
+        await deleteDoc(doc(db, CASES_COLLECTION, oldId));
+        deletedCount++;
+      }
+    }
+
+    alert(`✅ Import complete!\n${rows.length} total cases processed.\n${deletedCount} removed (closed).`);
+    await loadAllCases(); // refresh view
+  } catch (err) {
+    console.error("❌ Error importing Excel:", err);
+    alert("Error importing Excel: " + err.message);
+  } finally {
+    fileInput.value = ""; // reset input
+  }
+}
+
+// Helper: Excel → ISO date
+function formatExcelDate(val) {
+  if (!val) return "";
+  if (typeof val === "number") {
+    const date = new Date((val - 25569) * 86400 * 1000);
+    return date.toISOString().split("T")[0];
+  }
+  if (typeof val === "string" && val.includes("-")) return val.split(" ")[0];
+  return "";
+}
+

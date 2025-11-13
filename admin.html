@@ -1,229 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>KCI Admin Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-
-    // ===== Firebase Config =====
-    const firebaseConfig = {
-      apiKey: "AIzaSyCkVHlYHa8aEbXvOHK0UJmOv5zVx_Kcsx0",
-      authDomain: "kci-case-tracker.firebaseapp.com",
-      projectId: "kci-case-tracker",
-      storageBucket: "kci-case-tracker.appspot.com",
-      messagingSenderId: "554993696883",
-      appId: "1:554993696883:web:5a0fe904443c7279f7aa06"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    let ADMIN_EMAIL = null;
-    let allUsers = []; // store all users globally
-    let currentFilter = "all"; // all | approved | pending
-
-    // ===== Load Admin Email =====
-    async function getAdminEmail() {
-      try {
-        const snap = await getDoc(doc(db, "settings", "access"));
-        if (snap.exists()) {
-          ADMIN_EMAIL = snap.data().adminEmail;
-          console.log("Admin email loaded:", ADMIN_EMAIL);
-        } else {
-          alert("⚠️ Admin email not found in Firestore (settings/access)");
-        }
-      } catch (err) {
-        console.error("Failed to load admin email:", err);
-      }
-    }
-
-    // ===== Auth Protection =====
-    onAuthStateChanged(auth, async (user) => {
-      await getAdminEmail();
-      if (!user) {
-        alert("Please sign in first.");
-        window.location.href = "login.html";
-        return;
-      }
-      if (user.email !== ADMIN_EMAIL) {
-        alert("Access denied. Admins only.");
-        await signOut(auth);
-        window.location.href = "login.html";
-        return;
-      }
-
-      document.getElementById("adminEmail").textContent = user.email;
-      loadUsers();
-    });
-
-    // ===== Load Users =====
-    async function loadUsers() {
-      const tbody = document.getElementById("tbody");
-      tbody.innerHTML = "<tr><td colspan='5' style='text-align:center'>Loading...</td></tr>";
-
-      const snap = await getDocs(collection(db, "users"));
-      allUsers = [];
-      snap.forEach(docSnap => allUsers.push({ id: docSnap.id, ...docSnap.data() }));
-
-      updateCounts();
-      renderUsers();
-    }
-
-    // ===== Render Table =====
-    function renderUsers() {
-      const tbody = document.getElementById("tbody");
-      const q = document.getElementById("searchInput").value.toLowerCase();
-
-      let filtered = allUsers.filter(u =>
-        u.email.toLowerCase().includes(q) ||
-        (u.role || "").toLowerCase().includes(q)
-      );
-
-      if (currentFilter === "approved") filtered = filtered.filter(u => u.approved);
-      else if (currentFilter === "pending") filtered = filtered.filter(u => !u.approved);
-
-      tbody.innerHTML = "";
-      if (filtered.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;color:var(--muted)'>No matching users found</td></tr>";
-        return;
-      }
-
-      filtered.sort((a, b) => (a.approved === b.approved) ? 0 : a.approved ? 1 : -1);
-
-      filtered.forEach(u => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${u.email}</td>
-          <td>${u.role || 'user'}</td>
-          <td>${u.approved ? "✅ Approved" : "⏳ Pending"}</td>
-          <td>${u.createdOn ? new Date(u.createdOn).toLocaleString() : "—"}</td>
-          <td class="actions">
-            ${u.approved
-              ? `<button class="btn revoke" data-email="${u.email}">Revoke</button>`
-              : `<button class="btn approve" data-email="${u.email}">Approve</button>`}
-            <button class="btn delete" data-email="${u.email}">🗑 Delete</button>
-          </td>`;
-        tbody.appendChild(tr);
-      });
-
-      document.querySelectorAll(".btn.approve").forEach(btn => btn.addEventListener("click", () => updateUser(btn.dataset.email, true)));
-      document.querySelectorAll(".btn.revoke").forEach(btn => btn.addEventListener("click", () => updateUser(btn.dataset.email, false)));
-      document.querySelectorAll(".btn.delete").forEach(btn => btn.addEventListener("click", () => deleteUser(btn.dataset.email)));
-    }
-
-    // ===== Update Counts =====
-    function updateCounts() {
-      const approved = allUsers.filter(u => u.approved).length;
-      const pending = allUsers.filter(u => !u.approved).length;
-      document.getElementById("countApproved").textContent = approved;
-      document.getElementById("countPending").textContent = pending;
-      document.getElementById("countTotal").textContent = allUsers.length;
-    }
-
-    // ===== Approve / Revoke =====
-    async function updateUser(email, approved) {
-      if (!confirm(`${approved ? "Approve" : "Revoke"} ${email}?`)) return;
-      const ref = doc(db, "users", email);
-      await updateDoc(ref, { approved });
-      alert(`${email} ${approved ? "approved" : "revoked"}.`);
-      loadUsers();
-    }
-
-    // ===== Delete =====
-    async function deleteUser(email) {
-      if (!confirm(`Delete ${email}? This cannot be undone.`)) return;
-      const ref = doc(db, "users", email);
-      await deleteDoc(ref);
-      alert(`${email} deleted.`);
-      loadUsers();
-    }
-
-    // ===== Search & Filters =====
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("btnLogout").addEventListener("click", async () => {
-        await signOut(auth);
-        window.location.href = "login.html";
-      });
-
-      document.getElementById("searchInput").addEventListener("input", renderUsers);
-      document.querySelectorAll(".filter-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          currentFilter = btn.dataset.filter;
-          document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          renderUsers();
-        });
-      });
-    });
-  </script>
-
-  <style>
-    :root {
-      --bg:#0f1115; --panel:#151923; --panel-2:#1A1F2B;
-      --muted:#9aa4b2; --text:#e6ebf3; --border:#2a2f3a;
-      --accent:#4F8CF0; --ok:#38d9a9; --warn:#ffd166; --danger:#ff6b6b;
-    }
-    body { font-family:system-ui, sans-serif; margin:0; background:var(--bg); color:var(--text); }
-    header { background:var(--panel); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
-    h1 { margin:0; font-size:20px; }
-    .logout { background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:.4rem .9rem; cursor:pointer; }
-    .logout:hover { filter:brightness(1.1); }
-    .container { padding:1rem 1.5rem; }
-    .controls { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; flex-wrap:wrap; }
-    .search { background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:.5rem .8rem; color:var(--text); width:240px; }
-    .filter-group { display:flex; gap:.5rem; }
-    .filter-btn { background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:.4rem .8rem; cursor:pointer; }
-    .filter-btn.active { background:var(--accent); border-color:var(--accent); }
-    table { width:100%; border-collapse:collapse; }
-    th, td { padding:.75rem 1rem; border-bottom:1px solid var(--border); }
-    th { text-align:left; background:var(--panel-2); text-transform:uppercase; font-size:13px; letter-spacing:.5px; }
-    .btn { border:none; padding:.4rem .8rem; border-radius:8px; cursor:pointer; color:white; font-weight:500; }
-    .approve { background:var(--ok); }
-    .revoke { background:var(--warn); color:black; }
-    .delete { background:var(--danger); }
-    .actions { white-space:nowrap; display:flex; gap:.4rem; }
-    .stats { margin-bottom:.5rem; font-size:13px; color:var(--muted); }
-    .stats span { margin-right:1rem; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KCI Case Tracker — Admin</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <header>
-    <h1>KCI Admin Dashboard</h1>
-    <div>
-      <span id="adminEmail" style="margin-right:1rem;opacity:0.8"></span>
-      <button id="btnLogout" class="logout">Logout</button>
-    </div>
+  <header style="display:flex;align-items:center;gap:1rem;padding:1rem;border-bottom:1px solid #ddd">
+    <h2>Admin Dashboard</h2>
+    <div style="flex:1"></div>
+    <button id="btnBack" class="upload-btn">Back to Tracker</button>
+    <button id="btnSignOut" class="upload-btn">Sign Out</button>
   </header>
 
-  <div class="container">
-    <div class="controls">
-      <input id="searchInput" class="search" placeholder="Search by email or role...">
-      <div class="filter-group">
-        <button class="filter-btn active" data-filter="all">All (<span id="countTotal">0</span>)</button>
-        <button class="filter-btn" data-filter="pending">Pending (<span id="countPending">0</span>)</button>
-        <button class="filter-btn" data-filter="approved">Approved (<span id="countApproved">0</span>)</button>
-      </div>
-    </div>
+  <main style="padding:1rem;max-width:1100px;margin:0 auto;">
+    <section style="margin-bottom:1rem;">
+      <h3>Pending Users</h3>
+      <table id="pendingTbl" style="width:100%;border-collapse:collapse;margin-top:.5rem;">
+        <thead><tr><th>Email</th><th>Created On</th><th>Actions</th></tr></thead>
+        <tbody id="pendingBody"></tbody>
+      </table>
+    </section>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Created</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
-  </div>
+    <section>
+      <h3>Admin Settings</h3>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <input id="adminEmail" placeholder="admin@domain.com" style="padding:.5rem;border-radius:8px;border:1px solid #ccc" />
+        <button id="saveAdmin" class="upload-btn">Save Admin Email</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { app } from "./firebase-init.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs, doc, setDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const pendingBody = document.getElementById('pendingBody');
+    const adminEmailEl = document.getElementById('adminEmail');
+    const saveAdmin = document.getElementById('saveAdmin');
+    const btnBack = document.getElementById('btnBack');
+    const btnSignOut = document.getElementById('btnSignOut');
+
+    btnBack.addEventListener('click', ()=> location.href = 'index.html');
+    btnSignOut.addEventListener('click', async ()=> { await signOut(auth); location.href = 'login.html'; });
+
+    async function ensureAdminAndLoad(){
+      const s = await getDoc(doc(db, "settings", "access"));
+      const adminEmail = s.exists() ? s.data().adminEmail : null;
+      adminEmailEl.value = adminEmail || '';
+      // load pending users
+      const snap = await getDocs(collection(db, "users"));
+      pendingBody.innerHTML = '';
+      snap.forEach(d => {
+        const data = d.data();
+        if (!data.approved){
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${data.email}</td><td>${data.createdOn||''}</td><td>
+            <button data-email="${data.email}" class="approve">Approve</button>
+            <button data-email="${data.email}" class="reject">Reject</button>
+          </td>`;
+          pendingBody.appendChild(tr);
+        }
+      });
+      pendingBody.querySelectorAll('.approve').forEach(b=>{
+        b.addEventListener('click', async ()=> {
+          const email = b.dataset.email;
+          await setDoc(doc(db,'users',email), { email, approved:true }, { merge:true });
+          alert('Approved '+email);
+          await ensureAdminAndLoad();
+        });
+      });
+      pendingBody.querySelectorAll('.reject').forEach(b=>{
+        b.addEventListener('click', async ()=> {
+          const email = b.dataset.email;
+          // remove doc (or set approved:false)
+          await setDoc(doc(db,'users',email), { email, approved:false }, { merge:true });
+          alert('Rejected '+email);
+          await ensureAdminAndLoad();
+        });
+      });
+    }
+
+    saveAdmin.addEventListener('click', async ()=>{
+      const v = adminEmailEl.value.trim();
+      if (!v) return alert('Enter admin email');
+      await setDoc(doc(db, 'settings', 'access'), { adminEmail: v }, { merge:true });
+      alert('Saved admin email');
+    });
+
+    onAuthStateChanged(auth, async (user)=>{
+      if (!user) location.href = 'login.html';
+      // check user is admin by matching settings doc
+      const s = await getDoc(doc(db, "settings", "access"));
+      const adminEmail = s.exists() ? s.data().adminEmail : null;
+      if (user.email !== adminEmail){
+        alert('Only admin can access this page'); await signOut(auth); location.href = 'login.html';
+        return;
+      }
+      ensureAdminAndLoad();
+    });
+  </script>
 </body>
 </html>

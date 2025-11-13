@@ -5,7 +5,11 @@ import {
   getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import * as XLSX from "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+// --- Load XLSX safely as global ---
+if (typeof XLSX === "undefined") {
+  await import("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js");
+}
+
 import { app } from "./firebase-init.js";
 
 // --- Firebase init ---
@@ -272,3 +276,77 @@ function formatExcelDate(val) {
   if (typeof val === "string" && val.includes("-")) return val.split(" ")[0];
   return "";
 }
+
+// ==================== UI HANDLERS (SIDEBAR, THEME, BACKUP) ====================
+
+// Sidebar toggle
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const btnHamburger = document.getElementById("btnHamburger");
+const btnSideClose = document.getElementById("btnSideClose");
+
+btnHamburger?.addEventListener("click", () => {
+  sidebar.style.right = "0";
+  overlay.style.display = "block";
+});
+btnSideClose?.addEventListener("click", closeSidebar);
+overlay?.addEventListener("click", closeSidebar);
+
+function closeSidebar() {
+  sidebar.style.right = "-350px";
+  overlay.style.display = "none";
+}
+
+// Theme toggle
+const themeBtn = document.getElementById("btnTheme");
+themeBtn?.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  themeBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  localStorage.setItem("themeMode", document.body.classList.contains("dark") ? "dark" : "light");
+});
+window.addEventListener("load", () => {
+  const mode = localStorage.getItem("themeMode");
+  if (mode === "dark") {
+    document.body.classList.add("dark");
+    themeBtn.textContent = "☀️";
+  }
+});
+
+// Backup export/import
+const btnExport = document.getElementById("btnExport");
+const btnImport = document.getElementById("btnImport");
+const importBackupInput = document.getElementById("importBackupInput");
+
+btnExport?.addEventListener("click", async () => {
+  try {
+    const snap = await getDocs(collection(db, CASES_COLLECTION));
+    const data = [];
+    snap.forEach(docSnap => data.push(docSnap.data()));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `case_backup_${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+  } catch (err) {
+    alert("Error exporting backup: " + err.message);
+  }
+});
+
+btnImport?.addEventListener("click", () => importBackupInput.click());
+importBackupInput?.addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    for (const item of data) {
+      await setDoc(doc(db, CASES_COLLECTION, item.id), item, { merge: true });
+    }
+    alert("✅ Backup imported successfully.");
+    await loadAllCases();
+  } catch (err) {
+    alert("Error importing backup: " + err.message);
+  } finally {
+    importBackupInput.value = "";
+  }
+});

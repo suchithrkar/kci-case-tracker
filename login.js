@@ -1,23 +1,30 @@
 // ============ Firebase imports ============
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { 
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut 
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { 
-  getFirestore, doc, getDoc, setDoc 
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Your web app's Firebase configuration
+// ============ Firebase Config ============
 const firebaseConfig = {
   apiKey: "AIzaSyCkVHlYHa8aEbXvOHK0UJmOv5zVx_Kcsx0",
   authDomain: "kci-case-tracker.firebaseapp.com",
   projectId: "kci-case-tracker",
-  storageBucket: "kci-case-tracker.firebasestorage.app",
+  storageBucket: "kci-case-tracker.appspot.com",
   messagingSenderId: "554993696883",
   appId: "1:554993696883:web:5a0fe904443c7279f7aa06"
 };
 
-// Initialize Firebase
+// ============ Initialize Firebase ============
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -55,34 +62,35 @@ loginBtn.addEventListener("click", async () => {
     if (isSignUp) {
       console.log("Attempting to create account in Firebase Auth...");
 
+      // ✅ Create new Auth account
       const userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
-      console.log("✅ Auth account created:", userCred.user.uid, userCred.user.email);
+      const user = userCred.user;
 
-      // Use email as document ID (encoded safely for Firestore)
-      const safeEmail = emailVal.replace(/\./g, "(dot)").replace(/@/g, "(at)");
+      console.log("✅ Auth account created:", user.email);
 
-      // No encoding needed
-      await setDoc(doc(db, "users", emailVal), {
-        email: emailVal,
+      // ✅ Create Firestore user record (same email ID)
+      await setDoc(doc(db, "users", user.email), {
+        email: user.email,
         approved: false,
         role: "user",
         createdOn: new Date().toISOString()
       });
 
-
-      console.log("✅ Firestore document created for:", uid);
+      console.log("✅ Firestore doc created for:", user.email);
 
       alert("✅ Account created! Wait for admin approval before you can log in.");
       await signOut(auth);
       console.log("Signed out after registration.");
     } else {
       console.log("Attempting login...");
+
+      // ✅ Login existing user
       const userCred = await signInWithEmailAndPassword(auth, emailVal, passVal);
-      const safeEmail = emailVal.replace(/\./g, "(dot)").replace(/@/g, "(at)");
+      const user = userCred.user;
 
-      const ref = doc(db, "users", emailVal);
-
+      const ref = doc(db, "users", user.email);
       const snap = await getDoc(ref);
+
       if (!snap.exists()) {
         alert("No user record found. Contact admin.");
         await signOut(auth);
@@ -108,16 +116,16 @@ loginBtn.addEventListener("click", async () => {
 // ============ Auto redirect if logged in ============
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const ref = doc(db, "users", user.email);
-    const snap = await getDoc(ref);
-    if (snap.exists() && snap.data().approved) {
-      window.location.href = "index.html";
-    } else {
-      await signOut(auth);
+    try {
+      const ref = doc(db, "users", user.email);
+      const snap = await getDoc(ref);
+      if (snap.exists() && snap.data().approved) {
+        window.location.href = "index.html";
+      } else {
+        await signOut(auth);
+      }
+    } catch (err) {
+      console.error("Error verifying session:", err);
     }
   }
 });
-
-
-
-

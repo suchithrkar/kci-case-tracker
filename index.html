@@ -227,6 +227,18 @@
         const exportBtn = document.getElementById("btnExport");
         const importBtn = document.getElementById("btnImport");
         const logoutBtn = document.getElementById("btnLogout");
+        // ✅ Add Admin Dashboard button for admin
+        if (auth.currentUser.email === ADMIN_EMAIL) {
+          const header = document.querySelector(".header .grow");
+          const adminBtn = document.createElement("button");
+          adminBtn.className = "upload-btn";
+          adminBtn.textContent = "Admin Dashboard";
+          adminBtn.addEventListener("click", () => {
+          window.location.href = "admin.html";
+        });
+        header?.insertAdjacentElement("afterend", adminBtn);
+        }
+
 
         // ✅ Hide admin-only buttons for non-admins
         if (auth.currentUser.email !== ADMIN_EMAIL) {
@@ -307,6 +319,7 @@
 </body>
 
 </html>
+
 
 
 

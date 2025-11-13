@@ -179,34 +179,23 @@
 <!-- 🔒 Access Control + Role Handling -->
 <!-- 🔒 Access Control + Role Handling -->
 <script type="module" id="auth-guard">
+  // ======== Firebase Imports ========
   import { app } from "./firebase-init.js";
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-  
-  
-  // 🧠 Firebase Project Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyCkVHlYHa8aEbXvOHK0UJmOv5zVx_Kcsx0",
-    authDomain: "kci-case-tracker.firebaseapp.com",
-    projectId: "kci-case-tracker",
-    storageBucket: "kci-case-tracker.appspot.com",
-    messagingSenderId: "554993696883",
-    appId: "1:554993696883:web:5a0fe904443c7279f7aa06"
-  };
-
-  
+  // ======== Firebase Init ========
   const db = getFirestore(app);
   const auth = getAuth(app);
 
+  // ======== DOM Elements ========
   const appBody = document.getElementById("appBody");
   const loading = document.getElementById("loading");
 
   let ADMIN_EMAIL = null;
   let authChecked = false;
 
-  // 🧩 Fetch admin email from Firestore
+  // ======== Fetch Admin Email ========
   async function getAdminEmail() {
     try {
       const snap = await getDoc(doc(db, "settings", "access"));
@@ -217,58 +206,53 @@
     }
   }
 
-  // 🧩 Helper: Safe tracker script loader
+  // ======== Load Tracker Script (after auth verified) ========
   function loadTrackerScript() {
     if (!document.getElementById("trackerScript")) {
       const trackerScript = document.createElement("script");
       trackerScript.id = "trackerScript";
-      trackerScript.type = "module";        // ✅ this is the key fix
+      trackerScript.type = "module"; // ✅ required for ES imports
       trackerScript.src = "./script.js";
       document.body.appendChild(trackerScript);
-
 
       trackerScript.onload = () => {
         const uploadBtn = document.getElementById("btnUpload");
         const exportBtn = document.getElementById("btnExport");
         const importBtn = document.getElementById("btnImport");
         const logoutBtn = document.getElementById("btnLogout");
-        // ✅ Add Admin Dashboard button for admin
-        // ✅ Add Admin Dashboard button for admin (safer delayed mount)
-if (auth.currentUser.email === ADMIN_EMAIL) {
-  setTimeout(() => {
-    const header = document.querySelector(".header");
-    if (!header) return;
 
-    const adminBtn = document.createElement("button");
-    adminBtn.className = "upload-btn";
-    adminBtn.textContent = "Admin Dashboard";
-    adminBtn.title = "Go to Admin Panel";
-    adminBtn.style.marginLeft = "0.5rem";
-    adminBtn.addEventListener("click", () => {
-      window.location.href = "admin.html";
-    });
+        // ======== Admin Dashboard Button ========
+        if (auth.currentUser.email === ADMIN_EMAIL) {
+          setTimeout(() => {
+            const header = document.querySelector(".header");
+            if (!header) return;
 
-    // insert before the theme toggle for consistent look
-    const themeBtn = document.getElementById("btnTheme");
-    header.insertBefore(adminBtn, themeBtn);
-  }, 500); // wait for the header to fully render
-}
+            const adminBtn = document.createElement("button");
+            adminBtn.className = "upload-btn";
+            adminBtn.textContent = "Admin Dashboard";
+            adminBtn.title = "Go to Admin Panel";
+            adminBtn.style.marginLeft = "0.5rem";
+            adminBtn.addEventListener("click", () => {
+              window.location.href = "admin.html";
+            });
 
+            // Insert before theme toggle
+            const themeBtn = document.getElementById("btnTheme");
+            header.insertBefore(adminBtn, themeBtn);
+          }, 500);
+        }
 
-
-        // ✅ Hide admin-only buttons for non-admins
+        // ======== Hide Admin-only Buttons for Non-admins ========
         if (auth.currentUser.email !== ADMIN_EMAIL) {
           [uploadBtn, exportBtn, importBtn].forEach(btn => {
             if (!btn) return;
             btn.setAttribute("disabled", "true");
-            btn.style.opacity = "0.4";
-            btn.style.cursor = "not-allowed";
+            btn.style.display = "none";
             btn.title = "Admin-only feature";
-            if (btn) btn.style.display = "none";
           });
         }
 
-        // ✅ Logout functionality
+        // ======== Logout ========
         logoutBtn?.addEventListener("click", async () => {
           await signOut(auth);
           localStorage.clear();
@@ -280,14 +264,14 @@ if (auth.currentUser.email === ADMIN_EMAIL) {
     }
   }
 
-  // 🧩 Auth guard + delayed tracker load
+  // ======== Auth Guard ========
   onAuthStateChanged(auth, async (user) => {
     try {
       if (authChecked) return;
       authChecked = true;
 
       await getAdminEmail();
-      await new Promise(res => setTimeout(res, 1200));
+      await new Promise(res => setTimeout(res, 1200)); // allow Firebase token restore
 
       if (!user) {
         console.log("No user logged in → redirecting");
@@ -301,14 +285,14 @@ if (auth.currentUser.email === ADMIN_EMAIL) {
         loadTrackerScript();
       };
 
-      // ✅ Admin bypass
+      // ======== Admin Bypass ========
       if (user.email === ADMIN_EMAIL) {
         console.log("Admin logged in:", user.email);
         showApp();
         return;
       }
 
-      // ✅ Check if approved user
+      // ======== Check User Approval ========
       const userDoc = await getDoc(doc(db, "users", user.email));
       if (!userDoc.exists() || !userDoc.data().approved) {
         alert("Access pending admin approval.");
@@ -335,18 +319,3 @@ if (auth.currentUser.email === ADMIN_EMAIL) {
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

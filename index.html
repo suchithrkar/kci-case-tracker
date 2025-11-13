@@ -228,16 +228,27 @@
         const importBtn = document.getElementById("btnImport");
         const logoutBtn = document.getElementById("btnLogout");
         // ✅ Add Admin Dashboard button for admin
-        if (auth.currentUser.email === ADMIN_EMAIL) {
-          const header = document.querySelector(".header .grow");
-          const adminBtn = document.createElement("button");
-          adminBtn.className = "upload-btn";
-          adminBtn.textContent = "Admin Dashboard";
-          adminBtn.addEventListener("click", () => {
-          window.location.href = "admin.html";
-        });
-        header?.insertAdjacentElement("afterend", adminBtn);
-        }
+        // ✅ Add Admin Dashboard button for admin (safer delayed mount)
+if (auth.currentUser.email === ADMIN_EMAIL) {
+  setTimeout(() => {
+    const header = document.querySelector(".header");
+    if (!header) return;
+
+    const adminBtn = document.createElement("button");
+    adminBtn.className = "upload-btn";
+    adminBtn.textContent = "Admin Dashboard";
+    adminBtn.title = "Go to Admin Panel";
+    adminBtn.style.marginLeft = "0.5rem";
+    adminBtn.addEventListener("click", () => {
+      window.location.href = "admin.html";
+    });
+
+    // insert before the theme toggle for consistent look
+    const themeBtn = document.getElementById("btnTheme");
+    header.insertBefore(adminBtn, themeBtn);
+  }, 500); // wait for the header to fully render
+}
+
 
 
         // ✅ Hide admin-only buttons for non-admins
@@ -319,6 +330,7 @@
 </body>
 
 </html>
+
 
 
 

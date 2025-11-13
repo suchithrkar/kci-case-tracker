@@ -82,12 +82,23 @@ loginBtn.addEventListener("click", async () => {
       const userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
       const user = userCred.user;
 
-      await setDoc(doc(db, "users", user.email), {
-        email: user.email,
-        approved: false,
-        role: "user",
-        createdOn: new Date().toISOString()
-      });
+      // Retry-safe Firestore write (helps on slower network/Firebase lag)
+for (let i = 0; i < 3; i++) {
+  try {
+    await setDoc(doc(db, "users", user.email), {
+      email: user.email,
+      approved: false,
+      role: "user",
+      createdOn: new Date().toISOString()
+    });
+    console.log("✅ Firestore document created for:", user.email);
+    break;
+  } catch (err) {
+    console.warn(`Retry ${i + 1} Firestore user creation failed:`, err);
+    await new Promise(res => setTimeout(res, 800));
+  }
+}
+
 
       alert("✅ Account created! Wait for admin approval before you can log in.");
       await signOut(auth);
@@ -136,3 +147,4 @@ onAuthStateChanged(auth, async (user) => {
     }
   }
 });
+

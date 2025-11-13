@@ -1,150 +1,89 @@
-// ============ Firebase imports ============
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+// =================== LOGIN / SIGNUP / RESET ===================
+import { app } from "./firebase-init.js";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import {
   getFirestore,
   doc,
-  getDoc,
-  setDoc
+  setDoc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// ============ Firebase Config ============
-const firebaseConfig = {
-  apiKey: "AIzaSyCkVHlYHa8aEbXvOHK0UJmOv5zVx_Kcsx0",
-  authDomain: "kci-case-tracker.firebaseapp.com",
-  projectId: "kci-case-tracker",
-  storageBucket: "kci-case-tracker.appspot.com",
-  messagingSenderId: "554993696883",
-  appId: "1:554993696883:web:5a0fe904443c7279f7aa06"
-};
-
-// ============ Initialize Firebase ============
-const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ============ DOM refs ============
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-const loginBtn = document.getElementById("loginBtn");
-const toggleMode = document.getElementById("toggleMode");
-const forgotPassword = document.getElementById("forgotPassword");
+const emailField = document.getElementById("email");
+const passwordField = document.getElementById("password");
+const btnLogin = document.getElementById("btnLogin");
+const btnSignup = document.getElementById("btnSignup");
+const btnForgot = document.getElementById("btnForgot");
 
-let isSignUp = false;
+// --- Sign In ---
+btnLogin?.addEventListener("click", async () => {
+  const email = emailField.value.trim();
+  const password = passwordField.value.trim();
+  if (!email || !password) return alert("Please enter email and password.");
 
-// ============ Toggle Login / Signup ============
-toggleMode.addEventListener("click", () => {
-  isSignUp = !isSignUp;
-  loginBtn.textContent = isSignUp ? "Sign Up" : "Login";
-  toggleMode.textContent = isSignUp
-    ? "Already have an account? Login"
-    : "Don’t have an account? Sign up";
-});
-
-// ============ Forgot Password ============
-forgotPassword.addEventListener("click", async () => {
-  const emailVal = email.value.trim();
-  if (!emailVal) {
-    alert("Please enter your email above first.");
-    return;
-  }
   try {
-    await sendPasswordResetEmail(auth, emailVal);
-    alert(`📧 Password reset email sent to ${emailVal}. Check your inbox.`);
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.replace("index.html");
   } catch (err) {
-    console.error("Reset error:", err);
-    alert("Error sending reset email: " + err.message);
+    alert("Login failed: " + err.message);
   }
 });
 
-// ============ Login / Signup ============
-loginBtn.addEventListener("click", async () => {
-  const emailVal = email.value.trim();
-  const passVal = password.value.trim();
-
-  if (!emailVal || !passVal) {
-    alert("Please fill in both fields");
-    return;
-  }
-
-  console.log("Button clicked. Mode:", isSignUp ? "SignUp" : "Login");
+// --- Sign Up ---
+btnSignup?.addEventListener("click", async () => {
+  const email = emailField.value.trim();
+  const password = passwordField.value.trim();
+  if (!email || !password) return alert("Please enter email and password.");
 
   try {
-    if (isSignUp) {
-      console.log("Attempting to create account in Firebase Auth...");
-      const userCred = await createUserWithEmailAndPassword(auth, emailVal, passVal);
-      const user = userCred.user;
+    console.log("Attempting to create account in Firebase Auth...");
+    await createUserWithEmailAndPassword(auth, email, password);
 
-      // Retry-safe Firestore write (helps on slower network/Firebase lag)
-for (let i = 0; i < 3; i++) {
-  try {
-    await setDoc(doc(db, "users", user.email), {
-      email: user.email,
+    // Add user record to Firestore (pending approval)
+    await setDoc(doc(db, "users", email), {
+      email,
       approved: false,
-      role: "user",
-      createdOn: new Date().toISOString()
+      createdAt: new Date().toISOString()
     });
-    console.log("✅ Firestore document created for:", user.email);
-    break;
+
+    alert("Account created successfully. Please wait for admin approval.");
+    await auth.signOut();
+    window.location.replace("login.html");
   } catch (err) {
-    console.warn(`Retry ${i + 1} Firestore user creation failed:`, err);
-    await new Promise(res => setTimeout(res, 800));
-  }
-}
-
-
-      alert("✅ Account created! Wait for admin approval before you can log in.");
-      await signOut(auth);
-    } else {
-      const userCred = await signInWithEmailAndPassword(auth, emailVal, passVal);
-      const user = userCred.user;
-
-      const ref = doc(db, "users", user.email);
-      const snap = await getDoc(ref);
-
-      if (!snap.exists()) {
-        alert("No user record found. Contact admin.");
-        await signOut(auth);
-        return;
-      }
-
-      const data = snap.data();
-      if (!data.approved) {
-        alert("Access pending admin approval.");
-        await signOut(auth);
-        return;
-      }
-
-      console.log("✅ Login success. Redirecting...");
-      window.location.href = "index.html";
-    }
-  } catch (err) {
-    console.error("❌ Error in Auth or Firestore:", err);
+    console.error("Error creating user:", err);
     alert("Error: " + err.message);
   }
 });
 
-// ============ Auto redirect if logged in ============
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    try {
-      const ref = doc(db, "users", user.email);
-      const snap = await getDoc(ref);
-      if (snap.exists() && snap.data().approved) {
-        window.location.href = "index.html";
-      } else {
-        await signOut(auth);
-      }
-    } catch (err) {
-      console.error("Error verifying session:", err);
-    }
+// --- Forgot Password ---
+btnForgot?.addEventListener("click", async () => {
+  const email = prompt("Enter your registered email:");
+  if (!email) return;
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent! Please check your inbox.");
+  } catch (err) {
+    alert("Error sending reset email: " + err.message);
   }
 });
 
+// --- Auto Redirect if Logged In ---
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // Check if approved
+    const userDoc = await getDoc(doc(db, "users", user.email));
+    if (userDoc.exists() && userDoc.data().approved) {
+      window.location.replace("index.html");
+    } else {
+      await auth.signOut();
+    }
+  }
+});

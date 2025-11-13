@@ -3,87 +3,102 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KCI Case Tracker – Login</title>
+  <title>Admin Dashboard — KCI Tracker</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: var(--bg);
-    }
-    .login-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: var(--shadow);
-      width: min(400px, 90vw);
-    }
-    .login-card h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    .field {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 1rem;
-    }
-    .field label {
-      font-size: 14px;
-      margin-bottom: 0.4rem;
-    }
-    .field input {
-      padding: 0.6rem;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-    }
-    .btn {
-      width: 100%;
-      padding: 0.7rem;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .btn:hover {
-      filter: brightness(1.1);
-    }
-    .switch-mode {
-      text-align: center;
-      margin-top: 1rem;
-      color: var(--accent);
-      cursor: pointer;
-    }
-  </style>
 </head>
-
 <body>
-  <div class="login-card">
-    <h1>KCI Case Tracker</h1>
-    <div id="authForm">
-      <div class="field">
-        <label>Email</label>
-        <input id="email" type="email" placeholder="Enter your work email" />
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input id="password" type="password" placeholder="Enter your password" />
-      </div>
-      <button id="loginBtn" class="btn">Login</button>
-      <p class="switch-mode" id="toggleMode">Don’t have an account? Sign up</p>
+  <div id="admin-container" class="admin-container">
+    <h2>👨‍💼 Admin Dashboard</h2>
+
+    <div class="admin-controls">
+      <button id="btnBack">⬅️ Back to Tracker</button>
+      <button id="btnLogout">🚪 Sign Out</button>
     </div>
-    <p id="forgotPassword" style="margin-top:8px; cursor:pointer; color:#4F8CF0; text-align:center;">
-      Forgot Password?
-    </p>
+
+    <div id="userList" class="user-list">Loading users...</div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script type="module" src="login.js"></script>
-</body>
+  <script type="module">
+    import { app } from "./firebase-init.js";
+    import { 
+      getFirestore, collection, getDocs, updateDoc, doc 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { 
+      getAuth, signOut, onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const userListDiv = document.getElementById("userList");
+    const logoutBtn = document.getElementById("btnLogout");
+    const backBtn = document.getElementById("btnBack");
+
+    // Auth Guard — Admin Only
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.replace("login.html");
+        return;
+      }
+      if (user.email !== "suchith.raichurkar@hp.com") {
+        alert("Access denied. Admins only.");
+        await signOut(auth);
+        window.location.replace("login.html");
+        return;
+      }
+
+      await loadUsers();
+    });
+
+    async function loadUsers() {
+      try {
+        const snap = await getDocs(collection(db, "users"));
+        if (snap.empty) {
+          userListDiv.innerHTML = "<p>No users found.</p>";
+          return;
+        }
+
+        let html = "<table><tr><th>Email</th><th>Approved</th><th>Action</th></tr>";
+        snap.forEach((docSnap) => {
+          const data = docSnap.data();
+          html += `
+            <tr>
+              <td>${data.email}</td>
+              <td>${data.approved ? "✅ Yes" : "❌ No"}</td>
+              <td>
+                <button data-email="${data.email}" data-approved="${data.approved}" class="toggleBtn">
+                  ${data.approved ? "Revoke Access" : "Approve"}
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+        html += "</table>";
+        userListDiv.innerHTML = html;
+
+        document.querySelectorAll(".toggleBtn").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            const email = e.target.dataset.email;
+            const approved = e.target.dataset.approved === "true";
+            await updateDoc(doc(db, "users", email), { approved: !approved });
+            alert(`User ${email} ${approved ? "revoked" : "approved"} successfully.`);
+            await loadUsers();
+          });
+        });
+      } catch (err) {
+        console.error("Error loading users:", err);
+        userListDiv.innerHTML = `<p>Error loading users: ${err.message}</p>`;
+      }
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.replace("login.html");
+    });
+
+    backBtn.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
 </html>

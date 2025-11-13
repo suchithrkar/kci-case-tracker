@@ -3,102 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard — KCI Tracker</title>
+  <title>Login — KCI Case Tracker</title>
   <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="admin-container" class="admin-container">
-    <h2>👨‍💼 Admin Dashboard</h2>
-
-    <div class="admin-controls">
-      <button id="btnBack">⬅️ Back to Tracker</button>
-      <button id="btnLogout">🚪 Sign Out</button>
-    </div>
-
-    <div id="userList" class="user-list">Loading users...</div>
-  </div>
-
-  <script type="module">
-    import { app } from "./firebase-init.js";
-    import { 
-      getFirestore, collection, getDocs, updateDoc, doc 
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    import { 
-      getAuth, signOut, onAuthStateChanged 
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    const userListDiv = document.getElementById("userList");
-    const logoutBtn = document.getElementById("btnLogout");
-    const backBtn = document.getElementById("btnBack");
-
-    // Auth Guard — Admin Only
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.replace("login.html");
-        return;
-      }
-      if (user.email !== "suchith.raichurkar@hp.com") {
-        alert("Access denied. Admins only.");
-        await signOut(auth);
-        window.location.replace("login.html");
-        return;
-      }
-
-      await loadUsers();
-    });
-
-    async function loadUsers() {
-      try {
-        const snap = await getDocs(collection(db, "users"));
-        if (snap.empty) {
-          userListDiv.innerHTML = "<p>No users found.</p>";
-          return;
-        }
-
-        let html = "<table><tr><th>Email</th><th>Approved</th><th>Action</th></tr>";
-        snap.forEach((docSnap) => {
-          const data = docSnap.data();
-          html += `
-            <tr>
-              <td>${data.email}</td>
-              <td>${data.approved ? "✅ Yes" : "❌ No"}</td>
-              <td>
-                <button data-email="${data.email}" data-approved="${data.approved}" class="toggleBtn">
-                  ${data.approved ? "Revoke Access" : "Approve"}
-                </button>
-              </td>
-            </tr>
-          `;
-        });
-        html += "</table>";
-        userListDiv.innerHTML = html;
-
-        document.querySelectorAll(".toggleBtn").forEach(btn => {
-          btn.addEventListener("click", async (e) => {
-            const email = e.target.dataset.email;
-            const approved = e.target.dataset.approved === "true";
-            await updateDoc(doc(db, "users", email), { approved: !approved });
-            alert(`User ${email} ${approved ? "revoked" : "approved"} successfully.`);
-            await loadUsers();
-          });
-        });
-      } catch (err) {
-        console.error("Error loading users:", err);
-        userListDiv.innerHTML = `<p>Error loading users: ${err.message}</p>`;
-      }
+  <style>
+    /* Minimal styling for login screen */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #fff;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.replace("login.html");
-    });
+    .login-card {
+      background: #ffffff;
+      color: #222;
+      padding: 2rem;
+      border-radius: 14px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      animation: fadeIn 0.5s ease;
+    }
 
-    backBtn.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-  </script>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-card h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #004a7c;
+    }
+
+    .login-card input {
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .login-card button {
+      padding: 0.8rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: #0078d4;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .login-card button:hover {
+      background-color: #005a9e;
+    }
+
+    .login-card .secondary {
+      background-color: #eee;
+      color: #333;
+    }
+
+    .login-card .secondary:hover {
+      background-color: #ddd;
+    }
+
+    .links {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .links a {
+      color: #0078d4;
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 1rem;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <h2>🔐 KCI Case Tracker</h2>
+    <input type="email" id="email" placeholder="Email" autocomplete="username" />
+    <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+    
+    <button id="btnLogin">Login</button>
+    <button id="btnSignup" class="secondary">Sign Up</button>
+
+    <div class="links">
+      <a id="btnForgot">Forgot Password?</a>
+    </div>
+  </div>
+
+  <div class="footer">© 2025 HP Internal | Case Tracker</div>
+
+  <!-- Firebase Auth & Login Logic -->
+  <script type="module" src="./login.js"></script>
 </body>
 </html>

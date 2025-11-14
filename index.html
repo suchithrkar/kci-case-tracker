@@ -3,11 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KCI Case Tracker</title>
+  <title>KCI Case Tracker — Cloud Synced</title>
+
+  <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css" />
-  <!-- Load global SheetJS (XLSX) for Excel parsing (non-module global) -->
+
+  <!-- SheetJS (required for Excel processing) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
+
 <body id="appBody" style="display:none;">
   <div id="loading" style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
     <span>🔐 Checking login...</span>
@@ -18,24 +22,30 @@
     <button class="hamburger" id="btnHamburger" title="Primary Filters">☰</button>
     <div class="title">KCI Case Tracker</div>
     <div class="grow"></div>
+
     <button class="theme-toggle" id="btnTheme" title="Toggle Theme">🌙</button>
 
     <input id="fileInput" type="file" class="hidden" accept=".xlsx,.csv" />
     <button class="upload-btn" id="btnUpload">Upload Excel</button>
+
     <button class="upload-btn" id="btnExport">Export Backup</button>
     <input id="importBackupInput" type="file" class="hidden" accept=".json" />
     <button class="upload-btn" id="btnImport">Import Backup</button>
 
+    <!-- Tracker Button (visible on admin.html only, hidden here unless injected dynamically) -->
+    <button class="upload-btn" id="btnToTracker" style="display:none;">Tracker</button>
+
     <button class="upload-btn" id="btnLogout">Sign Out</button>
   </header>
 
-  <!-- Controls (same UI you used) -->
+  <!-- Controls -->
   <div class="controls">
     <div class="set1">
       <div class="search-wrap">
         <span class="icon">🔎</span>
         <input id="txtSearch" class="input search" placeholder="Search Case ID or any text.." />
       </div>
+
       <select id="ddlStatusFilter" class="input">
         <option value="">All Statuses</option>
         <option>Closed</option>
@@ -45,38 +55,45 @@
         <option>Service Pending</option>
         <option>Monitoring</option>
       </select>
-      <input id="dateFrom" type="date" class="input" title="Created On From" />
-      <input id="dateTo" type="date" class="input" title="Created On To" />
+
+      <input id="dateFrom" type="date" class="input" />
+      <input id="dateTo" type="date" class="input" />
+
       <button class="btn" id="btnApply">Apply</button>
       <button class="btn" id="btnClear">Clear</button>
     </div>
+
     <div class="set2">
       <button class="icon-btn" id="btnDueToday" title="Due Today">
         <span>📅</span>
         <span class="badge" id="badgeDue">0</span>
         <span class="tooltip">Due Today</span>
       </button>
+
       <button class="icon-btn" id="btnFlagged" title="Flagged Cases">
         <span>🚩</span>
         <span class="badge" id="badgeFlag">0</span>
         <span class="tooltip">Flagged Cases</span>
       </button>
-      <button class="icon-btn" id="btnRepeating" title="Show Repeating Customers">
+
+      <button class="icon-btn" id="btnRepeating" title="Repeating Customers">
         <span>👥</span>
         <span class="tooltip">Repeating Customers</span>
       </button>
+
       <button class="icon-btn" id="btnSortDate" title="Sort by Case Creation Date">
         <span>🕑</span>
         <span class="tooltip">Sort by Creation Date</span>
       </button>
-      <button class="icon-btn" id="btnUnupdated" title="Show Unupdated Cases">
+
+      <button class="icon-btn" id="btnUnupdated" title="Unupdated Cases">
         <span>📝</span>
         <span class="tooltip">Unupdated Cases</span>
       </button>
     </div>
   </div>
 
-  <!-- Overlay & Sidebar -->
+  <!-- Sidebar -->
   <div class="overlay" id="overlay"></div>
   <aside class="sidebar" id="sidebar">
     <div class="side-head">
@@ -109,18 +126,20 @@
     </table>
   </div>
 
-  <!-- Modal: Case Options -->
+  <!-- Modal -->
   <div class="modal" id="modal">
     <div class="modal-card">
       <div class="modal-head">
         <div class="modal-title" id="modalTitle">Case Options</div>
         <button class="btn" id="btnModalClose">Close</button>
       </div>
+
       <div class="modal-body">
         <div class="row">
           <div>Last Actioned On</div>
           <div id="optLastActioned" style="white-space:nowrap;font-weight:500;">—</div>
         </div>
+
         <div class="row">
           <div>Follow-up Date</div>
           <div class="date-wrap">
@@ -128,15 +147,18 @@
             <input id="optDate" type="date" />
           </div>
         </div>
+
         <div class="row">
           <div>Flag Case</div>
-          <div><div id="optFlag" class="switch" role="switch" aria-checked="false" tabindex="0"></div></div>
+          <div><div id="optFlag" class="switch" role="switch" aria-checked="false"></div></div>
         </div>
+
         <div class="row" style="align-items:start">
           <div>Notes</div>
-          <textarea id="optNotes" class="notes" placeholder="Add any notes..."></textarea>
+          <textarea id="optNotes" class="notes"></textarea>
         </div>
       </div>
+
       <div class="modal-foot">
         <button class="btn" id="btnModalSave">Save</button>
       </div>
@@ -146,80 +168,66 @@
   <!-- Toast -->
   <div class="toast" id="toast">Copied!</div>
 
-  <!-- Auth guard + role handling -->
+  <!-- 🔐 AUTH + SCRIPT LOADER -->
   <script type="module">
     import { app } from "./firebase-init.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    const db = getFirestore(app);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const appBody = document.getElementById("appBody");
     const loading = document.getElementById("loading");
+    const appBody = document.getElementById("appBody");
 
     let ADMIN_EMAIL = null;
-    let authChecked = false;
 
-    async function getAdminEmail(){
-      try{
-        const snap = await getDoc(doc(db, "settings", "access"));
-        if (snap.exists()) ADMIN_EMAIL = snap.data().adminEmail;
-        console.log("Admin email:", ADMIN_EMAIL);
-      } catch(err){
-        console.error("Error loading admin email:", err);
-      }
+    async function fetchAdminEmail() {
+      const snap = await getDoc(doc(db, "settings", "access"));
+      if (snap.exists()) ADMIN_EMAIL = snap.data().adminEmail;
     }
 
-    function loadTrackerScript(){
+    function loadTrackerScript() {
       if (document.getElementById("trackerScript")) return;
-      const trackerScript = document.createElement("script");
-      trackerScript.id = "trackerScript";
-      trackerScript.type = "module";
-      trackerScript.src = "./script.js";
-      document.body.appendChild(trackerScript);
+
+      const s = document.createElement("script");
+      s.id = "trackerScript";
+      s.type = "module";
+      s.src = "./script.js";
+      document.body.appendChild(s);
     }
 
     onAuthStateChanged(auth, async (user) => {
-      try{
-        if (authChecked) return;
-        authChecked = true;
+      await fetchAdminEmail();
 
-        await getAdminEmail();
-        await new Promise(r=>setTimeout(r, 700));
-
-        if (!user){
-          window.location.replace("login.html");
-          return;
-        }
-
-        // Admin
-        if (user.email === ADMIN_EMAIL){
-          loading?.remove();
-          appBody.style.display = "block";
-          loadTrackerScript();
-          return;
-        }
-
-        // non-admin: check users doc
-        const userDoc = await getDoc(doc(db, "users", user.email));
-        if (!userDoc.exists() || !userDoc.data().approved){
-          alert("Your account is pending admin approval.");
-          await signOut(auth);
-          window.location.replace("login.html");
-          return;
-        }
-
-        loading?.remove();
-        appBody.style.display = "block";
-        loadTrackerScript();
-      } catch(err){
-        console.error("Auth guard error:", err);
-        // show page for debugging fallback
-        loading?.remove();
-        appBody.style.display = "block";
-        loadTrackerScript();
+      if (!user) {
+        window.location.replace("login.html");
+        return;
       }
+
+      const isAdmin = user.email === ADMIN_EMAIL;
+
+      // Admin-only controls
+      ["btnUpload", "btnExport", "btnImport"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !isAdmin) el.style.display = "none";
+      });
+
+      // Add ADMIN → TRACKER button handling (for admin.html support)
+      const trackerBtn = document.getElementById("btnToTracker");
+      trackerBtn.style.display = isAdmin ? "inline-block" : "none";
+      trackerBtn.onclick = () => window.location.href = "index.html";
+
+      loading.style.display = "none";
+      appBody.style.display = "block";
+
+      loadTrackerScript();
+
+      // Logout
+      document.getElementById("btnLogout")?.addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.replace("login.html");
+      });
     });
   </script>
 

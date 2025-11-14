@@ -1,109 +1,96 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Admin — KCI Case Tracker</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KCI Admin</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body style="padding:18px;">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-    <h2 style="margin:0">Admin Dashboard</h2>
-    <button id="btnTracker" class="upload-btn">Tracker</button>
-    <button id="btnSignOut" class="upload-btn">Sign Out</button>
+<body style="padding:1rem;">
+  <h2>Admin Panel</h2>
+  <div style="display:flex;gap:1rem;">
+    <div style="flex:1;">
+      <h4>Pending user approvals</h4>
+      <div id="pendingList"></div>
+    </div>
+    <div style="flex:1;">
+      <h4>Settings</h4>
+      <label>Admin Email</label>
+      <input id="adminEmail" style="width:100%;padding:.5rem;margin-bottom:.5rem" />
+      <button id="saveAdmin" class="upload-btn">Save</button>
+      <hr />
+      <button id="goTracker" class="upload-btn">Open Tracker</button>
+    </div>
   </div>
 
-  <section>
-    <h3>Pending Users</h3>
-    <div id="pendingList">Loading…</div>
-  </section>
-
-  <section style="margin-top:18px;">
-    <h3>App Settings</h3>
-    <label>Admin Email</label>
-    <input id="adminEmail" style="width:360px;padding:.45rem;border-radius:8px" />
-    <div style="margin-top:.5rem">
-      <button id="saveAdmin" class="btn">Save Admin Email</button>
-    </div>
-  </section>
-
   <script type="module">
-  import { db, auth } from "./firebase-init.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-  import { collection, query, where, getDocs, doc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { app, db, auth } from "./firebase-init.js";
+    import { collection, getDocs, doc, setDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-  const pendingList = document.getElementById("pendingList");
-  const adminEmailInput = document.getElementById("adminEmail");
-  const saveAdminBtn = document.getElementById("saveAdmin");
-  const btnTracker = document.getElementById("btnTracker");
-  const btnSignOut = document.getElementById("btnSignOut");
+    const pendingList = document.getElementById('pendingList');
+    const adminEmailInput = document.getElementById('adminEmail');
+    const saveAdminBtn = document.getElementById('saveAdmin');
+    const goTracker = document.getElementById('goTracker');
 
-  onAuthStateChanged(getAuth(), async (user) =>{
-    if (!user) return location.replace("login.html");
-    // check admin by comparing with settings.access
-    try {
-      const sdoc = await getDoc(doc(db, "settings", "access"));
-      const adminEmail = sdoc.exists() ? sdoc.data().adminEmail : null;
-      if (!adminEmail || user.email !== adminEmail) {
-        alert("You are not admin.");
-        await signOut(getAuth());
-        location.replace("login.html");
-        return;
+    // only admin allowed
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user) return window.location.replace('login.html');
+      // verify this user is admin by reading settings/access
+      const sref = doc(db, "settings", "access");
+      const snap = await getDoc(sref);
+      if(!snap.exists() || snap.data().adminEmail !== user.email){
+        alert('Not authorized.');
+        await signOut(auth);
+        return window.location.replace('login.html');
       }
-      // load pending users
-      adminEmailInput.value = adminEmail || "";
-      await renderPending();
-    } catch (err) {
-      console.error(err);
-      alert("Admin check failed: " + err.message);
-      await signOut(getAuth());
-      location.replace("login.html");
-    }
-  });
-
-  btnTracker.addEventListener("click", ()=> location.href = "index.html");
-  btnSignOut.addEventListener("click", async ()=> { await signOut(getAuth()); location.replace("login.html"); });
-
-  async function renderPending(){
-    const q = query(collection(db, "users"));
-    const snap = await getDocs(q);
-    const pending = [];
-    snap.forEach(s => {
-      const d = s.data();
-      if (!d.approved) pending.push(d);
+      // load pending
+      loadPending();
+      const s = await getDoc(sref);
+      if(s.exists()) adminEmailInput.value = s.data().adminEmail || '';
     });
-    if (!pending.length) pendingList.innerHTML = "<div>No pending users</div>";
-    else {
-      pendingList.innerHTML = "";
+
+    async function loadPending(){
+      pendingList.innerHTML = '';
+      const usersSnap = await getDocs(collection(db, "users"));
+      const pending = [];
+      usersSnap.forEach(d => {
+        const data = d.data();
+        if(!data.approved) pending.push({ id: d.id, ...data });
+      });
+      if(!pending.length) pendingList.innerHTML = '<div>No pending users</div>';
       pending.forEach(u=>{
-        const row = document.createElement("div");
-        row.style.display = "flex";
-        row.style.alignItems = "center";
-        row.style.justifyContent = "space-between";
-        row.style.gap = "12px";
-        row.style.padding = ".5rem 0";
-        row.innerHTML = `<div>${u.email} — created: ${new Date(u.createdOn).toLocaleString()}</div>`;
-        const btn = document.createElement("button");
-        btn.textContent = "Approve";
-        btn.className = "btn";
-        btn.addEventListener("click", async ()=>{
-          await updateDoc(doc(db, "users", u.email), { approved: true });
-          await renderPending();
-          alert(u.email + " approved.");
+        const div = document.createElement('div');
+        div.style.marginBottom = '.5rem';
+        div.innerHTML = `<strong>${u.email || u.id}</strong> — <button data-email="${u.id}" class="approve">Approve</button> <button data-email="${u.id}" class="deny">Deny</button>`;
+        pendingList.appendChild(div);
+      });
+      pendingList.querySelectorAll('.approve').forEach(b=>{
+        b.addEventListener('click', async (e)=>{
+          const em = e.target.dataset.email;
+          await updateDoc(doc(db, "users", em), { approved: true });
+          alert('Approved ' + em);
+          loadPending();
         });
-        row.appendChild(btn);
-        pendingList.appendChild(row);
+      });
+      pendingList.querySelectorAll('.deny').forEach(b=>{
+        b.addEventListener('click', async (e)=>{
+          const em = e.target.dataset.email;
+          await updateDoc(doc(db, "users", em), { approved: false });
+          alert('Denied ' + em);
+          loadPending();
+        });
       });
     }
-  }
 
-  saveAdminBtn.addEventListener("click", async ()=>{
-    const val = adminEmailInput.value.trim();
-    if (!val) return alert("Enter email");
-    await setDoc(doc(db, "settings", "access"), { adminEmail: val });
-    alert("Saved.");
-  });
+    saveAdminBtn.addEventListener('click', async ()=>{
+      const email = adminEmailInput.value.trim();
+      if(!email) return alert('Type admin email');
+      await setDoc(doc(db, "settings", "access"), { adminEmail: email });
+      alert('Saved');
+    });
 
+    goTracker.addEventListener('click', ()=> window.location.href = 'index.html');
   </script>
 </body>
 </html>

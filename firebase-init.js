@@ -1,5 +1,6 @@
 // firebase-init.js
-// module that initializes Firebase and exports app, db, auth
+// Shared Firebase initialization used by other modules.
+// Replace the firebaseConfig values below with your project's credentials (I included your current config).
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";

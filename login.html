@@ -1,32 +1,25 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>KCI Case Tracker — Login</title>
+  <title>KCI Tracker — Login</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body style="display:grid;place-items:center;height:100vh;">
-  <div style="width:360px;padding:20px;border-radius:12px;background:var(--panel, #fff);box-shadow:0 8px 30px rgba(0,0,0,.06);">
-    <h2 style="margin-top:0">KCI Case Tracker</h2>
+<body style="display:flex;align-items:center;justify-content:center;height:100vh;">
+  <div style="width:360px;padding:1.2rem;border-radius:12px;background:var(--panel);border:1px solid var(--border);">
+    <h3 style="margin:0 0 12px 0;">KCI Case Tracker — Login</h3>
 
-    <label>Email</label>
-    <input id="email" type="email" style="width:100%;padding:.6rem;margin:.35rem 0;border-radius:8px" />
+    <input id="email" placeholder="Email" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2)" />
+    <input id="password" placeholder="Password" type="password" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2)" />
 
-    <label>Password</label>
-    <input id="password" type="password" style="width:100%;padding:.6rem;margin:.35rem 0;border-radius:8px" />
-
-    <div style="display:flex;gap:.5rem;margin-top:.6rem;">
-      <button id="loginBtn" style="flex:1;padding:.6rem">Login</button>
-      <button id="toggleMode" style="padding:.6rem">Don’t have an account? Sign up</button>
-    </div>
-
-    <div style="margin-top:.6rem;display:flex;justify-content:space-between;align-items:center;">
-      <a id="forgotLink" href="#" style="font-size:13px">Forgot password?</a>
-      <span id="status" style="font-size:13px;color:#666"></span>
+    <button id="loginBtn" class="upload-btn" style="width:100%;margin-bottom:.5rem">Login</button>
+    <div style="display:flex;justify-content:space-between;gap:.5rem">
+      <button id="toggleMode" class="btn">Don’t have an account? Sign up</button>
+      <button id="forgot" class="btn">Forgot</button>
     </div>
   </div>
 
-  <script type="module" src="./login.js"></script>
+  <script type="module" src="login.js"></script>
 </body>
 </html>

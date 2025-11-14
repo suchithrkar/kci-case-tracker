@@ -63,6 +63,15 @@ let filterState = {
   sortByDateAsc: null
 };
 
+const tdy = (() => {
+  const d = new Date();
+  return (
+    String(d.getDate()).padStart(2,'0') + "-" +
+    String(d.getMonth()+1).padStart(2,'0') + "-" +
+    d.getFullYear()
+  );
+})();
+
 const PRIMARY_SPECS = [
   { key:'caseResolutionCode', label:'Case Resolution Code', options:[] },
   { key:'tl', label:'TL', options:[] },
@@ -274,8 +283,10 @@ function render(){
     const tr = document.createElement('tr');
 
     // Priority coloring: due today > flagged > notes
-    if (r.followDate === tdy) tr.classList.add('due-today');
+    const fd = normalizeDMY(r.followDate);
+    if (fd === tdy) tr.classList.add('due-today');
     else if (r.flagged) tr.classList.add('flagged');
+
     else if (r.notes && r.notes.trim()) tr.classList.add('has-notes');
 
     const statusHtml = `<select class="status-select" data-id="${r.id}">
@@ -299,8 +310,13 @@ function render(){
   });
 
   // badges
-  const dueCount = rows.filter(r => normalizeDMY(r.followDate) === tdy && r.status && r.status !== 'Closed').length;
-  const flagCount = rows.filter(r => !!r.flagged).length;
+  const dueCount = rows.filter(r => {
+    const fd = normalizeDMY(r.followDate);
+    return fd === tdy && r.status && r.status !== 'Closed';
+  }).length;
+
+  const flagCount = rows.filter(r => r.flagged === true).length;
+
 
   el.badgeDue.textContent = String(dueCount);
   el.badgeFlag.textContent = String(flagCount);
@@ -447,7 +463,8 @@ function renderFromFiltered(filtered){
   tb.innerHTML = '';
   filtered.forEach((r, idx)=>{
     const tr = document.createElement('tr');
-    if (r.followDate === (() => { const d = new Date(); const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yyyy=d.getFullYear(); return `${dd}-${mm}-${yyyy}`; })()) tr.classList.add('due-today');
+    const fd = normalizeDMY(r.followDate);
+    if (fd === tdy) tr.classList.add('due-today');
     else if (r.flagged) tr.classList.add('flagged');
     else if (r.notes && r.notes.trim()) tr.classList.add('has-notes');
 
@@ -497,7 +514,7 @@ function startRealtime(){
       // normalize createdOn to DD-MM-YYYY if it looks like ISO or Excel serial
       // Normalize all stored dates to DD-MM-YYYY
     r.createdOn = normalizeDMY(r.createdOn);
-    r.followDate = normalizeDMY(r.followDate);
+    r.followDate = normalizeDMY(r.followDate === "null" ? "" : r.followDate);
     r.lastActionedOn = normalizeDMY(r.lastActionedOn);
 
     });
@@ -665,5 +682,6 @@ startRealtime();
 
 // set initial UI state for primary filters etc.
 buildPrimaryFilters();
+
 
 

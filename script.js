@@ -116,6 +116,28 @@ function toDisplayDate(isoOrSerial){
   return s;
 }
 
+function normalizeDMY(v){
+  if(!v) return "";
+  v = String(v).trim();
+
+  // Already DD-MM-YYYY
+  if (/^\d{2}-\d{2}-\d{4}$/.test(v)) return v;
+
+  // YYYY-MM-DD → DD-MM-YYYY
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+    const [y,m,d] = v.split("-");
+    return `${d}-${m}-${y}`;
+  }
+
+  // Excel serial number
+  if (/^\d+(\.\d+)?$/.test(v)) {
+    return toDisplayDate(Number(v)); // already returns DD-MM-YYYY
+  }
+
+  return "";
+}
+
+
 // build primary options dynamically from incoming rows
 function rebuildPrimaryOptions(allRows){
   const map = {};
@@ -277,8 +299,9 @@ function render(){
   });
 
   // badges
-  const dueCount = rows.filter(r=> r.followDate === tdy && r.status && r.status !== 'Closed').length;
-  const flagCount = rows.filter(r=> !!r.flagged).length;
+  const dueCount = rows.filter(r => normalizeDMY(r.followDate) === tdy && r.status && r.status !== 'Closed').length;
+  const flagCount = rows.filter(r => !!r.flagged).length;
+
   el.badgeDue.textContent = String(dueCount);
   el.badgeFlag.textContent = String(flagCount);
 }
@@ -390,7 +413,7 @@ function applyFilters(){
   })();
 
   if(filterState.mode === 'due')
-    out = out.filter(r => (r.followDate||'') === tdy && r.status && r.status !== 'Closed');
+    out = out.filter(r => normalizeDMY(r.followDate) === tdy && r.status && r.status !== 'Closed');
 
   else if(filterState.mode === 'flagged')
     out = out.filter(r => !!r.flagged);
@@ -472,15 +495,11 @@ function startRealtime(){
     // ensure dates are stored/displayed as DD-MM-YYYY (if incoming createdOn is ISO or number convert)
     all.forEach(r=>{
       // normalize createdOn to DD-MM-YYYY if it looks like ISO or Excel serial
-      if (r.createdOn) {
-        // If createdOn is in YYYY-MM-DD format
-        if(/^\d{4}-\d{2}-\d{2}/.test(r.createdOn)) {
-          const [y,m,d] = r.createdOn.split('-'); r.createdOn = `${d}-${m}-${y}`;
-        } else if (/^\d+(\.\d+)?$/.test(String(r.createdOn))) {
-          // numeric excel serial
-          r.createdOn = toDisplayDate(Number(r.createdOn));
-        }
-      }
+      // Normalize all stored dates to DD-MM-YYYY
+    r.createdOn = normalizeDMY(r.createdOn);
+    r.followDate = normalizeDMY(r.followDate);
+    r.lastActionedOn = normalizeDMY(r.lastActionedOn);
+
     });
     // save to memory rows
     rows = all.sort((a,b)=> (a.id||'').localeCompare(b.id||''));
@@ -646,4 +665,5 @@ startRealtime();
 
 // set initial UI state for primary filters etc.
 buildPrimaryFilters();
+
 

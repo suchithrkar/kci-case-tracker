@@ -1,33 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>KCI Case Tracker — Login</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <main style="max-width:420px;margin:48px auto;padding:18px;">
-    <h2>KCI Case Tracker — Login / Sign up</h2>
+<body style="display:grid;place-items:center;height:100vh;">
+  <div style="width:360px;padding:20px;border-radius:12px;background:var(--panel, #fff);box-shadow:0 8px 30px rgba(0,0,0,.06);">
+    <h2 style="margin-top:0">KCI Case Tracker</h2>
 
-    <div style="margin:8px 0;">
-      <label>Email</label>
-      <input id="email" type="email" style="width:100%;padding:.5rem;border-radius:8px;border:1px solid #ccc" />
-    </div>
-    <div style="margin:8px 0;">
-      <label>Password</label>
-      <input id="password" type="password" style="width:100%;padding:.5rem;border-radius:8px;border:1px solid #ccc" />
-    </div>
+    <label>Email</label>
+    <input id="email" type="email" style="width:100%;padding:.6rem;margin:.35rem 0;border-radius:8px" />
+
+    <label>Password</label>
+    <input id="password" type="password" style="width:100%;padding:.6rem;margin:.35rem 0;border-radius:8px" />
+
     <div style="display:flex;gap:.5rem;margin-top:.6rem;">
-      <button id="loginBtn" class="upload-btn">Login</button>
-      <button id="toggleMode" class="upload-btn">Don’t have an account? Sign up</button>
-      <button id="forgotBtn" class="upload-btn">Forgot Password</button>
+      <button id="loginBtn" style="flex:1;padding:.6rem">Login</button>
+      <button id="toggleMode" style="padding:.6rem">Don’t have an account? Sign up</button>
     </div>
-    <div style="margin-top:1rem;color:#888">
-      <small>After signing up, your account is created in Auth; an admin must approve you before you can access the tracker.</small>
-    </div>
-  </main>
 
-  <script type="module" src="login.js"></script>
+    <div style="margin-top:.6rem;display:flex;justify-content:space-between;align-items:center;">
+      <a id="forgotLink" href="#" style="font-size:13px">Forgot password?</a>
+      <span id="status" style="font-size:13px;color:#666"></span>
+    </div>
+  </div>
+
+  <script type="module" src="./login.js"></script>
 </body>
 </html>

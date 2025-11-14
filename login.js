@@ -1,32 +1,94 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>KCI Case Tracker — Login</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body style="display:grid;place-items:center;height:100vh;">
-  <div style="width:360px;padding:20px;border-radius:12px;background:var(--panel, #fff);box-shadow:0 8px 30px rgba(0,0,0,.06);">
-    <h2 style="margin-top:0">KCI Case Tracker</h2>
+// login.js
+import { app, db, auth } from "./firebase-init.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    <label>Email</label>
-    <input id="email" type="email" style="width:100%;padding:.6rem;margin:.35rem 0;border-radius:8px" />
+const emailEl = document.getElementById("email");
+const passEl = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const toggleModeBtn = document.getElementById("toggleMode");
+const forgotLink = document.getElementById("forgotLink");
+const statusSpan = document.getElementById("status");
 
-    <label>Password</label>
-    <input id="password" type="password" style="width:100%;padding:.6rem;margin:.35rem 0;border-radius:8px" />
+let isSignUp = false;
 
-    <div style="display:flex;gap:.5rem;margin-top:.6rem;">
-      <button id="loginBtn" style="flex:1;padding:.6rem">Login</button>
-      <button id="toggleMode" style="padding:.6rem">Don’t have an account? Sign up</button>
-    </div>
+toggleModeBtn.addEventListener("click", () => {
+  isSignUp = !isSignUp;
+  loginBtn.textContent = isSignUp ? "Sign Up" : "Login";
+  toggleModeBtn.textContent = isSignUp ? "Already have an account? Login" : "Don’t have an account? Sign up";
+});
 
-    <div style="margin-top:.6rem;display:flex;justify-content:space-between;align-items:center;">
-      <a id="forgotLink" href="#" style="font-size:13px">Forgot password?</a>
-      <span id="status" style="font-size:13px;color:#666"></span>
-    </div>
-  </div>
+loginBtn.addEventListener("click", async () => {
+  const email = emailEl.value.trim();
+  const pass = passEl.value.trim();
+  if (!email || !pass) return alert("Fill both fields");
 
-  <script type="module" src="./login.js"></script>
-</body>
-</html>
+  try {
+    if (isSignUp) {
+      statusSpan.textContent = "Creating account...";
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      // write a Firestore users doc (email used as ID). Use email as doc id (safe)
+      await setDoc(doc(db, "users", email), {
+        email,
+        approved: false,
+        role: "user",
+        createdOn: new Date().toISOString()
+      });
+      alert("✅ Account created! Wait for admin approval.");
+      await signOut(auth);
+      statusSpan.textContent = "";
+    } else {
+      statusSpan.textContent = "Signing in...";
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      // check approval
+      const udoc = await getDoc(doc(db, "users", email));
+      if (!udoc.exists() || !udoc.data().approved) {
+        alert("Access pending admin approval.");
+        await signOut(auth);
+        statusSpan.textContent = "";
+        return;
+      }
+      // success
+      window.location.href = "index.html";
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error: " + (err?.message || err));
+    statusSpan.textContent = "";
+  }
+});
+
+// forgot password
+forgotLink.addEventListener("click", async (e)=> {
+  e.preventDefault();
+  const email = emailEl.value.trim();
+  if (!email) return alert("Type email then click 'Forgot password'");
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent (check spam).");
+  } catch (err) {
+    console.error(err);
+    alert("Error: " + err.message);
+  }
+});
+
+// If already logged in (approved) redirect to index
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    try {
+      const udoc = await getDoc(doc(db, "users", user.email));
+      if (udoc.exists() && udoc.data().approved) window.location.href = "index.html";
+      else {
+        await signOut(auth);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+});

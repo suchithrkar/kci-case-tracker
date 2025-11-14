@@ -26,6 +26,21 @@ body{margin:0;height:100%;font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto
 .sidebar.open{transform:translateX(0)}
 .side-head{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--border);display:flex;gap:.5rem;justify-content:flex-end;padding:.5rem}
 .filter-block{border:1px solid var(--border);background:var(--panel-2);border-radius:16px;margin-bottom:.75rem;padding:.5rem}
+:root{
+  --bg:#0f1115; --panel:#151923; --panel-2:#1A1F2B; --muted:#9aa4b2; --accent:#4F8CF0; --text:#e6ebf3;
+}
+body{font-family:system-ui,Arial;background:var(--bg);color:var(--text);margin:0}
+.header{position:sticky;top:0;background:var(--panel);padding:.7rem 1rem;display:flex;align-items:center;gap:.8rem;border-bottom:1px solid #222}
+.upload-btn{padding:.55rem .8rem;border-radius:12px;background:var(--panel-2);border:1px solid #2a2f3a;color:var(--text);cursor:pointer}
+.btn{padding:.45rem .7rem;border-radius:9px;background:var(--panel-2);border:1px solid #2a2f3a;cursor:pointer;color:var(--text)}
+input,select,textarea{background:var(--panel-2);border:1px solid #2a2f3a;color:var(--text);padding:.45rem;border-radius:8px}
+.modal{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.5)}
+.modal.show{display:flex}
+/* add any extra rules you had before (row colors etc.) */
+.due-today{background:rgba(255,209,102,.12)}
+.flagged{background:rgba(255,107,107,.12)}
+.has-notes{background:rgba(79,140,240,0.08)}
+
 .table-wrap{width:100%;padding:1rem}
 table{width:100%;border-collapse:collapse}
 thead th{position:sticky;top:0;background:var(--panel-2);text-transform:uppercase;font-size:12px;letter-spacing:.6px;border-bottom:1px solid var(--border);padding:.7rem .6rem;z-index:20}
@@ -55,3 +70,4 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
 .toast.show{opacity:1}
 .upload-btn{cursor:pointer}
 .hidden{display:none}
+

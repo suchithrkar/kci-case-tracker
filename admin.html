@@ -1,109 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KCI Case Tracker — Admin</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin — KCI Case Tracker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <header style="display:flex;align-items:center;gap:1rem;padding:1rem;border-bottom:1px solid #ddd">
-    <h2>Admin Dashboard</h2>
-    <div style="flex:1"></div>
-    <button id="btnBack" class="upload-btn">Back to Tracker</button>
+<body style="padding:18px;">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+    <h2 style="margin:0">Admin Dashboard</h2>
+    <button id="btnTracker" class="upload-btn">Tracker</button>
     <button id="btnSignOut" class="upload-btn">Sign Out</button>
-  </header>
+  </div>
 
-  <main style="padding:1rem;max-width:1100px;margin:0 auto;">
-    <section style="margin-bottom:1rem;">
-      <h3>Pending Users</h3>
-      <table id="pendingTbl" style="width:100%;border-collapse:collapse;margin-top:.5rem;">
-        <thead><tr><th>Email</th><th>Created On</th><th>Actions</th></tr></thead>
-        <tbody id="pendingBody"></tbody>
-      </table>
-    </section>
+  <section>
+    <h3>Pending Users</h3>
+    <div id="pendingList">Loading…</div>
+  </section>
 
-    <section>
-      <h3>Admin Settings</h3>
-      <div style="display:flex;gap:.5rem;align-items:center;">
-        <input id="adminEmail" placeholder="admin@domain.com" style="padding:.5rem;border-radius:8px;border:1px solid #ccc" />
-        <button id="saveAdmin" class="upload-btn">Save Admin Email</button>
-      </div>
-    </section>
-  </main>
+  <section style="margin-top:18px;">
+    <h3>App Settings</h3>
+    <label>Admin Email</label>
+    <input id="adminEmail" style="width:360px;padding:.45rem;border-radius:8px" />
+    <div style="margin-top:.5rem">
+      <button id="saveAdmin" class="btn">Save Admin Email</button>
+    </div>
+  </section>
 
   <script type="module">
-    import { app } from "./firebase-init.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, setDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  import { db, auth } from "./firebase-init.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { collection, query, where, getDocs, doc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const pendingList = document.getElementById("pendingList");
+  const adminEmailInput = document.getElementById("adminEmail");
+  const saveAdminBtn = document.getElementById("saveAdmin");
+  const btnTracker = document.getElementById("btnTracker");
+  const btnSignOut = document.getElementById("btnSignOut");
 
-    const pendingBody = document.getElementById('pendingBody');
-    const adminEmailEl = document.getElementById('adminEmail');
-    const saveAdmin = document.getElementById('saveAdmin');
-    const btnBack = document.getElementById('btnBack');
-    const btnSignOut = document.getElementById('btnSignOut');
-
-    btnBack.addEventListener('click', ()=> location.href = 'index.html');
-    btnSignOut.addEventListener('click', async ()=> { await signOut(auth); location.href = 'login.html'; });
-
-    async function ensureAdminAndLoad(){
-      const s = await getDoc(doc(db, "settings", "access"));
-      const adminEmail = s.exists() ? s.data().adminEmail : null;
-      adminEmailEl.value = adminEmail || '';
-      // load pending users
-      const snap = await getDocs(collection(db, "users"));
-      pendingBody.innerHTML = '';
-      snap.forEach(d => {
-        const data = d.data();
-        if (!data.approved){
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${data.email}</td><td>${data.createdOn||''}</td><td>
-            <button data-email="${data.email}" class="approve">Approve</button>
-            <button data-email="${data.email}" class="reject">Reject</button>
-          </td>`;
-          pendingBody.appendChild(tr);
-        }
-      });
-      pendingBody.querySelectorAll('.approve').forEach(b=>{
-        b.addEventListener('click', async ()=> {
-          const email = b.dataset.email;
-          await setDoc(doc(db,'users',email), { email, approved:true }, { merge:true });
-          alert('Approved '+email);
-          await ensureAdminAndLoad();
-        });
-      });
-      pendingBody.querySelectorAll('.reject').forEach(b=>{
-        b.addEventListener('click', async ()=> {
-          const email = b.dataset.email;
-          // remove doc (or set approved:false)
-          await setDoc(doc(db,'users',email), { email, approved:false }, { merge:true });
-          alert('Rejected '+email);
-          await ensureAdminAndLoad();
-        });
-      });
-    }
-
-    saveAdmin.addEventListener('click', async ()=>{
-      const v = adminEmailEl.value.trim();
-      if (!v) return alert('Enter admin email');
-      await setDoc(doc(db, 'settings', 'access'), { adminEmail: v }, { merge:true });
-      alert('Saved admin email');
-    });
-
-    onAuthStateChanged(auth, async (user)=>{
-      if (!user) location.href = 'login.html';
-      // check user is admin by matching settings doc
-      const s = await getDoc(doc(db, "settings", "access"));
-      const adminEmail = s.exists() ? s.data().adminEmail : null;
-      if (user.email !== adminEmail){
-        alert('Only admin can access this page'); await signOut(auth); location.href = 'login.html';
+  onAuthStateChanged(getAuth(), async (user) =>{
+    if (!user) return location.replace("login.html");
+    // check admin by comparing with settings.access
+    try {
+      const sdoc = await getDoc(doc(db, "settings", "access"));
+      const adminEmail = sdoc.exists() ? sdoc.data().adminEmail : null;
+      if (!adminEmail || user.email !== adminEmail) {
+        alert("You are not admin.");
+        await signOut(getAuth());
+        location.replace("login.html");
         return;
       }
-      ensureAdminAndLoad();
+      // load pending users
+      adminEmailInput.value = adminEmail || "";
+      await renderPending();
+    } catch (err) {
+      console.error(err);
+      alert("Admin check failed: " + err.message);
+      await signOut(getAuth());
+      location.replace("login.html");
+    }
+  });
+
+  btnTracker.addEventListener("click", ()=> location.href = "index.html");
+  btnSignOut.addEventListener("click", async ()=> { await signOut(getAuth()); location.replace("login.html"); });
+
+  async function renderPending(){
+    const q = query(collection(db, "users"));
+    const snap = await getDocs(q);
+    const pending = [];
+    snap.forEach(s => {
+      const d = s.data();
+      if (!d.approved) pending.push(d);
     });
+    if (!pending.length) pendingList.innerHTML = "<div>No pending users</div>";
+    else {
+      pendingList.innerHTML = "";
+      pending.forEach(u=>{
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.alignItems = "center";
+        row.style.justifyContent = "space-between";
+        row.style.gap = "12px";
+        row.style.padding = ".5rem 0";
+        row.innerHTML = `<div>${u.email} — created: ${new Date(u.createdOn).toLocaleString()}</div>`;
+        const btn = document.createElement("button");
+        btn.textContent = "Approve";
+        btn.className = "btn";
+        btn.addEventListener("click", async ()=>{
+          await updateDoc(doc(db, "users", u.email), { approved: true });
+          await renderPending();
+          alert(u.email + " approved.");
+        });
+        row.appendChild(btn);
+        pendingList.appendChild(row);
+      });
+    }
+  }
+
+  saveAdminBtn.addEventListener("click", async ()=>{
+    const val = adminEmailInput.value.trim();
+    if (!val) return alert("Enter email");
+    await setDoc(doc(db, "settings", "access"), { adminEmail: val });
+    alert("Saved.");
+  });
+
   </script>
 </body>
 </html>

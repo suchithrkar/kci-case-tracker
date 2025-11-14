@@ -336,50 +336,85 @@ el.btnUnupdated.addEventListener('click', ()=>{ filterState.mode='unupdated'; ap
 
 function applyFilters(){
   let out = [...rows];
+
   // search
   if(filterState.search){
     const q = filterState.search.toLowerCase();
-    out = out.filter(r => Object.values({id:r.id, customerName:r.customerName, country:r.country, caseResolutionCode:r.caseResolutionCode, caseOwner:r.caseOwner, caGroup:r.caGroup, sbd:r.sbd, tl:r.tl, onsiteRFC:r.onsiteRFC, csrRFC:r.csrRFC, benchRFC:r.benchRFC, notes:r.notes}).some(v => String(v||'').toLowerCase().includes(q)));
+    out = out.filter(r => 
+      Object.values({
+        id:r.id,
+        customerName:r.customerName,
+        country:r.country,
+        caseResolutionCode:r.caseResolutionCode,
+        caseOwner:r.caseOwner,
+        caGroup:r.caGroup,
+        sbd:r.sbd,
+        tl:r.tl,
+        onsiteRFC:r.onsiteRFC,
+        csrRFC:r.csrRFC,
+        benchRFC:r.benchRFC,
+        notes:r.notes
+      }).some(v => String(v||'').toLowerCase().includes(q))
+    );
   }
-  if(filterState.status) out = out.filter(r => (r.status||'') === filterState.status);
-  if(filterState.from) out = out.filter(r => {
-    // createdOn stored as DD-MM-YYYY; convert to YYYY-MM-DD for comparison
-    if(!r.createdOn) return false;
-    const [dd,mm,yy] = r.createdOn.split('-'); const iso = `${yy}-${mm}-${dd}`; return iso >= filterState.from;
-  });
-  if(filterState.to) out = out.filter(r => {
-    if(!r.createdOn) return false;
-    const [dd,mm,yy] = r.createdOn.split('-'); const iso = `${yy}-${mm}-${dd}`; return iso <= filterState.to;
-  });
-  // primary filters (AND across)
-  Object.keys(filterState.primaries||{}).forEach(key=>{
-    const sel = filterState.primaries[key]||[];
-    if(sel.length) out = out.filter(r => sel.includes(String(r[key]||'')));
+
+  if(filterState.status)
+    out = out.filter(r => (r.status||'') === filterState.status);
+
+  if(filterState.from)
+    out = out.filter(r => {
+      if(!r.createdOn) return false;
+      const [dd,mm,yy] = r.createdOn.split('-');
+      return `${yy}-${mm}-${dd}` >= filterState.from;
+    });
+
+  if(filterState.to)
+    out = out.filter(r => {
+      if(!r.createdOn) return false;
+      const [dd,mm,yy] = r.createdOn.split('-');
+      return `${yy}-${mm}-${dd}` <= filterState.to;
+    });
+
+  // primary filters
+  Object.keys(filterState.primaries || {}).forEach(key => {
+    const sel = filterState.primaries[key] || [];
+    if(sel.length)
+      out = out.filter(r => sel.includes(String(r[key]||'')));
   });
 
-  // modes
-  const tdy = (() => { const d=new Date(); const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yyyy=d.getFullYear(); return `${dd}-${mm}-${yyyy}`; })();
-  if(filterState.mode === 'due') out = out.filter(r => (r.followDate||'') === tdy && r.status && r.status !== 'Closed');
-  else if(filterState.mode === 'flagged') out = out.filter(r => !!r.flagged);
+  // mode filters
+  const tdy = (() => {
+    const d=new Date(); const dd=String(d.getDate()).padStart(2,'0');
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    const yyyy=d.getFullYear(); return `${dd}-${mm}-${yyyy}`;
+  })();
+
+  if(filterState.mode === 'due')
+    out = out.filter(r => (r.followDate||'') === tdy && r.status && r.status !== 'Closed');
+
+  else if(filterState.mode === 'flagged')
+    out = out.filter(r => !!r.flagged);
+
   else if(filterState.mode === 'repeat'){
-    const counts = new Map(); out.forEach(r=> counts.set(r.customerName, (counts.get(r.customerName)||0)+1));
-    out = out.filter(r=> (counts.get(r.customerName)||0) > 1).sort((a,b)=> String(a.customerName||'').localeCompare(String(b.customerName||'')));
-  } else if(filterState.mode === 'unupdated'){
-    out = out.filter(r => !r.status || r.status.trim() === '');
+    const counts = new Map();
+    out.forEach(r => counts.set(r.customerName, (counts.get(r.customerName)||0)+1));
+    out = out.filter(r => (counts.get(r.customerName)||0) > 1)
+             .sort((a,b)=>String(a.customerName||'').localeCompare(String(b.customerName||'')));
   }
 
-  // sort by created
+  else if(filterState.mode === 'unupdated')
+    out = out.filter(r => !r.status || r.status.trim() === '');
+
+  // sorting
   if(filterState.sortByDateAsc !== null){
     out.sort((a,b)=>{
-      const da = (a.createdOn||'').split('-').reverse().join(''); // YYYYMMDD
+      const da = (a.createdOn||'').split('-').reverse().join('');
       const db = (b.createdOn||'').split('-').reverse().join('');
-      if(da === db) return 0;
       return filterState.sortByDateAsc ? (da < db ? -1 : 1) : (da > db ? -1 : 1);
     });
   }
 
-  // apply to rendered set
-  rowsFiltered = out;
+  // render
   renderFromFiltered(out);
 }
 
@@ -611,3 +646,4 @@ startRealtime();
 
 // set initial UI state for primary filters etc.
 buildPrimaryFilters();
+

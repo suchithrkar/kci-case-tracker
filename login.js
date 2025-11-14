@@ -1,80 +1,32 @@
-// login.js (type=module)
-import { app } from "./firebase-init.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KCI Case Tracker — Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body style="display:grid;place-items:center;height:100vh;">
+  <div style="width:360px;padding:20px;border-radius:12px;background:var(--panel, #fff);box-shadow:0 8px 30px rgba(0,0,0,.06);">
+    <h2 style="margin-top:0">KCI Case Tracker</h2>
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+    <label>Email</label>
+    <input id="email" type="email" style="width:100%;padding:.6rem;margin:.35rem 0;border-radius:8px" />
 
-const emailEl = document.getElementById('email');
-const passEl = document.getElementById('password');
-const loginBtn = document.getElementById('loginBtn');
-const toggleMode = document.getElementById('toggleMode');
-const forgotBtn = document.getElementById('forgotBtn');
+    <label>Password</label>
+    <input id="password" type="password" style="width:100%;padding:.6rem;margin:.35rem 0;border-radius:8px" />
 
-let isSignUp = false;
+    <div style="display:flex;gap:.5rem;margin-top:.6rem;">
+      <button id="loginBtn" style="flex:1;padding:.6rem">Login</button>
+      <button id="toggleMode" style="padding:.6rem">Don’t have an account? Sign up</button>
+    </div>
 
-toggleMode.addEventListener('click', ()=>{
-  isSignUp = !isSignUp;
-  loginBtn.textContent = isSignUp ? 'Sign Up' : 'Login';
-  toggleMode.textContent = isSignUp ? 'Already have an account? Login' : 'Don’t have an account? Sign up';
-});
+    <div style="margin-top:.6rem;display:flex;justify-content:space-between;align-items:center;">
+      <a id="forgotLink" href="#" style="font-size:13px">Forgot password?</a>
+      <span id="status" style="font-size:13px;color:#666"></span>
+    </div>
+  </div>
 
-forgotBtn.addEventListener('click', async ()=>{
-  const e = emailEl.value.trim();
-  if (!e) return alert('Enter your email to reset password');
-  try{
-    await sendPasswordResetEmail(auth, e);
-    alert('Password reset email sent.');
-  }catch(err){ alert('Error: '+err.message); console.error(err); }
-});
-
-loginBtn.addEventListener('click', async ()=>{
-  const e = emailEl.value.trim();
-  const p = passEl.value.trim();
-  if (!e || !p) return alert('Please fill both fields');
-  try{
-    if (isSignUp){
-      const userCred = await createUserWithEmailAndPassword(auth, e, p);
-      console.log('Auth created:', userCred.user.uid);
-      // create user doc in Firestore using email as doc id
-      await setDoc(doc(db, "users", e), {
-        email: e,
-        approved: false,
-        role: 'user',
-        createdOn: new Date().toISOString()
-      });
-      alert('Account created! Wait for admin approval.');
-      await signOut(auth);
-    } else {
-      const userCred = await signInWithEmailAndPassword(auth, e, p);
-      // check approved flag
-      const snap = await getDoc(doc(db, "users", e));
-      if (!snap.exists() || !snap.data().approved){
-        alert('Access pending admin approval.');
-        await signOut(auth);
-        return;
-      }
-      // success
-      window.location.href = 'index.html';
-    }
-  }catch(err){
-    console.error('Error in Auth:', err);
-    alert('Error: ' + (err.message || err.code));
-  }
-});
-
-// auto-redirect if already signed in and approved
-onAuthStateChanged(auth, async (user)=>{
-  if (user){
-    try{
-      const snap = await getDoc(doc(db, "users", user.email));
-      if (snap.exists() && snap.data().approved){
-        window.location.href = 'index.html';
-      } else {
-        // not approved -> sign out keep on login page
-        await signOut(auth);
-      }
-    }catch(e){ console.error(e); }
-  }
-});
+  <script type="module" src="./login.js"></script>
+</body>
+</html>

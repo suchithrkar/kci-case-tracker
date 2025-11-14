@@ -35,6 +35,10 @@ loginBtn.addEventListener('click', async ()=>{
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
       // create Firestore doc for user (email used as docId)
       // We store email doc id as raw email (you can encode if you prefer)
+      // 🔥 ensure token refresh so Firestore sees request.auth
+      await cred.user.getIdToken(true);
+
+      // now safe to write user document
       await setDoc(doc(db, "users", email), {
         email,
         approved: false,

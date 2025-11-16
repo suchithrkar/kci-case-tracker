@@ -30,58 +30,36 @@ loginBtn.addEventListener('click', async ()=>{
   const pass = passEl.value.trim();
   if(!email || !pass){ alert('Please fill both'); return; }
   try{
-    if (isSignUp) {
-  try {
-    // Create Auth user
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    console.log("✅ Auth user created:", cred.user.uid, cred.user.email);
-
-    // IMPORTANT: refresh ID token so Firestore sees request.auth for this write
-    try {
+    if(isSignUp){
+      // create auth user
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      // create Firestore doc for user (email used as docId)
+      // We store email doc id as raw email (you can encode if you prefer)
+      // 🔥 ensure token refresh so Firestore sees request.auth
       await cred.user.getIdToken(true);
-      console.log("✅ ID token refreshed for new user");
-    } catch (tokErr) {
-      console.warn("⚠️ Token refresh failed (continuing):", tokErr);
-      // still try to write the doc — we'll catch permission errors below
-    }
 
-    // Write Firestore user doc using the raw email as doc ID (rules expect this)
-    const userDocRef = doc(db, "users", email);
-    const userData = {
-      email,
-      approved: false,
-      role: "user",
-      createdOn: new Date().toISOString()
-    };
-
-    try {
-      await setDoc(userDocRef, userData);
-      console.log("✅ Firestore user doc created for:", email);
-      alert("Account created! Wait for admin approval before you can log in.");
-      // sign out so user must wait for approval
+      // now safe to write user document
+      await setDoc(doc(db, "users", email), {
+        email,
+        approved: false,
+        role: 'user',
+        createdOn: new Date().toISOString()
+      });
+      alert('Account created! Wait for admin approval before you can log in.');
       await signOut(auth);
-    } catch (fsErr) {
-      // Clear, explicit error for troubleshooting
-      console.error("❌ Firestore setDoc failed:", fsErr);
-      // If a permission error, explain what to check
-      if (fsErr.code && fsErr.code.includes("permission")) {
-        alert("Account created in Auth but failed to create user record in Firestore due to permissions. Check Firestore rules and logs (console).");
-      } else {
-        alert("Account created in Auth but failed creating user record in Firestore: " + fsErr.message);
-      }
-      // Optional: sign the user out to avoid half-signed-in state
-      try { await signOut(auth); } catch(e){ console.warn("Sign-out after failure:", e); }
+    } else {
+      // login
+      const u = await signInWithEmailAndPassword(auth, email, pass);
+      // on success, redirect will be handled by onAuthStateChanged guard in index.html
+      window.location.href = 'index.html';
     }
-
-  } catch (err) {
-    console.error("❌ createUserWithEmailAndPassword error:", err);
-    alert("Error creating account: " + err.message);
+  }catch(err){
+    console.error("Auth error:", err);
+    alert('Error: ' + err.message);
   }
-}
 });
 
 // if already logged in, go to index
 onAuthStateChanged(auth, (user)=>{
   if(user) window.location.href = 'index.html';
 });
-

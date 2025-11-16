@@ -1,25 +1,145 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>KCI Tracker — Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>KCI Case Tracker — Login</title>
+
+  <link rel="stylesheet" href="style.css"/>
+
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--bg);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .login-box {
+      width: 360px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      border-radius: 14px;
+      box-shadow: 0 0 10px #0003;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .login-title {
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: .9rem;
+      margin-bottom: .3rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: .7rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: .95rem;
+    }
+
+    #loginBtn {
+      margin-top: 1rem;
+      width: 100%;
+      padding: .8rem;
+      background: #007bff;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    #loginBtn:hover {
+      background: #0069d9;
+    }
+
+    #toggleMode {
+      margin-top: 1rem;
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: none;
+      border: none;
+      color: #00aaff;
+      cursor: pointer;
+      font-size: .9rem;
+      margin-bottom: .5rem;
+    }
+
+    #forgot {
+      margin-top: .2rem;
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: none;
+      border: none;
+      color: #ffb300;
+      cursor: pointer;
+      font-size: .9rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .footer-note {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: .8rem;
+      opacity: .7;
+    }
+  </style>
 </head>
-<body style="display:flex;align-items:center;justify-content:center;height:100vh;">
-  <div style="width:360px;padding:1.2rem;border-radius:12px;background:var(--panel);border:1px solid var(--border);">
-    <h3 style="margin:0 0 12px 0;">KCI Case Tracker — Login</h3>
 
-    <input id="email" placeholder="Email" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2)" />
-    <input id="password" placeholder="Password" type="password" style="width:100%;padding:.6rem;margin-bottom:.6rem;border-radius:8px;border:1px solid var(--border);background:var(--panel-2)" />
+<body>
 
-    <button id="loginBtn" class="upload-btn" style="width:100%;margin-bottom:.5rem">Login</button>
-    <div style="display:flex;justify-content:space-between;gap:.5rem">
-      <button id="toggleMode" class="btn">Don’t have an account? Sign up</button>
-      <button id="forgot" class="btn">Forgot</button>
+  <div class="login-box">
+
+    <div class="login-title">KCI Case Tracker</div>
+
+    <div class="input-group">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="Enter your email"/>
     </div>
+
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Enter password"/>
+    </div>
+
+    <button id="loginBtn">Login</button>
+
+    <button id="toggleMode">Don't have an account? Sign up</button>
+    <button id="forgot">Forgot Password?</button>
+
+    <div class="footer-note">
+      HP Internal — Restricted Use
+    </div>
+
   </div>
 
-  <script type="module" src="login.js"></script>
+  <script type="module" src="./firebase-init.js"></script>
+  <script type="module" src="./login.js"></script>
+
 </body>
 </html>

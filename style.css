@@ -90,16 +90,4 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 
 /* Toast */
 .toast{position:fixed;bottom:20px;right:20px;background:var(--panel-2);border:1px solid var(--border);padding:.5rem 1rem;border-radius:10px;opacity:0;transition:opacity .3s;z-index:100}
-
 .toast.show{opacity:1}
-
-/* Admin panel overrides */
-:root {
-  --border: #777;
-  --bg2: #2c2c2c;
-}
-
-[data-theme="light"] {
-  --border: #ccc;
-  --bg2: #f4f4f4;
-}

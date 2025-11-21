@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCI Case Tracker</title>
+
+<link rel="stylesheet" href="./css/style.css">
+
+<style>
+/* Reuse the same dark theme variables as before */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+/* HEADER */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .75rem 1rem;
+  width: 100%;
+}
+
+.hamburger {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.title { font-weight: 700; letter-spacing: .3px; }
+.grow { flex: 1; }
+
+.header-btn {
+  padding: .6rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  cursor: pointer;
+}
+.header-btn:hover { filter: brightness(1.08); }
+
+.user-name {
+  padding: .5rem .9rem;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+
+/* CONTROLS */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: .75rem 1rem;
+}
+
+.set1, .set2 {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.input {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .6rem .9rem;
+  outline: none;
+}
+
+.search-wrap {
+  position: relative;
+}
+.search-wrap .icon {
+  position: absolute;
+  left: .6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .7;
+}
+.search {
+  padding-left: 2rem;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  border-radius: 999px;
+  padding: .55rem .9rem;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.08); }
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  background: var(--danger);
+  color: white;
+  border-radius: 999px;
+  padding: 0 .35rem;
+  font-size: 11px;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  padding: .35rem .5rem;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.icon-btn:hover .tooltip { opacity: 1; }
+
+/* SIDEBAR */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  display: none;
+}
+.overlay.show { display: block; }
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 340px;
+  height: 100%;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  transform: translateX(-100%);
+  transition: .25s ease;
+  z-index: 50;
+}
+.sidebar.open { transform: translateX(0); }
+
+.side-head {
+  display: flex;
+  justify-content: flex-end;
+  padding: .5rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.side-btn {
+  padding: .4rem .8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  cursor: pointer;
+}
+
+.side {
+  padding: .75rem .75rem 1rem;
+  height: 100%;
+  overflow: auto;
+}
+.side::-webkit-scrollbar { width: 0; }
+
+/* Filters */
+.filter-block {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: .75rem;
+}
+.filter-head {
+  padding: .7rem .75rem;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.filter-body {
+  display: none;
+  border-top: 1px dashed var(--border);
+  padding: .5rem .75rem;
+}
+.filter-body.open { display: block; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  border-radius: 999px;
+  padding: .35rem .6rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background: var(--panel-2);
+  text-transform: uppercase;
+  padding: .7rem .6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody td {
+  padding: .65rem .6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,.05);
+}
+
+.sno { width: 60px; text-align: right; }
+
+.status-select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: .35rem .45rem;
+  border-radius: 8px;
+}
+
+/* Row Highlights */
+.due-today { background: rgba(255,209,102,0.15); }
+.flagged { background: rgba(255,107,107,0.15); }
+.has-notes { background: rgba(79,140,240,0.15); }
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 60;
+}
+.modal.show { display: flex; }
+
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: min(560px, 94vw);
+}
+
+.modal-head, .modal-foot {
+  padding: .8rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+}
+.modal-body { padding: 1rem; }
+.row { display: grid; grid-template-columns: 140px 1fr; align-items: center; }
+
+.notes {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: .6rem;
+  min-height: 90px;
+}
+
+.switch {
+  width: 44px;
+  height: 24px;
+  background: #2a2f3a;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  background: #9aa4b2;
+  border-radius: 50%;
+  transition: left .15s;
+}
+.switch.on { background: #2e7dff; }
+.switch.on::after { left: 22px; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button id="btnHamburger" class="hamburger">☰</button>
+  <div class="title">KCI Case Tracker</div>
+
+  <div class="grow"></div>
+
+  <div id="userName" class="user-name">User</div>
+
+  <button id="btnAdmin" class="header-btn">Admin Dashboard</button>
+  <button id="btnLogout" class="header-btn">Log Out</button>
+</header>
+
+<!-- CONTROLS -->
+<div class="controls">
+
+  <div class="set1">
+
+    <div class="search-wrap">
+      <span class="icon">🔎</span>
+      <input id="txtSearch" class="input search" placeholder="Search Case ID or any text..">
+    </div>
+
+    <div
+      id="statusBox"
+      class="input"
+      style="cursor:pointer; display:flex; align-items:center; gap:.5rem;">
+      <span id="statusLabel">All Statuses</span>
+      <span style="margin-left:auto; opacity:.7">▾</span>
+
+      <div id="statusPanel"
+        style="position:absolute; display:none; top:calc(100% + 6px); left:0;
+        background:var(--panel); border:1px solid var(--border); padding:.5rem;
+        border-radius:10px; min-width:200px; z-index:80;">
+      </div>
+    </div>
+
+    <input id="dateFrom" type="date" class="input">
+    <input id="dateTo" type="date" class="input">
+
+    <button id="btnApply" class="btn">Apply</button>
+    <button id="btnClear" class="btn">Clear</button>
+
+  </div>
+
+  <div class="set2">
+
+    <button id="btnDueToday" class="icon-btn">
+      <span>📅</span>
+      <span class="badge" id="badgeDue">0</span>
+      <span class="tooltip">Due Today</span>
+    </button>
+
+    <button id="btnFlagged" class="icon-btn">
+      <span>🚩</span>
+      <span class="badge" id="badgeFlag">0</span>
+      <span class="tooltip">Flagged</span>
+    </button>
+
+    <button id="btnRepeating" class="icon-btn">
+      <span>👥</span>
+      <span class="tooltip">Repeiting Customers</span>
+    </button>
+
+    <button id="btnSortDate" class="icon-btn">
+      <span>🕑</span>
+      <span class="tooltip">Sort by Date</span>
+    </button>
+
+  </div>
+
+</div>
+
+<!-- SIDEBAR -->
+<div id="overlay" class="overlay"></div>
+<aside id="sidebar" class="sidebar">
+  <div class="side-head">
+    <button id="btnSideApply" class="side-btn">Apply</button>
+    <button id="btnSideClose" class="side-btn">Close</button>
+  </div>
+  <div class="side">
+    <div id="filtersContainer"></div>
+  </div>
+</aside>
+
+<!-- TABLE -->
+<table>
+  <thead>
+    <tr>
+      <th>S.No</th>
+      <th>Case ID</th>
+      <th>Customer Name</th>
+      <th>Country</th>
+      <th>Case Resolution Code</th>
+      <th>Case Owner</th>
+      <th>CA Group</th>
+      <th>SBD</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+
+<!-- CASE ACTION MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">Case Options</div>
+      <button id="btnModalClose" class="btn">Close</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div>Last Actioned On</div>
+        <div id="optLastActioned">—</div>
+      </div>
+
+      <div class="row">
+        <div>Last Actioned By</div>
+        <div id="optLastBy">—</div>
+      </div>
+
+      <div class="row">
+        <div>Follow-up Date</div>
+        <input id="optDate" type="date" class="input">
+      </div>
+
+      <div class="row">
+        <div>Flag Case</div>
+        <div id="optFlag" class="switch"></div>
+      </div>
+
+      <div class="row" style="align-items:start;">
+        <div>Notes</div>
+        <textarea id="optNotes" class="notes"></textarea>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button id="btnModalSave" class="btn">Save</button>
+    </div>
+
+  </div>
+</div>
+
+
+<script type="module" src="./js/tracker.js"></script>
+
+</body>
+</html>

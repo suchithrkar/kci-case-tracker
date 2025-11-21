@@ -1,0 +1,202 @@
+/* =====================================================================
+   GLOBAL DARK THEME — USED BY ALL PAGES
+===================================================================== */
+
+:root {
+  --bg: #0f1115;
+  --text: #e5e7eb;
+
+  --panel: #1a1d23;
+  --panel-2: #2a2f3a;
+
+  --border: #3c4250;
+  --shadow: 0 0 12px rgba(0,0,0,0.35);
+
+  --accent: #3b82f6;
+  --accent-2: #60a5fa;
+
+  --danger: #ef4444;
+}
+
+/* No scrollbars by default */
+body::-webkit-scrollbar { width: 0; }
+
+/* Global typography */
+body, input, button, textarea, select {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  color: var(--text);
+}
+
+/* Universal reset */
+button {
+  cursor: pointer;
+}
+
+/* Inputs */
+.input, input, textarea, select {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 10px;
+  padding: .55rem .75rem;
+  outline: none;
+}
+
+/* Buttons */
+.btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .55rem 1rem;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.1); }
+
+/* Header */
+.header {
+  background: var(--panel);
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.header-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: .55rem 1rem;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background: var(--panel-2);
+  text-transform: uppercase;
+  padding: .7rem .6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody td {
+  padding: .6rem .6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Hover */
+tbody tr:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+/* Modals */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+.modal.show { display: flex; }
+
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  width: min(480px, 94vw);
+  box-shadow: var(--shadow);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: .75rem;
+}
+
+/* Toggle Switch */
+.switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #2a2f3a;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  background: #9aa4b2;
+  border-radius: 50%;
+  transition: .15s;
+}
+.switch.on {
+  background: #2e7dff;
+}
+.switch.on::after {
+  left: 22px;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 340px;
+  height: 100%;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  transform: translateX(-100%);
+  transition: .25s ease;
+  z-index: 100;
+}
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: none;
+  z-index: 90;
+}
+.overlay.show { display: block; }
+
+/* Search bar with icon */
+.search-wrap {
+  position: relative;
+}
+.search-wrap .icon {
+  position: absolute;
+  left: .65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .7;
+}
+.search {
+  padding-left: 2rem;
+}
+
+/* Badges */
+.badge {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  background: var(--danger);
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 0 5px;
+}
+
+/* Audit modal table */
+#auditBody tr:hover {
+  background: rgba(255,255,255,0.05);
+}

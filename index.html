@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KCI Case Tracker — Online Version</title>
+
+<style>
+:root{
+  --bg:#0f1115;
+  --panel:#151923;
+  --panel-2:#1A1F2B;
+  --muted:#9aa4b2;
+  --accent:#4F8CF0;
+  --accent-2:#8A74F9;
+  --text:#e6ebf3;
+  --danger:#ff6b6b;
+  --ok:#38d9a9;
+  --warn:#ffd166;
+  --border:#2a2f3a;
+  --shadow:0 8px 24px rgba(0,0,0,.35);
+  --radius:16px;
+}
+[data-theme="light"]{
+  --bg:#f7f9fe;
+  --panel:#ffffff;
+  --panel-2:#f1f4fa;
+  --muted:#4a5568;
+  --text:#10131a;
+  --border:#cfd6e4;
+  --danger:#e34;
+  --ok:#2b8;
+  --warn:#d59b00;
+  --shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+*{box-sizing:border-box}
+html,body{
+  height:100%;
+  margin:0;
+  overflow-x:hidden;
+  background:var(--bg);
+  color:var(--text);
+  font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+}
+button,input,select,textarea{
+  font:inherit;color:inherit;
+}
+
+/* Header */
+.header{
+  position:sticky;top:0;z-index:40;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  gap:.8rem;
+  padding:.75rem 1rem;
+  width:100%;
+}
+.hamburger{
+  width:38px;height:38px;
+  border-radius:50%;
+  display:grid;place-items:center;
+  border:1px solid var(--border);
+  background:transparent;cursor:pointer;
+}
+.hamburger:hover{filter:brightness(1.08)}
+.title{font-weight:700;letter-spacing:.3px}
+.grow{flex:1}
+
+/* NEW — Username text in header */
+.user-name {
+  font-weight:600;
+  padding:0 .75rem;
+  white-space:nowrap;
+}
+
+/* NEW — Admin & Logout buttons */
+.hdr-btn{
+  padding:.6rem 1rem;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  cursor:pointer;
+  white-space:nowrap;
+}
+.hdr-btn:hover{filter:brightness(1.08)}
+
+.theme-toggle{
+  width:38px;height:38px;
+  border-radius:50%;
+  display:grid;place-items:center;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  cursor:pointer;
+}
+.theme-toggle:hover{filter:brightness(1.08)}
+.hidden{display:none}
+
+/* Controls */
+.controls{
+  position:relative;z-index:30;
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:.75rem 1rem;
+  border-bottom:1px solid var(--border);
+  background:var(--panel);
+}
+.set1,.set2{display:flex;align-items:center;gap:.5rem}
+
+.input{
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:.6rem .9rem;
+  outline:none;min-width:220px;
+}
+.search-wrap{position:relative}
+.search-wrap .icon{
+  position:absolute;left:.6rem;top:50%;
+  transform:translateY(-50%);opacity:.7;
+}
+.search{padding-left:2rem}
+
+.btn{
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  border-radius:999px;
+  padding:.55rem .9rem;
+  cursor:pointer;
+}
+.btn:hover{filter:brightness(1.08)}
+
+.icon-btn{
+  width:38px;height:38px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  display:grid;place-items:center;
+  cursor:pointer;position:relative;
+}
+.icon-btn .badge{
+  position:absolute;right:-6px;top:-6px;
+  background:var(--danger);color:white;
+  border-radius:999px;padding:0 .35rem;
+  font-size:11px;border:2px solid var(--bg);
+}
+.tooltip{
+  position:absolute;bottom:-36px;
+  left:50%;transform:translateX(-50%);
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  padding:.35rem .5rem;border-radius:8px;
+  font-size:12px;white-space:nowrap;
+  opacity:0;pointer-events:none;z-index:35;
+}
+.icon-btn:hover .tooltip{opacity:1}
+
+/* Sidebar */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;z-index:35;
+}
+.overlay.show{display:block}
+.sidebar{
+  position:fixed;left:0;top:0;
+  height:100%;width:340px;
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  box-shadow:var(--shadow);
+  transform:translateX(-100%);
+  transition:transform .25s ease;
+  z-index:50;
+}
+.sidebar.open{transform:translateX(0)}
+.side-head{
+  position:sticky;top:0;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex;gap:.5rem;
+  justify-content:flex-end;
+  padding:.5rem;
+}
+.side-btn{
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  border-radius:999px;
+  padding:.45rem .8rem;
+  cursor:pointer;
+}
+.filter-head{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:.7rem .75rem;cursor:pointer;
+}
+.filter-title{font-weight:600}
+.filter-body{
+  border-top:1px dashed var(--border);
+  padding:.5rem .75rem .75rem;
+  display:none;
+}
+.filter-body.open{display:block}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{
+  display:inline-flex;align-items:center;
+  gap:.35rem;
+  border:1px solid var(--border);
+  background:var(--panel);
+  padding:.35rem .6rem;
+  border-radius:999px;
+}
+.lock{margin-left:.5rem;opacity:.8;cursor:pointer}
+.filter-locked .filter-body{
+  opacity:.4;pointer-events:none;filter:blur(1px);
+}
+
+/* Table */
+.table-wrap{width:100%}
+table{width:100%;border-collapse:collapse}
+thead th{
+  position:sticky;top:0;
+  background:var(--panel-2);
+  text-transform:uppercase;
+  font-size:12px;
+  letter-spacing:.6px;
+  border-bottom:1px solid var(--border);
+  padding:.7rem .6rem;z-index:20;
+}
+tbody td{
+  border-bottom:1px solid var(--border);
+  padding:.65rem .6rem;
+}
+tbody tr:hover{background:rgba(255,255,255,.05)}
+
+.sno{width:64px;text-align:right}
+.caseid{font-weight:600;cursor:pointer}
+.status-select{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:.35rem .45rem;
+  min-width:140px;
+}
+
+.due-today{
+  background:rgba(255,209,102,.15)!important;
+}
+.flagged{
+  background:rgba(255,107,107,.15)!important;
+}
+.has-notes{
+  background:rgba(79,140,240,0.15)!important;
+}
+
+/* Modal */
+.modal{
+  position:fixed;inset:0;
+  display:none;align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.55);z-index:60;
+}
+.modal.show{display:flex}
+.modal-card{
+  width:min(560px,94vw);
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+}
+.modal-head{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:.8rem 1rem;
+  border-bottom:1px solid var(--border);
+}
+.modal-title{font-weight:700}
+.modal-body{padding:1rem;display:grid;gap:.75rem}
+.row{display:grid;grid-template-columns:140px 1fr;gap:.6rem;align-items:center}
+.date-wrap{
+  display:flex;align-items:center;gap:.4rem;
+}
+.date-wrap input[type=date]{
+  padding:.45rem .6rem;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+}
+.switch{
+  position:relative;width:44px;height:24px;
+  background:#2a2f3a;border-radius:999px;
+  border:1px solid var(--border);cursor:pointer;
+}
+.switch::after{
+  content:"";position:absolute;
+  top:2px;left:2px;
+  width:20px;height:20px;
+  border-radius:50%;
+  background:#9aa4b2;
+  transition:left .15s ease;
+}
+.switch.on{background:#2e7dff}
+.switch.on::after{left:22px;background:white}
+
+.notes{
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:.6rem;min-height:84px;
+}
+.modal-foot{
+  display:flex;justify-content:flex-end;
+  gap:.5rem;padding:.8rem 1rem;
+  border-top:1px solid var(--border);
+}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:20px;right:20px;
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  padding:.5rem 1rem;
+  border-radius:10px;
+  opacity:0;transition:opacity .3s;
+  z-index:100;
+}
+.toast.show{opacity:1}
+
+/* Multi-select status dropdown */
+#statusPanel label{
+  display:flex;align-items:center;
+  gap:.5rem;padding:.25rem .35rem;
+  border-radius:8px;cursor:pointer;
+}
+#statusPanel label:hover{
+  background:rgba(255,255,255,.02);
+}
+#statusPanel input[type="checkbox"]{
+  width:16px;height:16px;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="hamburger" id="btnHamburger">☰</button>
+  <div class="title">KCI Case Tracker</div>
+  <div class="grow"></div>
+
+  <!-- USER FULL NAME -->
+  <div class="user-name" id="userFullName">Loading...</div>
+
+  <!-- THEME -->
+  <button class="theme-toggle" id="btnTheme">🌙</button>
+
+  <!-- INFO -->
+  <button class="theme-toggle" id="btnInfo">ℹ️</button>
+
+  <!-- ADMIN DASHBOARD (shown only if role = primary || secondary) -->
+  <button class="hdr-btn" id="btnAdmin" style="display:none;">Admin Dashboard</button>
+
+  <!-- LOG OUT -->
+  <button class="hdr-btn" id="btnLogout">Log Out</button>
+</header>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="set1">
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <span class="icon">🔎</span>
+      <input id="txtSearch" class="input search" placeholder="Search Case ID or any text.." />
+    </div>
+
+    <!-- Multi-status dropdown -->
+    <div id="statusBox" class="input" style="position:relative;cursor:pointer;display:flex;align-items:center;gap:.5rem;">
+      <span id="statusLabel">All Statuses</span>
+      <span style="margin-left:auto;opacity:.7">▾</span>
+      <div id="statusPanel"
+        style="position:absolute;left:0;top:calc(100% + 6px);min-width:240px;border:1px solid var(--border);
+               background:var(--panel);padding:.5rem;border-radius:10px;display:none;z-index:80;box-shadow:var(--shadow)">
+      </div>
+    </div>
+
+    <!-- Date range -->
+    <input id="dateFrom" type="date" class="input" />
+    <input id="dateTo" type="date" class="input" />
+
+    <button class="btn" id="btnApply">Apply</button>
+    <button class="btn" id="btnClear">Clear</button>
+  </div>
+
+  <div class="set2">
+    <button class="icon-btn" id="btnDueToday">
+      <span>📅</span><span class="badge" id="badgeDue">0</span>
+      <span class="tooltip">Due Today</span>
+    </button>
+
+    <button class="icon-btn" id="btnFlagged">
+      <span>🚩</span>
+      <span class="badge" id="badgeFlag">0</span>
+      <span class="tooltip">Flagged Cases</span>
+    </button>
+
+    <button class="icon-btn" id="btnRepeating">
+      <span>👥</span>
+      <span class="tooltip">Repeating Customers</span>
+    </button>
+
+    <button class="icon-btn" id="btnSortDate">
+      <span>🕑</span>
+      <span class="tooltip">Sort by Creation Date</span>
+    </button>
+
+    <button class="icon-btn" id="btnUnupdated">
+      <span>📝</span>
+      <span class="tooltip">Unupdated Cases</span>
+    </button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="side-head">
+    <button class="side-btn" id="btnSideApply">Apply</button>
+    <button class="side-btn" id="btnSideClose">Close</button>
+  </div>
+  <div class="side">
+    <div id="filtersContainer"></div>
+  </div>
+</aside>
+
+<!-- TABLE -->
+<div class="table-wrap">
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th class="sno">S.No</th>
+        <th>Case Id</th>
+        <th>Customer Name</th>
+        <th>Country</th>
+        <th>Case Resolution Code</th>
+        <th>Case Owner</th>
+        <th>CA Group</th>
+        <th>SBD</th>
+        <th>Status</th>
+        <th class="right">Action</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<!-- CASE OPTIONS MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">Case Options</div>
+      <button class="btn" id="btnModalClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Warning banner -->
+      <div id="modalWarning"
+           style="display:none;background:rgba(255,107,107,0.2);
+                  border:1px solid var(--danger);
+                  padding:.5rem;border-radius:10px;
+                  color:var(--danger);font-weight:600;">
+      </div>
+
+      <!-- Last Actioned -->
+      <div class="row">
+        <div>Last Actioned On</div>
+        <div id="optLastActioned" style="white-space:nowrap;font-weight:500;">—</div>
+      </div>
+
+      <!-- Follow-up -->
+      <div class="row">
+        <div>Follow-up Date</div>
+        <div class="date-wrap">
+          <span style="font-size:18px;padding:.25rem .35rem;
+                       border:1px solid var(--border);
+                       border-radius:10px;">📅</span>
+          <input id="optDate" type="date" />
+        </div>
+      </div>
+
+      <!-- Flag -->
+      <div class="row">
+        <div>Flag Case</div>
+        <div><div id="optFlag" class="switch"
+                  role="switch" aria-checked="false" tabindex="0"></div></div>
+      </div>
+
+      <!-- Notes -->
+      <div class="row" style="align-items:start;">
+        <div>Notes</div>
+        <textarea id="optNotes" class="notes"
+                  placeholder="Add any notes..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="btnModalSave">Save</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- TRACKER SUMMARY — TODAY MODAL -->
+<div class="modal" id="infoModal">
+  <div class="modal-card">
+
+    <div class="modal-head">
+      <div class="modal-title">Tracker Summary — Today</div>
+      <button class="btn" id="btnInfoClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+      <pre id="infoModalBody"
+           style="white-space:pre-wrap;font-size:14px;"></pre>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="btnInfoOk">OK</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">Copied!</div>
+
+<!-- JS MODULE IMPORTS (FIRESTORE + AUTH + TRACKER LOGIC WILL COME NEXT) -->
+<script type="module" src="./js/firebase.js"></script>
+<script type="module" src="./js/auth.js"></script>
+<script type="module" src="./js/userProfile.js"></script>
+<script type="module" src="./js/firestore-api.js"></script>
+<script type="module" src="./js/utils.js"></script>
+
+<!-- MAIN TRACKER LOGIC (WILL BE SECTION 2 + SECTION 3) -->
+<script type="module" src="./index.js"></script>
+
+</body>
+</html>

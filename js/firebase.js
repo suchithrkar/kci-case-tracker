@@ -1,28 +1,38 @@
-// firebase.js
+/* ============================================================
+   Firebase Initialization — KCI Case Tracker
+   Using Firebase JS SDK v12.x ES Modules
+   Compatible with GitHub Pages
+   ============================================================ */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  collection,
-  query,
-  where,
-  onSnapshot,
-  addDoc
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
 import {
   getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signOut
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
-export const firebaseConfig = {
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+/* ============================================================
+   Firebase Config — (Your Real Config)
+   ============================================================ */
+const firebaseConfig = {
   apiKey: "AIzaSyCkVHlYHa8aEbXvOHK0UJmOv5zVx_Kcsx0",
   authDomain: "kci-case-tracker.firebaseapp.com",
   projectId: "kci-case-tracker",
@@ -31,22 +41,40 @@ export const firebaseConfig = {
   appId: "1:554993696883:web:5a0fe904443c7279f7aa06"
 };
 
-const app = initializeApp(firebaseConfig);
+/* ============================================================
+   Initialize App
+   ============================================================ */
+export const app = initializeApp(firebaseConfig);
 
-export const db = getFirestore(app);
+/* ============================================================
+   Initialize Auth + Firestore
+   ============================================================ */
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
-// Firestore exports
+/* ============================================================
+   Re-export all Firebase helpers (cleaner imports everywhere)
+   ============================================================ */
+
+// AUTH
 export {
-  doc, getDoc, setDoc, updateDoc, collection,
-  query, where, onSnapshot, addDoc
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut
 };
 
-// Auth exports
+// FIRESTORE
 export {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  onAuthStateChanged,
-  signOut
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  onSnapshot
 };

@@ -331,6 +331,40 @@ btnReassignConfirm.onclick = async () => {
   await loadTeamsForAdmin();
 };
 
+function populateUpdateDataTeams() {
+  updateTeamList.innerHTML = "";
+
+  adminState.allTeams
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach(t => {
+      const row = document.createElement("div");
+      row.style.marginBottom = "0.4rem";
+
+      row.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;">
+          <div><strong>${t.name}</strong></div>
+          <div style="display:flex;gap:0.4rem;">
+            <button class="action-btn" data-action="upload" data-id="${t.id}">Upload Excel</button>
+            <button class="action-btn" data-action="export" data-id="${t.id}">Export Backup</button>
+            <button class="action-btn" data-action="import" data-id="${t.id}">Import Backup</button>
+          </div>
+        </div>
+      `;
+
+      // Secondary admin cannot use these
+      if (isSecondary(adminState.user)) {
+        row.querySelectorAll("button").forEach(b => {
+          b.disabled = true;
+          b.style.opacity = "0.4";
+          b.style.cursor = "not-allowed";
+        });
+      }
+
+      updateTeamList.appendChild(row);
+    });
+}
+
+
 
 
 /* ============================================================
@@ -941,3 +975,4 @@ btnAuditOk.onclick    = () => modalAudit.classList.remove("show");
 modalAudit.addEventListener("click", (e) => {
   if (e.target === modalAudit) modalAudit.classList.remove("show");
 });
+

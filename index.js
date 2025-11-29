@@ -54,7 +54,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const userDocRef = doc(auth.app.firestore, "users", user.uid);
+  const userDocRef = doc(db, "users", user.uid);
   const userSnap = await getDoc(userDocRef);
 
   if (!userSnap.exists()) {
@@ -913,3 +913,4 @@ Total Actioned Cases Today: ${totalActioned}`;
 
   infoModal.classList.add("show");
 }
+

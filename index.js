@@ -2,15 +2,40 @@
 // INDEX.JS — FIRESTORE TRACKER (PART 1)
 // ===============================
 
+// ===============================
+// FIXED FIREBASE IMPORTS FOR TRACKER
+// ===============================
 import {
   auth,
-  onAuthStateChanged
+  onAuthStateChanged,
+  db,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+  updateDoc,
+  setDoc,
+  deleteDoc
 } from "./js/firebase.js";
 
+// ===============================
+// OTHER IMPORTS
+// ===============================
 import {
-  getDoc,
-  doc
-} from "./js/firebase.js";
+  getUserProfile,
+  isPrimary,
+  isSecondary,
+  isGeneral,
+  getCurrentTrackerTeam,
+  toggleTheme
+} from "./js/userProfile.js";
+
+import { showPopup } from "./js/utils.js";
+import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
+
 
 import {
   listenToTeamCases,
@@ -913,4 +938,5 @@ Total Actioned Cases Today: ${totalActioned}`;
 
   infoModal.classList.add("show");
 }
+
 

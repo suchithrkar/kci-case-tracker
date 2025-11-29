@@ -64,6 +64,22 @@ const modalUpdateData     = document.getElementById("modalUpdateData");
 const btnUpdateClose      = document.getElementById("btnUpdateClose");
 const btnUpdateDone       = document.getElementById("btnUpdateDone");
 
+/* ============================================================
+   FIX — Enable Update Data Modal
+   ============================================================ */
+el.btnUpdateData.onclick = () => {
+  modalUpdateData.classList.add("show");
+};
+
+btnUpdateClose.onclick = () => {
+  modalUpdateData.classList.remove("show");
+};
+
+btnUpdateDone.onclick = () => {
+  modalUpdateData.classList.remove("show");
+};
+
+
 const excelInput          = document.getElementById("excelInput");
 const uploadSummary       = document.getElementById("uploadSummary");
 const btnProcessExcel     = document.getElementById("btnProcessExcel");
@@ -975,4 +991,5 @@ btnAuditOk.onclick    = () => modalAudit.classList.remove("show");
 modalAudit.addEventListener("click", (e) => {
   if (e.target === modalAudit) modalAudit.classList.remove("show");
 });
+
 

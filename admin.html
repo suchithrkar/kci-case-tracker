@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KCI Case Tracker — Admin Dashboard</title>
+
+<style>
+/* =========================================================
+   SHARED THEME VARIABLES (SAME AS INDEX.HTML)
+   ========================================================= */
+:root{
+  --bg:#0f1115;
+  --panel:#151923;
+  --panel-2:#1A1F2B;
+  --muted:#9aa4b2;
+  --accent:#4F8CF0;
+  --accent-2:#8A74F9;
+  --text:#e6ebf3;
+  --danger:#ff6b6b;
+  --ok:#38d9a9;
+  --warn:#ffd166;
+  --border:#2a2f3a;
+  --shadow:0 8px 24px rgba(0,0,0,.35);
+  --radius:16px;
+}
+[data-theme="light"]{
+  --bg:#f7f9fe;
+  --panel:#ffffff;
+  --panel-2:#f1f4fa;
+  --muted:#4a5568;
+  --text:#10131a;
+  --border:#cfd6e4;
+  --danger:#e34;
+  --ok:#2b8;
+  --warn:#d59b00;
+  --shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+*{box-sizing:border-box}
+html,body{
+  height:100%;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:14px system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  padding:0.9rem 1.2rem;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+.title{
+  font-size:1.25rem;
+  font-weight:700;
+}
+.grow{flex:1}
+
+.hdr-btn{
+  padding:0.55rem 1rem;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  cursor:pointer;
+  white-space:nowrap;
+}
+.hdr-btn:hover{
+  filter:brightness(1.08);
+}
+
+.theme-toggle{
+  width:38px;height:38px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  display:grid;place-items:center;
+  cursor:pointer;
+}
+.theme-toggle:hover{
+  filter:brightness(1.08);
+}
+
+.user-name{
+  font-weight:600;
+  white-space:nowrap;
+  padding-right:0.4rem;
+}
+
+/* ============================================================
+   TABS (STATS | USERS)
+   ============================================================ */
+.tab-bar{
+  display:flex;
+  gap:2rem;
+  padding:0.75rem 1.2rem;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+}
+
+.tab{
+  font-weight:600;
+  opacity:0.6;
+  cursor:pointer;
+  padding-bottom:0.4rem;
+  border-bottom:3px solid transparent;
+}
+.tab.active{
+  opacity:1;
+  border-bottom:3px solid var(--accent);
+}
+
+/* ============================================================
+   CONTENT AREA
+   ============================================================ */
+.content{
+  padding:1.2rem;
+}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:1rem;
+}
+thead th{
+  text-align:left;
+  padding:0.65rem 0.6rem;
+  font-size:12px;
+  letter-spacing:0.5px;
+  background:var(--panel-2);
+  border-bottom:1px solid var(--border);
+}
+tbody td{
+  padding:0.65rem 0.6rem;
+  border-bottom:1px solid var(--border);
+}
+tbody tr:hover{
+  background:rgba(255,255,255,0.05);
+}
+.action-btn{
+  padding:0.35rem 0.6rem;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  cursor:pointer;
+  margin-right:0.35rem;
+}
+.action-btn:hover{
+  filter:brightness(1.08);
+}
+
+/* ============================================================
+   MODALS (Create Team, Update Data, Audit)
+   ============================================================ */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:200;
+}
+.modal.show{
+  display:flex;
+}
+.modal-card{
+  width:min(600px, 92vw);
+  background:var(--panel);
+  border-radius:16px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0.9rem 1rem;
+  border-bottom:1px solid var(--border);
+}
+.modal-title{
+  font-size:1.1rem;
+  font-weight:700;
+}
+.modal-body{
+  padding:1rem;
+  max-height:60vh;
+  overflow:auto;
+}
+.modal-foot{
+  display:flex;
+  justify-content:flex-end;
+  gap:0.5rem;
+  padding:0.8rem 1rem;
+  border-top:1px solid var(--border);
+}
+.modal-btn{
+  padding:0.55rem 1rem;
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:999px;
+  cursor:pointer;
+}
+.modal-btn:hover{
+  filter:brightness(1.08);
+}
+
+/* INPUTS */
+.input{
+  padding:0.6rem 0.8rem;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  width:100%;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="header">
+  <div class="title">The Admin Dashboard</div>
+  <div class="grow"></div>
+
+  <div class="user-name" id="adminUserName">Loading...</div>
+  <button class="theme-toggle" id="adminTheme">🌙</button>
+
+  <!-- Visible ONLY to primary admin -->
+  <button class="hdr-btn" id="btnUpdateData">Update Data</button>
+  <button class="hdr-btn" id="btnCreateTeam">Create Team</button>
+
+  <!-- Visible to primary & secondary -->
+  <button class="hdr-btn" id="btnGotoTracker">Tracker</button>
+
+  <button class="hdr-btn" id="btnAdminLogout">Log Out</button>
+</header>
+
+<!-- ============================================================
+     TAB BAR (STATS | USERS)
+     ============================================================ -->
+<div class="tab-bar">
+  <div class="tab active" id="tabUsers">Users</div>
+  <div class="tab" id="tabStats">Stats</div>
+</div>
+
+<!-- ============================================================
+     CONTENT AREA (Sections will swap via JS)
+     ============================================================ -->
+<div class="content">
+
+  <!-- USERS TAB -->
+  <div id="sectionUsers">
+    <h2>Manage Users</h2>
+    <div id="usersTableWrap"></div>
+  </div>
+
+  <!-- STATS TAB -->
+  <div id="sectionStats" style="display:none;">
+    <h2>Team Statistics</h2>
+    <div id="statsControls"></div>
+    <div id="statsTableWrap"></div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     (Modals will be inserted in SECTION 1 — Part 3)
+     ============================================================ -->
+
+<!-- ============================================================
+     CREATE TEAM MODAL
+     ============================================================ -->
+<div class="modal" id="modalCreateTeam">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Create or Manage Teams</div>
+      <button class="modal-btn" id="btnTeamClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+
+      <h3>Create New Team</h3>
+      <input class="input" id="newTeamName" placeholder="Enter new team name..." />
+      <button class="modal-btn" id="btnTeamCreate" style="margin-top:0.6rem;">Create Team</button>
+
+      <hr style="margin:1rem 0;border-color:var(--border);" />
+
+      <h3>Existing Teams</h3>
+      <div id="teamList"></div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="modal-btn" id="btnTeamDone">Done</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     UPDATE DATA MODAL (EXCEL UPLOAD PER TEAM)
+     ============================================================ -->
+<div class="modal" id="modalUpdateData">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Update Case Data</div>
+      <button class="modal-btn" id="btnUpdateClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+
+      <p>Select a team to upload data for:</p>
+      <div id="updateTeamList"></div>
+
+      <hr style="margin:1rem 0;border-color:var(--border);">
+
+      <h3>Data Upload (XLSX)</h3>
+      <input type="file" id="excelInput" accept=".xlsx,.xls" />
+
+      <div id="uploadSummary" style="margin-top:1rem;"></div>
+
+      <button class="modal-btn" id="btnProcessExcel" style="margin-top:0.8rem;">Process Excel</button>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="modal-btn" id="btnUpdateDone">Done</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     AUDIT MODAL (RANDOM 5 CASES)
+     ============================================================ -->
+<div class="modal" id="modalAudit">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Audit — Random 5 Cases</div>
+      <button class="modal-btn" id="btnAuditClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+      <div id="auditList"></div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="modal-btn" id="btnAuditOk">OK</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     TEAM REASSIGN MODAL (When deleting a team with users)
+     ============================================================ -->
+<div class="modal" id="modalReassign">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Reassign Users Before Deleting Team</div>
+      <button class="modal-btn" id="btnReassignClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+      <p>You must reassign all users before deleting this team.</p>
+      <p>Select a new team:</p>
+      <select class="input" id="reassignTeamSelect"></select>
+
+      <button class="modal-btn" id="btnReassignConfirm" style="margin-top:0.8rem;">
+        Reassign Users
+      </button>
+    </div>
+
+    <div class="modal-foot">
+      <button class="modal-btn" id="btnReassignDone">Done</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ADMIN PAGE LOGIC -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script type="module" src="./admin.js?v=9"></script>
+
+
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KCI Case Tracker — Login</title>
+
+<!-- Shared Theme Styles -->
+<style>
+:root {
+  --bg:#0f1115;
+  --panel:#151923;
+  --panel-2:#1A1F2B;
+  --border:#2a2f3a;
+  --text:#e6ebf3;
+  --muted:#9aa4b2;
+  --accent:#4F8CF0;
+  --radius:16px;
+}
+
+[data-theme="light"] {
+  --bg:#f7f9fe;
+  --panel:#ffffff;
+  --panel-2:#f1f4fa;
+  --border:#cfd6e4;
+  --text:#10131a;
+  --muted:#4a5568;
+}
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:15px system-ui, sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.card {
+  background:var(--panel);
+  padding:2rem;
+  width:min(420px, 90%);
+  border-radius:20px;
+  border:1px solid var(--border);
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+
+h1 {
+  text-align:center;
+  margin-bottom:1.4rem;
+}
+
+.input {
+  width:100%;
+  padding:.8rem;
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  margin-bottom:1rem;
+  color:var(--text);
+}
+
+.btn {
+  width:100%;
+  padding:.8rem;
+  background:var(--accent);
+  border:none;
+  border-radius:12px;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn:hover { filter:brightness(1.08); }
+
+.link {
+  text-decoration:underline;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:14px;
+  margin-top:.5rem;
+  display:block;
+  text-align:center;
+}
+
+.tabs {
+  display:flex;
+  margin-bottom:1.2rem;
+  background:var(--panel-2);
+  border-radius:12px;
+  padding:4px;
+}
+
+.tab {
+  flex:1;
+  text-align:center;
+  padding:.6rem;
+  border-radius:10px;
+  cursor:pointer;
+}
+.tab.active {
+  background:var(--accent);
+  color:white;
+}
+
+.popup {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  padding:1rem 1.2rem;
+  border-radius:12px;
+  z-index:999;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <h1>KCI Case Tracker</h1>
+
+  <div class="tabs">
+    <div id="tabLogin" class="tab active">Login</div>
+    <div id="tabSignup" class="tab">Sign Up</div>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="loginForm">
+    <input id="loginEmail" class="input" placeholder="Email" type="email" />
+    <input id="loginPassword" class="input" placeholder="Password" type="password" />
+    <button id="btnLogin" class="btn">Login</button>
+    <span id="forgot" class="link">Forgot Password?</span>
+  </div>
+
+  <!-- SIGNUP FORM -->
+  <div id="signupForm" style="display:none;">
+    <input id="signFirst" class="input" placeholder="First Name" />
+    <input id="signLast" class="input" placeholder="Last Name" />
+    <input id="signEmail" class="input" placeholder="Email" type="email" />
+    <input id="signPassword" class="input" placeholder="Password" type="password" />
+    <button id="btnSignup" class="btn">Sign Up</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { signup, login, resetPassword, watchAuth } from "./js/auth.js";
+import { initUserProfile } from "./js/userProfile.js";
+import { showPopup } from "./js/utils.js";
+
+// Tabs
+const tabLogin = document.getElementById("tabLogin");
+const tabSignup = document.getElementById("tabSignup");
+const loginForm = document.getElementById("loginForm");
+const signupForm = document.getElementById("signupForm");
+
+tabLogin.onclick = () => {
+  tabLogin.classList.add("active");
+  tabSignup.classList.remove("active");
+  loginForm.style.display = "block";
+  signupForm.style.display = "none";
+};
+
+tabSignup.onclick = () => {
+  tabSignup.classList.add("active");
+  tabLogin.classList.remove("active");
+  loginForm.style.display = "none";
+  signupForm.style.display = "block";
+};
+
+// AUTO-REDIRECT IF LOGGED IN
+watchAuth((user) => {
+  if (user && user.status === "approved") {
+    if (user.role === "primary" || user.role === "secondary") {
+      location.href = "admin.html";
+    } else {
+      location.href = "index.html";
+    }
+  }
+});
+
+// LOGIN
+document.getElementById("btnLogin").onclick = async () => {
+  const email = loginEmail.value.trim();
+  const pass = loginPassword.value.trim();
+
+  try {
+    const user = await login(email, pass);
+    showPopup("Login successful!");
+  } catch (err) {
+    showPopup(err.message);
+  }
+};
+
+// SIGNUP
+document.getElementById("btnSignup").onclick = async () => {
+  const first = signFirst.value.trim();
+  const last = signLast.value.trim();
+  const email = signEmail.value.trim();
+  const pass = signPassword.value.trim();
+
+  if (!first || !last || !email || !pass) {
+    showPopup("Please fill all fields.");
+    return;
+  }
+
+  try {
+    await signup(first, last, email, pass);
+    showPopup("Account created. Waiting for admin approval.");
+    tabLogin.click();
+  } catch (err) {
+    showPopup(err.message);
+  }
+};
+
+// FORGOT PASSWORD
+document.getElementById("forgot").onclick = async () => {
+  const email = prompt("Enter your email:");
+  if (!email) return;
+
+  try {
+    await resetPassword(email);
+    showPopup("Password reset link sent.");
+  } catch (err) {
+    showPopup(err.message);
+  }
+};
+</script>
+
+</body>
+</html>

@@ -113,13 +113,23 @@ onAuthStateChanged(auth, async (user) => {
   /* Header Initialization */
   el.userFullName.textContent = `${data.firstName} ${data.lastName}`;
 
-  document.documentElement.dataset.theme = data.theme || "dark";
-  el.btnTheme.textContent = data.theme === "light" ? "🌙" : "☀️";
-  el.btnTheme.onclick = () => {
-    toggleTheme(trackerState.user);
-    el.btnTheme.textContent =
-      trackerState.user.theme === "light" ? "🌙" : "☀️";
-  };
+  // Theme initialization
+document.documentElement.dataset.theme = data.theme || "dark";
+
+// Correct icons: 
+// dark theme active → show ☀️ (click to switch to light)
+// light theme active → show 🌙 (click to switch to dark)
+el.btnTheme.textContent =
+  (data.theme || "dark") === "dark" ? "☀️" : "🌙";
+
+el.btnTheme.onclick = () => {
+  toggleTheme(trackerState.user);
+
+  const newTheme = trackerState.user.theme;
+  el.btnTheme.textContent =
+    newTheme === "dark" ? "☀️" : "🌙";
+};
+
 
   /* Admin button */
   if (isPrimary(data) || isSecondary(data)) {
@@ -540,20 +550,30 @@ export function applyFilters() {
   }
 
   if (uiState.mode === "repeat") {
-    const count = {};
-    rows.forEach(r => {
-      const name = (r.customerName || "").trim().toLowerCase();
-      if (!name) return;
-      count[name] = (count[name] || 0) + 1;
-    });
-    rows = rows.filter(r =>
-      count[(r.customerName || "").trim().toLowerCase()] > 1
-    );
-    trackerState.filteredCases = rows;
-    updateBadges();
-    renderTable();
-    return;
-  }
+  const count = {};
+
+  rows.forEach(r => {
+    const name = (r.customerName || "").trim().toLowerCase();
+    if (!name) return;
+    count[name] = (count[name] || 0) + 1;
+  });
+
+  // keep only repeating customers
+  rows = rows.filter(r =>
+    count[(r.customerName || "").trim().toLowerCase()] > 1
+  );
+
+  // NEW: sort alphabetically by customerName
+  rows.sort((a, b) =>
+    (a.customerName || "").localeCompare(b.customerName || "")
+  );
+
+  trackerState.filteredCases = rows;
+  updateBadges();
+  renderTable();
+  return;
+}
+
 
   /* ===============================================================
      NORMAL MODE — APPLY FULL FILTER PIPELINE
@@ -1375,6 +1395,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

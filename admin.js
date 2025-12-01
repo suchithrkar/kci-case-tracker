@@ -1103,6 +1103,10 @@ function computeStatsEngineAdaptive(casesList, usersList) {
       if (adminState.selectedStatsTeam !== "TOTAL" && u.teamId !== adminState.selectedStatsTeam) continue;
     }
 
+         // Cases owned by this user (needed for other metrics)
+    const userCases = filteredCases.filter(r => r.lastActionedBy === u.id);
+
+
     // STATUS UPDATED TODAY (only statusChangedOn matters, not lastActionedOn)
 const todayCases = filteredCases.filter(r =>
   r.statusChangedOn === today && r.statusChangedBy === u.id
@@ -1342,6 +1346,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

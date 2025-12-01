@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>KCI Case Tracker</title>
+
+  <!-- MAIN TRACKER STYLES -->
+  <link rel="stylesheet" href="css/index.css">
+
+  <!-- ICONS -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ===========================================================
+       BASE VARIABLES (DARK/LIGHT MODE COMPATIBLE)
+       =========================================================== */
+    :root[data-theme="dark"] {
+      --bg: #1e1e1e;
+      --fg: #eaeaea;
+      --card: #2a2a2a;
+      --border: #3a3a3a;
+      --accent: #3ea6ff;
+      --accent2: #41c97b;
+      --danger: #ff5757;
+      --warning: #ffb020;
+    }
+
+    :root[data-theme="light"] {
+      --bg: #f6f6f6;
+      --fg: #1f1f1f;
+      --card: #ffffff;
+      --border: #d0d0d0;
+      --accent: #0078d4;
+      --accent2: #009851;
+      --danger: #d43939;
+      --warning: #ff9800;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ===========================================================
+       GLOBAL TOAST (Used by showPopup)
+       =========================================================== */
+    #toast {
+      visibility: hidden;
+      min-width: 180px;
+      background-color: var(--accent);
+      color: white;
+      text-align: center;
+      border-radius: 4px;
+      padding: 10px 16px;
+      position: fixed;
+      z-index: 999999;
+      right: 20px;
+      bottom: 30px;
+      font-size: 15px;
+      opacity: 0;
+      transition: opacity 0.4s ease, visibility 0.4s;
+    }
+
+    #toast.show {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+
+</head>
+<body>
+
+  <!-- ===========================================================
+       HEADER — Top Navigation
+       =========================================================== -->
+  <header id="topHeader" style="
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 18px;
+    background:var(--card);
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    z-index:50;
+  ">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <!-- Hamburger -->
+      <span id="btnHamburger" style="font-size:20px;cursor:pointer;">
+        <i class="fa-solid fa-bars"></i>
+      </span>
+
+      <!-- Username -->
+      <strong id="userFullName" style="font-size:15px;opacity:0.9;">User</strong>
+    </div>
+
+    <!-- Right Controls -->
+    <div style="display:flex;align-items:center;gap:12px;">
+      <!-- Admin Button (JS decides visibility) -->
+      <button id="btnAdmin" class="action-btn" style="
+        display:none;
+        background:var(--accent);
+        padding:6px 10px;
+        border:none;
+        border-radius:4px;
+        cursor:pointer;
+      ">
+        Admin
+      </button>
+
+      <!-- Theme Toggle -->
+      <span id="btnTheme" style="cursor:pointer;font-size:20px;">
+        ☀️
+      </span>
+
+      <!-- Logout -->
+      <button id="btnLogout" class="action-btn" style="
+        background:var(--danger);
+        padding:6px 10px;
+        border:none;
+        border-radius:4px;
+        cursor:pointer;
+      ">
+        Logout
+      </button>
+    </div>
+  </header>
+
+
+  <!-- ===========================================================
+       SIDEBAR + OVERLAY
+       =========================================================== -->
+  <!-- Overlay (darkens background when sidebar open) -->
+  <div id="overlay" style="
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    display:none;
+    z-index:40;
+  "></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" style="
+    position:fixed;
+    left:-260px;
+    top:0;
+    width:240px;
+    height:100%;
+    background:var(--card);
+    border-right:1px solid var(--border);
+    padding:20px;
+    box-sizing:border-box;
+    transition:0.3s ease;
+    z-index:45;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  ">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;font-size:17px;">Menu</h3>
+      <span id="btnSideClose" style="cursor:pointer;font-size:20px;">
+        <i class="fa-solid fa-xmark"></i>
+      </span>
+    </div>
+
+    <hr style="border:0;border-top:1px solid var(--border);">
+
+    <button id="btnInfo" class="action-btn" style="width:100%;">ℹ️ Summary</button>
+    <button id="btnDueToday" class="action-btn" style="width:100%;">Due Today</button>
+    <button id="btnFlagged" class="action-btn" style="width:100%;">Flagged</button>
+    <button id="btnRepeating" class="action-btn" style="width:100%;">Repeating</button>
+    <button id="btnUnupdated" class="action-btn" style="width:100%;">Unupdated</button>
+
+    <hr style="border:0;border-top:1px solid var(--border);">
+
+    <p style="font-size:13px;opacity:0.7;">
+      Use the filter controls above the table to refine results.
+    </p>
+  </aside>
+
+  <!-- ===========================================================
+       FILTER BAR / CONTROLS
+       =========================================================== -->
+  <div id="filterBar" style="
+    padding: 15px 18px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    position: sticky;
+    top: 58px;
+    z-index: 40;
+  ">
+
+    <!-- SEARCH -->
+    <input id="txtSearch" class="input" type="text"
+      placeholder="Search case ID / name / country / etc..."
+      style="min-width: 240px;">
+
+    <!-- DATE FROM -->
+    <div>
+      <label style="font-size:12px;">From</label><br>
+      <input id="dateFrom" class="input" type="date">
+    </div>
+
+    <!-- DATE TO -->
+    <div>
+      <label style="font-size:12px;">To</label><br>
+      <input id="dateTo" class="input" type="date">
+    </div>
+
+    <!-- STATUS MULTI-SELECT -->
+    <div id="statusBox" style="
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      min-width: 150px;
+    ">
+      <span id="statusLabel" style="font-size:13px;opacity:0.85;">
+        All Statuses
+      </span>
+
+      <!-- Panel -->
+      <div id="statusPanel" style="
+        position: absolute;
+        left: 0;
+        top: 38px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px;
+        display: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        z-index: 30;
+        width: 170px;
+      ">
+        <!-- JS injected checkboxes -->
+      </div>
+    </div>
+
+    <!-- APPLY -->
+    <button id="btnApply" class="action-btn">Apply</button>
+
+    <!-- CLEAR -->
+    <button id="btnClear" class="danger-btn">Clear</button>
+
+    <!-- SORT -->
+    <button id="btnSortDate" class="action-btn" style="background:var(--accent2);">
+      Sort Date
+    </button>
+
+    <!-- BADGES -->
+    <div style="margin-left:auto;display:flex;gap:14px;align-items:center;">
+      <span style="font-size:13px;">Due: <strong id="badgeDue">0</strong></span>
+      <span style="font-size:13px;">Flagged: <strong id="badgeFlag">0</strong></span>
+    </div>
+
+  </div>
+
+  <!-- ===========================================================
+       CASE TABLE
+       =========================================================== -->
+  <div id="tableContainer" style="padding: 0 18px; margin-top: 12px;">
+
+    <table class="tracker-table" style="
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--border);
+    ">
+      <thead>
+        <tr style="background: var(--card); border-bottom: 1px solid var(--border);">
+          <th>#</th>
+          <th>Case ID</th>
+          <th>Customer</th>
+          <th>Country</th>
+          <th>Res. Code</th>
+          <th>Owner</th>
+          <th>CA Group</th>
+          <th>SBD</th>
+          <th>Status</th>
+          <th>Options</th>
+        </tr>
+      </thead>
+
+      <tbody id="tbody">
+        <!-- Rows injected by index.js -->
+      </tbody>
+    </table>
+
+  </div>
+  <!-- ===========================================================
+       CASE OPTIONS MODAL
+       =========================================================== -->
+  <div id="modal" class="modal">
+    <div class="modal-card" style="max-width:480px; width:100%;">
+
+      <h2 class="modal-title" id="modalTitle">
+        Case Options
+      </h2>
+
+      <!-- LAST ACTIONED LABEL -->
+      <div style="margin-bottom: 12px;">
+        <div style="font-size:13px; opacity:0.75;">Last Actioned On:</div>
+        <div id="optLastActioned" style="font-size:15px; margin-top:3px;">—</div>
+      </div>
+
+      <!-- Last Actioned By Name (inserted via JS) -->
+      <div id="optLastActionedByName" style="
+        font-size:13px;
+        margin-top: -8px;
+        margin-bottom: 16px;
+        opacity:0.8;
+      ">
+        <!-- Filled dynamically by JS -->
+      </div>
+
+      <!-- FOLLOW DATE -->
+      <label style="font-size:13px;">Follow-up Date</label>
+      <input id="optDate" class="input" type="date"
+        style="margin-top:6px; margin-bottom:16px; width:100%;">
+
+      <!-- FLAG -->
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin-bottom:16px;
+      ">
+        <span style="font-size:14px;">Flag</span>
+
+        <div id="optFlag" class="flag-toggle" role="checkbox" aria-checked="false"
+          style="
+            width: 42px;
+            height: 22px;
+            background: var(--border);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+          ">
+          <div style="
+            width: 18px;
+            height: 18px;
+            background: var(--card);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: 0.2s;
+          "></div>
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <label style="font-size:13px;">Notes</label>
+      <textarea id="optNotes" class="input"
+        placeholder="Type notes here..."
+        style="
+          width:100%;
+          min-height:80px;
+          resize:none;
+          margin-top:6px;
+          margin-bottom:16px;
+        "></textarea>
+
+      <!-- WARNING BAR (SP/MON follow-up required) -->
+      <div id="modalWarning" style="
+        display:none;
+        background: var(--danger);
+        color:white;
+        padding:8px 10px;
+        border-radius:6px;
+        margin-bottom:12px;
+        font-size:13px;
+      ">
+        <!-- JS injects message -->
+      </div>
+
+      <!-- MODAL FOOTER -->
+      <div class="modal-footer">
+        <button id="btnModalClose" class="danger-btn">Cancel</button>
+        <button id="btnModalSave" class="action-btn">Save</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       INFO SUMMARY MODAL
+       =========================================================== -->
+  <div id="infoModal" class="modal">
+    <div class="modal-card" style="max-width:420px; width:100%;">
+
+      <h2 class="modal-title">Summary</h2>
+
+      <div id="infoContent" style="
+        padding: 6px 2px;
+        font-size: 14px;
+        line-height: 1.6em;
+      ">
+        <!-- Filled dynamically by index.js -->
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnInfoClose" class="action-btn">Close</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===========================================================
+       GLOBAL LOADING OVERLAY (Used by index.js when needed)
+       =========================================================== -->
+  <div id="loadingMask" style="
+    display:none;
+    position:fixed;
+    left:0; top:0;
+    width:100vw; height:100vh;
+    background:rgba(0,0,0,0.35);
+    backdrop-filter: blur(2px);
+    z-index: 3000;
+    color:white;
+    font-size:20px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  ">
+    Loading…
+  </div>
+
+
+  <!-- ===========================================================
+       TOAST (Double-click Case ID → Copy)
+       =========================================================== -->
+  <div id="toast"
+    style="
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      padding:10px 16px;
+      background:var(--accent);
+      color:white;
+      border-radius:6px;
+      font-size:14px;
+      opacity:0;
+      visibility:hidden;
+      transition: opacity 0.3s ease, visibility 0.3s;
+      z-index:9999;
+    ">
+    Copied!
+  </div>
+
+
+  <!-- ===========================================================
+       FLAG TOGGLE (Slider Fix)
+       =========================================================== -->
+  <style>
+    #optFlag.on {
+      background: var(--accent);
+    }
+    #optFlag.on div {
+      left: 22px !important;
+      background: white !important;
+    }
+
+    /* Row Highlight Classes */
+    .due-today {
+      background-color: rgba(255, 230, 140, 0.35);
+    }
+    .flagged {
+      background-color: rgba(255, 120, 120, 0.35);
+    }
+    .has-notes {
+      background-color: rgba(100, 180, 255, 0.25);
+    }
+
+    /* Hover highlight */
+    .hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* Status dropdown cell styling */
+    td select.status-select {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px;
+      color: var(--fg);
+    }
+
+    /* Gear icon button */
+    .icon-btn {
+      border: none;
+      background: var(--card);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: 0.2s;
+    }
+    .icon-btn:hover {
+      background: var(--border);
+    }
+
+    /* Modal transition fix */
+    .modal-card {
+      transition: all 0.15s ease;
+    }
+  </style>
+
+  <!-- ===========================================================
+       MODAL CLICK-OUTSIDE + ESC SUPPORT
+       (Extra safety layer — index.js also handles logic)
+       =========================================================== -->
+  <script>
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".modal.show").forEach(m => {
+          m.classList.remove("show");
+        });
+      }
+    });
+
+    document.querySelectorAll(".modal").forEach(modal => {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.classList.remove("show");
+      });
+    });
+  </script>
+
+
+  <!-- ===========================================================
+       FIREBASE + APP SCRIPTS
+       =========================================================== -->
+
+  <!-- Firebase Initialization -->
+  <script type="module" src="./js/firebase.js"></script>
+
+  <!-- Shared utilities -->
+  <script type="module" src="./js/utils.js"></script>
+
+  <!-- Firestore API (listener + update wrapper) -->
+  <script type="module" src="./js/firestore-api.js"></script>
+
+  <!-- User Profile (theme storage, role checks, team getter) -->
+  <script type="module" src="./js/userProfile.js"></script>
+
+  <!-- Main Tracker Logic -->
+  <script type="module" src="./index.js"></script>
+
+
+  <!-- Extra spacing -->
+  <div style="height:40px;"></div>
+
+</body>
+</html>

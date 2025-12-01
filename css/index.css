@@ -1,0 +1,758 @@
+/* ============================================================================
+   KCI CASE TRACKER — INDEX.CSS  (CLEAN MODERN VERSION)
+   ----------------------------------------------------------------------------
+   This stylesheet provides all UI styling for:
+     - Header
+     - Sidebar
+     - Filter bar
+     - Case table
+     - Options modal
+     - Info summary modal
+     - Toast
+     - Row colors (flagged, due today, repeating, unupdated)
+     - Responsive layout
+     - Theme support (dark / light)
+   ============================================================================
+*/
+
+
+/* ============================================================================
+   BASE RESET
+============================================================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+
+/* ============================================================================
+   BUTTONS
+============================================================================ */
+
+.action-btn {
+  background: var(--accent);
+  color: white;
+  padding: 7px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
+
+.danger-btn {
+  background: var(--danger);
+  color: white;
+  padding: 7px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.danger-btn:hover {
+  opacity: 0.9;
+}
+
+
+/* ============================================================================
+   INPUTS
+============================================================================ */
+
+.input {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--fg);
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: 2px solid var(--accent);
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================
+   Contains:
+     - Hamburger menu
+     - Username display
+     - Admin button
+     - Theme toggle
+     - Logout button
+============================================================================ */
+
+#topHeader {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+#topHeader button {
+  font-size: 13px;
+}
+
+#btnHamburger {
+  padding: 4px 10px;
+  border-radius: 5px;
+  transition: 0.2s;
+}
+
+#btnHamburger:hover {
+  background: var(--border);
+}
+
+#btnTheme {
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#btnTheme:hover {
+  opacity: 0.7;
+}
+
+
+/* ============================================================================
+   SIDEBAR + OVERLAY
+============================================================================ */
+
+#sidebar {
+  transition: left 0.28s ease;
+}
+
+#overlay {
+  transition: 0.25s ease;
+}
+
+
+/* Sidebar Buttons */
+#sidebar button {
+  padding: 8px 12px;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  border-radius: 5px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+#sidebar button:hover {
+  background: var(--border);
+}
+
+#btnSideClose {
+  padding: 4px 10px;
+  border-radius: 5px;
+  transition: 0.2s;
+}
+
+#btnSideClose:hover {
+  background: var(--border);
+}
+
+/* ============================================================================
+   FILTER BAR
+   ============================================================================
+   Contains:
+     - Search input
+     - Date From / Date To
+     - Status multi-select
+     - Apply / Clear buttons
+     - Sort button
+     - Badges (Due / Flagged)
+============================================================================ */
+
+#filterBar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+#filterBar label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Status Box */
+#statusBox {
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  min-width: 150px;
+}
+
+/* Status Panel */
+#statusPanel {
+  position: absolute;
+  left: 0;
+  top: 40px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  display: none;
+  z-index: 40;
+  width: 170px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+#statusPanel label {
+  font-size: 13px;
+}
+
+#statusPanel input {
+  margin-right: 8px;
+}
+
+/* Filter Buttons */
+#btnApply,
+#btnClear,
+#btnSortDate {
+  padding: 7px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+#btnSortDate {
+  background: var(--accent2);
+  color: white;
+}
+
+/* Badge Counts */
+#badgeDue,
+#badgeFlag {
+  font-weight: bold;
+  color: var(--accent);
+}
+
+/* ============================================================================
+   CASE TABLE
+   ============================================================================
+*/
+
+.tracker-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  background: var(--card);
+  margin-bottom: 20px;
+}
+
+.tracker-table thead th {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tracker-table tbody td {
+  padding: 10px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+/* Hover state */
+.tracker-table tbody tr:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* Case # column */
+.tracker-table tbody td:first-child {
+  opacity: 0.7;
+  width: 50px;
+  text-align: center;
+}
+
+/* ID column double-click selection */
+.tracker-table .case-id {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Status Select */
+.status-select {
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 13px;
+  min-width: 120px;
+}
+
+.status-select:focus {
+  outline: 2px solid var(--accent);
+}
+
+/* Gear button */
+.icon-btn {
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.icon-btn:hover {
+  background: var(--border);
+}
+
+/* ============================================================================
+   ROW COLORS (Applied by index.js)
+============================================================================ */
+
+/* Due Today */
+.due-today {
+  background-color: rgba(255, 220, 120, 0.25) !important;
+}
+
+/* Flagged */
+.flagged {
+  background-color: rgba(255, 120, 120, 0.25) !important;
+}
+
+/* Notes present */
+.has-notes {
+  background-color: rgba(120, 180, 255, 0.18) !important;
+}
+
+/* Unupdated cases */
+.unupdated {
+  background-color: rgba(180, 180, 180, 0.15) !important;
+}
+
+/* ============================================================================
+   MODALS (Case Options + Info Summary)
+   ============================================================================
+   Shared modal system for:
+     - Case Options Modal (#modal)
+     - Info Summary Modal (#infoModal)
+============================================================================ */
+
+/* Overlay */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+}
+
+.modal.show {
+  display: flex;
+}
+
+/* Modal Card */
+.modal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 22px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 480px;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: all 0.18s ease;
+}
+
+/* index.js animates it */
+.modal.show .modal-card {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-title {
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Notes Textarea */
+#optNotes {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1.4em;
+}
+
+/* Warning Bar */
+#modalWarning {
+  border-radius: 6px;
+  background: var(--danger);
+  color: white;
+  font-size: 13px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+/* Last Actioned labels */
+#optLastActioned {
+  font-weight: 600;
+}
+
+#optLastActionedByName {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+/* ===========================================================
+   INFO SUMMARY MODAL
+   =========================================================== */
+
+#infoContent {
+  font-size: 14px;
+  line-height: 1.6em;
+}
+
+#infoContent strong {
+  color: var(--accent);
+}
+
+/* Title fix */
+#infoModal .modal-card {
+  max-width: 420px;
+}
+
+/* Add bottom spacing */
+#infoContent > div {
+  margin-bottom: 6px;
+}
+
+/* ============================================================================
+   TOAST (Copied! popup)
+   ============================================================================
+*/
+
+#toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--accent);
+  color: white;
+  padding: 10px 16px;
+  font-size: 14px;
+  border-radius: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s;
+  z-index: 9999;
+}
+
+#toast.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+/* ============================================================================
+   LOADING MASK
+   ============================================================================
+   Used when:
+     - Initial case load
+     - Heavy operations
+============================================================================ */
+
+#loadingMask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(2px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  z-index: 3000;
+}
+
+
+/* ============================================================================
+   FLAG SLIDER (Options Modal)
+============================================================================ */
+
+#optFlag {
+  width: 42px;
+  height: 22px;
+  border-radius: 20px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#optFlag div {
+  width: 18px;
+  height: 18px;
+  background: var(--card);
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: 0.2s;
+}
+
+/* When ON */
+#optFlag.on {
+  background: var(--accent);
+}
+
+#optFlag.on div {
+  left: 22px !important;
+  background: white !important;
+}
+
+
+/* ============================================================================
+   GENERAL HIGHLIGHTING
+============================================================================ */
+
+.hover { background: rgba(255,255,255,0.05); }
+
+.case-id:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+/* ============================================================================
+   RESPONSIVE NOTES
+============================================================================ */
+
+@media (max-width: 800px) {
+  .tracker-table thead {
+    font-size: 12px;
+  }
+  .tracker-table tbody td {
+    padding: 8px;
+  }
+  #filterBar {
+    gap: 10px;
+  }
+}
+
+/* ============================================================================
+   POLISH + SPACING + TRANSITIONS
+   ============================================================================
+   These styles improve:
+     - Spacing consistency
+     - Visual polish
+     - Subtle animations
+     - Readability
+============================================================================ */
+
+/* Smooth transitions on common interactive elements */
+button,
+.input,
+.status-select,
+.icon-btn,
+#statusBox {
+  transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
+}
+
+/* Case ID hover effect */
+.case-id {
+  transition: color 0.2s ease;
+}
+
+/* Fade-in effect for dynamically added table rows */
+#tbody tr {
+  animation: fadeInRow 0.15s ease;
+}
+
+@keyframes fadeInRow {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Extra spacing inside modal content blocks */
+.modal-card > div {
+  margin-bottom: 8px;
+}
+
+/* Ensure long customer/country names don't overflow */
+.tracker-table td {
+  word-break: break-word;
+  max-width: 240px;
+}
+
+/* Info modal: highlight labels */
+#infoContent b, #infoContent strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Scrollable modal content if screen height is small */
+.modal-card {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* ===========================================================
+   RESPONSIVE IMPROVEMENTS
+   =========================================================== */
+
+@media (max-width: 1024px) {
+  #filterBar {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 760px) {
+
+  /* Smaller table text */
+  .tracker-table thead th {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .tracker-table tbody td {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  /* Inputs shrink nicely */
+  .input {
+    font-size: 13px;
+    padding: 5px;
+  }
+
+  /* Sidebar full width on phones */
+  #sidebar {
+    width: 75%;
+    left: -75%;
+  }
+
+  /* Slightly smaller buttons */
+  .action-btn, .danger-btn {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  /* Status dropdown narrower */
+  #statusBox {
+    min-width: 120px;
+  }
+
+  /* Avoid filterBar pushing content down too much */
+  #filterBar {
+    gap: 10px;
+    padding: 12px 14px;
+  }
+}
+
+@media (max-width: 540px) {
+
+  #topHeader {
+    padding: 10px 14px;
+  }
+
+  #userFullName {
+    font-size: 14px;
+  }
+
+  .modal-card {
+    max-width: 95%;
+  }
+
+  /* Table becomes scrollable horizontally */
+  #tableContainer {
+    overflow-x: auto;
+  }
+
+  .tracker-table {
+    min-width: 900px;
+  }
+}
+
+/* ============================================================================
+   FOOTER UTILITIES + FUTURE-PROOFING
+   ============================================================================
+   These are small helpers used or reserved for future enhancements.
+============================================================================ */
+
+/* Extra bottom space to avoid last-row crowding */
+.page-end-space {
+  height: 40px;
+}
+
+/* Simple fade utility for dynamic UI parts */
+.fade-in {
+  animation: fadeIn 0.25s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Utility class if needed for future disabled elements */
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Hidden class (JS toggles this often) */
+.hidden {
+  display: none !important;
+}
+
+
+/* ============================================================================
+   END OF index.css
+   ============================================================================
+   This file is complete and fully compatible with:
+     ✔ new index.js  (Tracker logic)
+     ✔ new index.html
+     ✔ new firestore-api.js
+     ✔ new Firestore rules
+   ---------------------------------------------------------------------------
+   Tracker UI is now stable, responsive, and production-ready.
+============================================================================ */

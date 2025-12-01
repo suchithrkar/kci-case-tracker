@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>KCI Case Tracker — Admin Panel</title>
+
+  <!-- MAIN STYLESHEET -->
+  <link rel="stylesheet" href="css/admin.css" />
+
+  <!-- ICONS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- XLSX for Excel Processing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    /* TEMP STYLES (full final CSS will be delivered later) */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #1e1e1e;
+      --fg: #e8e8e8;
+      --card-bg: #2a2a2a;
+      --border: #3a3a3a;
+      --accent: #3ea6ff;
+      --danger: #e55353;
+    }
+
+    :root[data-theme="light"] {
+      --bg: #f5f5f5;
+      --fg: #222;
+      --card-bg: #fff;
+      --border: #ddd;
+      --accent: #0078d4;
+      --danger: #d32f2f;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    #themeToggle {
+      cursor: pointer;
+      font-size: 20px;
+      padding: 4px 10px;
+    }
+
+    /* Tab row */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 20px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 58px;
+      z-index: 9;
+    }
+
+    .tab {
+      padding: 8px 14px;
+      cursor: pointer;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: 0.2s;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .section {
+      display: none;
+      padding: 20px;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .admin-table th {
+      background: var(--card-bg);
+    }
+
+    .action-btn,
+    .danger-btn {
+      padding: 6px 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 13px;
+    }
+
+    .action-btn {
+      background: var(--accent);
+      color: white;
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: white;
+    }
+
+    .input {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      padding: 6px 8px;
+      border-radius: 4px;
+      min-width: 110px;
+    }
+
+    /* Modals base */
+    .modal {
+      position: fixed;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 8px;
+      min-width: 300px;
+      max-width: 500px;
+      transform: scale(0.9);
+      opacity: 0;
+    }
+
+    h2.modal-title {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 18px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <!-- ===============================================================
+       HEADER — Modern Clean Admin Header with Theme Toggle
+       =============================================================== -->
+  <header>
+    <h1>KCI Case Tracker — Admin Panel</h1>
+
+    <div>
+      <!-- Theme Toggle -->
+      <span id="themeToggle" title="Toggle Theme">
+        <i class="fa-solid fa-moon"></i>
+      </span>
+
+      <!-- Logout -->
+      <button id="btnLogout" class="action-btn" style="margin-left: 15px;">
+        Logout
+      </button>
+    </div>
+  </header>
+
+
+  <!-- ===============================================================
+       TABS — Teams / Users / Stats
+       =============================================================== -->
+  <div class="tabs">
+    <div id="tabTeams" class="tab active"><i class="fa fa-users"></i> Teams</div>
+    <div id="tabUsers" class="tab"><i class="fa fa-user"></i> Users</div>
+    <div id="tabStats" class="tab"><i class="fa fa-chart-line"></i> Stats</div>
+  </div>
+
+
+  <!-- ===============================================================
+       MAIN CONTENT SECTIONS (Shown/Hidden by admin.js)
+       =============================================================== -->
+
+  <!-- ======================= TEAMS SECTION ======================== -->
+  <section id="sectionTeams" class="section" style="display:block;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h2>Teams</h2>
+      <button id="btnTeamCreate" class="action-btn"><i class="fa fa-plus"></i> Create Team</button>
+    </div>
+
+    <div id="teamsTableWrap">
+      <!-- Filled by admin.js -->
+    </div>
+  </section>
+
+
+  <!-- ======================= USERS SECTION ======================== -->
+  <section id="sectionUsers" class="section">
+    <h2>Users</h2>
+
+    <div id="usersTableWrap">
+      <!-- Filled by admin.js -->
+    </div>
+  </section>
+
+
+  <!-- ======================= STATS SECTION ======================== -->
+  <section id="sectionStats" class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <h2>Stats</h2>
+
+      <!-- Stats Controls (team selector + refresh button) -->
+      <div id="statsControls" style="display:flex;align-items:center;gap:12px;">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+
+    <div id="statsTableWrap" style="margin-top:15px;">
+      <!-- Stats Table generated by admin.js -->
+    </div>
+  </section>
+
+  <!-- ===============================================================
+       MODAL — CREATE TEAM
+       =============================================================== -->
+  <div id="modalTeamCreate" class="modal">
+    <div class="modal-card">
+      <h2 class="modal-title">Create Team</h2>
+
+      <label>Team Name</label>
+      <input id="txtTeamCreate" class="input" type="text" placeholder="Enter team name" style="width:100%;margin-top:6px;">
+
+      <div class="modal-footer">
+        <button id="btnTeamCreateClose" class="danger-btn">Cancel</button>
+        <button id="btnTeamCreateSave" class="action-btn">Create</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===============================================================
+       MODAL — RENAME TEAM
+       =============================================================== -->
+  <div id="modalTeamRename" class="modal">
+    <div class="modal-card">
+      <h2 class="modal-title">Rename Team</h2>
+
+      <label>New Team Name</label>
+      <input id="txtTeamRename" class="input" type="text" placeholder="Enter new name" style="width:100%;margin-top:6px;">
+
+      <div class="modal-footer">
+        <button id="btnTeamRenameClose" class="danger-btn">Cancel</button>
+        <button id="btnTeamRenameSave" class="action-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===============================================================
+       MODAL — REASSIGN USERS (when deleting a team containing users)
+       =============================================================== -->
+  <div id="modalReassign" class="modal">
+    <div class="modal-card">
+      <h2 class="modal-title">Reassign Users</h2>
+
+      <p style="opacity:0.85;margin-bottom:14px;">
+        This team has users assigned to it. Please move them to another team
+        before deleting:
+      </p>
+
+      <label>Reassign to</label>
+      <select id="reassignTeamSelect" class="input" style="width:100%;margin-top:6px;">
+        <!-- Populated by admin.js -->
+      </select>
+
+      <div class="modal-footer">
+        <button id="btnReassignClose" class="danger-btn">Cancel</button>
+        <button id="btnReassignConfirm" class="action-btn">Reassign & Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===============================================================
+       MODAL — EXCEL IMPORT
+       =============================================================== -->
+  <div id="modalExcel" class="modal">
+    <div class="modal-card">
+      <h2 class="modal-title">Import Excel</h2>
+
+      <label>Select Team</label>
+      <select id="excelTeamSelect" class="input" style="width:100%;margin-top:6px;margin-bottom:12px;">
+        <!-- Filled via JS -->
+      </select>
+
+      <label>Select Excel File (.xlsx)</label>
+      <input id="fileExcel" type="file" accept=".xlsx" style="margin-top:6px;margin-bottom:12px;" />
+
+      <p style="font-size:13px;opacity:0.75;">
+        The selected Excel file will be uploaded and merged into the database.
+        Existing cases with matching IDs will be updated.
+      </p>
+
+      <div class="modal-footer">
+        <button id="btnExcelClose" class="danger-btn">Cancel</button>
+        <button id="btnExcelContinue" class="action-btn">Process</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===============================================================
+       MODAL — BACKUP IMPORT / EXPORT
+       =============================================================== -->
+  <div id="modalBackup" class="modal">
+    <div class="modal-card">
+      <h2 class="modal-title">Backup Tools</h2>
+
+      <p style="margin-bottom:12px;opacity:0.85;">
+        Export or import a full JSON backup including Teams, Users, and Cases.
+      </p>
+
+      <label>Import Backup (.json)</label>
+      <input id="fileBackup" type="file" accept=".json" style="margin-top:6px;margin-bottom:12px;" />
+
+      <div class="modal-footer">
+        <button id="btnBackupClose" class="danger-btn">Close</button>
+        <button id="btnBackupImport" class="action-btn">Import JSON</button>
+        <button id="btnBackupExport" class="action-btn" style="background:#5b8def;">
+          Export Backup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===============================================================
+       MODAL — AUDIT (Show 5 Recent Cases for Selected User)
+       =============================================================== -->
+  <div id="auditModal" class="modal">
+    <div class="modal-card" style="max-width:600px;">
+      <h2 class="modal-title">Audit — Recent Cases</h2>
+
+      <div id="auditList" style="
+        max-height: 380px;
+        overflow-y: auto;
+        padding-right: 4px;
+      ">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnAuditClose" class="action-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===============================================================
+       GLOBAL POPUP TOAST (showPopup)
+       =============================================================== -->
+  <div id="popup" style="
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    background: var(--accent);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    z-index: 2000;
+  ">
+    Popup
+  </div>
+
+  <script>
+    /* Auto hide logic for popup */
+    const popup = document.getElementById("popup");
+    popup.classList.remove("show");
+  </script>
+
+  <!-- ===============================================================
+       THEME TOGGLE (Dark / Light Mode)
+       =============================================================== -->
+  <script>
+    const themeToggle = document.getElementById("themeToggle");
+
+    themeToggle.onclick = () => {
+      const root = document.documentElement;
+      const current = root.getAttribute("data-theme");
+
+      const next = current === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+
+      // Update icon
+      themeToggle.innerHTML =
+        next === "dark"
+          ? '<i class="fa-solid fa-moon"></i>'
+          : '<i class="fa-solid fa-sun"></i>';
+    };
+  </script>
+
+
+  <!-- ===============================================================
+       LOGOUT HANDLER
+       =============================================================== -->
+  <script type="module">
+    import { auth } from "./js/firebase.js";
+
+    const logoutBtn = document.getElementById("btnLogout");
+    logoutBtn.onclick = () => {
+      auth.signOut().then(() => {
+        location.href = "login.html";
+      });
+    };
+  </script>
+
+
+  <!-- ===============================================================
+       MODAL CLICK-OUTSIDE + ESC CLOSE SUPPORT
+       (admin.js also binds behavior; this ensures baseline support)
+       =============================================================== -->
+  <script>
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".modal.show").forEach(modal => {
+          modal.classList.remove("show");
+        });
+      }
+    });
+
+    document.querySelectorAll(".modal").forEach(modal => {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.classList.remove("show");
+      });
+    });
+  </script>
+
+  <!-- ===============================================================
+       GLOBAL LOADING OVERLAY (Used for Excel, Backup, Heavy Ops)
+       =============================================================== -->
+  <div id="adminLoadingMask" style="
+    display: none;
+    position: fixed;
+    left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(3px);
+    z-index: 3000;
+    color: white;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  ">
+    Processing…
+  </div>
+
+
+  <!-- ===============================================================
+       SAFETY FALLBACKS (prevent broken UI during slow loads)
+       =============================================================== -->
+  <script>
+    // Prevent scroll while modal is open
+    const observer = new MutationObserver(() => {
+      const anyOpen = document.querySelector(".modal.show");
+      if (anyOpen) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
+    });
+
+    observer.observe(document.body, { attributes: true, subtree: true });
+  </script>
+
+
+  <!-- ===============================================================
+       FIREBASE + APP SCRIPTS
+       =============================================================== -->
+
+  <!-- Firebase Initialization -->
+  <script type="module" src="./js/firebase.js"></script>
+
+  <!-- Utility Helper Script -->
+  <script type="module" src="./js/utils.js"></script>
+
+  <!-- Firestore API wrapper -->
+  <script type="module" src="./js/firestore-api.js"></script>
+
+  <!-- User Profile (role check, theme storage, etc.) -->
+  <script type="module" src="./js/userProfile.js"></script>
+
+  <!-- Main Admin Logic (final chunked version you pasted) -->
+  <script type="module" src="./admin.js"></script>
+
+  <!-- ===============================================================
+       END OF MAIN HTML STRUCTURE
+       =============================================================== -->
+
+  <!-- Extra spacing at bottom for scroll comfort -->
+  <div style="height: 40px;"></div>
+
+</body>
+</html>

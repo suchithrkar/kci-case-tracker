@@ -178,7 +178,11 @@ function setupRealtimeCases(teamId) {
 /* =======================================================================
    SIDEBAR CONTROLS (FIXED — HAMBURGER WORKS NOW)
    ======================================================================= */
+/* =======================================================================
+   SIDEBAR CONTROLS + PRIMARY FILTER UI BUILD
+   ======================================================================= */
 function setupSidebarControls() {
+  // Open / close
   el.hamburger.onclick = () => {
     el.sidebar.classList.add("open");
     el.overlay.classList.add("show");
@@ -191,7 +195,176 @@ function setupSidebarControls() {
     el.sidebar.classList.remove("open");
     el.overlay.classList.remove("show");
   }
+
+  // Build the primary filters UI initially
+  buildPrimaryFilters();
+
+  // Sidebar apply (same behavior as page Apply)
+  document.getElementById("btnSideApply").onclick = () => {
+    // Bring values from sidebar checkboxes into uiState.primaries then call applyFilters()
+    syncPrimaryFiltersFromUI();
+    // Also sync search/dates fields (so sidebar apply works as full apply)
+    uiState.search = el.txtSearch.value.trim().toLowerCase();
+    uiState.from = el.dateFrom.value;
+    uiState.to = el.dateTo.value;
+    applyFilters();
+    closeSidebar();
+  };
 }
+
+/* =======================================================================
+   PRIMARY FILTERS - Data model + UI builder + sync helpers
+   - uiState.primaries already exists (object of arrays).
+   - We add uiState.primaryLocks to track locked filters.
+   ======================================================================= */
+if (!uiState.primaryLocks) {
+  uiState.primaryLocks = {
+    caseResolutionCode: false,
+    tl: false,
+    sbd: false,
+    caGroup: false,
+    onsiteRFC: false,
+    csrRFC: false,
+    benchRFC: false,
+    country: false
+  };
+}
+
+/* Filter options (fixed order & labels) */
+const PRIMARY_OPTIONS = {
+  caseResolutionCode: ["Onsite Solution", "Offsite Solution", "Parts Shipped"],
+  tl: ["Aarthi", "Sandeep", "Ratan"],
+  sbd: ["Met", "Not Met", "NA"],
+  caGroup: ["0-3 Days","3-5 Days","5-10 Days","10-14 Days","15-30 Days","30-60 Days","60-90 Days","> 90 Days"],
+  onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
+  csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
+  benchRFC: ["Possible completed","Repair Pending"],
+  country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"]
+};
+
+/* Build sidebar markup for all primary filters and attach handlers */
+function buildPrimaryFilters() {
+  const container = document.getElementById("filtersContainer");
+  container.innerHTML = ""; // reset
+
+  Object.keys(PRIMARY_OPTIONS).forEach(key => {
+    const title = keyToLabel(key);
+
+    // top header with title + expand arrow + lock icon
+    const block = document.createElement("div");
+    block.className = "filter";
+
+    block.innerHTML = `
+      <div class="filter-head" data-key="${key}">
+        <div class="filter-title">${title}</div>
+        <div>
+          <span class="lock" data-key="${key}" title="Lock / Unlock">🔓</span>
+          <span style="margin-left:8px">▾</span>
+        </div>
+      </div>
+      <div class="filter-body" id="filter-body-${key}">
+        <div class="chips" id="chips-${key}">
+          ${PRIMARY_OPTIONS[key].map(opt => `
+            <label style="display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem;">
+              <input type="checkbox" data-key="${key}" data-value="${escapeHtml(opt)}"/>
+              ${escapeHtml(opt)}
+            </label>
+          `).join("")}
+        </div>
+      </div>
+    `;
+
+    container.appendChild(block);
+
+    // expand/collapse
+    const head = block.querySelector(".filter-head");
+    const body = block.querySelector(".filter-body");
+    head.onclick = (e) => {
+      // clicking lock should not toggle body
+      if (e.target.classList.contains("lock")) return;
+      body.classList.toggle("open");
+    };
+
+    // lock toggle
+    const lockSpan = block.querySelector(".lock");
+    lockSpan.onclick = (e) => {
+      e.stopPropagation();
+      const k = lockSpan.dataset.key;
+      uiState.primaryLocks[k] = !uiState.primaryLocks[k];
+      updateFilterLockedUI(k);
+    };
+
+    // checkbox changes
+    block.querySelectorAll("input[type='checkbox']").forEach(cb => {
+      cb.onchange = () => {
+        const k = cb.dataset.key;
+        const val = cb.dataset.value;
+        const set = new Set(uiState.primaries[k] || []);
+        cb.checked ? set.add(val) : set.delete(val);
+        uiState.primaries[k] = [...set];
+      };
+    });
+
+    // initialize locks UI & checked state
+    updateFilterLockedUI(key);
+    // If uiState already has selections for this filter (e.g., after Clear), set checked states
+    (uiState.primaries[key] || []).forEach(v => {
+      const elCb = block.querySelector(`input[data-value="${cssEscapeAttr(v)}"]`);
+      if (elCb) elCb.checked = true;
+    });
+  });
+}
+
+/* Helper: update lock UI */
+function updateFilterLockedUI(key) {
+  const locked = !!uiState.primaryLocks[key];
+  const block = document.querySelector(`.filter-head [data-key="${key}"]`)?.closest?.(".filter") ||
+                document.querySelector(`[data-key="${key}"]`)?.closest?.(".filter");
+  // fallback locate lock element
+  const lockSpan = document.querySelector(`.lock[data-key="${key}"]`);
+  const body = document.getElementById(`filter-body-${key}`);
+  if (!lockSpan || !body) return;
+
+  lockSpan.textContent = locked ? "🔒" : "🔓";
+  if (locked) {
+    body.classList.add("filter-locked");
+    body.style.opacity = "0.45";
+    body.style.pointerEvents = "none";
+  } else {
+    body.classList.remove("filter-locked");
+    body.style.opacity = "";
+    body.style.pointerEvents = "";
+  }
+}
+
+/* Synchronize UI checkboxes → uiState.primaries (called on sidebar apply) */
+function syncPrimaryFiltersFromUI() {
+  Object.keys(PRIMARY_OPTIONS).forEach(key => {
+    const checks = Array.from(document.querySelectorAll(`#filter-body-${key} input[type="checkbox"]`));
+    uiState.primaries[key] = checks.filter(c => c.checked).map(c => c.dataset.value);
+  });
+}
+
+/* Utility: convert key to human label */
+function keyToLabel(k) {
+  const map = {
+    caseResolutionCode: "Case Resolution Code",
+    tl: "TL",
+    sbd: "SBD",
+    caGroup: "CA Group",
+    onsiteRFC: "Onsite RFC Status",
+    csrRFC: "CSR RFC Status",
+    benchRFC: "Bench RFC Status",
+    country: "Country"
+  };
+  return map[k] || k;
+}
+
+/* Small helper for selecting checkboxes by value */
+function cssEscapeAttr(s) {
+  return String(s).replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 
 /* =======================================================================
    FILTER CONTROLS — APPLY, CLEAR, SEARCH, DATES
@@ -210,14 +383,21 @@ function setupFilterControls() {
   el.dateTo.onchange = () => (uiState.to = el.dateTo.value);
 
   /* APPLY */
+    /* APPLY */
   el.btnApply.onclick = () => {
     uiState.search = el.txtSearch.value.trim().toLowerCase();
     uiState.from = el.dateFrom.value;
     uiState.to = el.dateTo.value;
+
+    // Also sync any primary filter checkboxes currently visible in the sidebar
+    syncPrimaryFiltersFromUI();
+
     applyFilters();
   };
 
+
   /* CLEAR */
+    /* CLEAR */
   el.btnClear.onclick = () => {
     uiState.search = "";
     uiState.from = "";
@@ -230,9 +410,21 @@ function setupFilterControls() {
     el.dateFrom.value = "";
     el.dateTo.value = "";
 
+    // Clear primary filters except locked ones
+    Object.keys(uiState.primaries).forEach(key => {
+      if (!uiState.primaryLocks || !uiState.primaryLocks[key]) {
+        uiState.primaries[key] = [];
+      }
+      // if locked, keep selections as-is
+    });
+
+    // Rebuild status and primary filter UIs to reflect cleared state
     buildStatusPanel();
+    buildPrimaryFilters();
+
     applyFilters();
   };
+
 
   /* MODE BUTTONS — Direct override (Option A behavior) */
   el.btnDueToday.onclick = () => { uiState.mode = "due"; applyFilters(); };
@@ -388,6 +580,20 @@ export function applyFilters() {
   /* STATUS MULTI-SELECT */
   if (uiState.statusList.length > 0)
     rows = rows.filter(r => uiState.statusList.includes(r.status));
+
+     /* PRIMARY TABLE FILTERS (AND across filters; OR within each filter's options) */
+  // For each primary filter, if selection exists, keep rows matching any of its options.
+  Object.keys(uiState.primaries).forEach(key => {
+    const sel = uiState.primaries[key] || [];
+    if (!sel || sel.length === 0) return; // ignore unselected filters
+
+    rows = rows.filter(r => {
+      const val = (r[key] || "").toString();
+      // For CA Group and similar columns, exact match is used; adjust if needed
+      return sel.includes(val);
+    });
+  });
+
 
   /* SORT */
   if (uiState.sortByDateAsc !== null) {
@@ -568,6 +774,8 @@ modalWarning.style.display = "none";
 optLastActioned.insertAdjacentElement("afterend", optLastActionedByName);
 
 let currentModalCaseId = null;
+let pendingStatusForModal = null;   // temporarily stores status chosen which requires follow-up
+let prevStatusBeforeModal = null;   // to revert if modal cancelled
 let requireFollowUp = false;
 
 /* =======================================================================
@@ -587,8 +795,22 @@ function handleStatusChange(caseId, newStatus) {
   row.lastActionedBy = trackerState.user.uid;
 
   // If follow-up date required, open modal BEFORE Firestore write
+    // If follow-up date required (Service Pending / Monitoring)
   if (needsFollow) {
+    // store previous status so we can revert if user cancels modal
+    prevStatusBeforeModal = row.status || "";
+    // set pending status so saveModalData knows to write it
+    pendingStatusForModal = newStatus;
+
+    // Set status & ownership locally for immediate UI feedback
+    row.status = newStatus;
+    row.lastActionedOn = today;
+    row.lastActionedBy = trackerState.user.uid;
+
+    // Open modal enforcing follow-up — modal save will persist status + statusChangedOn/By
     openCaseModal(caseId, true);
+    // re-render filters/table to show local change
+    applyFilters();
     return;
   }
 
@@ -597,10 +819,11 @@ function handleStatusChange(caseId, newStatus) {
     status: newStatus,
     lastActionedOn: today,
     lastActionedBy: trackerState.user.uid,
-     // NEW FIELDS for stats engine
-  statusChangedOn: today,
-  statusChangedBy: trackerState.user.uid
+    // NEW FIELDS for stats engine
+    statusChangedOn: today,
+    statusChangedBy: trackerState.user.uid
   });
+
 
   applyFilters();
 }
@@ -745,10 +968,22 @@ btnModalClose.onclick = closeModal;
 modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 
 function closeModal() {
+  // if follow-up modal was open and user cancelled (no save), revert status
+  if (requireFollowUp && pendingStatusForModal && currentModalCaseId) {
+    const r = trackerState.allCases.find(x => x.id === currentModalCaseId);
+    if (r) {
+      r.status = prevStatusBeforeModal || "";
+    }
+    // reset pending flags
+    pendingStatusForModal = null;
+    prevStatusBeforeModal = null;
+  }
+
   requireFollowUp = false;
   currentModalCaseId = null;
   modal.classList.remove("show");
 }
+
 
 /* =======================================================================
    MODAL WARNINGS
@@ -958,19 +1193,34 @@ async function saveModalData() {
   r.lastActionedOn = today;
   r.lastActionedBy = trackerState.user.uid;
 
+    // Build the update object
+  const updateObj = {
+    followDate: r.followDate,
+    flagged: r.flagged,
+    notes: r.notes,
+    lastActionedOn: today,
+    lastActionedBy: trackerState.user.uid
+  };
+
+  // If the user selected Service Pending / Monitoring earlier, persist the status now
+  if (pendingStatusForModal) {
+    updateObj.status = pendingStatusForModal;
+    updateObj.statusChangedOn = today;
+    updateObj.statusChangedBy = trackerState.user.uid;
+  }
+
   try {
-    await firestoreUpdateCase(caseId, {
-      followDate: r.followDate,
-      flagged: r.flagged,
-      notes: r.notes,
-      lastActionedOn: today,
-      lastActionedBy: trackerState.user.uid
-    });
+    await firestoreUpdateCase(caseId, updateObj);
   } catch (err) {
     console.error(err);
     showPopup("Error updating case.");
     return false;
   }
+
+  // clear pending vars after successful save
+  pendingStatusForModal = null;
+  prevStatusBeforeModal = null;
+
 
   applyFilters();
   requireFollowUp = false;
@@ -1125,6 +1375,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

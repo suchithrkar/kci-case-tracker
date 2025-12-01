@@ -596,7 +596,7 @@ function handleStatusChange(caseId, newStatus) {
   firestoreUpdateCase(caseId, {
     status: newStatus,
     lastActionedOn: today,
-    lastActionedBy: trackerState.user.uid
+    lastActionedBy: trackerState.user.uid,
      // NEW FIELDS for stats engine
   statusChangedOn: today,
   statusChangedBy: trackerState.user.uid
@@ -1125,6 +1125,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

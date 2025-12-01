@@ -597,6 +597,9 @@ function handleStatusChange(caseId, newStatus) {
     status: newStatus,
     lastActionedOn: today,
     lastActionedBy: trackerState.user.uid
+     // NEW FIELDS for stats engine
+  statusChangedOn: today,
+  statusChangedBy: trackerState.user.uid
   });
 
   applyFilters();
@@ -1122,6 +1125,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

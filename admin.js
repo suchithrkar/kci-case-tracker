@@ -102,6 +102,7 @@ const btnAuditOk          = document.getElementById("btnAuditOk");
 
 
 
+
 /* ============================================================
    GLOBAL ADMIN STATE
    ============================================================ */
@@ -110,6 +111,9 @@ export const adminState = {
   allTeams: [],
   selectedStatsTeam: "TOTAL",
 };
+
+let statsCases = [];
+let allUsers = [];
 
 
 
@@ -1212,9 +1216,6 @@ function setupStatsAutoRefresh() {
   // (Your existing subscribeStatsCases() already calls renderStatsTable; just replace that call with this)
 }
 
-/* Replace previous render call: use renderStatsTableNew() */
-renderStatsTable = renderStatsTableNew; // override old function name if present
-
 
 
 /* ============================================================================
@@ -1228,8 +1229,7 @@ renderStatsTable = renderStatsTableNew; // override old function name if present
   - single read per refresh
 */
 
-let statsCases = [];
-let allUsers = [];
+
 
 /* ------------------------------------------------------------
    Load users ONCE for stats tab

@@ -585,6 +585,8 @@ function handleStatusChange(caseId, newStatus) {
   row.status = newStatus;
   row.lastActionedOn = today;
   row.lastActionedBy = trackerState.user.uid;
+   
+
 
   // If follow-up date required, open modal BEFORE Firestore write
   if (needsFollow) {
@@ -597,6 +599,9 @@ function handleStatusChange(caseId, newStatus) {
     status: newStatus,
     lastActionedOn: today,
     lastActionedBy: trackerState.user.uid
+     // NEW FIELDS for stats engine
+  statusChangedOn: today,
+  statusChangedBy: trackerState.user.uid
   });
 
   applyFilters();
@@ -1122,6 +1127,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

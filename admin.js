@@ -101,6 +101,29 @@ const btnAuditClose       = document.getElementById("btnAuditClose");
 const btnAuditOk          = document.getElementById("btnAuditOk");
 
 
+function openAuditModal(userId) {
+  const today = new Date().toISOString().split("T")[0];
+
+  // Get cases actioned today by this user (only status updates)
+  const userTodayCases = statsCases.filter(r =>
+    r.statusChangedOn === today && r.statusChangedBy === userId
+  );
+
+  // Pick 5 random unique Case IDs
+  const five = userTodayCases
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5);
+
+  auditList.innerHTML = five.length
+    ? five.map(c => `<div style="margin-bottom:8px;">${c.id}</div>`).join("")
+    : "<div>No cases available for audit today.</div>";
+
+  modalAudit.classList.add("show");
+}
+
+btnAuditClose.onclick = () => modalAudit.classList.remove("show");
+btnAuditOk.onclick = () => modalAudit.classList.remove("show");
+
 
 
 /* ============================================================
@@ -1080,10 +1103,14 @@ function computeStatsEngineAdaptive(casesList, usersList) {
       if (adminState.selectedStatsTeam !== "TOTAL" && u.teamId !== adminState.selectedStatsTeam) continue;
     }
 
-    const userCases = filteredCases.filter(r => r.lastActionedBy === u.id);
+    // STATUS UPDATED TODAY (only statusChangedOn matters, not lastActionedOn)
+const todayCases = filteredCases.filter(r =>
+  r.statusChangedOn === today && r.statusChangedBy === u.id
+);
 
-    // Total Actioned = unique case ids
-    const totalActioned = new Set(userCases.map(r => r.id)).size;
+// Unique case IDs only
+const totalActioned = new Set(todayCases.map(r => r.id)).size;
+
 
     // Closed Today
     const closedTodayList = userCases.filter(r => r.lastActionedOn === today && r.status === "Closed");
@@ -1315,5 +1342,6 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 

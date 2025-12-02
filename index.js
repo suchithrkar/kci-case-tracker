@@ -1054,12 +1054,7 @@ function animateModalClose(callback) {
   }, 120);
 }
 
-/* Override openCaseModal to add animations */
-const originalOpenCaseModal = openCaseModal;
-openCaseModal = function(caseId, enforce = false) {
-  originalOpenCaseModal(caseId, enforce);  // call previous logic
-  animateModalOpen();
-};
+
 
 /* Override modal close to animate */
 function closeModalAnimated() {
@@ -1111,12 +1106,20 @@ function resizeNotes() {
   optNotes.style.height = (optNotes.scrollHeight + 6) + "px";
 }
 
-/* Enhance openCaseModal with notes resize */
-const originalOpen = openCaseModal;
-openCaseModal = function(caseId, enforce=false) {
-  originalOpen(caseId, enforce);
+/* FINAL unified openCaseModal override (animation + notes resize) */
+const originalOpenCaseModal = openCaseModal;
+
+openCaseModal = function(caseId, enforce = false) {
+  // Call original modal logic
+  originalOpenCaseModal(caseId, enforce);
+
+  // Run animation
+  animateModalOpen();
+
+  // Resize notes box
   setTimeout(resizeNotes, 60);
 };
+
 
 /* =======================================================================
    FOLLOW-UP DATE INPUT — QUICK SELECT SHORTCUTS
@@ -1390,6 +1393,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

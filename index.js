@@ -811,8 +811,7 @@ function handleStatusChange(caseId, newStatus) {
 
   // Set status & ownership immediately (UI responsive)
   row.status = newStatus;
-  row.lastActionedOn = today;
-  row.lastActionedBy = trackerState.user.uid;
+  
 
   // If follow-up date required, open modal BEFORE Firestore write
     // If follow-up date required (Service Pending / Monitoring)
@@ -824,8 +823,7 @@ function handleStatusChange(caseId, newStatus) {
 
     // Set status & ownership locally for immediate UI feedback
     row.status = newStatus;
-    row.lastActionedOn = today;
-    row.lastActionedBy = trackerState.user.uid;
+    
 
     // Open modal enforcing follow-up — modal save will persist status + statusChangedOn/By
     openCaseModal(caseId, true);
@@ -1394,6 +1392,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

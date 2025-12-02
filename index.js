@@ -1028,21 +1028,25 @@ btnModalClose.onclick = closeModal;
 modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 
 function closeModal() {
-  // if follow-up modal was open and user cancelled (no save), revert status
+  // If modal was enforcing follow-up and user cancels → revert status
   if (requireFollowUp && pendingStatusForModal && currentModalCaseId) {
     const r = trackerState.allCases.find(x => x.id === currentModalCaseId);
     if (r) {
       r.status = prevStatusBeforeModal || "";
     }
-    // reset pending flags
     pendingStatusForModal = null;
     prevStatusBeforeModal = null;
   }
 
   requireFollowUp = false;
   currentModalCaseId = null;
-  modal.classList.remove("show");
+
+  // Animate close, THEN hide modal
+  animateModalClose(() => {
+    modal.classList.remove("show");
+  });
 }
+
 
 
 /* =======================================================================
@@ -1107,8 +1111,9 @@ function closeModalAnimated() {
 }
 
 /* Replace close handlers */
-btnModalClose.onclick = closeModalAnimated;
-modal.onclick = (e) => { if (e.target === modal) closeModalAnimated(); };
+btnModalClose.onclick = closeModal;
+modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
 
 /* =======================================================================
    IMPROVED FLAG SWITCH — SMOOTH SLIDE + VISUAL FEEDBACK

@@ -785,13 +785,13 @@ const optDate = document.getElementById("optDate");
 const optFlag = document.getElementById("optFlag");
 const optNotes = document.getElementById("optNotes");
 const optLastActioned = document.getElementById("optLastActioned");
-const optLastActionedByName = document.createElement("div"); // added for name reveal
+const optLastActionedByName = document.getElementById("optLastActionedByName"); // added for name reveal
 
 const btnModalClose = document.getElementById("btnModalClose");
 const btnModalSave = document.getElementById("btnModalSave");
 
 modalWarning.style.display = "none";
-optLastActioned.insertAdjacentElement("afterend", optLastActionedByName);
+
 
 let currentModalCaseId = null;
 let pendingStatusForModal = null;   // temporarily stores status chosen which requires follow-up
@@ -906,10 +906,20 @@ export function openCaseModal(caseId, enforce = false) {
 
 async function loadLastActionedByName(uid) {
   if (!uid) {
-    optLastActionedByName.textContent = "Last Actioned By: —";
+    optLastActionedByName.textContent = "—";
     optLastActionedByName.style.opacity = 0.7;
     return;
   }
+
+  const snap = await getDoc(doc(db, "users", uid));
+  if (snap.exists()) {
+    const u = snap.data();
+    optLastActionedByName.textContent = `${u.firstName} ${u.lastName}`;
+  } else {
+    optLastActionedByName.textContent = "Unknown";
+  }
+}
+
 
   const snap = await getDoc(doc(db, "users", uid));
   if (snap.exists()) {
@@ -1395,6 +1405,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

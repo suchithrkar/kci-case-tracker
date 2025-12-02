@@ -854,26 +854,20 @@ function handleStatusChange(caseId, newStatus) {
 
   const needsFollow = (newStatus === "Service Pending" || newStatus === "Monitoring");
 
-  // Set status & ownership immediately (UI responsive)
+  // ❗ STORE true previous status BEFORE overwriting
+  const previousStatus = row.status;
+
+  // Update local state
   row.status = newStatus;
-  
 
-  // If follow-up date required, open modal BEFORE Firestore write
-    // If follow-up date required (Service Pending / Monitoring)
   if (needsFollow) {
-    // store previous status so we can revert if user cancels modal
-    prevStatusBeforeModal = row.status || "";
-    // set pending status so saveModalData knows to write it
+    prevStatusBeforeModal = previousStatus;   // FIXED
     pendingStatusForModal = newStatus;
-
-    
-
-    // Open modal enforcing follow-up — modal save will persist status + statusChangedOn/By
     openCaseModal(caseId, true);
-    // re-render filters/table to show local change
     applyFilters();
     return;
   }
+
 
   // Normal statuses → update Firestore directly
   firestoreUpdateCase(caseId, {
@@ -1392,6 +1386,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

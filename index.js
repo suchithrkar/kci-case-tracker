@@ -1119,17 +1119,7 @@ modal.onclick = (e) => { if (e.target === modal) closeModal(); };
    IMPROVED FLAG SWITCH — SMOOTH SLIDE + VISUAL FEEDBACK
    ======================================================================= */
 
-optFlag.onclick = () => {
-  const isOn = optFlag.classList.contains("on");
 
-  if (isOn) {
-    optFlag.classList.remove("on");
-    optFlag.setAttribute("aria-checked", "false");
-  } else {
-    optFlag.classList.add("on");
-    optFlag.setAttribute("aria-checked", "true");
-  }
-};
 
 /* Optional subtle highlight for active flag */
 function refreshFlagUI() {
@@ -1443,6 +1433,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

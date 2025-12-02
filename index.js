@@ -61,24 +61,34 @@ const el = {
 /* ============================================================
    TOOLTIP EDGE-PROTECTION — AUTO REALIGN ON SCREEN EDGES
    ============================================================ */
+/* ============================================================
+   Tooltip Edge Protection — Reposition Without Wrapping Text
+   ============================================================ */
 document.addEventListener("mouseover", (e) => {
-  const tooltip = e.target.closest(".icon-btn")?.querySelector(".tooltip");
+  const btn = e.target.closest(".icon-btn");
+  if (!btn) return;
+
+  const tooltip = btn.querySelector(".tooltip");
   if (!tooltip) return;
 
-  // Reset classes
-  tooltip.classList.remove("left-align", "right-align");
+  // Reset alignment
+  tooltip.classList.remove("align-left", "align-right");
 
+  // Force layout to compute size
   const rect = tooltip.getBoundingClientRect();
+  const padding = 8; // small buffer from edges
 
-  // Tooltip goes outside right edge
-  if (rect.right > window.innerWidth - 4) {
-    tooltip.classList.add("left-align");
+  // If the tooltip goes beyond right boundary
+  if (rect.right > window.innerWidth - padding) {
+    tooltip.classList.add("align-right");
   }
-  // Tooltip goes outside left edge
-  else if (rect.left < 4) {
-    tooltip.classList.add("right-align");
+
+  // If the tooltip goes beyond left boundary
+  else if (rect.left < padding) {
+    tooltip.classList.add("align-left");
   }
 });
+
 
 
 /* =======================================================================
@@ -1416,6 +1426,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

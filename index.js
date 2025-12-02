@@ -1231,7 +1231,7 @@ btnModalSave.onclick = async () => {
   btnModalSave.disabled = false;
   btnModalSave.textContent = "Save";
 
-  if (result) closeModalAnimated();
+  if (result) closeModal();
 };
 
 /* Refactor main save logic into this helper */
@@ -1443,6 +1443,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

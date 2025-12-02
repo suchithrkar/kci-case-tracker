@@ -146,14 +146,21 @@ button,input,select,textarea{
   font-size:11px;border:2px solid var(--bg);
 }
 .tooltip{
-  position:absolute;bottom:-36px;
-  left:50%;transform:translateX(-50%);
+  position:absolute;
+  bottom:-36px;
+  left:50%;
+  transform:translateX(-50%);
   background:var(--panel-2);
   border:1px solid var(--border);
-  padding:.35rem .5rem;border-radius:8px;
-  font-size:12px;white-space:nowrap;
-  opacity:0;pointer-events:none;z-index:35;
+  padding:.35rem .5rem;
+  border-radius:8px;
+  font-size:12px;
+  white-space:nowrap; /* ← keep horizontal */
+  opacity:0;
+  pointer-events:none;
+  z-index:35;
 }
+
 /* Prevent tooltip overflow on screen edges */
 .tooltip {
   max-width: calc(100vw - 20px);
@@ -161,16 +168,19 @@ button,input,select,textarea{
   word-break: break-word;
 }
 /* Tooltip flips when too close to screen edges */
-.tooltip.left-align {
-  left: auto;
-  right: 0;
-  transform: none;
+/* Align tooltip fully to the left of button */
+.tooltip.align-left {
+  left: 0;
+  transform: translateX(0);
 }
 
-.tooltip.right-align {
-  left: 0;
-  transform: none;
+/* Align tooltip fully to the right of button */
+.tooltip.align-right {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
 }
+
 
 .icon-btn:hover .tooltip{opacity:1}
 
@@ -567,6 +577,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

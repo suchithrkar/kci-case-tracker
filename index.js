@@ -821,8 +821,6 @@ function handleStatusChange(caseId, newStatus) {
     // set pending status so saveModalData knows to write it
     pendingStatusForModal = newStatus;
 
-    // Set status & ownership locally for immediate UI feedback
-    row.status = newStatus;
     
 
     // Open modal enforcing follow-up — modal save will persist status + statusChangedOn/By
@@ -1392,6 +1390,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

@@ -235,9 +235,15 @@ function setupSidebarControls() {
   document.getElementById("btnSideClose").onclick = closeSidebar;
 
   function closeSidebar() {
-    el.sidebar.classList.remove("open");
-    el.overlay.classList.remove("show");
-  }
+     el.sidebar.classList.remove("open");
+     el.overlay.classList.remove("show");
+
+     // Collapse all filter bodies when sidebar closes
+     document.querySelectorAll(".filter-body.open").forEach(body => {
+       body.classList.remove("open");
+     });
+   }
+
 
   // Build the primary filters UI initially
   buildPrimaryFilters();
@@ -252,6 +258,12 @@ function setupSidebarControls() {
     uiState.to = el.dateTo.value;
     applyFilters();
     closeSidebar();
+
+     // Collapse filters after applying
+document.querySelectorAll(".filter-body.open").forEach(body => {
+    body.classList.remove("open");
+});
+
   };
 }
 
@@ -1426,6 +1438,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

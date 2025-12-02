@@ -977,48 +977,7 @@ optFlag.onclick = () => {
    MODAL — SAVE BUTTON
    ======================================================================= */
 
-btnModalSave.onclick = async () => {
-  if (!currentModalCaseId) return;
 
-  const caseId = currentModalCaseId;
-  const r = trackerState.allCases.find(x => x.id === caseId);
-  if (!r) return;
-
-  const today = new Date().toISOString().split("T")[0];
-
-  const follow = optDate.value
-    ? new Date(optDate.value).toISOString().split("T")[0]
-    : null;
-
-  /* Follow-up required for SP/MON */
-  if (requireFollowUp && !follow) {
-    showModalWarning("Please select a follow-up date.");
-    return;
-  }
-  hideModalWarning();
-
-  /* Apply to local state */
-  r.followDate = follow;
-  r.flagged = optFlag.classList.contains("on");
-  r.notes = optNotes.value.trim();
-  r.lastActionedOn = today;
-  r.lastActionedBy = trackerState.user.uid;
-
-  /* Firestore update — ONLY allowed fields */
-  await firestoreUpdateCase(caseId, {
-    followDate: r.followDate,
-    flagged: r.flagged,
-    notes: r.notes,
-    lastActionedOn: today,
-    lastActionedBy: trackerState.user.uid
-  });
-
-  requireFollowUp = false;
-  currentModalCaseId = null;
-
-  modal.classList.remove("show");
-  applyFilters();
-};
 
 /* =======================================================================
    MODAL — CLOSE LOGIC
@@ -1433,6 +1392,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

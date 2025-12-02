@@ -933,6 +933,9 @@ export function openCaseModal(caseId, enforce = false) {
   }
 
   modal.classList.add("show");
+   animateModalOpen();
+   setTimeout(resizeNotes, 60);
+
 }
 
 /* =======================================================================
@@ -1100,18 +1103,13 @@ function resizeNotes() {
 }
 
 /* FINAL unified openCaseModal override (animation + notes resize) */
-const originalOpenCaseModal = openCaseModal;
-
-openCaseModal = function(caseId, enforce = false) {
-  // Call original modal logic
-  originalOpenCaseModal(caseId, enforce);
-
-  // Run animation
+// DO NOT override openCaseModal.
+// Just add animation after each modal is shown.
+document.addEventListener("modal:opened", () => {
   animateModalOpen();
-
-  // Resize notes box
   setTimeout(resizeNotes, 60);
-};
+});
+
 
 
 /* =======================================================================
@@ -1386,6 +1384,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

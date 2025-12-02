@@ -58,6 +58,29 @@ const el = {
   badgeFlag: document.getElementById("badgeFlag"),
 };
 
+/* ============================================================
+   TOOLTIP EDGE-PROTECTION — AUTO REALIGN ON SCREEN EDGES
+   ============================================================ */
+document.addEventListener("mouseover", (e) => {
+  const tooltip = e.target.closest(".icon-btn")?.querySelector(".tooltip");
+  if (!tooltip) return;
+
+  // Reset classes
+  tooltip.classList.remove("left-align", "right-align");
+
+  const rect = tooltip.getBoundingClientRect();
+
+  // Tooltip goes outside right edge
+  if (rect.right > window.innerWidth - 4) {
+    tooltip.classList.add("left-align");
+  }
+  // Tooltip goes outside left edge
+  else if (rect.left < 4) {
+    tooltip.classList.add("right-align");
+  }
+});
+
+
 /* =======================================================================
    TRACKER STATE
    ======================================================================= */
@@ -1393,6 +1416,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

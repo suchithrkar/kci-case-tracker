@@ -920,17 +920,6 @@ async function loadLastActionedByName(uid) {
   }
 }
 
-
-  const snap = await getDoc(doc(db, "users", uid));
-  if (snap.exists()) {
-    const u = snap.data();
-    optLastActionedByName.textContent =
-      `Last Actioned By: ${u.firstName} ${u.lastName}`;
-  } else {
-    optLastActionedByName.textContent = "Last Actioned By: Unknown";
-  }
-}
-
 /* =======================================================================
    MODAL — FLAG SWITCH
    ======================================================================= */
@@ -1405,6 +1394,7 @@ applyFilters = function() {
 
   oldApplyFilters();
 };
+
 
 
 

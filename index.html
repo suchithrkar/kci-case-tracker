@@ -154,6 +154,24 @@ button,input,select,textarea{
   font-size:12px;white-space:nowrap;
   opacity:0;pointer-events:none;z-index:35;
 }
+/* Prevent tooltip overflow on screen edges */
+.tooltip {
+  max-width: calc(100vw - 20px);
+  white-space: normal;
+  word-break: break-word;
+}
+/* Tooltip flips when too close to screen edges */
+.tooltip.left-align {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.tooltip.right-align {
+  left: 0;
+  transform: none;
+}
+
 .icon-btn:hover .tooltip{opacity:1}
 
 /* Sidebar */
@@ -549,6 +567,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

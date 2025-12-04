@@ -760,7 +760,7 @@ export function renderTable() {
 /* Gear button now a proper clickable button */
 function renderGearButton(caseId) {
   return `
-    <button class="icon-btn" style="padding:4px 8px;font-size:16px;padding:4px;margin-left:5px;"
+    <button class="icon-btn" style="font-size:16px;padding:4px;margin-left:5px;"
       data-action="opts" data-id="${caseId}">
       ⚙️
     </button>
@@ -1381,6 +1381,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

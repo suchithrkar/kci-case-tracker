@@ -197,14 +197,17 @@ button,input,select,textarea{
   z-index:50;
 }
 .sidebar.open{transform:translateX(0)}
-.side-head{
-  position:sticky;top:0;
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  display:flex;gap:.5rem;
-  justify-content:flex-end;
-  padding:.5rem;
+.side-head {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1rem;   /* SAME spacing as Apply/Close buttons */
 }
+
 .side-title {
   font-size: 14px;
   font-weight: 600;
@@ -626,6 +629,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

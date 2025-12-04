@@ -197,20 +197,34 @@ button,input,select,textarea{
   z-index:50;
 }
 .sidebar.open{transform:translateX(0)}
-.side-head{
-  position:sticky;top:0;
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  display:flex;gap:.5rem;
-  justify-content:flex-end;
-  padding:.5rem;
+.side-head {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1rem;   /* SAME spacing as Apply/Close buttons */
 }
+.side-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.side-actions {
+  display: flex;
+  gap: .5rem;
+}
+
 /* Scrollable filter area */
 .side {
   height: calc(100% - 56px);
   overflow-y: auto;
-  padding: 1rem;
+  padding: 0 1rem 1rem;   /* MATCHES header spacing */
 }
+
 
 /* Hide scrollbar (Chrome/Edge/Safari) */
 .side::-webkit-scrollbar {
@@ -239,22 +253,27 @@ button,input,select,textarea{
   font-weight: 600;
 }
 .filter {
-  background: var(--panel-2);
+  background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  margin-bottom: 0.9rem;
+  border-radius: 8px;   /* matches Apply/Close button style */
+  margin-bottom: 1rem;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: none;     /* REMOVE all shadows */
 }
+.filter:last-child {
+  margin-bottom: 0;
+}
+
 .filter-title{font-weight:600}
 .filter-body {
   overflow: hidden;
   max-height: 0;
   border-top: 1px solid var(--border);
   background: var(--panel);
-  padding: 0 1rem;
+  padding: 0 1.25rem; /* better left/right spacing */
   transition: max-height .25s ease, padding .25s ease;
 }
+
 
 .filter-body.open {
   max-height: 600px;
@@ -487,9 +506,13 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 <div class="overlay" id="overlay"></div>
 <aside class="sidebar" id="sidebar">
   <div class="side-head">
-    <button class="side-btn" id="btnSideApply">Apply</button>
-    <button class="side-btn" id="btnSideClose">Close</button>
+  <div class="side-title">Primary Filters</div>
+  <div class="side-actions">
+    <button id="btnSideApply" class="btn small">Apply</button>
+    <button id="btnSideClose" class="btn small">Close</button>
   </div>
+</div>
+
   <div class="side">
     <div id="filtersContainer"></div>
   </div>
@@ -611,6 +634,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

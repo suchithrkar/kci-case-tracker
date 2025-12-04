@@ -306,18 +306,33 @@ button,input,select,textarea{
 /* Table */
 .table-wrap{width:100%}
 table{width:100%;border-collapse:collapse}
-thead th{
-  position:sticky;top:0;
-  background:var(--panel-2);
-  text-transform:uppercase;
-  font-size:12px;
-  letter-spacing:.6px;
-  border-bottom:1px solid var(--border);
-  padding:.7rem .6rem;z-index:20;
+thead th {
+  position: sticky;
+  top: 0;
+  background: var(--panel-2);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .6px;
+  border-bottom: 1px solid var(--border);
+
+  /* ↓ NEW: center and compact */
+  text-align: center;
+  padding: .55rem .4rem;   
+  vertical-align: middle;
+
+  z-index: 20;
 }
-tbody td{
-  border-bottom:1px solid var(--border);
-  padding:.65rem .6rem;
+
+tbody td {
+  border-bottom: 1px solid var(--border);
+
+  /* ↓ NEW: center and compact */
+  text-align: center;
+  vertical-align: middle;
+  padding: .48rem .35rem;  /* slightly smaller row height */
+}
+table td, table th {
+  white-space: nowrap;
 }
 tbody tr:hover{background:rgba(255,255,255,.05)}
 
@@ -642,6 +657,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

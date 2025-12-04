@@ -191,7 +191,7 @@ button,input,select,textarea{
   height:100%;width:340px;
   background:var(--panel);
   border-right:1px solid var(--border);
-  box-shadow:var(--shadow);
+  box-shadow: none;
   transform:translateX(-100%);
   transition:transform .25s ease;
   z-index:50;
@@ -205,6 +205,16 @@ button,input,select,textarea{
   justify-content:flex-end;
   padding:.5rem;
 }
+.side-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.side-actions {
+  display: flex;
+  gap: .5rem;
+}
+
 /* Scrollable filter area */
 .side {
   height: calc(100% - 56px);
@@ -244,7 +254,7 @@ button,input,select,textarea{
   border-radius: 12px;
   margin-bottom: 0.9rem;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: none;
 }
 .filter-title{font-weight:600}
 .filter-body {
@@ -487,9 +497,6 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 <div class="overlay" id="overlay"></div>
 <aside class="sidebar" id="sidebar">
   <div class="side-head">
-    <button class="side-btn" id="btnSideApply">Apply</button>
-    <button class="side-btn" id="btnSideClose">Close</button>
-  </div>
   <div class="side">
     <div id="filtersContainer"></div>
   </div>
@@ -611,6 +618,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

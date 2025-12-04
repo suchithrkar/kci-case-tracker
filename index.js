@@ -501,17 +501,25 @@ function setupFilterControls() {
 function setupStatusPanel() {
   buildStatusPanel();
 
+  el.statusPanel.onclick = (e) => e.stopPropagation();   // << ADD THIS
+
   /* Clicking the box toggles panel */
   el.statusBox.onclick = (e) => {
     if (!e.target.closest("input"))
       toggleStatusPanel();
   };
 
+
   /* Clicking outside closes panel */
   document.addEventListener("click", (e) => {
-    if (!el.statusBox.contains(e.target))
-      el.statusPanel.style.display = "none";
-  });
+  if (
+    !el.statusBox.contains(e.target) &&
+    !el.statusPanel.contains(e.target)
+  ) {
+    el.statusPanel.style.display = "none";
+  }
+});
+
 
   function toggleStatusPanel() {
     el.statusPanel.style.display =
@@ -1373,5 +1381,6 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 

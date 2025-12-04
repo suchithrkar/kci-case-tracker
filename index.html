@@ -233,35 +233,53 @@ button,input,select,textarea{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: .75rem 1rem;
-  background: var(--panel-2);
-  cursor: pointer;
+  padding: .9rem 1.1rem;
+  background: var(--panel);
   font-weight: 600;
+  border-bottom: 1px solid var(--border);
 }
+.filter-head .icons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
 .filter {
   background: var(--panel-2);
   border: 1px solid var(--border);
   border-radius: 12px;
-  margin-bottom: 0.9rem;
+  margin-bottom: 1rem;
   overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  transition: transform .15s ease, box-shadow .15s ease;
 }
 .filter-title{font-weight:600}
 .filter-body {
   overflow: hidden;
   max-height: 0;
+  background: var(--panel-2);
+  padding: 0 1.25rem;
   border-top: 1px solid var(--border);
-  background: var(--panel);
-  padding: 0 1rem;
   transition: max-height .25s ease, padding .25s ease;
 }
 
 .filter-body.open {
   max-height: 600px;
-  padding: .75rem 1rem 1rem;
+  padding: 1rem 1.25rem 1.25rem;
 }
+.filter-head .arrow {
+  transition: transform .25s ease;
+}
+
+.filter-body.open + .filter-head .arrow,
+.filter-head.open .arrow {
+  transform: rotate(180deg);
+}
+
+
 .filter:hover {
-  filter: brightness(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
 }
 .chips{display:flex;flex-wrap:wrap;gap:.4rem}
 .chip{
@@ -611,6 +629,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

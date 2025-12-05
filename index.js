@@ -969,10 +969,16 @@ firestoreUpdateCase(caseId, {
   statusChangedBy: trackerState.user.uid
 });
 
-// 🚫 Prevent case from disappearing when in "Unupdated" mode
+// In normal modes → refresh
 if (uiState.mode !== "unupdated") {
-  applyFilters();
+    applyFilters();
 }
+
+// CRITICAL FIX: Reset protection after finishing normal update
+if (uiState.mode === "unupdated") {
+    unupdatedProtect = false;
+}
+
 
 }
 
@@ -1525,6 +1531,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

@@ -211,7 +211,11 @@ function setupRealtimeCases(teamId) {
       flagged: !!c.flagged,
       notes: c.notes || "",
       lastActionedOn: c.lastActionedOn || "",
-      lastActionedBy: c.lastActionedBy || ""
+      lastActionedBy: c.lastActionedBy || "",
+
+      // <-- NEW: include the status-change audit fields
+     statusChangedOn: c.statusChangedOn || "",
+     statusChangedBy: c.statusChangedBy || ""
     }));
 
     applyFilters();
@@ -1463,6 +1467,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

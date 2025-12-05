@@ -561,6 +561,32 @@ function updateStatusLabel() {
 /* =======================================================================
    FILTER ENGINE (REBUILT CLEANLY)
    ======================================================================= */
+
+function restrictNcmCasesForUser(rows, user) {
+  const isPrimary = user.role === "primary";
+  const isGeneral = user.role === "general";
+
+  // Secondary admin → no restriction
+  if (!isPrimary && !isGeneral) return rows;
+
+  const ncm1Selected = trackerState.statusFilter.has("NCM 1");
+  const ncm2Selected = trackerState.statusFilter.has("NCM 2");
+
+  // If neither selected → return normally
+  if (!ncm1Selected && !ncm2Selected) return rows;
+
+  return rows.filter(r => {
+    if (r.status === "NCM 1" && ncm1Selected) {
+      return r.statusChangedBy === user.uid;
+    }
+    if (r.status === "NCM 2" && ncm2Selected) {
+      return r.statusChangedBy === user.uid;
+    }
+    return true; // all other statuses unaffected
+  });
+}
+
+
 export function applyFilters() {
   const today = new Date().toISOString().split("T")[0];
   let rows = [...trackerState.allCases];
@@ -623,6 +649,7 @@ export function applyFilters() {
 
   trackerState.filteredCases = rows;
   updateBadges();
+   rows = restrictNcmCasesForUser(rows, trackerState.user);
   renderTable();
   return;
 }
@@ -1435,6 +1462,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

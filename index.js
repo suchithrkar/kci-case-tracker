@@ -917,7 +917,7 @@ function handleStatusChange(caseId, newStatus) {
   const previousStatus = row.status;
 
   // Update local state
-  row.status = newStatus;
+  //row.status = newStatus;
 
   if (needsFollow) {
     prevStatusBeforeModal = previousStatus;   // FIXED
@@ -1494,6 +1494,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

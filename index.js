@@ -650,7 +650,7 @@ export function applyFilters() {
 
   trackerState.filteredCases = rows;
   updateBadges();
-   rows = restrictNcmCasesForUser(rows, trackerState.user);
+   rows = restrictNcmCasesForUser(rows, uiState.user);
   renderTable();
   return;
 }
@@ -1463,6 +1463,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

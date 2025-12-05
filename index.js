@@ -710,7 +710,8 @@ if (uiState.sortByDateAsc !== null) {
 }
 
 /* APPLY SPECIAL NCM FILTERING */
-rows = restrictNcmCasesForUser(rows, uiState.user);
+rows = restrictNcmCasesForUser(rows, trackerState.user);
+
 
 trackerState.filteredCases = rows;
 updateBadges();
@@ -1471,6 +1472,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

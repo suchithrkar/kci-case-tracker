@@ -1318,7 +1318,11 @@ async function saveModalData() {
   prevStatusBeforeModal = null;
 
 
+  // 🚫 Prevent auto-refresh while in Unupdated mode
+if (uiState.mode !== "unupdated") {
   applyFilters();
+}
+
   requireFollowUp = false;
   currentModalCaseId = null;
 
@@ -1475,6 +1479,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

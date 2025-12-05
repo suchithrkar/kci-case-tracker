@@ -837,6 +837,7 @@ const modalWarning = document.getElementById("modalWarning");
 const optDate = document.getElementById("optDate");
 const optFlag = document.getElementById("optFlag");
 const optNotes = document.getElementById("optNotes");
+let notesHeightLocked = false;
 const optLastActioned = document.getElementById("optLastActioned");
 const optLastActionedByName = document.getElementById("optLastActionedByName"); // added for name reveal
 
@@ -936,12 +937,15 @@ export function openCaseModal(caseId, enforce = false) {
   optNotes.value = r.notes || "";
 
    /* Restore saved notes box height */
-const savedH = localStorage.getItem("notesBoxHeight");
+   const savedH = localStorage.getItem("notesBoxHeight");
 if (savedH) {
+  notesHeightLocked = true;       // ← prevent auto-resize overwrite
   optNotes.style.height = savedH;
 } else {
-  resizeNotes();  // default autoresize
+  notesHeightLocked = false;      // ← normal auto-resize mode
+  resizeNotes();
 }
+
 
 
   /* Warning Block */
@@ -1126,12 +1130,17 @@ optNotes.addEventListener("input", () => {
 /* SAVE resized height to localStorage */
 optNotes.addEventListener("mouseup", () => {
   const h = optNotes.style.height;
-  if (h) localStorage.setItem("notesBoxHeight", h);
+  if (h) {
+    localStorage.setItem("notesBoxHeight", h);
+    notesHeightLocked = true;   // ← lock the height once resized
+  }
 });
+
 
 
 /* Initial resize when modal opens */
 function resizeNotes() {
+  if (notesHeightLocked) return;   // ← prevent overwriting saved height
   optNotes.style.height = "auto";
   optNotes.style.height = (optNotes.scrollHeight + 6) + "px";
 }
@@ -1407,6 +1416,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

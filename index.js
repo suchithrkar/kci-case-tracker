@@ -480,7 +480,7 @@ function setupFilterControls() {
     uiState.search = "";
     uiState.from = "";
     uiState.to = "";
-    uiState.statusList = [];
+    uiState.statusList = [];     // reset status filter
     uiState.mode = "normal";
     uiState.sortByDateAsc = null;
 
@@ -488,20 +488,23 @@ function setupFilterControls() {
     el.dateFrom.value = "";
     el.dateTo.value = "";
 
-    // Clear primary filters except locked ones
+    // Reset primary filters (except locked)
     Object.keys(uiState.primaries).forEach(key => {
-      if (!uiState.primaryLocks || !uiState.primaryLocks[key]) {
-        uiState.primaries[key] = [];
-      }
-      // if locked, keep selections as-is
+        if (!uiState.primaryLocks[key]) {
+            uiState.primaries[key] = [];
+        }
     });
 
-    // Rebuild status and primary filter UIs to reflect cleared state
     buildStatusPanel();
     buildPrimaryFilters();
 
+    // *** CRITICAL FIX ***
+    // Make sure no checkbox modifies uiState.statusList during reset
+    el.statusPanel.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
+
     applyFilters();
-  };
+};
+
 
 
   /* MODE BUTTONS — Direct override (Option A behavior) */
@@ -1522,6 +1525,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

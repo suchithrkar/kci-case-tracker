@@ -917,6 +917,12 @@ let requireFollowUp = false;
    ======================================================================= */
 
 function handleStatusChange(caseId, newStatus) {
+
+   // FINAL FIX: protect instantly before UI auto-refresh
+  if (uiState.mode === "unupdated") {
+      unupdatedProtect = true;
+  }
+   
   const today = new Date().toISOString().split("T")[0];
   const row = trackerState.allCases.find(r => r.id === caseId);
   if (!row) return;
@@ -1510,6 +1516,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

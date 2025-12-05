@@ -951,6 +951,11 @@ function handleStatusChange(caseId, newStatus) {
   applyFilters();
 }
 
+     if (uiState.mode === "unupdated") {
+    unupdatedProtect = false;
+}
+
+
     return;
   }
 
@@ -1521,6 +1526,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

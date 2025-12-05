@@ -1356,6 +1356,21 @@ document.getElementById("btnInfoClose").onclick = () =>
   infoModal.classList.remove("show");
 document.getElementById("btnInfoOk").onclick = () =>
   infoModal.classList.remove("show");
+document.getElementById("btnInfoCopy").onclick = () => {
+  const text = infoModalBody.textContent;
+
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      const toast = document.getElementById("toast");
+      toast.textContent = "Copied!";
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 900);
+    })
+    .catch(() => {
+      alert("Copy failed. Your browser may block clipboard access.");
+    });
+};
+
 infoModal.onclick = (e) => {
   if (e.target === infoModal) infoModal.classList.remove("show");
 };
@@ -1420,6 +1435,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

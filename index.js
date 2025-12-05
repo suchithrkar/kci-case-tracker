@@ -918,17 +918,20 @@ function handleStatusChange(caseId, newStatus) {
 
 
   // Normal statuses → update Firestore directly
-  firestoreUpdateCase(caseId, {
-    status: newStatus,
-    lastActionedOn: today,
-    lastActionedBy: trackerState.user.uid,
-    // NEW FIELDS for stats engine
-    statusChangedOn: today,
-    statusChangedBy: trackerState.user.uid
-  });
+  // Normal statuses → update Firestore directly
+firestoreUpdateCase(caseId, {
+  status: newStatus,
+  lastActionedOn: today,
+  lastActionedBy: trackerState.user.uid,
+  statusChangedOn: today,
+  statusChangedBy: trackerState.user.uid
+});
 
-
+// 🚫 Prevent case from disappearing when in "Unupdated" mode
+if (uiState.mode !== "unupdated") {
   applyFilters();
+}
+
 }
 
 /* =======================================================================
@@ -1472,6 +1475,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

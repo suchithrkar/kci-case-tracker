@@ -1123,9 +1123,13 @@ setInterval(refreshFlagUI, 300);
    ======================================================================= */
 
 optNotes.addEventListener("input", () => {
+  // If height was manually resized → do NOT auto-resize
+  if (notesHeightLocked) return;
+
   optNotes.style.height = "auto";
   optNotes.style.height = (optNotes.scrollHeight + 6) + "px";
 });
+
 
 /* SAVE resized height to localStorage */
 optNotes.addEventListener("mouseup", () => {
@@ -1416,6 +1420,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

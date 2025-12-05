@@ -218,7 +218,18 @@ function setupRealtimeCases(teamId) {
      statusChangedBy: c.statusChangedBy || ""
     }));
 
-    applyFilters();
+    // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
+if (uiState.mode !== "unupdated") {
+  applyFilters();
+} else {
+  // Just update filteredCases with the rows currently on screen
+  trackerState.filteredCases = trackerState.allCases.filter(r =>
+    !r.status || r.status.trim() === ""
+  );
+  renderTable();
+  updateBadges();
+}
+
   });
 }
 
@@ -1479,6 +1490,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

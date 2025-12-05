@@ -222,16 +222,21 @@ function setupRealtimeCases(teamId) {
     }));
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
-if (uiState.mode !== "unupdated") {
-  applyFilters();
-} else {
-  // Just update filteredCases with the rows currently on screen
-  trackerState.filteredCases = trackerState.allCases.filter(r =>
-    !r.status || r.status.trim() === ""
-  );
-  renderTable();
-  updateBadges();
+// 🚫 In Unupdated Mode → BLOCK realtime auto-refresh when editing
+if (uiState.mode === "unupdated" && unupdatedProtect) {
+    return; // completely stop refresh
 }
+
+if (uiState.mode !== "unupdated") {
+    applyFilters();
+} else {
+    trackerState.filteredCases = trackerState.allCases.filter(r =>
+        !r.status || r.status.trim() === ""
+    );
+    renderTable();
+    updateBadges();
+}
+
 
   });
 }
@@ -1516,6 +1521,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

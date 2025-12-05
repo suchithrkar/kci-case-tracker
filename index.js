@@ -923,7 +923,11 @@ function handleStatusChange(caseId, newStatus) {
     prevStatusBeforeModal = previousStatus;   // FIXED
     pendingStatusForModal = newStatus;
     openCaseModal(caseId, true);
-    applyFilters();
+     
+    if (uiState.mode !== "unupdated") {
+  applyFilters();
+}
+
     return;
   }
 
@@ -1490,6 +1494,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

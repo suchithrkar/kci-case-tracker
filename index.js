@@ -569,22 +569,23 @@ function restrictNcmCasesForUser(rows, user) {
   // Secondary admin → no restriction
   if (!isPrimary && !isGeneral) return rows;
 
-  const ncm1Selected = trackerState.statusFilter.has("NCM 1");
-  const ncm2Selected = trackerState.statusFilter.has("NCM 2");
+  const ncm1Selected = uiState.statusList.includes("NCM 1");
+  const ncm2Selected = uiState.statusList.includes("NCM 2");
 
   // If neither selected → return normally
   if (!ncm1Selected && !ncm2Selected) return rows;
 
   return rows.filter(r => {
-    if (r.status === "NCM 1" && ncm1Selected) {
+    if (r.status === "NCM 1" && ncm1Selected)
       return r.statusChangedBy === user.uid;
-    }
-    if (r.status === "NCM 2" && ncm2Selected) {
+
+    if (r.status === "NCM 2" && ncm2Selected)
       return r.statusChangedBy === user.uid;
-    }
-    return true; // all other statuses unaffected
+
+    return true; // all other statuses remain unaffected
   });
 }
+
 
 
 export function applyFilters() {
@@ -1462,6 +1463,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

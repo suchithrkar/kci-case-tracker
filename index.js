@@ -975,9 +975,9 @@ if (uiState.mode !== "unupdated") {
 }
 
 // CRITICAL FIX: Reset protection after finishing normal update
-if (uiState.mode === "unupdated") {
-    unupdatedProtect = false;
-}
+//if (uiState.mode === "unupdated") {
+//    unupdatedProtect = false;
+//}
 
 
 }
@@ -1531,6 +1531,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

@@ -842,6 +842,8 @@ const optLastActionedByName = document.getElementById("optLastActionedByName"); 
 
 const btnModalClose = document.getElementById("btnModalClose");
 const btnModalSave = document.getElementById("btnModalSave");
+const btnModalClear = document.getElementById("btnModalClear");
+
 
 modalWarning.style.display = "none";
 
@@ -933,6 +935,15 @@ export function openCaseModal(caseId, enforce = false) {
   /* Notes */
   optNotes.value = r.notes || "";
 
+   /* Restore saved notes box height */
+const savedH = localStorage.getItem("notesBoxHeight");
+if (savedH) {
+  optNotes.style.height = savedH;
+} else {
+  resizeNotes();  // default autoresize
+}
+
+
   /* Warning Block */
   if (requireFollowUp && !r.followDate) {
     showModalWarning(`Status "${r.status}" needs a follow-up date.`);
@@ -990,6 +1001,14 @@ optFlag.onclick = () => {
 
 btnModalClose.onclick = closeModal;
 modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+/* CLEAR BUTTON — Reset Notes + Follow-up Date */
+btnModalClear.onclick = () => {
+  optNotes.value = "";
+  optDate.value = "";
+  resizeNotes();   // keep textarea visually correct
+};
+
 
 function closeModal() {
   // If modal was enforcing follow-up and user cancels → revert status
@@ -1103,6 +1122,13 @@ optNotes.addEventListener("input", () => {
   optNotes.style.height = "auto";
   optNotes.style.height = (optNotes.scrollHeight + 6) + "px";
 });
+
+/* SAVE resized height to localStorage */
+optNotes.addEventListener("mouseup", () => {
+  const h = optNotes.style.height;
+  if (h) localStorage.setItem("notesBoxHeight", h);
+});
+
 
 /* Initial resize when modal opens */
 function resizeNotes() {
@@ -1381,6 +1407,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

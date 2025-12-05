@@ -654,7 +654,6 @@ export function applyFilters() {
 
   trackerState.filteredCases = rows;
   updateBadges();
-   rows = restrictNcmCasesForUser(rows, uiState.user);
   renderTable();
   return;
 }
@@ -701,17 +700,22 @@ export function applyFilters() {
 
 
   /* SORT */
-  if (uiState.sortByDateAsc !== null) {
-    rows.sort((a, b) =>
-      uiState.sortByDateAsc
-        ? a.createdOn.localeCompare(b.createdOn)
-        : b.createdOn.localeCompare(a.createdOn)
-    );
-  }
+  /* SORT */
+if (uiState.sortByDateAsc !== null) {
+  rows.sort((a, b) =>
+    uiState.sortByDateAsc
+      ? a.createdOn.localeCompare(b.createdOn)
+      : b.createdOn.localeCompare(a.createdOn)
+  );
+}
 
-  trackerState.filteredCases = rows;
-  updateBadges();
-  renderTable();
+/* APPLY SPECIAL NCM FILTERING */
+rows = restrictNcmCasesForUser(rows, uiState.user);
+
+trackerState.filteredCases = rows;
+updateBadges();
+renderTable();
+
 }
 
 /* =======================================================================
@@ -1467,6 +1471,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

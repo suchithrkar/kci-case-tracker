@@ -124,6 +124,9 @@ const uiState = {
   }
 };
 
+let unupdatedProtect = false;
+
+
 /* =======================================================================
    AUTH STATE LISTENER
    ======================================================================= */
@@ -605,9 +608,11 @@ function restrictNcmCasesForUser(rows, user) {
 
 export function applyFilters() {
   // 🚫 Global protection: do NOT auto-refresh if modal process is happening in Unupdated mode
-  if (uiState.mode === "unupdated" && modal.classList.contains("show")) {
-    return;   // skip filtering while modal is open
-  }
+  // 🚫 Global fail-safe override:
+if (uiState.mode === "unupdated" && unupdatedProtect) {
+    return;   // BLOCK ALL FILTERING
+}
+
 
   const today = new Date().toISOString().split("T")[0];
   let rows = [...trackerState.allCases];
@@ -927,6 +932,8 @@ function handleStatusChange(caseId, newStatus) {
   if (needsFollow) {
     prevStatusBeforeModal = previousStatus;   // FIXED
     pendingStatusForModal = newStatus;
+     if (uiState.mode === "unupdated") unupdatedProtect = true;
+
     openCaseModal(caseId, true);
      
     if (uiState.mode !== "unupdated") {
@@ -1093,6 +1100,8 @@ function closeModal() {
   animateModalClose(() => {
     modal.classList.remove("show");
   });
+   unupdatedProtect = false;
+
 }
 
 
@@ -1346,6 +1355,7 @@ if (uiState.mode !== "unupdated") {
 
   requireFollowUp = false;
   currentModalCaseId = null;
+unupdatedProtect = false;
 
   return true;
 }
@@ -1500,6 +1510,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

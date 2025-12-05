@@ -604,6 +604,11 @@ function restrictNcmCasesForUser(rows, user) {
 
 
 export function applyFilters() {
+  // 🚫 Global protection: do NOT auto-refresh if modal process is happening in Unupdated mode
+  if (uiState.mode === "unupdated" && modal.classList.contains("show")) {
+    return;   // skip filtering while modal is open
+  }
+
   const today = new Date().toISOString().split("T")[0];
   let rows = [...trackerState.allCases];
 
@@ -1071,6 +1076,7 @@ btnModalClear.onclick = () => {
 
 function closeModal() {
   // If modal was enforcing follow-up and user cancels → revert status
+   /*
   if (requireFollowUp && pendingStatusForModal && currentModalCaseId) {
     const r = trackerState.allCases.find(x => x.id === currentModalCaseId);
     if (r) {
@@ -1078,7 +1084,7 @@ function closeModal() {
     }
     pendingStatusForModal = null;
     prevStatusBeforeModal = null;
-  }
+  }*/
 
   requireFollowUp = false;
   currentModalCaseId = null;
@@ -1494,6 +1500,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

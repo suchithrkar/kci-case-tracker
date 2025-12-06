@@ -409,9 +409,6 @@ async function applyExcelChanges() {
   showPopup("Excel update complete!");
    processing = false;
 
-   const mb = $("modalPreview").querySelector(".modal-body");
-mb.scrollTop = mb.scrollHeight;
-
 
 }
 
@@ -1084,7 +1081,6 @@ function resetExcelUI() {
   // Reset modal preview buttons if preview modal was opened
   $("btnConfirmImport").disabled = false;
   $("btnPreviewCancel").disabled = false;
-  $("btnPreviewClose").disabled = false;
   $("allowDeletion").disabled = false;
 
    $("previewSection").style.display = "none";
@@ -1633,6 +1629,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

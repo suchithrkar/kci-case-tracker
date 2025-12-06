@@ -114,6 +114,39 @@ h1 {
   border-radius:12px;
   z-index:999;
 }
+
+/* Input widths consistent */
+.input,
+.btn,
+.password-wrap {
+  width: 100%;
+}
+
+/* Password field wrapper */
+.password-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrap .input {
+  padding-right: 2.6rem; /* space for icon */
+}
+
+/* Eye icon */
+.toggle-pass {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.65;
+}
+
+.toggle-pass:hover {
+  opacity: 1;
+}
+
+  
 </style>
 </head>
 
@@ -131,7 +164,11 @@ h1 {
   <!-- LOGIN FORM -->
   <div id="loginForm">
     <input id="loginEmail" class="input" placeholder="Email" type="email" />
-    <input id="loginPassword" class="input" placeholder="Password" type="password" />
+    <div class="password-wrap">
+  <input id="loginPassword" class="input" placeholder="Password" type="password" />
+  <span class="toggle-pass" data-target="loginPassword">👁️</span>
+</div>
+
     <button id="btnLogin" class="btn">Login</button>
     <span id="forgot" class="link">Forgot Password?</span>
   </div>
@@ -141,7 +178,11 @@ h1 {
     <input id="signFirst" class="input" placeholder="First Name" />
     <input id="signLast" class="input" placeholder="Last Name" />
     <input id="signEmail" class="input" placeholder="Email" type="email" />
-    <input id="signPassword" class="input" placeholder="Password" type="password" />
+    <div class="password-wrap">
+  <input id="signPassword" class="input" placeholder="Password" type="password" />
+  <span class="toggle-pass" data-target="signPassword">👁️</span>
+</div>
+
     <button id="btnSignup" class="btn">Sign Up</button>
   </div>
 
@@ -229,7 +270,26 @@ document.getElementById("forgot").onclick = async () => {
     showPopup(err.message);
   }
 };
+
+// PASSWORD SHOW/HIDE TOGGLE
+document.querySelectorAll(".toggle-pass").forEach(icon => {
+  icon.onclick = () => {
+    const id = icon.dataset.target;
+    const input = document.getElementById(id);
+
+    if (input.type === "password") {
+      input.type = "text";
+      icon.textContent = "🙈";
+    } else {
+      input.type = "password";
+      icon.textContent = "👁️";
+    }
+  };
+});
+
+  
 </script>
 
 </body>
+
 </html>

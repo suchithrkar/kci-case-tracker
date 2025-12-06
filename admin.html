@@ -395,6 +395,27 @@ select.user-team-dd,
   font-size: 18px;
 }
 
+/* ============================================================
+   PREVIEW MODAL + PROGRESS UI
+   ============================================================ */
+
+#excelProgress {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  white-space: pre-line;
+}
+
+#previewCounts strong {
+  font-size: 16px;
+}
+
+#deleteCheckboxWrap input {
+  transform: scale(1.2);
+}
+
+
 
 </style>
 
@@ -513,18 +534,33 @@ select.user-team-dd,
 
       <h3>Data Upload (XLSX)</h3>
 
+<!-- Upload Row -->
 <div class="upload-row">
+
+  <!-- Custom File Selector -->
   <label class="file-input-label">
     <span>📄 Choose File</span>
     <input type="file" id="excelInput" accept=".xlsx,.xls">
   </label>
 
-  <button class="modal-btn" id="btnProcessExcel">Process Excel</button>
+  <!-- Selected file name -->
+  <div id="selectedFileName" style="opacity:0.8; font-size:13px;">No file selected</div>
+
+  <!-- PREVIEW CHANGES button -->
+  <button class="modal-btn" id="btnPreviewChanges" disabled>
+    PREVIEW CHANGES
+  </button>
+
 </div>
 
+<!-- Summary Area -->
 <div id="uploadSummary" style="margin-top:1rem;">
   <strong>Selected Team:</strong> -
 </div>
+
+<!-- Progress Area (hidden until needed) -->
+<div id="excelProgress" style="margin-top:1rem; display:none; font-size:14px; line-height:1.5;"></div>
+
 
 
     </div>
@@ -534,6 +570,42 @@ select.user-team-dd,
     </div>
   </div>
 </div>
+
+<!-- ============================================================
+     PREVIEW CHANGES MODAL
+     ============================================================ -->
+<div class="modal" id="modalPreview">
+  <div class="modal-card">
+    
+    <div class="modal-head">
+      <div class="modal-title">Preview Changes</div>
+      <button class="modal-btn" id="btnPreviewClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div id="previewCounts" style="font-size:15px; line-height:1.7;">
+        <!-- Filled by JS -->
+      </div>
+
+      <!-- Delete Confirmation Checkbox -->
+      <div id="deleteCheckboxWrap" style="margin-top:1rem; display:none;">
+        <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer;">
+          <input type="checkbox" id="allowDeletion">
+          <span>Allow deletion of missing cases</span>
+        </label>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="modal-btn" id="btnPreviewCancel">Cancel</button>
+      <button class="modal-btn" id="btnConfirmImport" disabled>Confirm Update</button>
+    </div>
+
+  </div>
+</div>
+
 
 
 <!-- ============================================================
@@ -595,6 +667,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

@@ -144,22 +144,24 @@ async function parseExcelFile(file) {
 
         parsed.push({
           id,
-          customerName: (r[1] || "").trim(),
-          country: (r[2] || "").trim(),
-          resolution: (r[3] || "").trim(),
-          caseOwner: (r[4] || "").trim(),
-          caGroup: (r[5] || "").trim(),
-          sbd: (r[6] || "").trim(),
-          onsiteRFC: (r[7] || "").trim(),
-          csrRFC: (r[8] || "").trim(),
-          benchRFC: (r[9] || "").trim(),
+          customerName: String(r[1] || "").trim(),
+country:      String(r[2] || "").trim(),
+resolution:   String(r[3] || "").trim(),
+caseOwner:    String(r[4] || "").trim(),
+caGroup:      String(r[5] || "").trim(),
+sbd:          String(r[6] || "").trim(),
+onsiteRFC:    String(r[7] || "").trim(),
+csrRFC:       String(r[8] || "").trim(),
+benchRFC:     String(r[9] || "").trim(),
         });
       }
 
       excelState.excelCases = parsed;
 
       updateProgress(`Excel loaded.\nTotal valid rows: ${parsed.length}`);
-       validateReadyState();
+// Do NOT call validateReadyState() here.
+// It is called AFTER parseExcelFile() in the onchange handler.
+
 
       resolve();
     };
@@ -1615,6 +1617,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

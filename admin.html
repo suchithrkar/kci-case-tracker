@@ -560,6 +560,32 @@ select.user-team-dd,
 <!-- Progress Area (hidden until needed) -->
 <div id="excelProgress" style="margin-top:1rem; display:none; font-size:14px; line-height:1.5;"></div>
 
+       <!-- Preview Results (hidden until PREVIEW CHANGES is clicked) -->
+<div id="previewSection" style="display:none; margin-top:1.5rem;">
+
+  <h3>Preview Changes</h3>
+
+  <div id="previewCounts" style="font-size:15px; line-height:1.7; margin-top:0.5rem;">
+    <!-- filled by JS -->
+  </div>
+
+  <!-- Deletion Checkbox -->
+  <div id="deleteCheckboxWrap" style="margin-top:1rem; display:none;">
+    <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer;">
+      <input type="checkbox" id="allowDeletion">
+      <span>Allow deletion of missing cases</span>
+    </label>
+  </div>
+
+  <!-- Preview Buttons -->
+  <div style="margin-top:1rem; display:flex; gap:0.6rem;">
+    <button class="modal-btn" id="btnConfirmImport" disabled>Confirm Update</button>
+    <button class="modal-btn" id="btnPreviewCancel">Cancel Preview</button>
+  </div>
+
+</div>
+
+
 
 
     </div>
@@ -567,41 +593,6 @@ select.user-team-dd,
     <div class="modal-foot">
       <button class="modal-btn" id="btnUpdateDone">Done</button>
     </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     PREVIEW CHANGES MODAL
-     ============================================================ -->
-<div class="modal" id="modalPreview">
-  <div class="modal-card">
-    
-    <div class="modal-head">
-      <div class="modal-title">Preview Changes</div>
-      <button class="modal-btn" id="btnPreviewClose">Close</button>
-    </div>
-
-    <div class="modal-body">
-
-      <div id="previewCounts" style="font-size:15px; line-height:1.7;">
-        <!-- Filled by JS -->
-      </div>
-
-      <!-- Delete Confirmation Checkbox -->
-      <div id="deleteCheckboxWrap" style="margin-top:1rem; display:none;">
-        <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer;">
-          <input type="checkbox" id="allowDeletion">
-          <span>Allow deletion of missing cases</span>
-        </label>
-      </div>
-
-    </div>
-
-    <div class="modal-foot">
-      <button class="modal-btn" id="btnPreviewCancel">Cancel</button>
-      <button class="modal-btn" id="btnConfirmImport" disabled>Confirm Update</button>
-    </div>
-
   </div>
 </div>
 
@@ -666,6 +657,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

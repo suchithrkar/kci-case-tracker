@@ -425,14 +425,18 @@ if (rfcKeys.includes(k) && cb.checked) {
         uiState.primaries.caseResolutionCode = ["Offsite Solution"];
     }
 
-    // 5) Rebuild the filters
+    // Delay rebuild so the checkbox click completes first
+setTimeout(() => {
+    // Rebuild filters
     buildPrimaryFilters();
 
-    // 6) Re-open the previously open filters
+    // Re-open previously open filters
     openFilters.forEach(key => {
         const body = document.getElementById(`filter-body-${key}`);
         if (body) body.classList.add("open");
     });
+}, 0);
+
 }
 
 };
@@ -1628,6 +1632,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

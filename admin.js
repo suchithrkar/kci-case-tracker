@@ -261,19 +261,22 @@ function openPreviewModal() {
   $("btnConfirmImport").disabled = !$("allowDeletion").checked;
 };
 
-$("allowDeletion").onchange = () => {
-    $("btnConfirmImport").disabled = !$("allowDeletion").checked;
-};
-
 
   $("modalPreview").classList.add("show");
 }
 
-$("btnPreviewClose").onclick = () =>
+$("btnPreviewClose").onclick = () => {
   $("modalPreview").classList.remove("show");
+  $("previewCounts").innerHTML = "";
+  clearProgress();
+};
 
-$("btnPreviewCancel").onclick = () =>
+$("btnPreviewCancel").onclick = () => {
   $("modalPreview").classList.remove("show");
+  $("previewCounts").innerHTML = "";
+  clearProgress();
+};
+
 
 // ======================================================
 // CONFIRM IMPORT BUTTON → START FIRESTORE WRITE PROCESS
@@ -1060,7 +1063,7 @@ function resetExcelUI() {
   clearProgress();
 
   // Reset modal preview buttons if preview modal was opened
-  $("btnConfirmImport").disabled = (d.deleted.length > 0);
+  $("btnConfirmImport").disabled = false;
   $("btnPreviewCancel").disabled = false;
   $("btnPreviewClose").disabled = false;
   $("allowDeletion").disabled = false;
@@ -1607,6 +1610,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

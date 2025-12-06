@@ -665,14 +665,20 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
   }
 
   if (uiState.mode === "unupdated") {
-    rows = rows.filter(r =>
-      !r.status || r.status.trim() === ""
-    );
+    rows = rows.filter(r => {
+        // Keep pending-updated rows visible
+        if (pendingUnupdated.has(r.id)) return true;
+
+        // Keep rows that are actually unupdated
+        return !r.status || r.status.trim() === "";
+    });
+
     trackerState.filteredCases = rows;
     updateBadges();
     renderTable();
     return;
-  }
+}
+
 
   if (uiState.mode === "repeat") {
   const count = {};
@@ -1570,6 +1576,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

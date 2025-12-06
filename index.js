@@ -503,6 +503,8 @@ function setupFilterControls() {
 
      // NEW: clear all pending updates so Unupdated view fully resets
 pendingUnupdated.clear();
+         unupdatedProtect = false;   // VERY IMPORTANT FIX
+
 
 
     buildStatusPanel();
@@ -1568,6 +1570,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

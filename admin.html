@@ -149,28 +149,38 @@ html,body{
 }
 
 /* ============================================================
-   TABLES
+   TRACKER TABLE STYLE — REPLICATED FOR ADMIN (Users + Stats)
    ============================================================ */
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:1rem;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
 }
-thead th{
-  text-align:left;
-  padding:0.65rem 0.6rem;
-  font-size:12px;
-  letter-spacing:0.5px;
-  background:var(--panel-2);
-  border-bottom:1px solid var(--border);
+
+thead th {
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .6px;
+  padding: .55rem .75rem;
+  text-align: left;        /* left aligned for admin */
+  vertical-align: middle;
+  white-space: nowrap;
 }
-tbody td{
-  padding:0.65rem 0.6rem;
-  border-bottom:1px solid var(--border);
+
+tbody td {
+  border-bottom: 1px solid var(--border);
+  padding: .55rem .75rem;
+  vertical-align: middle;
+  white-space: nowrap;
+  text-align: left;        /* admin version stays left-aligned */
 }
-tbody tr:hover{
-  background:rgba(255,255,255,0.05);
+
+tbody tr:hover {
+  background: rgba(255,255,255,0.05);
 }
+
 .action-btn{
   padding:0.35rem 0.6rem;
   border-radius:8px;
@@ -489,6 +499,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

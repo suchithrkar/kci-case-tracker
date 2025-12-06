@@ -256,7 +256,15 @@ function openPreviewModal() {
   $("deleteCheckboxWrap").style.display = d.deleted.length > 0 ? "block" : "none";
 
   $("allowDeletion").checked = false;
-  $("btnConfirmImport").disabled = false;
+  $("btnConfirmImport").disabled = (d.deleted.length > 0);
+   $("allowDeletion").onchange = () => {
+  $("btnConfirmImport").disabled = !$("allowDeletion").checked;
+};
+
+$("allowDeletion").onchange = () => {
+    $("btnConfirmImport").disabled = !$("allowDeletion").checked;
+};
+
 
   $("modalPreview").classList.add("show");
 }
@@ -270,6 +278,13 @@ $("btnPreviewCancel").onclick = () =>
 // ======================================================
 // CONFIRM IMPORT BUTTON → START FIRESTORE WRITE PROCESS
 // ======================================================
+// Prevent clicking outside modal to close it
+$("modalPreview").onclick = (e) => {
+  if (!processing) return;
+  // ignore clicks while processing
+  e.stopPropagation();
+};
+
 $("btnConfirmImport").onclick = async () => {
   const d = excelState.diff;
 
@@ -284,12 +299,7 @@ $("btnConfirmImport").onclick = async () => {
   $("btnPreviewClose").disabled = true;
   $("allowDeletion").disabled = true;
 
-   // Prevent clicking outside modal to close it
-$("modalPreview").onclick = (e) => {
-  if (!processing) return;
-  // ignore clicks while processing
-  e.stopPropagation();
-};
+   
 
 
   clearProgress();
@@ -386,6 +396,10 @@ async function applyExcelChanges() {
   showPopup("Excel update complete!");
    processing = false;
 
+   const mb = $("modalPreview").querySelector(".modal-body");
+mb.scrollTop = mb.scrollHeight;
+
+
 }
 
 
@@ -409,11 +423,6 @@ btnUpdateDone.onclick = () => {
 };
 
 
-
-const excelInput          = document.getElementById("excelInput");
-const uploadSummary       = document.getElementById("uploadSummary");
-const btnProcessExcel     = document.getElementById("btnProcessExcel");
-uploadSummary.innerHTML = `<strong>Selected Team:</strong> -`;
 
 const modalReassign       = document.getElementById("modalReassign");
 const reassignTeamSelect  = document.getElementById("reassignTeamSelect");
@@ -1051,26 +1060,14 @@ function resetExcelUI() {
   clearProgress();
 
   // Reset modal preview buttons if preview modal was opened
-  $("btnConfirmImport").disabled = false;
+  $("btnConfirmImport").disabled = (d.deleted.length > 0);
   $("btnPreviewCancel").disabled = false;
   $("btnPreviewClose").disabled = false;
   $("allowDeletion").disabled = false;
 }
 
 
-// Excel parsing (SheetJS available globally)
-function readExcelFile(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      resolve(XLSX.utils.sheet_to_json(sheet, { header: 1 }));
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
+
 
 function excelToDate(num) {
   if (!num) return "";
@@ -1079,9 +1076,7 @@ function excelToDate(num) {
   return d.toISOString().split("T")[0];
 }
 
-let selectedUploadTeam = null;
-let excelCases = [];
-let firestoreCases = [];
+
 
 updateTeamList.addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
@@ -1612,6 +1607,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

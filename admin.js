@@ -1287,10 +1287,11 @@ async function loadStatsCasesOnce() {
 ------------------------------------------------------------ */
 function buildStatsControls() {
   statsControls.innerHTML = `
-    <button class="action-btn" id="btnStatsRefresh">
-      🔄 Refresh Stats
+    <button class="action-btn" id="btnStatsRefresh" title="Refresh">
+      🔄
     </button>
-  `;
+`;
+
 
   document.getElementById("btnStatsRefresh").onclick = async () => {
     showPopup("Refreshing stats...");
@@ -1309,6 +1310,8 @@ function buildTeamSelector() {
 
   const sel = document.createElement("select");
   sel.className = "input";
+sel.style.width = "auto";
+
   sel.id = "statsTeamSelect";
   sel.style.marginRight = "12px";
 
@@ -1336,6 +1339,7 @@ function buildTeamSelector() {
   };
 
   statsControls.prepend(sel);
+
 }
 
 /* ------------------------------------------------------------
@@ -1346,6 +1350,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

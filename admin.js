@@ -238,7 +238,15 @@ async function loadFirestoreCasesForTeam(teamId) {
     where("teamId", "==", teamId)
   );
 
-  const snap = await getDocs(q);
+  let snap;
+try {
+  snap = await getDocs(q);
+} catch (err) {
+  console.error("Firestore read failed:", err);
+  showPopup("Could not load Firestore cases. Try again in 1–2 seconds.");
+  return;
+}
+
 
   excelState.firestoreCases = snap.docs.map(d => ({
     id: d.id,
@@ -484,6 +492,12 @@ btnAuditOk.onclick = () => modalAudit.classList.remove("show");
 // NEW: PREVIEW CHANGES BUTTON (replaces Process Excel)
 // ================================================
 $("btnPreviewChanges").onclick = async () => {
+
+  // Prevent running before auth is ready
+  if (!document.body.dataset.authready) {
+    return showPopup("Please wait... authentication still loading.");
+  }
+
   clearProgress();
   updateProgress("Preparing preview...");
 
@@ -544,6 +558,9 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   adminState.user = { uid: user.uid, ...data };
+   // EXCEL IMPORT is disabled until Auth is ready
+document.body.dataset.authready = "true";
+
 
   // Display user name
   el.adminUserName.textContent = `${data.firstName} ${data.lastName}`;
@@ -1623,6 +1640,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

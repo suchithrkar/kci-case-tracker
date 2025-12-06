@@ -274,6 +274,33 @@ select.user-team-dd,
   border: 1px solid var(--border);
 }
 
+/* ============================================================
+   STATS HEADER BAR (Team Statistics + Filters)
+   ============================================================ */
+.stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.stats-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.stats-header select {
+  width: auto !important;
+  min-width: 150px;
+}
+
+#btnStatsRefresh {
+  padding: 0.55rem 0.65rem !important;
+  font-size: 18px;
+}
+
 
 </style>
 
@@ -322,7 +349,14 @@ select.user-team-dd,
 
   <!-- STATS TAB -->
   <div id="sectionStats" style="display:none;">
+    <div class="stats-header">
     <h2>Team Statistics</h2>
+
+    <div class="stats-header-right">
+        <div id="statsControls"></div>
+    </div>
+</div>
+
     <div id="statsControls"></div>
     <div id="statsTableWrap"></div>
   </div>
@@ -455,6 +489,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

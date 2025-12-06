@@ -315,7 +315,8 @@ select.user-team-dd,
 /* ============================================================
    STATS HEADER BAR (Team Statistics + Filters)
    ============================================================ */
-.stats-header {
+.stats-header,
+.users-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -381,7 +382,9 @@ select.user-team-dd,
 
   <!-- USERS TAB -->
   <div id="sectionUsers">
+     <div class="users-header">
     <h2>Manage Users</h2>
+     </div>
     <div id="usersTableWrap"></div>
   </div>
 
@@ -527,6 +530,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

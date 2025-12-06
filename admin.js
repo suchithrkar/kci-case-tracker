@@ -268,46 +268,37 @@ function openPreviewModal() {
     <strong>Deleted Cases:</strong> ${d.deleted.length}
   `;
 
-  // show deletion checkbox only if needed
+  // show preview section
+  $("previewSection").style.display = "block";
+
+  // show checkbox only when needed
   $("deleteCheckboxWrap").style.display = d.deleted.length > 0 ? "block" : "none";
 
   $("allowDeletion").checked = false;
   $("btnConfirmImport").disabled = (d.deleted.length > 0);
-   if (d.deleted.length > 0) {
-  $("allowDeletion").onchange = () => {
-    $("btnConfirmImport").disabled = !$("allowDeletion").checked;
-  };
-} else {
-  $("btnConfirmImport").disabled = false;
+
+  if (d.deleted.length > 0) {
+    $("allowDeletion").onchange = () => {
+      $("btnConfirmImport").disabled = !$("allowDeletion").checked;
+    };
+  } else {
+    $("btnConfirmImport").disabled = false;
+  }
 }
-
-
-
-  $("modalPreview").classList.add("show");
-}
-
-$("btnPreviewClose").onclick = () => {
-  $("modalPreview").classList.remove("show");
-  $("previewCounts").innerHTML = "";
-  clearProgress();
-};
 
 $("btnPreviewCancel").onclick = () => {
-  $("modalPreview").classList.remove("show");
+  $("previewSection").style.display = "none";
   $("previewCounts").innerHTML = "";
   clearProgress();
 };
+
+
 
 
 // ======================================================
 // CONFIRM IMPORT BUTTON → START FIRESTORE WRITE PROCESS
 // ======================================================
-// Prevent clicking outside modal to close it
-$("modalPreview").onclick = (e) => {
-  if (!processing) return;
-  // ignore clicks while processing
-  e.stopPropagation();
-};
+
 
 $("btnConfirmImport").onclick = async () => {
   const d = excelState.diff;
@@ -319,8 +310,6 @@ $("btnConfirmImport").onclick = async () => {
 
   // Disable UI while processing
   $("btnConfirmImport").disabled = true;
-  $("btnPreviewCancel").disabled = true;
-  $("btnPreviewClose").disabled = true;
   $("allowDeletion").disabled = true;
 
    
@@ -1097,6 +1086,10 @@ function resetExcelUI() {
   $("btnPreviewCancel").disabled = false;
   $("btnPreviewClose").disabled = false;
   $("allowDeletion").disabled = false;
+
+   $("previewSection").style.display = "none";
+$("previewCounts").innerHTML = "";
+
 }
 
 
@@ -1640,6 +1633,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

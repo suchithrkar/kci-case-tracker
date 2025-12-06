@@ -307,6 +307,40 @@ tbody tr:hover {
   background:var(--panel-2);
 }
 
+/* =============================================
+   Upload row layout
+   ============================================= */
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: .6rem;
+}
+
+/* Custom file input button */
+.file-input-label {
+  padding: .55rem 1rem;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--text);
+}
+
+.file-input-label:hover {
+  filter: brightness(1.08);
+}
+
+/* Hide actual input */
+.file-input-label input[type="file"] {
+  display: none;
+}
+
+
 /* ============================================================
    FIX — Ensure form controls inherit text color in dark theme
    ============================================================ */
@@ -478,11 +512,20 @@ select.user-team-dd,
       <hr style="margin:1rem 0;border-color:var(--border);">
 
       <h3>Data Upload (XLSX)</h3>
-      <input type="file" id="excelInput" accept=".xlsx,.xls" />
 
-      <div id="uploadSummary" style="margin-top:1rem;"></div>
+<div class="upload-row">
+  <label class="file-input-label">
+    <span>📄 Choose File</span>
+    <input type="file" id="excelInput" accept=".xlsx,.xls">
+  </label>
 
-      <button class="modal-btn" id="btnProcessExcel" style="margin-top:0.8rem;">Process Excel</button>
+  <button class="modal-btn" id="btnProcessExcel">Process Excel</button>
+</div>
+
+<div id="uploadSummary" style="margin-top:1rem;">
+  <strong>Selected Team:</strong> -
+</div>
+
 
     </div>
 
@@ -552,6 +595,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

@@ -144,9 +144,11 @@ html,body{
 /* ============================================================
    CONTENT AREA
    ============================================================ */
-.content{
-  padding:1.2rem;
+/* Remove horizontal padding so tables go edge-to-edge */
+.content {
+  padding: 1.2rem 0;  /* top/bottom padding only */
 }
+
 
 /* ============================================================
    TRACKER TABLE STYLE — REPLICATED FOR ADMIN (Users + Stats)
@@ -180,6 +182,15 @@ tbody td {
   white-space: nowrap;
   text-align: center;       /* ← CENTER BODY TEXT */
 }
+
+/* Make user table & stats table full width */
+#usersTableWrap,
+#statsTableWrap {
+  width: 100%;
+  padding: 0;       /* remove extra padding */
+  margin: 0;
+}
+
 
 
 tbody tr:hover {
@@ -503,6 +514,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

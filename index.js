@@ -381,12 +381,47 @@ function buildPrimaryFilters() {
     // checkbox changes
     block.querySelectorAll("input[type='checkbox']").forEach(cb => {
       cb.onchange = () => {
-        const k = cb.dataset.key;
-        const val = cb.dataset.value;
-        const set = new Set(uiState.primaries[k] || []);
-        cb.checked ? set.add(val) : set.delete(val);
-        uiState.primaries[k] = [...set];
-      };
+    const k = cb.dataset.key;
+    const val = cb.dataset.value;
+
+    // Normal update
+    const set = new Set(uiState.primaries[k] || []);
+    cb.checked ? set.add(val) : set.delete(val);
+    uiState.primaries[k] = [...set];
+
+    /* =======================================================
+       AUTO RFC LOGIC — YOUR 3 SPECIAL RULES
+       Applies ONLY when selecting inside:
+       onsiteRFC, csrRFC, benchRFC
+       ======================================================= */
+    const rfcKeys = ["onsiteRFC", "csrRFC", "benchRFC"];
+
+    if (rfcKeys.includes(k) && cb.checked) {
+
+        // 1) Clear the other two RFC filters
+        rfcKeys.forEach(rk => {
+            if (rk !== k) uiState.primaries[rk] = [];
+        });
+
+        // 2) Clear Case Resolution Code completely
+        uiState.primaries.caseResolutionCode = [];
+
+        // 3) Apply correct Case Resolution Code mapping
+        if (k === "onsiteRFC") {
+            uiState.primaries.caseResolutionCode = ["Onsite Solution"];
+        }
+        if (k === "csrRFC") {
+            uiState.primaries.caseResolutionCode = ["Parts Shipped"];
+        }
+        if (k === "benchRFC") {
+            uiState.primaries.caseResolutionCode = ["Offsite Solution"];
+        }
+
+        // 4) Rebuild the sidebar UI so selections visually update
+        buildPrimaryFilters();
+    }
+};
+
     });
 
     // initialize locks UI & checked state
@@ -1578,6 +1613,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

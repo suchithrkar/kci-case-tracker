@@ -286,11 +286,6 @@ function openPreviewModal() {
   }
 }
 
-$("btnPreviewCancel").onclick = () => {
-  $("previewSection").style.display = "none";
-  $("previewCounts").innerHTML = "";
-  clearProgress();
-};
 
 
 
@@ -1080,7 +1075,6 @@ function resetExcelUI() {
 
   // Reset modal preview buttons if preview modal was opened
   $("btnConfirmImport").disabled = false;
-  $("btnPreviewCancel").disabled = false;
   $("allowDeletion").disabled = false;
 
    $("previewSection").style.display = "none";
@@ -1629,6 +1623,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

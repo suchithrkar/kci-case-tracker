@@ -233,13 +233,19 @@ function computeDiff() {
 async function loadFirestoreCasesForTeam(teamId) {
   updateProgress("Loading existing Firestore cases...");
 
-  return new Promise((resolve) => {
-    listenToTeamCases(teamId, (rows) => {
-      excelState.firestoreCases = rows;
-      resolve();
-    });
-  });
+  const q = query(
+    collection(db, "cases"),
+    where("teamId", "==", teamId)
+  );
+
+  const snap = await getDocs(q);
+
+  excelState.firestoreCases = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
 }
+
 
 
 // ======================================================
@@ -1617,6 +1623,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

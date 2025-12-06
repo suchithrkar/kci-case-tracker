@@ -33,6 +33,38 @@ import { isPrimary, isSecondary, toggleTheme } from "./js/userProfile.js";
 import { showPopup } from "./js/utils.js";
 
 
+// ================================================
+// GLOBAL STATE FOR EXCEL IMPORT
+// ================================================
+const excelState = {
+  teamId: null,
+  file: null,
+  rawRows: [],
+  excelCases: [],
+  firestoreCases: [],
+  diff: { new: [], updated: [], deleted: [] }
+};
+
+let processing = false;
+
+
+// Quick DOM helpers
+const $ = (id) => document.getElementById(id);
+
+// Update text in the progress box
+function updateProgress(msg) {
+  const box = $("excelProgress");
+  box.style.display = "block";
+  box.textContent += msg + "\n";
+   box.scrollTop = box.scrollHeight;
+}
+function clearProgress() {
+  const box = $("excelProgress");
+  box.style.display = "none";
+  box.textContent = "";
+}
+
+
 
 /* ============================================================
    GLOBAL DOM REFERENCES
@@ -64,20 +96,318 @@ const modalUpdateData     = document.getElementById("modalUpdateData");
 const btnUpdateClose      = document.getElementById("btnUpdateClose");
 const btnUpdateDone       = document.getElementById("btnUpdateDone");
 
+$("excelInput").onchange = async (e) => {
+  const file = e.target.files[0];
+  excelState.file = file;
+
+  if (!file) {
+    $("selectedFileName").textContent = "No file selected";
+    return;
+  }
+
+  $("selectedFileName").textContent = file.name;
+   $("btnPreviewChanges").disabled = true;
+  clearProgress();
+  updateProgress("Reading file...");
+
+  // PARSE FILE
+  await parseExcelFile(file);
+
+  validateReadyState();
+};
+
+// ======================================================
+// PARSE EXCEL FILE (fixed + improved)
+// ======================================================
+async function parseExcelFile(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+
+    reader.onload = (evt) => {
+      const data = evt.target.result;
+      const wb = XLSX.read(data, { type: "binary" });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      excelState.rawRows = rows;
+
+      updateProgress("Excel loaded. Processing rows...");
+
+      const parsed = [];
+
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || !r[0]) continue;
+
+        const id = String(r[0]).trim();
+        if (!id) continue;
+
+        parsed.push({
+          id,
+          customerName: (r[1] || "").trim(),
+          country: (r[2] || "").trim(),
+          resolution: (r[3] || "").trim(),
+          caseOwner: (r[4] || "").trim(),
+          caGroup: (r[5] || "").trim(),
+          sbd: (r[6] || "").trim(),
+          onsiteRFC: (r[7] || "").trim(),
+          csrRFC: (r[8] || "").trim(),
+          benchRFC: (r[9] || "").trim(),
+        });
+      }
+
+      excelState.excelCases = parsed;
+
+      updateProgress(`Excel loaded.\nTotal valid rows: ${parsed.length}`);
+       validateReadyState();
+
+      resolve();
+    };
+
+    reader.readAsBinaryString(file);
+  });
+}
+
+// ======================================================
+// ENABLE/DISABLE PREVIEW BUTTON BASED ON STATE
+// ======================================================
+function validateReadyState() {
+  const ready =
+    excelState.teamId &&
+    excelState.file &&
+    excelState.excelCases.length > 0;
+
+  $("btnPreviewChanges").disabled = !ready;
+}
+
+
+// ======================================================
+// COMPARE EXCEL CASES vs FIRESTORE CASES
+// ======================================================
+function computeDiff() {
+  const excelMap = new Map();
+  excelState.excelCases.forEach(c => excelMap.set(c.id, c));
+
+  const fsMap = new Map();
+  excelState.firestoreCases.forEach(c => fsMap.set(c.id, c));
+
+  const diff = {
+    new: [],
+    updated: [],
+    deleted: []
+  };
+
+  // Detect new + updated
+  for (const ex of excelState.excelCases) {
+    const fs = fsMap.get(ex.id);
+
+    if (!fs) {
+      diff.new.push(ex);
+      continue;
+    }
+
+    const changed =
+      ex.customerName !== fs.customerName ||
+      ex.country !== fs.country ||
+      ex.resolution !== fs.resolution ||
+      ex.caseOwner !== fs.caseOwner ||
+      ex.caGroup !== fs.caGroup ||
+      ex.sbd !== fs.sbd ||
+      ex.onsiteRFC !== fs.onsiteRFC ||
+      ex.csrRFC !== fs.csrRFC ||
+      ex.benchRFC !== fs.benchRFC;
+
+    if (changed) diff.updated.push(ex);
+  }
+
+  // Detect deleted
+  for (const fs of excelState.firestoreCases) {
+    if (!excelMap.has(fs.id)) diff.deleted.push(fs);
+  }
+
+  excelState.diff = diff;
+}
+
+async function loadFirestoreCasesForTeam(teamId) {
+  updateProgress("Loading existing Firestore cases...");
+
+  return new Promise((resolve) => {
+    listenToTeamCases(teamId, (rows) => {
+      excelState.firestoreCases = rows;
+      resolve();
+    });
+  });
+}
+
+
+// ======================================================
+// PREVIEW CHANGES MODAL
+// ======================================================
+function openPreviewModal() {
+  const d = excelState.diff;
+
+  $("previewCounts").innerHTML = `
+    <strong>New Cases:</strong> ${d.new.length}<br>
+    <strong>Updated Cases:</strong> ${d.updated.length}<br>
+    <strong>Deleted Cases:</strong> ${d.deleted.length}
+  `;
+
+  // show deletion checkbox only if needed
+  $("deleteCheckboxWrap").style.display = d.deleted.length > 0 ? "block" : "none";
+
+  $("allowDeletion").checked = false;
+  $("btnConfirmImport").disabled = false;
+
+  $("modalPreview").classList.add("show");
+}
+
+$("btnPreviewClose").onclick = () =>
+  $("modalPreview").classList.remove("show");
+
+$("btnPreviewCancel").onclick = () =>
+  $("modalPreview").classList.remove("show");
+
+// ======================================================
+// CONFIRM IMPORT BUTTON → START FIRESTORE WRITE PROCESS
+// ======================================================
+$("btnConfirmImport").onclick = async () => {
+  const d = excelState.diff;
+
+  // Safety: deletions require checkbox
+  if (d.deleted.length > 0 && !$("allowDeletion").checked) {
+    return showPopup("Enable 'Allow deletion' to continue.");
+  }
+
+  // Disable UI while processing
+  $("btnConfirmImport").disabled = true;
+  $("btnPreviewCancel").disabled = true;
+  $("btnPreviewClose").disabled = true;
+  $("allowDeletion").disabled = true;
+
+   // Prevent clicking outside modal to close it
+$("modalPreview").onclick = (e) => {
+  if (!processing) return;
+  // ignore clicks while processing
+  e.stopPropagation();
+};
+
+
+  clearProgress();
+  updateProgress("Starting update…");
+
+  await applyExcelChanges();  // main engine
+
+  updateProgress("\nDONE.\nYou may close this window.");
+
+};
+
+// ======================================================
+// MAIN ENGINE — APPLY EXCEL CHANGES (batch write + progress)
+// ======================================================
+async function applyExcelChanges() {
+   processing = true;
+  const { new: newCases, updated, deleted } = excelState.diff;
+
+  updateProgress(`Preparing to write data...`);
+  updateProgress(`New: ${newCases.length}`);
+  updateProgress(`Updated: ${updated.length}`);
+  updateProgress(`Deleted: ${deleted.length}`);
+
+  const batchLimit = 400; // Safe threshold below Firestore 500 limit
+
+  // Utility to run batches safely
+  async function runBatches(tasks, label) {
+    let batch = [];
+    let processed = 0;
+
+    for (const t of tasks) {
+      batch.push(t);
+      processed++;
+
+      if (batch.length >= batchLimit) {
+        updateProgress(`${label}: writing batch (${processed - batch.length} to ${processed})...`);
+        await Promise.all(batch);
+        batch = [];
+      }
+    }
+
+    if (batch.length > 0) {
+      updateProgress(`${label}: writing final batch...`);
+      await Promise.all(batch);
+    }
+
+    updateProgress(`${label}: ✔ completed (${processed})`);
+  }
+
+  // ======================================================
+  // NEW CASES → setDoc
+  // ======================================================
+  updateProgress("\nCreating NEW cases...");
+  await runBatches(
+    newCases.map(c =>
+      setDoc(doc(db, "cases", c.id), { ...c, teamId: excelState.teamId })
+    ),
+    "New"
+  );
+
+  // ======================================================
+  // UPDATED CASES → updateDoc (only changed fields)
+  // ======================================================
+  updateProgress("\nUpdating existing cases...");
+
+  await runBatches(
+    updated.map(c =>
+      updateDoc(doc(db, "cases", c.id), c)
+    ),
+    "Updated"
+  );
+
+  // ======================================================
+  // DELETED CASES → deleteDoc
+  // ======================================================
+  if (deleted.length > 0) {
+    updateProgress("\nDeleting missing cases...");
+    await runBatches(
+      deleted.map(c => deleteDoc(doc(db, "cases", c.id))),
+      "Deleted"
+    );
+  }
+
+  // ======================================================
+  // SUMMARY
+  // ======================================================
+  updateProgress("\n-----------------------------------");
+  updateProgress("UPDATE COMPLETE");
+  updateProgress(`New: ${newCases.length}`);
+  updateProgress(`Updated: ${updated.length}`);
+  updateProgress(`Deleted: ${deleted.length}`);
+  updateProgress("-----------------------------------");
+
+  showPopup("Excel update complete!");
+   processing = false;
+
+}
+
+
+
 /* ============================================================
    FIX — Enable Update Data Modal
    ============================================================ */
 el.btnUpdateData.onclick = () => {
+  resetExcelUI();
   modalUpdateData.classList.add("show");
 };
 
+
 btnUpdateClose.onclick = () => {
+  resetExcelUI();
+  modalUpdateData.classList.remove("show");
+};
+btnUpdateDone.onclick = () => {
+  resetExcelUI();
   modalUpdateData.classList.remove("show");
 };
 
-btnUpdateDone.onclick = () => {
-  modalUpdateData.classList.remove("show");
-};
 
 
 const excelInput          = document.getElementById("excelInput");
@@ -124,6 +454,26 @@ function openAuditModal(userId) {
 // Buttons to close modal
 btnAuditClose.onclick = () => modalAudit.classList.remove("show");
 btnAuditOk.onclick = () => modalAudit.classList.remove("show");
+
+// ================================================
+// NEW: PREVIEW CHANGES BUTTON (replaces Process Excel)
+// ================================================
+$("btnPreviewChanges").onclick = async () => {
+  clearProgress();
+  updateProgress("Preparing preview...");
+
+  if (!excelState.teamId) return showPopup("Select a team.");
+  if (!excelState.file) return showPopup("Select an Excel file.");
+
+  // Load existing firestore cases for this team
+  await loadFirestoreCasesForTeam(excelState.teamId);
+
+  updateProgress("Comparing Excel → Firestore...");
+  computeDiff();
+
+  openPreviewModal();
+};
+
 
 
 
@@ -682,6 +1032,32 @@ async function deleteAllCasesForTeam(teamId) {
    SECTION 5 — UPDATE DATA ENGINE (Excel + Backup)
    ============================================================ */
 
+// ======================================================
+// RESET EXCEL UI STATE
+// ======================================================
+function resetExcelUI() {
+  excelState.teamId = null;
+  excelState.file = null;
+  excelState.rawRows = [];
+  excelState.excelCases = [];
+  excelState.firestoreCases = [];
+  excelState.diff = { new: [], updated: [], deleted: [] };
+
+  $("selectedFileName").textContent = "No file selected";
+  $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> -`;
+  $("btnPreviewChanges").disabled = true;
+  $("allowDeletion").checked = false;
+
+  clearProgress();
+
+  // Reset modal preview buttons if preview modal was opened
+  $("btnConfirmImport").disabled = false;
+  $("btnPreviewCancel").disabled = false;
+  $("btnPreviewClose").disabled = false;
+  $("allowDeletion").disabled = false;
+}
+
+
 // Excel parsing (SheetJS available globally)
 function readExcelFile(file) {
   return new Promise((resolve, reject) => {
@@ -720,134 +1096,19 @@ updateTeamList.addEventListener("click", async (e) => {
   }
 
   if (action === "upload") {
-    selectedUploadTeam = teamId;
-    uploadSummary.innerHTML = `<strong>Selected Team:</strong> ${teamId}`;
-  }
+  excelState.teamId = teamId;
+  $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> ${teamId}`;
+  validateReadyState();
+}
+
 
   if (action === "export") exportBackup(teamId);
   if (action === "import") importBackupPrompt(teamId);
 });
 
-btnProcessExcel.onclick = async () => {
-  if (!selectedUploadTeam) return showPopup("Choose a team.");
-  const file = excelInput.files[0];
-  if (!file) return showPopup("Select an Excel file.");
 
-  uploadSummary.innerHTML = "Reading file...";
-  const rows = await readExcelFile(file);
 
-  firestoreCases = [];
-  const snap = await getDocs(collection(db, "cases"));
-  snap.forEach(d => {
-    if (d.data().teamId === selectedUploadTeam)
-      firestoreCases.push({ id: d.id, ...d.data() });
-  });
 
-  excelCases = [];
-  for (let i = 1; i < rows.length; i++) {
-    const r = rows[i];
-    if (!r[0]) continue;
-
-    const id = String(r[0]).trim();
-    const existing = firestoreCases.find(x => x.id === id);
-
-    excelCases.push({
-      id,
-      customerName: r[1] || "",
-      createdOn: excelToDate(r[2]),
-      createdBy: r[3] || "",
-      country: r[6] || "",
-      caseResolutionCode: r[8] || "",
-      caseOwner: r[9] || "",
-      caGroup: r[17] || "",
-      tl: r[20] || "",
-      sbd: r[29] || "",
-      onsiteRFC: r[33] || "",
-      csrRFC: r[34] || "",
-      benchRFC: r[35] || "",
-      status: existing?.status || "",
-      followDate: existing?.followDate || null,
-      flagged: existing?.flagged || false,
-      notes: existing?.notes || "",
-      lastActionedOn: existing?.lastActionedOn || "",
-      lastActionedBy: existing?.lastActionedBy || "",
-      teamId: selectedUploadTeam,
-    });
-  }
-
-  uploadSummary.innerHTML = `
-    Excel loaded.<br>
-    Total rows: ${excelCases.length}
-  `;
-};
-
-btnProcessExcel.addEventListener("dblclick", async () => {
-  if (!isPrimary(adminState.user)) return;
-  await applyExcelChanges();
-});
-
-async function applyExcelChanges() {
-  const excelMap = new Map(excelCases.map(c => [c.id, c]));
-  const fsMap = new Map(firestoreCases.map(c => [c.id, c]));
-
-  const newCases = [];
-  const updated = [];
-  const deleted = [];
-
-  for (const ex of excelCases) {
-    const fs = fsMap.get(ex.id);
-    if (!fs) newCases.push(ex);
-    else {
-      const changed =
-        ex.customerName !== fs.customerName ||
-        ex.createdOn !== fs.createdOn ||
-        ex.createdBy !== fs.createdBy ||
-        ex.country !== fs.country ||
-        ex.caseResolutionCode !== fs.caseResolutionCode ||
-        ex.caseOwner !== fs.caseOwner ||
-        ex.caGroup !== fs.caGroup ||
-        ex.tl !== fs.tl ||
-        ex.sbd !== fs.sbd ||
-        ex.onsiteRFC !== fs.onsiteRFC ||
-        ex.csrRFC !== fs.csrRFC ||
-        ex.benchRFC !== fs.benchRFC;
-
-      if (changed) updated.push(ex);
-    }
-  }
-
-  for (const fs of firestoreCases)
-    if (!excelMap.has(fs.id)) deleted.push(fs);
-
-  for (const c of newCases)
-    await setDoc(doc(db, "cases", c.id), c);
-
-  for (const c of updated)
-    await updateDoc(doc(db, "cases", c.id), {
-      customerName: c.customerName,
-      createdOn: c.createdOn,
-      createdBy: c.createdBy,
-      country: c.country,
-      caseResolutionCode: c.caseResolutionCode,
-      caseOwner: c.caseOwner,
-      caGroup: c.caGroup,
-      tl: c.tl,
-      sbd: c.sbd,
-      onsiteRFC: c.onsiteRFC,
-      csrRFC: c.csrRFC,
-      benchRFC: c.benchRFC,
-    });
-
-  for (const c of deleted)
-    await deleteDoc(doc(db, "cases", c.id));
-
-  uploadSummary.innerHTML = `
-    <strong>Update Complete</strong><br>
-    New: ${newCases.length}<br>
-    Updated: ${updated.length}<br>
-    Deleted: ${deleted.length}<br>
-  `;
-}
 
 
 
@@ -1351,6 +1612,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -1075,10 +1075,12 @@ if (savedH) {
 
   /* Warning Block */
   if (requireFollowUp && !r.followDate) {
-    showModalWarning(`Status "${r.status}" needs a follow-up date.`);
-  } else {
-    hideModalWarning();
-  }
+  const displayStatus = pendingStatusForModal || r.status || "";
+  showModalWarning(`Status "${displayStatus}" needs a follow-up date.`);
+} else {
+  hideModalWarning();
+}
+
 
   modal.classList.add("show");
    animateModalOpen();
@@ -1576,6 +1578,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

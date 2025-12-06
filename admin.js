@@ -83,6 +83,7 @@ btnUpdateDone.onclick = () => {
 const excelInput          = document.getElementById("excelInput");
 const uploadSummary       = document.getElementById("uploadSummary");
 const btnProcessExcel     = document.getElementById("btnProcessExcel");
+uploadSummary.innerHTML = `<strong>Selected Team:</strong> -`;
 
 const modalReassign       = document.getElementById("modalReassign");
 const reassignTeamSelect  = document.getElementById("reassignTeamSelect");
@@ -1350,6 +1351,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

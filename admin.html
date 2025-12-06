@@ -47,19 +47,21 @@ html,body{
 }
 
 /* ============================================================
-   HEADER
+   HEADER — EXACT MATCH TO TRACKER HEADER
    ============================================================ */
-.header{
-  display:flex;
-  align-items:center;
-  gap:1rem;
-  padding:.75rem 1rem;
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  z-index:50;
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: .65rem 1rem;   /* EXACT tracker padding */
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 58px;           /* Exact tracker header height */
 }
+
 /* Match header button height from tracker */
 .header .hdr-btn {
   padding: .6rem 1.2rem !important;
@@ -81,15 +83,21 @@ html,body{
 /* ============================================================
    MATCH TRACKER HEADER BUTTON STYLE
    ============================================================ */
+/* Header buttons identical to tracker */
 .hdr-btn {
-  padding: .6rem 1rem !important;
+  padding: .55rem 1.15rem !important;  /* EXACT padding from tracker */
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--panel-2);
   cursor: pointer;
   font-weight: 500;
+  font-size: 14px;                     /* Same as tracker */
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 
 .hdr-btn:hover{
   filter:brightness(1.08);
@@ -111,6 +119,7 @@ html,body{
   font-weight:600;
   white-space:nowrap;
   padding-right:0.4rem;
+   padding-top: 2px;
 }
 
 /* ============================================================
@@ -450,6 +459,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

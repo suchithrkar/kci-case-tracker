@@ -257,9 +257,14 @@ function openPreviewModal() {
 
   $("allowDeletion").checked = false;
   $("btnConfirmImport").disabled = (d.deleted.length > 0);
-   $("allowDeletion").onchange = () => {
-  $("btnConfirmImport").disabled = !$("allowDeletion").checked;
-};
+   if (d.deleted.length > 0) {
+  $("allowDeletion").onchange = () => {
+    $("btnConfirmImport").disabled = !$("allowDeletion").checked;
+  };
+} else {
+  $("btnConfirmImport").disabled = false;
+}
+
 
 
   $("modalPreview").classList.add("show");
@@ -1610,6 +1615,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

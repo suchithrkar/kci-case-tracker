@@ -157,6 +157,9 @@ table {
   margin-top: 1rem;
 }
 
+/* ============================================================
+   CENTER-ALIGNED TABLE STYLE (Users + Stats)
+   ============================================================ */
 thead th {
   background: var(--panel-2);
   border-bottom: 1px solid var(--border);
@@ -164,7 +167,7 @@ thead th {
   font-size: 12px;
   letter-spacing: .6px;
   padding: .55rem .75rem;
-  text-align: left;        /* left aligned for admin */
+  text-align: center;       /* ← CENTER HEADER TEXT */
   vertical-align: middle;
   white-space: nowrap;
 }
@@ -174,8 +177,9 @@ tbody td {
   padding: .55rem .75rem;
   vertical-align: middle;
   white-space: nowrap;
-  text-align: left;        /* admin version stays left-aligned */
+  text-align: center;       /* ← CENTER BODY TEXT */
 }
+
 
 tbody tr:hover {
   background: rgba(255,255,255,0.05);
@@ -499,6 +503,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

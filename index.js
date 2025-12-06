@@ -394,32 +394,47 @@ function buildPrimaryFilters() {
        Applies ONLY when selecting inside:
        onsiteRFC, csrRFC, benchRFC
        ======================================================= */
-    const rfcKeys = ["onsiteRFC", "csrRFC", "benchRFC"];
+    /* =======================================================
+   AUTO RFC LOGIC — YOUR 3 SPECIAL RULES
+   ======================================================= */
+const rfcKeys = ["onsiteRFC", "csrRFC", "benchRFC"];
 
-    if (rfcKeys.includes(k) && cb.checked) {
+if (rfcKeys.includes(k) && cb.checked) {
 
-        // 1) Clear the other two RFC filters
-        rfcKeys.forEach(rk => {
-            if (rk !== k) uiState.primaries[rk] = [];
-        });
+    // 1) Remember currently open filter bodies
+    const openFilters = Array.from(
+        document.querySelectorAll(".filter-body.open")
+    ).map(el => el.id.replace("filter-body-", ""));
 
-        // 2) Clear Case Resolution Code completely
-        uiState.primaries.caseResolutionCode = [];
+    // 2) Clear the other RFC filters
+    rfcKeys.forEach(rk => {
+        if (rk !== k) uiState.primaries[rk] = [];
+    });
 
-        // 3) Apply correct Case Resolution Code mapping
-        if (k === "onsiteRFC") {
-            uiState.primaries.caseResolutionCode = ["Onsite Solution"];
-        }
-        if (k === "csrRFC") {
-            uiState.primaries.caseResolutionCode = ["Parts Shipped"];
-        }
-        if (k === "benchRFC") {
-            uiState.primaries.caseResolutionCode = ["Offsite Solution"];
-        }
+    // 3) Clear Case Resolution Code completely
+    uiState.primaries.caseResolutionCode = [];
 
-        // 4) Rebuild the sidebar UI so selections visually update
-        buildPrimaryFilters();
+    // 4) Apply mapping
+    if (k === "onsiteRFC") {
+        uiState.primaries.caseResolutionCode = ["Onsite Solution"];
     }
+    if (k === "csrRFC") {
+        uiState.primaries.caseResolutionCode = ["Parts Shipped"];
+    }
+    if (k === "benchRFC") {
+        uiState.primaries.caseResolutionCode = ["Offsite Solution"];
+    }
+
+    // 5) Rebuild the filters
+    buildPrimaryFilters();
+
+    // 6) Re-open the previously open filters
+    openFilters.forEach(key => {
+        const body = document.getElementById(`filter-body-${key}`);
+        if (body) body.classList.add("open");
+    });
+}
+
 };
 
     });
@@ -1613,6 +1628,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

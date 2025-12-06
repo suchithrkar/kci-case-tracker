@@ -121,27 +121,44 @@ html,body{
 /* ============================================================
    TABS (STATS | USERS)
    ============================================================ */
-.tab-bar{
-  display:flex;
-  gap:2rem;
-  padding:0.75rem 1.2rem;
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
+/* ============================================================
+   PILL SWITCHER TAB DESIGN (Users / Stats)
+   ============================================================ */
+.tab-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.2rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
 }
 
-.tab{
-  font-weight:600;
-  opacity:0.6;
-  cursor:pointer;
-  padding-bottom:0.4rem;
-  border-bottom:3px solid transparent;
-   width: 100%;
-   text-align: center;
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.55rem 1.1rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 13px;
+  color: var(--muted);
+  transition: background 0.2s ease, border 0.2s ease, color 0.2s ease;
 }
-.tab.active{
-  opacity:1;
-  border-bottom:3px solid var(--accent);
+
+.tab:hover {
+  color: var(--text);
+  background: var(--panel-2);
 }
+
+.tab.active {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
 
 /* ============================================================
    CONTENT AREA
@@ -371,9 +388,10 @@ select.user-team-dd,
      TAB BAR (STATS | USERS)
      ============================================================ -->
 <div class="tab-bar">
-  <div class="tab active" id="tabUsers">Users</div>
-  <div class="tab" id="tabStats">Stats</div>
+  <div class="tab active" id="tabUsers">👤 USERS</div>
+  <div class="tab" id="tabStats">📊 STATS</div>
 </div>
+
 
 <!-- ============================================================
      CONTENT AREA (Sections will swap via JS)
@@ -530,6 +548,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

@@ -66,14 +66,19 @@ html,body{
 }
 .grow{flex:1}
 
-.hdr-btn{
-  padding:0.55rem 1rem;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:var(--panel-2);
-  cursor:pointer;
-  white-space:nowrap;
+/* ============================================================
+   MATCH TRACKER HEADER BUTTON STYLE
+   ============================================================ */
+.hdr-btn {
+  padding: .6rem 1rem !important;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
 }
+
 .hdr-btn:hover{
   filter:brightness(1.08);
 }
@@ -225,6 +230,34 @@ tbody tr:hover{
   background:var(--panel-2);
   width:100%;
 }
+
+/* ============================================================
+   FIX — Ensure form controls inherit text color in dark theme
+   ============================================================ */
+button, input, select, textarea {
+  color: var(--text);
+}
+
+/* Dropdown background + border visible in dark mode */
+select.input,
+select.user-role-dd,
+select.user-team-dd,
+.status-select {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* Action buttons always readable */
+.action-btn,
+.hdr-btn,
+.modal-btn {
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+
+
 </style>
 
 </head>
@@ -405,6 +438,7 @@ tbody tr:hover{
 </body>
 
 </html>
+
 
 
 

@@ -125,6 +125,9 @@ const uiState = {
 };
 
 let unupdatedProtect = false;
+// track specific caseIds that are being updated while in Unupdated mode
+const pendingUnupdated = new Set();
+
 
 
 /* =======================================================================
@@ -230,9 +233,12 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 if (uiState.mode !== "unupdated") {
     applyFilters();
 } else {
-    trackerState.filteredCases = trackerState.allCases.filter(r =>
-        !r.status || r.status.trim() === ""
-    );
+    trackerState.filteredCases = trackerState.allCases.filter(r => {
+    // Keep rows that are empty status OR that are currently pending an update
+    if (pendingUnupdated.has(r.id)) return true;
+    return !r.status || r.status.trim() === "";
+});
+
     renderTable();
     updateBadges();
 }
@@ -494,6 +500,10 @@ function setupFilterControls() {
             uiState.primaries[key] = [];
         }
     });
+
+     // NEW: clear all pending updates so Unupdated view fully resets
+pendingUnupdated.clear();
+
 
     buildStatusPanel();
     buildPrimaryFilters();
@@ -930,6 +940,12 @@ function handleStatusChange(caseId, newStatus) {
   if (uiState.mode === "unupdated") {
       unupdatedProtect = true;
   }
+
+   // If we're in unupdated mode, mark this case as pending so the listener will keep it visible
+if (uiState.mode === "unupdated") {
+  pendingUnupdated.add(caseId);
+}
+
    
   const today = new Date().toISOString().split("T")[0];
   const row = trackerState.allCases.find(r => r.id === caseId);
@@ -961,18 +977,31 @@ function handleStatusChange(caseId, newStatus) {
 
   // Normal statuses → update Firestore directly
   // Normal statuses → update Firestore directly
+// Update Firestore, then remove pending lock for this case and refresh if needed
 firestoreUpdateCase(caseId, {
   status: newStatus,
   lastActionedOn: today,
   lastActionedBy: trackerState.user.uid,
   statusChangedOn: today,
   statusChangedBy: trackerState.user.uid
+}).then(() => {
+  // Firestore confirmed — remove from pending set
+  pendingUnupdated.delete(caseId);
+
+  // If we are still viewing unupdated, let filters re-run (this will hide the case if it now has a status)
+  if (uiState.mode === "unupdated") {
+    applyFilters();
+  } else {
+    // otherwise refresh the normal view
+    applyFilters();
+  }
+}).catch(err => {
+  // On failure, remove pending and show popup (prevents permanent stuck case)
+  pendingUnupdated.delete(caseId);
+  showPopup("Failed to update case. Please try again.");
+  console.error(err);
 });
 
-// In normal modes → refresh
-if (uiState.mode !== "unupdated") {
-    applyFilters();
-}
 
 // CRITICAL FIX: Reset protection after finishing normal update
 //if (uiState.mode === "unupdated") {
@@ -1358,6 +1387,14 @@ async function saveModalData() {
 
   try {
     await firestoreUpdateCase(caseId, updateObj);
+     // NEW: Remove pending lock for this case after modal save
+pendingUnupdated.delete(caseId);
+
+// You allowed unupdated list to refresh after modal save
+if (uiState.mode === "unupdated") {
+    applyFilters();
+}
+
   } catch (err) {
     console.error(err);
     showPopup("Error updating case.");
@@ -1531,6 +1568,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

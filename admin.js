@@ -1176,7 +1176,7 @@ function renderStatsTableNew() {
 
   // build table header
   const header = `
-    <table style="width:100%;border-collapse:collapse;">
+    <table class="admin-stats-table">
       <thead>
         <tr style="text-align:left;border-bottom:1px solid var(--border);">
           <th>User</th>
@@ -1350,6 +1350,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

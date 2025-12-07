@@ -1551,9 +1551,27 @@ async function loadAllUsersForStats() {
    Load cases ONCE for stats tab (NO realtime)
 ------------------------------------------------------------ */
 async function loadStatsCasesOnce() {
-  const snap = await getDocs(collection(db, "cases"));
-  statsCases = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  // Load cases using a team-scoped query for non-primary users
+  try {
+    let snap;
+
+    if (!isPrimary(adminState.user)) {
+      // Secondary → only read cases for their team
+      const q = query(collection(db, "cases"), where("teamId", "==", adminState.user.teamId));
+      snap = await getDocs(q);
+    } else {
+      // Primary → can read all cases (TOTAL mode or specific team selected elsewhere)
+      snap = await getDocs(collection(db, "cases"));
+    }
+
+    statsCases = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    console.error("Failed to load stats cases:", err);
+    showPopup("Unable to load cases for stats (permission or network issue).");
+    statsCases = []; // safe fallback
+  }
 }
+
 
 /* ------------------------------------------------------------
    Manual REFRESH button for stats tab
@@ -1586,6 +1604,31 @@ function buildTeamSelector() {
 sel.style.width = "auto";
 
   sel.id = "statsTeamSelect";
+
+   // 🔒 If secondary admin/user → lock selector to their team
+if (!isPrimary(adminState.user)) {
+    // Set selected team to user's own team
+    adminState.selectedStatsTeam = adminState.user.teamId;
+
+    // Clear any default options
+    sel.innerHTML = "";
+
+    // Add only their team as the single option
+    const myTeamOpt = document.createElement("option");
+    myTeamOpt.value = adminState.user.teamId;
+
+    const myTeam = adminState.allTeams.find(t => t.id === adminState.user.teamId);
+    myTeamOpt.textContent = myTeam ? myTeam.name : adminState.user.teamId;
+
+    sel.appendChild(myTeamOpt);
+
+    // Disable the dropdown (secondary cannot switch teams)
+    sel.disabled = true;
+
+    return sel; // important: stop here and return the selector
+}
+
+   
   sel.style.marginRight = "12px";
 
   if (isPrimary(adminState.user)) {
@@ -1623,6 +1666,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

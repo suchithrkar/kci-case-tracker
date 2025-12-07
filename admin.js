@@ -1382,6 +1382,9 @@ function computeStatsEngineAdaptive(casesList, usersList) {
   const rows = [];
 
   for (const u of usersList) {
+         // ❌ Hide secondary admins from stats table
+    if (u.role === "secondary") continue;
+
     // enforce visibility rules
     if (!isPrimary(adminState.user)) {
       if (u.teamId !== adminState.user.teamId) continue;
@@ -1679,6 +1682,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

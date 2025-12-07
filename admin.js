@@ -866,7 +866,12 @@ function renderUsersTable(users) {
       <tbody>
   `;
 
-  users.sort((a, b) => a.email.localeCompare(b.email));
+  users.sort((a, b) => {
+  const da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+  const db = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+  return da - db; // oldest → newest
+});
+
 
   users.forEach(u => {
     const created = u.createdAt?.toDate
@@ -1666,6 +1671,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

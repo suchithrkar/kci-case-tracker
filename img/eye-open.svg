@@ -1,0 +1,8 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+     xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+  <!-- Eye outline -->
+  <path d="M1 12C2.73 7.61 7 4.5 12 4.5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12z"
+        stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Pupil -->
+  <circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+</svg>

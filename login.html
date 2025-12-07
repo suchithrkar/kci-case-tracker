@@ -52,15 +52,19 @@ h1 {
   margin-bottom:1.4rem;
 }
 
+/* Make ALL inputs identical width, same as password input */
 .input {
-  width:100%;
-  padding:.8rem;
-  background:var(--panel-2);
-  border:1px solid var(--border);
-  border-radius:12px;
-  margin-bottom:1rem;
-  color:var(--text);
+  width: 100%;
+  padding: .8rem;
+  padding-right: 2.6rem; /* MATCH password field spacing */
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  color: var(--text);
+  box-sizing: border-box; /* prevents width mismatch */
 }
+
 
 .btn {
   width:100%;
@@ -315,4 +319,5 @@ document.querySelectorAll(".toggle-pass").forEach(icon => {
 </body>
 
 </html>
+
 

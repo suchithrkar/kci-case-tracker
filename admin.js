@@ -459,8 +459,13 @@ function openAuditModal(userId) {
     .slice(0, 5);
 
   auditList.innerHTML = five.length
-    ? five.map(c => `<div style="margin-bottom:8px;">${c.id}</div>`).join("")
-    : "<div>No cases available for audit today.</div>";
+  ? five.map(c => `
+      <div style="margin-bottom:8px;">
+        ${c.id} — ${c.status || "No Selected Status"}
+      </div>
+    `).join("")
+  : "<div>No cases available for audit today.</div>";
+
 
   modalAudit.classList.add("show");
 }
@@ -1694,6 +1699,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

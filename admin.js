@@ -1455,6 +1455,18 @@ const totalActioned = new Set(todayCases.map(r => r.id)).size;
   total.metPct = total.closedToday ? Math.round((total.met / total.closedToday) * 100) : 0;
   total.notMetPct = total.closedToday ? Math.round((total.notMet / total.closedToday) * 100) : 0;
 
+   // Sort stats rows by user account creation date (oldest → newest)
+rows.sort((a, b) => {
+  const ua = allUsers.find(u => u.id === a.userId);
+  const ub = allUsers.find(u => u.id === b.userId);
+
+  const da = ua?.createdAt?.toDate ? ua.createdAt.toDate() : new Date(0);
+  const db = ub?.createdAt?.toDate ? ub.createdAt.toDate() : new Date(0);
+
+  return da - db; // oldest → newest
+});
+
+   
   return { totalRow: total, userRows: rows };
 }
 
@@ -1682,6 +1694,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

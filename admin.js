@@ -986,7 +986,13 @@ function renderUserActions(u) {
     `;
   }
 
-  return `<button class="action-btn" data-remove="${u.id}">Remove</button>`;
+  // Do NOT allow removing the Primary Admin
+if (u.role === "primary") {
+  return `<span style="opacity:0.6;">—</span>`; // or return "" to show nothing
+}
+
+return `<button class="action-btn" data-remove="${u.id}">Remove</button>`;
+
 }
 
 /* -----------------------------------------------------------------------
@@ -1014,8 +1020,9 @@ function bindUserActions() {
   document.querySelectorAll("[data-remove]").forEach(btn => {
     btn.onclick = async () => {
       const uid = btn.dataset.remove;
-      if (uid === adminState.user.uid)
-        return showPopup("You cannot remove yourself.");
+      if (u.role === "primary") {
+  return showPopup("Primary Admin cannot be removed.");
+}
 
       if (!confirm("Remove user permanently?")) return;
 
@@ -1672,6 +1679,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

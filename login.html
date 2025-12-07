@@ -121,6 +121,14 @@ h1 {
 .password-wrap {
   width: 100%;
 }
+/* Ensure all input fields match button width perfectly */
+.input-wrap {
+  width: 100%;
+}
+.input-wrap .input {
+  width: 100%;
+}
+
 
 /* Password field wrapper */
 .password-wrap {
@@ -137,9 +145,11 @@ h1 {
 .toggle-pass {
   position: absolute;
   right: 12px;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
-  font-size: 18px;
-  opacity: 0.65;
+  opacity: 0.75;
+  user-select: none;
 }
 
 .toggle-pass:hover {
@@ -163,10 +173,13 @@ h1 {
 
   <!-- LOGIN FORM -->
   <div id="loginForm">
-    <input id="loginEmail" class="input" placeholder="Email" type="email" />
+    <div class="input-wrap">
+  <input id="loginEmail" class="input" placeholder="Email" type="email" />
+</div>
+
     <div class="password-wrap">
   <input id="loginPassword" class="input" placeholder="Password" type="password" />
-  <span class="toggle-pass" data-target="loginPassword">👁️</span>
+  <img class="toggle-pass" data-target="loginPassword" src="img/eye-open.png" />
 </div>
 
     <button id="btnLogin" class="btn">Login</button>
@@ -175,12 +188,21 @@ h1 {
 
   <!-- SIGNUP FORM -->
   <div id="signupForm" style="display:none;">
-    <input id="signFirst" class="input" placeholder="First Name" />
-    <input id="signLast" class="input" placeholder="Last Name" />
-    <input id="signEmail" class="input" placeholder="Email" type="email" />
+    <div class="input-wrap">
+  <input id="signFirst" class="input" placeholder="First Name" />
+</div>
+
+<div class="input-wrap">
+  <input id="signLast" class="input" placeholder="Last Name" />
+</div>
+
+<div class="input-wrap">
+  <input id="signEmail" class="input" placeholder="Email" type="email" />
+</div>
+
     <div class="password-wrap">
   <input id="signPassword" class="input" placeholder="Password" type="password" />
-  <span class="toggle-pass" data-target="signPassword">👁️</span>
+  <img class="toggle-pass" data-target="signPassword" src="img/eye-open.png" />
 </div>
 
     <button id="btnSignup" class="btn">Sign Up</button>
@@ -274,18 +296,18 @@ document.getElementById("forgot").onclick = async () => {
 // PASSWORD SHOW/HIDE TOGGLE
 document.querySelectorAll(".toggle-pass").forEach(icon => {
   icon.onclick = () => {
-    const id = icon.dataset.target;
-    const input = document.getElementById(id);
+    const input = document.getElementById(icon.dataset.target);
 
     if (input.type === "password") {
       input.type = "text";
-      icon.textContent = "🙈";
+      icon.src = "img/eye-closed.png";  // hide mode
     } else {
       input.type = "password";
-      icon.textContent = "👁️";
+      icon.src = "img/eye-open.png";    // show mode
     }
   };
 });
+
 
   
 </script>
@@ -293,3 +315,4 @@ document.querySelectorAll(".toggle-pass").forEach(icon => {
 </body>
 
 </html>
+

@@ -152,13 +152,15 @@ h1 {
   width: 22px;
   height: 22px;
   cursor: pointer;
-  opacity: 0.75;
-  user-select: none;
+  opacity: 0.9;
+  color: var(--muted); /* #9aa4b2 — controls SVG stroke via currentColor */
+  display: inline-block;
+  vertical-align: middle;
 }
 
-.toggle-pass:hover {
-  opacity: 1;
-}
+.toggle-pass:hover { opacity: 1; }
+
+
 
   
 </style>
@@ -183,7 +185,7 @@ h1 {
 
     <div class="password-wrap">
   <input id="loginPassword" class="input" placeholder="Password" type="password" />
-  <img class="toggle-pass" data-target="loginPassword" src="img/eye-open.png" />
+  <img class="toggle-pass" data-target="loginPassword" src="img/eye-open.svg" />
 </div>
 
     <button id="btnLogin" class="btn">Login</button>
@@ -206,7 +208,7 @@ h1 {
 
     <div class="password-wrap">
   <input id="signPassword" class="input" placeholder="Password" type="password" />
-  <img class="toggle-pass" data-target="signPassword" src="img/eye-open.png" />
+  <img class="toggle-pass" data-target="signPassword" src="img/eye-open.svg" />
 </div>
 
     <button id="btnSignup" class="btn">Sign Up</button>
@@ -304,10 +306,10 @@ document.querySelectorAll(".toggle-pass").forEach(icon => {
 
     if (input.type === "password") {
       input.type = "text";
-      icon.src = "img/eye-closed.png";  // hide mode
+      icon.src = "img/eye-closed.svg";  // hide mode
     } else {
       input.type = "password";
-      icon.src = "img/eye-open.png";    // show mode
+      icon.src = "img/eye-open.svg";    // show mode
     }
   };
 });
@@ -319,5 +321,6 @@ document.querySelectorAll(".toggle-pass").forEach(icon => {
 </body>
 
 </html>
+
 
 

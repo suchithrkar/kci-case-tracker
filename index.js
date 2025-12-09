@@ -178,6 +178,14 @@ el.btnTheme.onclick = () => {
     el.btnAdmin.style.display = "none";
   }
 
+   // HIDE INFO BUTTON FOR SECONDARY USERS
+if (isSecondary(data)) {
+  const infoBtn = document.getElementById("btnInfo");
+  infoBtn.style.display = "none";     // hide button
+  infoBtn.disabled = true;            // disable interaction
+}
+
+
   el.btnLogout.onclick = () => auth.signOut().then(() => (location.href = "login.html"));
 
   setupSidebarControls();
@@ -1632,6 +1640,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

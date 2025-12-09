@@ -606,6 +606,8 @@ onAuthStateChanged(auth, async (user) => {
    // EXCEL IMPORT is disabled until Auth is ready
 document.body.dataset.authready = "true";
 
+   document.body.dataset.role = data.role;
+
 
   // Display user name
   el.adminUserName.textContent = `${data.firstName} ${data.lastName}`;
@@ -1816,6 +1818,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -996,14 +996,6 @@ function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1).toLowerCase();
 }
 
-  html += `</tbody></table>`;
-  usersTableWrap.innerHTML = html;
-
-  bindRoleDropdowns();
-  bindTeamDropdowns();
-  bindUserActions();
-}
-
 /* -----------------------------------------------------------------------
    FIXED ROLE DROPDOWN
    ----------------------------------------------------------------------- */
@@ -1824,6 +1816,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

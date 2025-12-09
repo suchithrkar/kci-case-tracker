@@ -505,6 +505,15 @@ const btnAuditClose       = document.getElementById("btnAuditClose");
 const btnAuditOk          = document.getElementById("btnAuditOk");
 
 function openAuditModal(userId) {
+   
+     // Lookup user name for title
+  const user = allUsers.find(u => u.id === userId);
+  const userName = user ? `${user.firstName} ${user.lastName}` : userId;
+
+  // Update modal title dynamically
+  document.querySelector("#modalAudit .modal-title").textContent =
+    `Audit — ${userName}`;
+   
   const today = new Date().toISOString().split("T")[0];
 
   // Get cases actioned today by this user (only status updates)
@@ -1818,6 +1827,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

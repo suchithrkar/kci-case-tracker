@@ -914,28 +914,87 @@ function loadUsersForAdmin() {
    ======================================================================= */
 
 function renderUsersTable(users) {
-  let html = `
-    <table>
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Created</th>
-          <th>Team</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+  let html = `<table><thead><tr>`;
 
-   /* USERS TABLE SORTING */
+  if (isSecondary(adminState.user)) {
+    // SECONDARY USER — ONLY FOUR COLUMNS
+    html += `
+      <th>Email</th>
+      <th>Name</th>
+      <th>Created</th>
+      <th>Team</th>
+    `;
+  } else {
+    // PRIMARY ADMIN — FULL COLUMNS
+    html += `
+      <th>Email</th>
+      <th>Name</th>
+      <th>Role</th>
+      <th>Status</th>
+      <th>Created</th>
+      <th>Team</th>
+      <th>Actions</th>
+    `;
+  }
+
+  html += `</tr></thead><tbody>`;
+
+  // Sort by creation date
   users.sort((a, b) => {
-  const da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
-  const db = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
-  return da - db; // oldest → newest
-});
+    const da = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+    const db = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+    return da - db; // oldest → newest
+  });
+
+  users.forEach(u => {
+    const created = u.createdAt?.toDate
+      ? u.createdAt.toDate().toLocaleDateString()
+      : "—";
+
+    const name = `${capitalize(u.firstName)} ${capitalize(u.lastName)}`;
+    const teamName = (u.teamId || "—").toUpperCase();
+
+    if (isSecondary(adminState.user)) {
+      // SECONDARY ADMIN ROW
+      html += `
+        <tr>
+          <td>${u.email}</td>
+          <td>${name}</td>
+          <td>${created}</td>
+          <td>${teamName}</td>
+        </tr>
+      `;
+    } else {
+      // PRIMARY ADMIN ROW
+      html += `
+        <tr>
+          <td>${u.email}</td>
+          <td>${name}</td>
+          <td>${renderRoleDropdown(u)}</td>
+          <td>${capitalize(u.status)}</td>
+          <td>${created}</td>
+          <td>${renderTeamDropdown(u)}</td>
+          <td>${renderUserActions(u)}</td>
+        </tr>
+      `;
+    }
+  });
+
+  html += `</tbody></table>`;
+  usersTableWrap.innerHTML = html;
+
+  if (isPrimary(adminState.user)) {
+    bindRoleDropdowns();
+    bindTeamDropdowns();
+    bindUserActions();
+  }
+}
+
+// Helper function for capitalization
+function capitalize(str) {
+  if (!str) return "";
+  return str[0].toUpperCase() + str.slice(1).toLowerCase();
+}
 
 
   users.forEach(u => {
@@ -1786,6 +1845,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

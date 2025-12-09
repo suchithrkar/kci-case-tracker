@@ -996,27 +996,6 @@ function capitalize(str) {
   return str[0].toUpperCase() + str.slice(1).toLowerCase();
 }
 
-
-  users.forEach(u => {
-    const created = u.createdAt?.toDate
-      ? u.createdAt.toDate().toLocaleDateString()
-      : "—";
-
-    const fullName = `${u.firstName} ${u.lastName}`;
-
-    html += `
-      <tr>
-        <td>${u.email}</td>
-        <td>${fullName}</td>
-        <td>${renderRoleDropdown(u)}</td>
-        <td>${u.status}</td>
-        <td>${created}</td>
-        <td>${renderTeamDropdown(u)}</td>
-        <td>${renderUserActions(u)}</td>
-      </tr>
-    `;
-  });
-
   html += `</tbody></table>`;
   usersTableWrap.innerHTML = html;
 
@@ -1845,6 +1824,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

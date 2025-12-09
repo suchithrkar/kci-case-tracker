@@ -315,6 +315,23 @@ tbody tr:hover {
   filter:brightness(1.08);
 }
 
+/* CREATE TEAM — Input + Button same row */
+.create-team-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.create-team-row input {
+  flex: 1;                 /* Fill remaining space */
+}
+
+.create-team-row button {
+  white-space: nowrap;     /* Keep button text compact */
+}
+
+
 /* INPUTS */
 .input{
   padding:0.6rem 0.8rem;
@@ -514,8 +531,11 @@ select.user-team-dd,
     <div class="modal-body">
 
       <h3>Create New Team</h3>
-      <input class="input" id="newTeamName" placeholder="Enter new team name..." />
-      <button class="modal-btn" id="btnTeamCreate" style="margin-top:0.6rem;">Create Team</button>
+      <div class="create-team-row">
+  <input class="input" id="newTeamName" placeholder="Enter new team name..." />
+  <button class="modal-btn" id="btnTeamCreate">Create Team</button>
+</div>
+
 
       <hr style="margin:1rem 0;border-color:var(--border);" />
 
@@ -674,6 +694,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

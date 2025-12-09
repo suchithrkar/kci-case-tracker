@@ -1194,6 +1194,34 @@ updateTeamList.addEventListener("click", async (e) => {
   if (action === "import") importBackupPrompt(teamId);
 });
 
+// -----------------------------
+// Prevent file picker when no team selected
+// -----------------------------
+const fileLabel = document.querySelector(".file-input-label");
+const excelInputEl = $("excelInput");
+
+if (fileLabel && excelInputEl) {
+  // clicking the styled label
+  fileLabel.addEventListener("click", (ev) => {
+    if (!excelState.teamId) {
+      ev.preventDefault(); // stop label from forwarding click to input
+      showPopup("Please select a team before choosing a file.");
+      // gently bring the teams list into view so user sees where to click
+      if (updateTeamList) updateTeamList.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    // otherwise allow normal behaviour
+  });
+
+  // also guard direct clicks on the hidden input (extra safety)
+  excelInputEl.addEventListener("click", (ev) => {
+    if (!excelState.teamId) {
+      ev.preventDefault();
+      showPopup("Please select a team before choosing a file.");
+      if (updateTeamList) updateTeamList.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, { capture: true });
+}
 
 
 
@@ -1758,6 +1786,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -143,17 +143,29 @@ async function parseExcelFile(file) {
         if (!id) continue;
 
         parsed.push({
-          id,
-          customerName: String(r[1] || "").trim(),
-country:      String(r[2] || "").trim(),
-resolution:   String(r[3] || "").trim(),
-caseOwner:    String(r[4] || "").trim(),
-caGroup:      String(r[5] || "").trim(),
-sbd:          String(r[6] || "").trim(),
-onsiteRFC:    String(r[7] || "").trim(),
-csrRFC:       String(r[8] || "").trim(),
-benchRFC:     String(r[9] || "").trim(),
-        });
+  id,                                                   // Col A
+  customerName: String(r[1] || "").trim(),              // Col B
+
+  createdOn: excelToDate(r[2]),                         // Col C (Excel serial → YYYY-MM-DD)
+
+  createdBy: String(r[3] || "").trim(),                 // Col D
+
+  country: String(r[6] || "").trim(),                   // Col G
+
+  caseResolutionCode: String(r[8] || "").trim(),        // Col I
+
+  caseOwner: String(r[9] || "").trim(),                 // Col J
+
+  caGroup: String(r[17] || "").trim(),                  // Col R
+
+  tl: String(r[20] || "").trim(),                       // Col U
+
+  sbd: String(r[29] || "").trim(),                      // Col AD
+
+  onsiteRFC: String(r[33] || "").trim(),                // Col AH
+  csrRFC:    String(r[34] || "").trim(),                // Col AI
+  benchRFC:  String(r[35] || "").trim()                 // Col AJ
+});
       }
 
       excelState.excelCases = parsed;
@@ -209,15 +221,19 @@ function computeDiff() {
     }
 
     const changed =
-      ex.customerName !== fs.customerName ||
-      ex.country !== fs.country ||
-      ex.resolution !== fs.resolution ||
-      ex.caseOwner !== fs.caseOwner ||
-      ex.caGroup !== fs.caGroup ||
-      ex.sbd !== fs.sbd ||
-      ex.onsiteRFC !== fs.onsiteRFC ||
-      ex.csrRFC !== fs.csrRFC ||
-      ex.benchRFC !== fs.benchRFC;
+  ex.customerName !== fs.customerName ||
+  ex.createdOn !== fs.createdOn ||
+  ex.createdBy !== fs.createdBy ||
+  ex.country !== fs.country ||
+  ex.caseResolutionCode !== fs.caseResolutionCode ||
+  ex.caseOwner !== fs.caseOwner ||
+  ex.caGroup !== fs.caGroup ||
+  ex.tl !== fs.tl ||
+  ex.sbd !== fs.sbd ||
+  ex.onsiteRFC !== fs.onsiteRFC ||
+  ex.csrRFC !== fs.csrRFC ||
+  ex.benchRFC !== fs.benchRFC;
+
 
     if (changed) diff.updated.push(ex);
   }
@@ -362,11 +378,38 @@ async function applyExcelChanges() {
   // ======================================================
   updateProgress("\nCreating NEW cases...");
   await runBatches(
-    newCases.map(c =>
-      setDoc(doc(db, "cases", c.id), { ...c, teamId: excelState.teamId })
-    ),
-    "New"
-  );
+  newCases.map(ex =>
+    setDoc(doc(db, "cases", ex.id), {
+      id: ex.id,
+      teamId: excelState.teamId,
+
+      customerName: ex.customerName,
+      createdOn: ex.createdOn,
+      createdBy: ex.createdBy,
+      country: ex.country,
+      caseResolutionCode: ex.caseResolutionCode,
+      caseOwner: ex.caseOwner,
+      caGroup: ex.caGroup,
+      tl: ex.tl,
+      sbd: ex.sbd,
+      onsiteRFC: ex.onsiteRFC,
+      csrRFC: ex.csrRFC,
+      benchRFC: ex.benchRFC,
+
+      // default fields
+      status: "",
+      followDate: "",
+      flagged: false,
+      notes: "",
+      lastActionedOn: "",
+      lastActionedBy: "",
+      statusChangedOn: "",
+      statusChangedBy: ""
+    })
+  ),
+  "New"
+);
+
 
   // ======================================================
   // UPDATED CASES → updateDoc (only changed fields)
@@ -374,11 +417,27 @@ async function applyExcelChanges() {
   updateProgress("\nUpdating existing cases...");
 
   await runBatches(
-    updated.map(c =>
-      updateDoc(doc(db, "cases", c.id), c)
-    ),
-    "Updated"
-  );
+  updated.map(ex => {
+    const updateFields = {
+      customerName: ex.customerName,
+      createdOn: ex.createdOn,
+      createdBy: ex.createdBy,
+      country: ex.country,
+      caseResolutionCode: ex.caseResolutionCode,
+      caseOwner: ex.caseOwner,
+      caGroup: ex.caGroup,
+      tl: ex.tl,
+      sbd: ex.sbd,
+      onsiteRFC: ex.onsiteRFC,
+      csrRFC: ex.csrRFC,
+      benchRFC: ex.benchRFC
+    };
+
+    return updateDoc(doc(db, "cases", ex.id), updateFields);
+  }),
+  "Updated"
+);
+
 
   // ======================================================
   // DELETED CASES → deleteDoc
@@ -1699,6 +1758,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -1350,6 +1350,58 @@ document.addEventListener("modal:opened", () => {
 });
 
 
+/* ============================================================
+   EXPORT EXCEL — CURRENT TABLE VIEW ONLY
+   ============================================================ */
+
+// Load XLSX if not already available
+if (typeof XLSX === "undefined") {
+  const script = document.createElement("script");
+  script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+  document.head.appendChild(script);
+}
+
+document.getElementById("btnExportExcel").onclick = () => {
+  if (!trackerState.filteredCases || trackerState.filteredCases.length === 0) {
+    showPopup("No cases to export.");
+    return;
+  }
+
+  // Build rows for Excel
+  const rows = trackerState.filteredCases.map(r => ({
+    "Case ID": r.id,
+    "Customer Name": r.customerName,
+    "Country": r.country,
+    "Case Resolution Code": r.caseResolutionCode,
+    "Case Owner": r.caseOwner,
+    "TL": r.tl,
+    "Created On": r.createdOn,
+    "CA Group": r.caGroup,
+    "SBD": r.sbd,
+    "Status": r.status,
+    "Follow Up Date": r.followDate,
+    "Flagged": r.flagged ? "Yes" : "No",
+    "Notes": r.notes,
+    "Last Actioned By": r.lastActionedBy,
+    "Last Actioned On": r.lastActionedOn,
+    "Status Changed By": r.statusChangedBy,
+    "Status Changed On": r.statusChangedOn
+  }));
+
+  // Convert to sheet
+  const ws = XLSX.utils.json_to_sheet(rows, { origin: "A1" });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Cases");
+
+  // Filename: Team + timestamp
+  const filename = `KCI_Cases_${new Date().toISOString().slice(0,10)}.xlsx`;
+
+  XLSX.writeFile(wb, filename);
+
+  showPopup("Excel exported successfully!");
+};
+
+
 
 /* =======================================================================
    FOLLOW-UP DATE INPUT — QUICK SELECT SHORTCUTS
@@ -1640,6 +1692,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

@@ -15,7 +15,6 @@
 import {
   auth,
   onAuthStateChanged,
-
   db,
   collection,
   doc,
@@ -914,10 +913,15 @@ function loadUsersForAdmin() {
   }
 
   onSnapshot(q, (snap) => {
-    const users = [];
-    snap.forEach(d => users.push({ id: d.id, ...d.data() }));
-    renderUsersTable(users);
-  });
+  const users = [];
+  snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+
+  // FIX: store users globally so Remove button can see them
+  allUsers = users;
+
+  renderUsersTable(users);
+});
+
 }
 
 /* =======================================================================
@@ -1838,6 +1842,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

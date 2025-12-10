@@ -1701,7 +1701,7 @@ function renderStatsTableNew() {
       <td>
   ${
     u.spMonNoFollow > 0
-      ? `<span class="no-follow-link" data-userid="${u.userId}" style="color:#4F8CF0;cursor:pointer;">
+      ? `<span class="no-follow-link" data-userid="${u.userId}" style="color:#4F8CF0;cursor:pointer;font-weight:700;">
            ${u.spMonNoFollow}
          </span>`
       : u.spMonNoFollow
@@ -1890,6 +1890,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

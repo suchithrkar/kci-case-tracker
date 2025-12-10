@@ -1688,7 +1688,6 @@ function renderStatsTableNew() {
         <th>Met</th>
         <th>Not Met</th>
 
-        <!-- SP/MON No Follow with tooltip -->
         <th style="position:relative;">
           SP/MON No Follow Up
           <span class="tooltip">
@@ -1696,7 +1695,6 @@ function renderStatsTableNew() {
           </span>
         </th>
 
-        <!-- Follow-ups X/Y with tooltip -->
         <th style="position:relative;">
           Follow-ups
           <span class="tooltip">
@@ -1710,6 +1708,7 @@ function renderStatsTableNew() {
       </tr>
     </thead>
 `;
+
 
 
   // total row first
@@ -1927,6 +1926,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

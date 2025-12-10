@@ -1145,6 +1145,7 @@ function bindUserActions() {
     showPopup("User removed.");
   };
 });
+}
 
 
 /* =======================================================================
@@ -1837,6 +1838,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

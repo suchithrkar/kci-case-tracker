@@ -319,12 +319,30 @@ document.querySelectorAll(".toggle-pass").forEach(el => {
   });
 });
 
+  // ENTER KEY — Trigger Login or Signup
+document.addEventListener("keydown", (e) => {
+  // Ignore if Enter pressed while focusing toggle-pass
+  if (e.key === "Enter" && !e.target.classList.contains("toggle-pass")) {
+
+    // If Login tab is active → trigger login button
+    if (tabLogin.classList.contains("active")) {
+      document.getElementById("btnLogin").click();
+    }
+
+    // If Signup tab is active → trigger signup button
+    else if (tabSignup.classList.contains("active")) {
+      document.getElementById("btnSignup").click();
+    }
+  }
+});
+
   
 </script>
 
 </body>
 
 </html>
+
 
 
 

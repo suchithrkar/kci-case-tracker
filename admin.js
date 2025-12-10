@@ -1691,7 +1691,8 @@ function renderStatsTableNew() {
         <th style="position:relative;">
           SP/MON No Follow Up
           <span class="tooltip">
-            Service Pending and Monitoring Cases without Follow-Up date marked.
+            Service Pending and Monitoring Cases<br>
+            without Follow-Up date marked.
           </span>
         </th>
 
@@ -1926,6 +1927,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

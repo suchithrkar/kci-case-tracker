@@ -1123,11 +1123,29 @@ function bindUserActions() {
   });
 
   document.querySelectorAll("[data-remove]").forEach(btn => {
-    btn.onclick = async () => {
-      const uid = btn.dataset.remove;
-      if (u.role === "primary") {
-  return showPopup("Primary Admin cannot be removed.");
-}
+  btn.onclick = async () => {
+    const uid = btn.dataset.remove;
+
+    // Get the user object so we can check role safely
+    const userObj = allUsers.find(u => u.id === uid);
+
+    // Safety check
+    if (!userObj) {
+      return showPopup("User not found.");
+    }
+
+    // Prevent removing primary admin
+    if (userObj.role === "primary") {
+      return showPopup("Primary Admin cannot be removed.");
+    }
+
+    if (!confirm("Remove user permanently?")) return;
+
+    await deleteDoc(doc(db, "users", uid));
+    showPopup("User removed.");
+  };
+});
+
 
       if (!confirm("Remove user permanently?")) return;
 
@@ -1827,6 +1845,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

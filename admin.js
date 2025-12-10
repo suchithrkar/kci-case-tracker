@@ -541,6 +541,11 @@ function openAuditModal(userId) {
 btnAuditClose.onclick = () => modalAudit.classList.remove("show");
 btnAuditOk.onclick = () => modalAudit.classList.remove("show");
 
+// SP/MON No Follow modal close handlers
+btnNoFollowClose.onclick = () => modalNoFollow.classList.remove("show");
+btnNoFollowOk.onclick = () => modalNoFollow.classList.remove("show");
+
+
 // ================================================
 // NEW: PREVIEW CHANGES BUTTON (replaces Process Excel)
 // ================================================
@@ -566,6 +571,35 @@ $("btnPreviewChanges").onclick = async () => {
   openPreviewModal();
 };
 
+function openNoFollowModal(userId) {
+
+  // Title
+  const user = allUsers.find(u => u.id === userId);
+  const userName = user ? `${user.firstName} ${user.lastName}` : userId;
+  document.getElementById("noFollowTitle").textContent =
+    `SP/MON No Follow — ${userName}`;
+
+  // Filter cases for this user
+  const cases = statsCases.filter(r =>
+    r.lastActionedBy === userId &&
+    (r.status === "Service Pending" || r.status === "Monitoring") &&
+    (!r.followDate || r.followDate.trim() === "")
+  );
+
+  if (!cases.length) {
+    noFollowList.innerHTML = "<div>No matching cases.</div>";
+  } else {
+    noFollowList.innerHTML = cases
+      .map(c => `
+        <div style="margin-bottom:8px; padding:4px 0; border-bottom:1px solid var(--border);">
+          <strong>${c.id}</strong> — ${c.status || "Unknown Status"}
+        </div>
+      `)
+      .join("");
+  }
+
+  modalNoFollow.classList.add("show");
+}
 
 
 
@@ -1664,7 +1698,15 @@ function renderStatsTableNew() {
       <td>${u.closedToday}</td>
       <td>${u.met} (${u.metPct}%)</td>
       <td>${u.notMet} (${u.notMetPct}%)</td>
-      <td>${u.spMonNoFollow}</td>
+      <td>
+  ${
+    u.spMonNoFollow > 0
+      ? `<span class="no-follow-link" data-userid="${u.userId}" style="color:#4F8CF0;cursor:pointer;text-decoration:underline;">
+           ${u.spMonNoFollow}
+         </span>`
+      : u.spMonNoFollow
+  }
+</td>
       <td>${u.followX} / ${u.followY}</td>
       <td><button class="action-btn" data-audit="${u.userId}">Audit</button></td>
     </tr>
@@ -1678,6 +1720,12 @@ function renderStatsTableNew() {
   statsTableWrap.querySelectorAll("[data-audit]").forEach(btn => {
     btn.onclick = () => openAuditModal(btn.dataset.audit);
   });
+
+   // Bind No-Follow clickable numbers
+statsTableWrap.querySelectorAll(".no-follow-link").forEach(el => {
+  el.onclick = () => openNoFollowModal(el.dataset.userid);
+});
+   
 }
 
 /* small helper to escape HTML (reused from index.js) */
@@ -1842,6 +1890,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

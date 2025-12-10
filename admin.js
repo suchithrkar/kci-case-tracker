@@ -591,7 +591,7 @@ function openNoFollowModal(userId) {
   } else {
     noFollowList.innerHTML = cases
       .map(c => `
-        <div style="margin-bottom:8px; padding:4px 0; border-bottom:1px solid var(--border);">
+        <div style="margin-bottom:8px; padding:4px 0;">
           <strong>${c.id}</strong> — ${c.status || "Unknown Status"}
         </div>
       `)
@@ -1701,7 +1701,7 @@ function renderStatsTableNew() {
       <td>
   ${
     u.spMonNoFollow > 0
-      ? `<span class="no-follow-link" data-userid="${u.userId}" style="color:#4F8CF0;cursor:pointer;text-decoration:underline;">
+      ? `<span class="no-follow-link" data-userid="${u.userId}" style="color:#4F8CF0;cursor:pointer;">
            ${u.spMonNoFollow}
          </span>`
       : u.spMonNoFollow
@@ -1890,6 +1890,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

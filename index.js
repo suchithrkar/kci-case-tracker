@@ -169,11 +169,22 @@ if (trackerState.teamId) {
    ------------------------------------------------------------------ */
 
 
-const usersSnap = await getDocs(collection(db, "users"));
+/* Load UID → Full Name map (SAFE per team) */
+const qUsers = query(
+  collection(db, "users"),
+  where("teamId", "==", trackerState.teamId)
+);
+
+const usersSnap = await getDocs(qUsers);
 usersSnap.forEach(d => {
   const u = d.data();
   userNameMap[d.id] = `${u.firstName} ${u.lastName}`;
 });
+
+/* Always add current user's own name (allowed by rules) */
+userNameMap[trackerState.user.uid] =
+  `${trackerState.user.firstName} ${trackerState.user.lastName}`;
+
 
   // Theme initialization
 document.documentElement.dataset.theme = data.theme || "dark";
@@ -1719,6 +1730,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

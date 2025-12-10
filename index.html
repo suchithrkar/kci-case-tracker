@@ -542,8 +542,32 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </div>
 
   <div class="side">
+
+    <!-- READY FOR CLOSURE FILTER BLOCK -->
+    <div class="filter" style="margin-bottom:1.2rem;">
+        <div class="filter-head" style="background:var(--panel-2); cursor:default;">
+            <div style="font-weight:600;">Ready for Closure</div>
+
+            <div style="display:flex; gap:.5rem; align-items:center;">
+                <button id="rfcClear" class="side-btn" style="padding:.35rem .8rem;">Clear</button>
+                <button id="rfcLock" class="side-btn" style="padding:.35rem .8rem;">🔓</button>
+            </div>
+        </div>
+
+        <div class="filter-body open" style="max-height:none; padding:1rem;">
+            <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
+                <button class="side-btn rfcBtn" data-type="onsite">Onsite</button>
+                <button class="side-btn rfcBtn" data-type="offsite">Offsite</button>
+                <button class="side-btn rfcBtn" data-type="csr">CSR</button>
+                <button class="side-btn rfcBtn" data-type="total">TOTAL</button>
+            </div>
+        </div>
+    </div>
+
     <div id="filtersContainer"></div>
-  </div>
+
+</div>
+
 </aside>
 
 <!-- TABLE -->
@@ -666,6 +690,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

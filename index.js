@@ -9,6 +9,7 @@ import {
   collection,
   doc,
   getDoc,
+   getDocs,
   query,
   where,
   onSnapshot,
@@ -166,7 +167,7 @@ if (trackerState.teamId) {
    /* ------------------------------------------------------------------
    LOAD ALL USERS ONCE → Build UID → Full Name map
    ------------------------------------------------------------------ */
-import { getDocs } from "./js/firebase.js";
+
 
 const usersSnap = await getDocs(collection(db, "users"));
 usersSnap.forEach(d => {
@@ -1405,8 +1406,8 @@ document.getElementById("btnExportExcel").onclick = () => {
     "Flagged": r.flagged ? "Yes" : "No",
     "Notes": r.notes,
     "Last Actioned By": userNameMap[r.lastActionedBy] || r.lastActionedBy || "",
+     "Last Actioned On": r.lastActionedOn,
    "Status Changed By": userNameMap[r.statusChangedBy] || r.statusChangedBy || "",
-    "Status Changed By": r.statusChangedBy,
     "Status Changed On": r.statusChangedOn
   }));
 
@@ -1718,6 +1719,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

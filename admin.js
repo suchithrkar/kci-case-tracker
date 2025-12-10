@@ -31,6 +31,26 @@ import {
 import { isPrimary, isSecondary, toggleTheme } from "./js/userProfile.js";
 import { showPopup } from "./js/utils.js";
 
+// Tooltip edge protection for admin page
+document.addEventListener("mouseover", (e) => {
+  const cell = e.target.closest("th");
+  if (!cell) return;
+
+  const tooltip = cell.querySelector(".tooltip");
+  if (!tooltip) return;
+
+  tooltip.classList.remove("align-left", "align-right");
+
+  const rect = tooltip.getBoundingClientRect();
+  const padding = 8;
+
+  if (rect.right > window.innerWidth - padding) {
+    tooltip.classList.add("align-right");
+  } else if (rect.left < padding) {
+    tooltip.classList.add("align-left");
+  }
+});
+
 
 // ================================================
 // GLOBAL STATE FOR EXCEL IMPORT
@@ -1659,21 +1679,38 @@ function renderStatsTableNew() {
 
   // build table header
   const header = `
-    <table class="admin-stats-table">
-      <thead>
-        <tr style="text-align:left;border-bottom:1px solid var(--border);">
-          <th>User</th>
-          <th>Total Actioned</th>
-          <th>Closed Today</th>
-          <th>Met</th>
-          <th>Not Met</th>
-          <th>SP/MON No Follow</th>
-          <th>Follow-ups X/Y</th>
-          <th>Audit</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+  <table class="admin-stats-table">
+    <thead>
+      <tr style="text-align:left;border-bottom:1px solid var(--border);">
+        <th>User</th>
+        <th>Total Actioned</th>
+        <th>Closed Today</th>
+        <th>Met</th>
+        <th>Not Met</th>
+
+        <!-- SP/MON No Follow with tooltip -->
+        <th style="position:relative;">
+          SP/MON No Follow Up
+          <span class="tooltip">
+            Service Pending and Monitoring Cases without Follow-Up date marked.
+          </span>
+        </th>
+
+        <!-- Follow-ups X/Y with tooltip -->
+        <th style="position:relative;">
+          Follow-ups
+          <span class="tooltip">
+            Cases Due to be followed up today.<br>
+            X - Total Due Today Cases.<br>
+            Y - Missed Follow Up Cases.
+          </span>
+        </th>
+
+        <th>Audit</th>
+      </tr>
+    </thead>
+`;
+
 
   // total row first
   const t = stats.totalRow;
@@ -1890,6 +1927,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -1446,7 +1446,7 @@ const team = trackerState.teamName || "UnknownTeam";
 const filename = `KCI_Cases_${team}_${date}.xlsx`;
 
 
-  XLSX.writeFile(wb, filename);
+  XLSX.writeFile(wb, filename, { bookType: "xlsx", bookSST: false, cellStyles: true });
 
   showPopup("Excel exported successfully!");
 };
@@ -1742,6 +1742,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

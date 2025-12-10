@@ -1506,19 +1506,36 @@ async function computeStatsEngine() {
         r.followDate < today
     ).length;
 
+     // Compute X / Y / Z counts
+const X_lastActionedToday = filteredCases.filter(r =>
+  r.lastActionedBy === u.id && r.lastActionedOn === today
+).length;
+
+const Y_statusChangedToday = totalActioned;  // already computed
+
+const Z_difference = X_lastActionedToday - Y_statusChangedToday;
+
     rows.push({
-      userId: u.id,
-      name: `${u.firstName} ${u.lastName}`,
-      totalActioned,
-      closedToday: closedTodayCount,
-      met,
-      metPct,
-      notMet,
-      notMetPct,
-      spMonNoFollow,
-      followX,
-      followY
-    });
+  userId: u.id,
+  name: `${u.firstName} ${u.lastName}`,
+
+  // Replace totalActioned with Y only (status changes)
+  totalActionedY: totalActioned,
+
+  // New fields
+  lastActionedX: X_lastActionedToday,
+  diffZ: Z_difference,
+
+  closedToday,
+  met,
+  metPct,
+  notMet,
+  notMetPct,
+  spMonNoFollow,
+  followX,
+  followY
+});
+
   }
 
   /* =============================================================
@@ -1526,15 +1543,21 @@ async function computeStatsEngine() {
      (sum of all user rows currently displayed)
      ============================================================= */
   const total = {
-    name: "TEAM TOTAL",
-    totalActioned: rows.reduce((a, r) => a + r.totalActioned, 0),
-    closedToday:  rows.reduce((a, r) => a + r.closedToday, 0),
-    met:          rows.reduce((a, r) => a + r.met, 0),
-    notMet:       rows.reduce((a, r) => a + r.notMet, 0),
-    spMonNoFollow:rows.reduce((a, r) => a + r.spMonNoFollow, 0),
-    followX:      rows.reduce((a, r) => a + r.followX, 0),
-    followY:      rows.reduce((a, r) => a + r.followY, 0)
-  };
+  name: "TEAM TOTAL",
+
+  lastActionedX: rows.reduce((s, r) => s + r.lastActionedX, 0),
+  totalActionedY: rows.reduce((s, r) => s + r.totalActionedY, 0),
+  diffZ: rows.reduce((s, r) => s + r.lastActionedX, 0) -
+        rows.reduce((s, r) => s + r.totalActionedY, 0),
+
+  closedToday: rows.reduce((s, r) => s + r.closedToday, 0),
+  met: rows.reduce((s, r) => s + r.met, 0),
+  notMet: rows.reduce((s, r) => s + r.notMet, 0),
+  spMonNoFollow: rows.reduce((s, r) => s + r.spMonNoFollow, 0),
+  followX: rows.reduce((s, r) => s + r.followX, 0),
+  followY: rows.reduce((s, r) => s + r.followY, 0)
+};
+
 
   // Recompute percentages for TOTAL row
   total.metPct = total.closedToday ? Math.round((total.met / total.closedToday) * 100) : 0;
@@ -1717,7 +1740,7 @@ function renderStatsTableNew() {
   const totalRowHtml = `
     <tr style="font-weight:700;background:rgba(255,255,255,0.03);">
       <td>${t.name}</td>
-      <td>${t.totalActioned}</td>
+      <td>${t.lastActionedX} / ${t.totalActionedY} / ${t.diffZ}</td>
       <td>${t.closedToday}</td>
       <td>${t.met} (${t.metPct}%)</td>
       <td>${t.notMet} (${t.notMetPct}%)</td>
@@ -1731,7 +1754,7 @@ function renderStatsTableNew() {
   const userRowsHtml = stats.userRows.map(u => `
     <tr>
       <td>${escapeHtml(u.name)}</td>
-      <td>${u.totalActioned}</td>
+      <td>${u.lastActionedX} / ${u.totalActionedY} / ${u.diffZ}</td>
       <td>${u.closedToday}</td>
       <td>${u.met} (${u.metPct}%)</td>
       <td>${u.notMet} (${u.notMetPct}%)</td>
@@ -1927,6 +1950,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -1424,6 +1424,18 @@ document.getElementById("btnExportExcel").onclick = () => {
 
   // Convert to sheet
   const ws = XLSX.utils.json_to_sheet(rows, { origin: "A1" });
+   // ==== MAKE HEADER ROW BOLD ====
+const headerCells = Object.keys(rows[0]);   // all column headers
+
+headerCells.forEach((header, i) => {
+  const cellAddress = XLSX.utils.encode_cell({ r: 0, c: i }); // row 0 = header row
+  if (!ws[cellAddress]) return;
+
+  ws[cellAddress].s = {
+    font: { bold: true }
+  };
+});
+   
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Cases");
 
@@ -1730,6 +1742,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

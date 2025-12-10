@@ -148,21 +148,38 @@ h1 {
   padding-right: 2.6rem; /* space for icon */
 }
 
-/* Eye icon */
+/* toggle-pass — text-only icon inside password input */
 .toggle-pass {
   position: absolute;
   right: 12px;
-  top: 6px;
-  width: 30px;
-  height: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;            /* adjust size as needed (18–22px works well) */
+  line-height: 1;
   cursor: pointer;
-  opacity: 0.9;
-  color: var(--muted); /* #9aa4b2 — controls SVG stroke via currentColor */
-  display: inline-block;
-  vertical-align: middle;
+  color: var(--muted);        /* matches your muted color #9aa4b2 */
+  opacity: 0.95;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  border-radius: 6px;         /* subtle hit target */
 }
 
-.toggle-pass:hover { opacity: 1; }
+/* visible focus style for keyboard users */
+.toggle-pass:focus,
+.toggle-pass:focus-visible {
+  outline: 2px solid rgba(79,140,240,0.18);
+  outline-offset: 2px;
+  color: var(--text);
+}
+
+/* hover */
+.toggle-pass:hover { opacity: 1; color: var(--text); }
+
 
 
 
@@ -189,7 +206,7 @@ h1 {
 
     <div class="password-wrap">
   <input id="loginPassword" class="input" placeholder="Password" type="password" />
-  <img class="toggle-pass" data-target="loginPassword" src="img/eye-open.svg" />
+  <span class="toggle-pass" role="button" aria-pressed="false" tabindex="0" data-target="loginPassword">SHOW</span>
 </div>
 
     <button id="btnLogin" class="btn">Login</button>
@@ -212,7 +229,7 @@ h1 {
 
     <div class="password-wrap">
   <input id="signPassword" class="input" placeholder="Password" type="password" />
-  <img class="toggle-pass" data-target="signPassword" src="img/eye-open.svg" />
+  <span class="toggle-pass" role="button" aria-pressed="false" tabindex="0" data-target="signPassword">SHOW</span>
 </div>
 
     <button id="btnSignup" class="btn">Sign Up</button>
@@ -303,20 +320,47 @@ document.getElementById("forgot").onclick = async () => {
   }
 };
 
-// PASSWORD SHOW/HIDE TOGGLE
-document.querySelectorAll(".toggle-pass").forEach(icon => {
-  icon.onclick = () => {
-    const input = document.getElementById(icon.dataset.target);
+// TEXT-ICON PASSWORD SHOW/HIDE TOGGLE (pure text icons)
+const ICONS = {
+  visible: "◯",  // shown when password is hidden (tap to "show")
+  hidden:  "●"   // shown when password is visible (tap to "hide")
+};
+// If you prefer another pair, change the two strings above (e.g., "Show"/"Hide", "👁"/"🙈", etc.)
+
+document.querySelectorAll(".toggle-pass").forEach(el => {
+  // click behavior
+  el.addEventListener("click", () => {
+    const id = el.dataset.target;
+    const input = document.getElementById(id);
+    if (!input) return;
 
     if (input.type === "password") {
+      // reveal
       input.type = "text";
-      icon.src = "img/eye-closed.svg";  // hide mode
+      el.textContent = ICONS.hidden;
+      el.setAttribute("aria-pressed", "true");
+      el.setAttribute("aria-label", "Hide password");
     } else {
+      // hide
       input.type = "password";
-      icon.src = "img/eye-open.svg";    // show mode
+      el.textContent = ICONS.visible;
+      el.setAttribute("aria-pressed", "false");
+      el.setAttribute("aria-label", "Show password");
     }
-  };
+  });
+
+  // keyboard support (Enter / Space)
+  el.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" || ev.key === " ") {
+      ev.preventDefault();
+      el.click();
+    }
+  });
+
+  // initialize label (in case)
+  el.setAttribute("aria-label", "Show password");
 });
+
 
 
   
@@ -325,6 +369,7 @@ document.querySelectorAll(".toggle-pass").forEach(icon => {
 </body>
 
 </html>
+
 
 
 

@@ -411,13 +411,17 @@ function buildPrimaryFilters() {
     };
 
     // lock toggle
-    const lockSpan = block.querySelector(".lock");
-    lockSpan.onclick = (e) => {
-      e.stopPropagation();
-      const k = lockSpan.dataset.key;
-      uiState.primaryLocks[k] = !uiState.primaryLocks[k];
-      updateFilterLockedUI(k);
-    };
+    // lock removed → skip lock logic entirely
+const lockSpan = block.querySelector(".lock");
+if (lockSpan) {
+  lockSpan.onclick = (e) => {
+    e.stopPropagation();
+    const k = lockSpan.dataset.key;
+    uiState.primaryLocks[k] = !uiState.primaryLocks[k];
+    updateFilterLockedUI(k);
+  };
+}
+
 
     // checkbox changes
     block.querySelectorAll("input[type='checkbox']").forEach(cb => {
@@ -598,16 +602,12 @@ document.addEventListener("click", (e) => {
 
 
 /* Helper: update lock UI */
+/* Helper: update lock UI */
 function updateFilterLockedUI(key) {
   const locked = !!uiState.primaryLocks[key];
-  const block = document.querySelector(`.filter-head [data-key="${key}"]`)?.closest?.(".filter") ||
-                document.querySelector(`[data-key="${key}"]`)?.closest?.(".filter");
-  // fallback locate lock element
-  const lockSpan = document.querySelector(`.lock[data-key="${key}"]`);
   const body = document.getElementById(`filter-body-${key}`);
-  if (!lockSpan || !body) return;
+  if (!body) return;
 
-  lockSpan.textContent = locked ? "🔒" : "🔓";
   if (locked) {
     body.classList.add("filter-locked");
     body.style.opacity = "0.45";
@@ -618,6 +618,7 @@ function updateFilterLockedUI(key) {
     body.style.pointerEvents = "";
   }
 }
+
 
 /* Synchronize UI checkboxes → uiState.primaries (called on sidebar apply) */
 function syncPrimaryFiltersFromUI() {
@@ -1832,6 +1833,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

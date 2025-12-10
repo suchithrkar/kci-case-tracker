@@ -1147,14 +1147,6 @@ function bindUserActions() {
 });
 
 
-      if (!confirm("Remove user permanently?")) return;
-
-      await deleteDoc(doc(db, "users", uid));
-      showPopup("User removed.");
-    };
-  });
-}
-
 /* =======================================================================
    CASCADE DELETE — DELETE ALL CASES FOR A TEAM
    ======================================================================= */
@@ -1845,6 +1837,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

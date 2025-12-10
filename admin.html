@@ -449,6 +449,27 @@ select.user-team-dd,
   transform: scale(1.2);
 }
 
+/* Tooltips for stats table header */
+th .tooltip {
+  position: absolute;
+  bottom: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  padding: .35rem .5rem;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+/* Show tooltip on hover */
+th:hover .tooltip {
+  opacity: 1;
+}
 
 
 </style>
@@ -714,6 +735,7 @@ select.user-team-dd,
 </body>
 
 </html>
+
 
 
 

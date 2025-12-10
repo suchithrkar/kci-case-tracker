@@ -1650,32 +1650,56 @@ const totalActioned = new Set(todayCases.map(r => r.id)).size;
     const followX = userCases.filter(r => r.followDate && r.status !== "Closed" && r.followDate === today).length;
     const followY = userCases.filter(r => r.followDate && r.status !== "Closed" && r.followDate < today).length;
 
-    rows.push({
-      userId: u.id,
-      name: `${u.firstName} ${u.lastName}`,
-      totalActioned,
-      closedToday,
-      met,
-      metPct,
-      notMet,
-      notMetPct,
-      spMonNoFollow,
-      followX,
-      followY
-    });
+    // NEW — X = lastActionedToday
+const X_lastActionedToday = filteredCases.filter(r =>
+  r.lastActionedBy === u.id && r.lastActionedOn === today
+).length;
+
+// Y = statusChangedToday (already computed)
+const Y_statusChangedToday = totalActioned;
+
+// Z = difference
+const Z_difference = X_lastActionedToday - Y_statusChangedToday;
+
+rows.push({
+  userId: u.id,
+  name: `${u.firstName} ${u.lastName}`,
+
+  // NEW FIELDS
+  lastActionedX: X_lastActionedToday,
+  totalActionedY: Y_statusChangedToday,
+  diffZ: Z_difference,
+
+  closedToday,
+  met,
+  metPct,
+  notMet,
+  notMetPct,
+  spMonNoFollow,
+  followX,
+  followY
+});
+
   }
 
   // TEAM TOTAL = sums of rows
   const total = {
-    name: "TEAM TOTAL",
-    totalActioned: rows.reduce((s, r) => s + r.totalActioned, 0),
-    closedToday: rows.reduce((s, r) => s + r.closedToday, 0),
-    met: rows.reduce((s, r) => s + r.met, 0),
-    notMet: rows.reduce((s, r) => s + r.notMet, 0),
-    spMonNoFollow: rows.reduce((s, r) => s + r.spMonNoFollow, 0),
-    followX: rows.reduce((s, r) => s + r.followX, 0),
-    followY: rows.reduce((s, r) => s + r.followY, 0)
-  };
+  name: "TEAM TOTAL",
+
+  lastActionedX: rows.reduce((s, r) => s + (r.lastActionedX || 0), 0),
+  totalActionedY: rows.reduce((s, r) => s + (r.totalActionedY || 0), 0),
+  diffZ:
+    rows.reduce((s, r) => s + (r.lastActionedX || 0), 0) -
+    rows.reduce((s, r) => s + (r.totalActionedY || 0), 0),
+
+  closedToday: rows.reduce((s, r) => s + r.closedToday, 0),
+  met: rows.reduce((s, r) => s + r.met, 0),
+  notMet: rows.reduce((s, r) => s + r.notMet, 0),
+  spMonNoFollow: rows.reduce((s, r) => s + r.spMonNoFollow, 0),
+  followX: rows.reduce((s, r) => s + r.followX, 0),
+  followY: rows.reduce((s, r) => s + r.followY, 0)
+};
+
 
   total.metPct = total.closedToday ? Math.round((total.met / total.closedToday) * 100) : 0;
   total.notMetPct = total.closedToday ? Math.round((total.notMet / total.closedToday) * 100) : 0;
@@ -1950,6 +1974,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

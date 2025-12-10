@@ -97,9 +97,14 @@ document.addEventListener("mouseover", (e) => {
 export const trackerState = {
   user: null,
   teamId: null,
+    teamName: "",
   allCases: [],
   filteredCases: []
 };
+
+/* Map UID → Full Name for Excel export */
+const userNameMap = {};
+
 
 /* =======================================================================
    UI STATE (CLEAN REBUILD)
@@ -149,8 +154,25 @@ onAuthStateChanged(auth, async (user) => {
   trackerState.user = { uid: user.uid, ...data };
   trackerState.teamId = getCurrentTrackerTeam(trackerState.user);
 
+   /* Load team name for Excel filename */
+if (trackerState.teamId) {
+  const teamSnap = await getDoc(doc(db, "teams", trackerState.teamId));
+  trackerState.teamName = teamSnap.exists() ? teamSnap.data().name : trackerState.teamId;
+}
+
   /* Header Initialization */
   el.userFullName.textContent = `${data.firstName} ${data.lastName}`;
+
+   /* ------------------------------------------------------------------
+   LOAD ALL USERS ONCE → Build UID → Full Name map
+   ------------------------------------------------------------------ */
+import { getDocs } from "./js/firebase.js";
+
+const usersSnap = await getDocs(collection(db, "users"));
+usersSnap.forEach(d => {
+  const u = d.data();
+  userNameMap[d.id] = `${u.firstName} ${u.lastName}`;
+});
 
   // Theme initialization
 document.documentElement.dataset.theme = data.theme || "dark";
@@ -1382,8 +1404,8 @@ document.getElementById("btnExportExcel").onclick = () => {
     "Follow Up Date": r.followDate,
     "Flagged": r.flagged ? "Yes" : "No",
     "Notes": r.notes,
-    "Last Actioned By": r.lastActionedBy,
-    "Last Actioned On": r.lastActionedOn,
+    "Last Actioned By": userNameMap[r.lastActionedBy] || r.lastActionedBy || "",
+   "Status Changed By": userNameMap[r.statusChangedBy] || r.statusChangedBy || "",
     "Status Changed By": r.statusChangedBy,
     "Status Changed On": r.statusChangedOn
   }));
@@ -1394,7 +1416,11 @@ document.getElementById("btnExportExcel").onclick = () => {
   XLSX.utils.book_append_sheet(wb, ws, "Cases");
 
   // Filename: Team + timestamp
-  const filename = `KCI_Cases_${new Date().toISOString().slice(0,10)}.xlsx`;
+  const date = new Date().toISOString().slice(0,10);
+const team = trackerState.teamName || "UnknownTeam";
+
+const filename = `KCI_Cases_${team}_${date}.xlsx`;
+
 
   XLSX.writeFile(wb, filename);
 
@@ -1692,6 +1718,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

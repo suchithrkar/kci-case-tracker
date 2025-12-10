@@ -148,39 +148,24 @@ h1 {
   padding-right: 2.6rem; /* space for icon */
 }
 
-/* toggle-pass — text-only icon inside password input */
+/* Show / Hide text toggle */
 .toggle-pass {
   position: absolute;
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 18px;            /* adjust size as needed (18–22px works well) */
-  line-height: 1;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  color: var(--muted);        /* matches your muted color #9aa4b2 */
-  opacity: 0.95;
+  color: var(--muted);
+  opacity: 0.9;
   user-select: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  text-align: center;
-  border-radius: 6px;         /* subtle hit target */
 }
 
-/* visible focus style for keyboard users */
-.toggle-pass:focus,
-.toggle-pass:focus-visible {
-  outline: 2px solid rgba(79,140,240,0.18);
-  outline-offset: 2px;
+.toggle-pass:hover {
+  opacity: 1;
   color: var(--text);
 }
-
-/* hover */
-.toggle-pass:hover { opacity: 1; color: var(--text); }
-
-
 
 
   
@@ -320,48 +305,20 @@ document.getElementById("forgot").onclick = async () => {
   }
 };
 
-// TEXT-ICON PASSWORD SHOW/HIDE TOGGLE (pure text icons)
-const ICONS = {
-  visible: "Show",  // shown when password is hidden (tap to "show")
-  hidden:  "Hide"   // shown when password is visible (tap to "hide")
-};
-// If you prefer another pair, change the two strings above (e.g., "Show"/"Hide", "👁"/"🙈", etc.)
-
+// SIMPLE SHOW / HIDE TEXT TOGGLE
 document.querySelectorAll(".toggle-pass").forEach(el => {
-  // click behavior
   el.addEventListener("click", () => {
-    const id = el.dataset.target;
-    const input = document.getElementById(id);
-    if (!input) return;
+    const input = document.getElementById(el.dataset.target);
 
     if (input.type === "password") {
-      // reveal
       input.type = "text";
-      el.textContent = ICONS.hidden;
-      el.setAttribute("aria-pressed", "true");
-      el.setAttribute("aria-label", "Hide password");
+      el.textContent = "Hide";
     } else {
-      // hide
       input.type = "password";
-      el.textContent = ICONS.visible;
-      el.setAttribute("aria-pressed", "false");
-      el.setAttribute("aria-label", "Show password");
+      el.textContent = "Show";
     }
   });
-
-  // keyboard support (Enter / Space)
-  el.addEventListener("keydown", (ev) => {
-    if (ev.key === "Enter" || ev.key === " ") {
-      ev.preventDefault();
-      el.click();
-    }
-  });
-
-  // initialize label (in case)
-  el.setAttribute("aria-label", "Show password");
 });
-
-
 
   
 </script>
@@ -369,6 +326,7 @@ document.querySelectorAll(".toggle-pass").forEach(el => {
 </body>
 
 </html>
+
 
 
 

@@ -1730,7 +1730,16 @@ function renderStatsTableNew() {
     <thead>
       <tr style="text-align:left;border-bottom:1px solid var(--border);">
         <th>User</th>
-        <th>Total Actioned</th>
+        
+        <th style="position:relative;">
+  Total Actioned
+  <span class="tooltip">
+    X — Total Actioned Cases.<br>
+    Y — Total Followed Up Cases.<br>
+    Z — Total Updated Cases (X - Y).
+  </span>
+</th>
+
         <th>Closed Today</th>
         <th>Met</th>
         <th>Not Met</th>
@@ -1974,6 +1983,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

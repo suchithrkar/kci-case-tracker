@@ -384,7 +384,6 @@ function buildPrimaryFilters() {
       <div class="filter-head" data-key="${key}">
         <div class="filter-title">${title}</div>
         <div>
-          <span class="lock" data-key="${key}" title="Lock / Unlock">🔓</span>
           <span style="margin-left:8px">▾</span>
         </div>
       </div>
@@ -494,6 +493,109 @@ setTimeout(() => {
     });
   });
 }
+
+/* ============================================================
+   READY FOR CLOSURE FILTER — BUTTON LOGIC
+   ============================================================ */
+
+let rfcLocked = false;
+
+// Main lock toggle
+document.addEventListener("click", (e) => {
+    const lockBtn = e.target.closest("#rfcLock");
+    if (!lockBtn) return;
+
+    rfcLocked = !rfcLocked;
+    lockBtn.textContent = rfcLocked ? "🔒" : "🔓";
+
+    // Lock ALL primary filters
+    Object.keys(uiState.primaryLocks).forEach(k => {
+        uiState.primaryLocks[k] = rfcLocked;
+    });
+
+    buildPrimaryFilters();
+});
+
+// CLEAR button — clears only primary filters
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest("#rfcClear");
+    if (!btn || rfcLocked) return;
+
+    Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
+    buildPrimaryFilters();
+    applyFilters();
+});
+
+// Button Selection Logic
+document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".rfcBtn");
+    if (!btn || rfcLocked) return;
+
+    const type = btn.dataset.type;
+
+    // Clear all filters first
+    Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
+
+    if (type === "onsite") {
+        uiState.primaries.caseResolutionCode = ["Onsite Solution"];
+        uiState.primaries.onsiteRFC = [
+            "Closed - Canceled",
+            "Closed - Posted",
+            "Open - Completed"
+        ];
+        buildPrimaryFilters();
+        applyFilters();
+        return;
+    }
+
+    if (type === "offsite") {
+        uiState.primaries.caseResolutionCode = ["Offsite Solution"];
+        uiState.primaries.benchRFC = ["Possible completed"];
+        buildPrimaryFilters();
+        applyFilters();
+        return;
+    }
+
+    if (type === "csr") {
+        uiState.primaries.caseResolutionCode = ["Parts Shipped"];
+        uiState.primaries.csrRFC = ["Cancelled","Closed","POD"];
+        buildPrimaryFilters();
+        applyFilters();
+        return;
+    }
+
+    if (type === "total") {
+        // TOTAL = union of the 3 button results (does not select UI checkboxes)
+        const onsiteList = trackerState.allCases.filter(r =>
+            ["Onsite Solution"].includes(r.caseResolutionCode)
+            &&
+            ["Closed - Canceled","Closed - Posted","Open - Completed"]
+            .includes(r.onsiteRFC)
+        );
+
+        const offsiteList = trackerState.allCases.filter(r =>
+            ["Offsite Solution"].includes(r.caseResolutionCode)
+            &&
+            ["Possible completed"].includes(r.benchRFC)
+        );
+
+        const csrList = trackerState.allCases.filter(r =>
+            ["Parts Shipped"].includes(r.caseResolutionCode)
+            &&
+            ["Cancelled","Closed","POD"].includes(r.csrRFC)
+        );
+
+        trackerState.filteredCases = [
+            ...onsiteList,
+            ...offsiteList,
+            ...csrList
+        ];
+
+        renderTable();
+        return;
+    }
+});
+
 
 /* Helper: update lock UI */
 function updateFilterLockedUI(key) {
@@ -1730,6 +1832,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

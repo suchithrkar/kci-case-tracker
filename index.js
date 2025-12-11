@@ -519,6 +519,9 @@ document.addEventListener("click", (e) => {
         uiState.primaryLocks[k] = rfcLocked;
     });
 
+   document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+
+
     buildPrimaryFilters();
 });
 
@@ -528,6 +531,9 @@ document.addEventListener("click", (e) => {
     if (!btn || rfcLocked) return;
 
    uiState.mode = "normal";
+
+   // Remove RFC highlights
+    document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
 
     Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
     buildPrimaryFilters();
@@ -546,6 +552,11 @@ const previouslyOpenFilters = Array.from(
 
 
     const type = btn.dataset.type;
+
+   // Highlight active RFC button
+document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+btn.classList.add("active");
+
 
     // Clear all filters first
     Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
@@ -1959,6 +1970,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

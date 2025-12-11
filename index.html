@@ -444,6 +444,40 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 #statusPanel input[type="checkbox"]{
   width:16px;height:16px;
 }
+
+/* RFC BUTTON STYLING */
+.rfcBtn, .rfcClearBtn {
+    border:1px solid var(--border);
+    background:var(--panel-2);
+    border-radius:10px;
+    padding:.45rem .8rem;
+    cursor:pointer;
+    transition:0.15s ease;
+}
+
+.rfcBtn:hover, .rfcClearBtn:hover {
+    background:var(--panel);
+    filter:brightness(1.12);
+}
+
+/* ACTIVE RFC BUTTON HIGHLIGHT */
+.rfcBtn.active {
+    background:var(--accent);
+    border-color:var(--accent);
+    color:white;
+    font-weight:600;
+}
+
+  #rfcLock {
+    opacity:0.75;
+    transition:0.2s;
+}
+#rfcLock:hover {
+    opacity:1;
+    transform:scale(1.12);
+}
+
+  
 </style>
 </head>
 <body>
@@ -549,18 +583,29 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
             <div style="font-weight:600;">Ready for Closure</div>
 
             <div style="display:flex; gap:.5rem; align-items:center;">
-                <button id="rfcClear" class="side-btn" style="padding:.35rem .8rem;">Clear</button>
-                <button id="rfcLock" class="side-btn" style="padding:.35rem .8rem;">🔓</button>
+                <!-- Order: Lock (icon-only text) | Clear All (small button) -->
+<span id="rfcLock" style="
+    cursor:pointer;
+    font-size:18px;
+    padding:4px 6px;
+    user-select:none;
+">🔓</span>
+
+<button id="rfcClear" class="rfcClearBtn"
+    style="padding:.25rem .6rem;font-size:12px;border-radius:10px;">
+    Clear All
+</button>
+
             </div>
         </div>
 
         <div class="filter-body open" style="max-height:none; padding:1rem;">
             <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
-                <button class="side-btn rfcBtn" data-type="onsite">Onsite</button>
-                <button class="side-btn rfcBtn" data-type="offsite">Offsite</button>
-                <button class="side-btn rfcBtn" data-type="csr">CSR</button>
-                <button class="side-btn rfcBtn" data-type="total">TOTAL</button>
-                <button class="side-btn rfcBtn" data-type="negative">-ve</button>
+                <button class="rfcBtn" data-type="onsite">Onsite</button>
+                <button class="rfcBtn" data-type="offsite">Offsite</button>
+                <button class="rfcBtn" data-type="csr">CSR</button>
+                <button class="rfcBtn" data-type="total">TOTAL</button>
+                <button class="rfcBtn" data-type="negative">-ve</button>
             </div>
         </div>
     </div>
@@ -691,6 +736,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

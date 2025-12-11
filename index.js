@@ -598,6 +598,62 @@ document.addEventListener("click", (e) => {
         renderTable();
         return;
     }
+
+       if (type === "negative") {
+        // 1) Start with ALL cases from current team
+        let base = [...trackerState.allCases];
+
+        // 2) Subtract TOTAL filter cases
+        const onsiteTotal = trackerState.allCases.filter(r =>
+            r.caseResolutionCode === "Onsite Solution" &&
+            ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
+                .includes(r.onsiteRFC)
+        );
+
+        const offsiteTotal = trackerState.allCases.filter(r =>
+            r.caseResolutionCode === "Offsite Solution" &&
+            r.benchRFC === "Possible completed"
+        );
+
+        const csrTotal = trackerState.allCases.filter(r =>
+            r.caseResolutionCode === "Parts Shipped" &&
+            ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
+        );
+
+        const totalCases = [
+            ...onsiteTotal,
+            ...offsiteTotal,
+            ...csrTotal
+        ].map(c => c.id);
+
+        // Remove TOTAL cases
+        base = base.filter(r => !totalCases.includes(r.id));
+
+        // 3) Remove Onsite + CA Group 0-3 / 3-5
+        base = base.filter(r => !(
+            r.caseResolutionCode === "Onsite Solution" &&
+            ["0-3 Days", "3-5 Days"].includes(r.caGroup)
+        ));
+
+        // 4) Remove Parts Shipped + CA Group 0-3
+        base = base.filter(r => !(
+            r.caseResolutionCode === "Parts Shipped" &&
+            r.caGroup === "0-3 Days"
+        ));
+
+        // 5) Remove Offsite + CA Group 0-3 / 3-5 / 5-10
+        base = base.filter(r => !(
+            r.caseResolutionCode === "Offsite Solution" &&
+            ["0-3 Days", "3-5 Days", "5-10 Days"].includes(r.caGroup)
+        ));
+
+        // Final result
+        trackerState.filteredCases = base;
+        renderTable();
+        return;
+    }
+
+   
 });
 
 
@@ -1833,6 +1889,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

@@ -527,6 +527,8 @@ document.addEventListener("click", (e) => {
     const btn = e.target.closest("#rfcClear");
     if (!btn || rfcLocked) return;
 
+   uiState.mode = "normal";
+
     Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
     buildPrimaryFilters();
     applyFilters();
@@ -543,6 +545,7 @@ document.addEventListener("click", (e) => {
     Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
 
     if (type === "onsite") {
+       uiState.mode = "normal";
         uiState.primaries.caseResolutionCode = ["Onsite Solution"];
         uiState.primaries.onsiteRFC = [
             "Closed - Canceled",
@@ -555,6 +558,7 @@ document.addEventListener("click", (e) => {
     }
 
     if (type === "offsite") {
+       uiState.mode = "normal";
         uiState.primaries.caseResolutionCode = ["Offsite Solution"];
         uiState.primaries.benchRFC = ["Possible completed"];
         buildPrimaryFilters();
@@ -563,6 +567,7 @@ document.addEventListener("click", (e) => {
     }
 
     if (type === "csr") {
+       uiState.mode = "normal";
         uiState.primaries.caseResolutionCode = ["Parts Shipped"];
         uiState.primaries.csrRFC = ["Cancelled","Closed","POD"];
         buildPrimaryFilters();
@@ -918,6 +923,15 @@ if (uiState.mode === "total") {
         ...csrList
     ];
 
+   // APPLY SORTING HERE
+if (uiState.sortByDateAsc !== null) {
+    out.sort((a, b) =>
+        uiState.sortByDateAsc
+            ? a.createdOn.localeCompare(b.createdOn)
+            : b.createdOn.localeCompare(a.createdOn)
+    );
+}
+
     updateBadges();
     renderTable();
     return;
@@ -965,6 +979,15 @@ if (uiState.mode === "negative") {
         r.caseResolutionCode === "Offsite Solution" &&
         ["0-3 Days","3-5 Days","5-10 Days"].includes(r.caGroup)
     ));
+
+   // APPLY SORTING
+if (uiState.sortByDateAsc !== null) {
+    base.sort((a, b) =>
+        uiState.sortByDateAsc
+            ? a.createdOn.localeCompare(b.createdOn)
+            : b.createdOn.localeCompare(a.createdOn)
+    );
+}
 
     trackerState.filteredCases = base;
 
@@ -1903,6 +1926,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

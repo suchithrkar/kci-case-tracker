@@ -911,8 +911,8 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
   return;
 }
 
-   /* ===============================================================
-   RFC MODE: TOTAL
+  /* ===============================================================
+   RFC MODE: TOTAL  (NEW — does NOT return early)
    =============================================================== */
 if (uiState.mode === "total") {
 
@@ -931,52 +931,23 @@ if (uiState.mode === "total") {
         ["Cancelled","Closed","POD"].includes(r.csrRFC)
     );
 
-    // MERGE RESULT
-    let out = [
+    rows = [
         ...onsiteList,
         ...offsiteList,
         ...csrList
     ];
-
-    // APPLY SORTING (FIXED)
-    if (uiState.sortByDateAsc !== null) {
-        out.sort((a, b) =>
-            uiState.sortByDateAsc
-                ? a.createdOn.localeCompare(b.createdOn)
-                : b.createdOn.localeCompare(a.createdOn)
-        );
-    }
-
-    trackerState.filteredCases = out;
-
-    updateBadges();
-    renderTable();
-    return;
 }
 
-
-   /* ===============================================================
-   RFC MODE: NEGATIVE
+/* ===============================================================
+   RFC MODE: NEGATIVE (NEW — does NOT return early)
    =============================================================== */
 if (uiState.mode === "negative") {
 
     let base = [...trackerState.allCases];
 
-    const onsiteTotal = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Onsite Solution" &&
-        ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
-        .includes(r.onsiteRFC)
-    );
-
-    const offsiteTotal = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Offsite Solution" &&
-        r.benchRFC === "Possible completed"
-    );
-
-    const csrTotal = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Parts Shipped" &&
-        ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
-    );
+    const onsiteTotal = ...
+    const offsiteTotal = ...
+    const csrTotal = ...
 
     const totalCases = [...onsiteTotal, ...offsiteTotal, ...csrTotal]
         .map(c => c.id);
@@ -998,21 +969,9 @@ if (uiState.mode === "negative") {
         ["0-3 Days","3-5 Days","5-10 Days"].includes(r.caGroup)
     ));
 
-   // APPLY SORTING
-if (uiState.sortByDateAsc !== null) {
-    base.sort((a, b) =>
-        uiState.sortByDateAsc
-            ? a.createdOn.localeCompare(b.createdOn)
-            : b.createdOn.localeCompare(a.createdOn)
-    );
+    rows = base;
 }
 
-    trackerState.filteredCases = base;
-
-    updateBadges();
-    renderTable();
-    return;
-}
 
 
 
@@ -1944,6 +1903,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

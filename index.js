@@ -674,10 +674,31 @@ function setupFilterControls() {
     /* CLEAR */
   el.btnClear.onclick = () => {
 
+    const totalOrNeg = (uiState.mode === "total" || uiState.mode === "negative");
+
+    if (totalOrNeg && rfcLocked) {
+        // Sidebar is locked → DO NOT reset mode or primaries
+        // Only clear main-page filters (search, dates, status, sort)
+        uiState.search = "";
+        uiState.from = "";
+        uiState.to = "";
+        uiState.statusList = [];
+        uiState.sortByDateAsc = null;
+
+        el.txtSearch.value = "";
+        el.dateFrom.value = "";
+        el.dateTo.value = "";
+
+        buildStatusPanel();
+        applyFilters();
+        return; // ← IMPORTANT
+    }
+
+    // NORMAL CLEAR BEHAVIOR (when sidebar not locked or other modes)
     uiState.search = "";
     uiState.from = "";
     uiState.to = "";
-    uiState.statusList = [];     // reset status filter
+    uiState.statusList = [];
     uiState.mode = "normal";
     uiState.sortByDateAsc = null;
 
@@ -685,24 +706,18 @@ function setupFilterControls() {
     el.dateFrom.value = "";
     el.dateTo.value = "";
 
-    // Reset primary filters (except locked)
     Object.keys(uiState.primaries).forEach(key => {
         if (!uiState.primaryLocks[key]) {
             uiState.primaries[key] = [];
         }
     });
 
-     // NEW: clear all pending updates so Unupdated view fully resets
-pendingUnupdated.clear();
-         unupdatedProtect = false;   // VERY IMPORTANT FIX
-
-
+    pendingUnupdated.clear();
+    unupdatedProtect = false;
 
     buildStatusPanel();
     buildPrimaryFilters();
 
-    // *** CRITICAL FIX ***
-    // Make sure no checkbox modifies uiState.statusList during reset
     el.statusPanel.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
 
     applyFilters();
@@ -1929,6 +1944,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

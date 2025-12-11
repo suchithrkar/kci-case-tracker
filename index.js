@@ -115,7 +115,7 @@ const uiState = {
   from: "",
   to: "",
   statusList: [],
-  mode: "normal",          // normal | due | flagged | repeat | unupdated
+  mode: "normal",   // normal | due | flagged | repeat | unupdated | total | negative
   sortByDateAsc: null,     // null = off, true = asc, false = desc
 
   primaries: {
@@ -306,6 +306,8 @@ function setupSidebarControls() {
   document.getElementById("btnSideClose").onclick = closeSidebar;
 
   function closeSidebar() {
+     uiState.mode = "normal";
+
      el.sidebar.classList.remove("open");
      el.overlay.classList.remove("show");
 
@@ -321,6 +323,8 @@ function setupSidebarControls() {
 
   // Sidebar apply (same behavior as page Apply)
   document.getElementById("btnSideApply").onclick = () => {
+     uiState.mode = "normal";
+     
     // Bring values from sidebar checkboxes into uiState.primaries then call applyFilters()
     syncPrimaryFiltersFromUI();
     // Also sync search/dates fields (so sidebar apply works as full apply)
@@ -569,89 +573,17 @@ document.addEventListener("click", (e) => {
     }
 
     if (type === "total") {
-        // TOTAL = union of the 3 button results (does not select UI checkboxes)
-        const onsiteList = trackerState.allCases.filter(r =>
-            ["Onsite Solution"].includes(r.caseResolutionCode)
-            &&
-            ["Closed - Canceled","Closed - Posted","Open - Completed"]
-            .includes(r.onsiteRFC)
-        );
+    uiState.mode = "total";
+    applyFilters();
+    return;
+}
 
-        const offsiteList = trackerState.allCases.filter(r =>
-            ["Offsite Solution"].includes(r.caseResolutionCode)
-            &&
-            ["Possible completed"].includes(r.benchRFC)
-        );
-
-        const csrList = trackerState.allCases.filter(r =>
-            ["Parts Shipped"].includes(r.caseResolutionCode)
-            &&
-            ["Cancelled","Closed","POD"].includes(r.csrRFC)
-        );
-
-        trackerState.filteredCases = [
-            ...onsiteList,
-            ...offsiteList,
-            ...csrList
-        ];
-
-        renderTable();
-        return;
-    }
 
        if (type === "negative") {
-        // 1) Start with ALL cases from current team
-        let base = [...trackerState.allCases];
-
-        // 2) Subtract TOTAL filter cases
-        const onsiteTotal = trackerState.allCases.filter(r =>
-            r.caseResolutionCode === "Onsite Solution" &&
-            ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
-                .includes(r.onsiteRFC)
-        );
-
-        const offsiteTotal = trackerState.allCases.filter(r =>
-            r.caseResolutionCode === "Offsite Solution" &&
-            r.benchRFC === "Possible completed"
-        );
-
-        const csrTotal = trackerState.allCases.filter(r =>
-            r.caseResolutionCode === "Parts Shipped" &&
-            ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
-        );
-
-        const totalCases = [
-            ...onsiteTotal,
-            ...offsiteTotal,
-            ...csrTotal
-        ].map(c => c.id);
-
-        // Remove TOTAL cases
-        base = base.filter(r => !totalCases.includes(r.id));
-
-        // 3) Remove Onsite + CA Group 0-3 / 3-5
-        base = base.filter(r => !(
-            r.caseResolutionCode === "Onsite Solution" &&
-            ["0-3 Days", "3-5 Days"].includes(r.caGroup)
-        ));
-
-        // 4) Remove Parts Shipped + CA Group 0-3
-        base = base.filter(r => !(
-            r.caseResolutionCode === "Parts Shipped" &&
-            r.caGroup === "0-3 Days"
-        ));
-
-        // 5) Remove Offsite + CA Group 0-3 / 3-5 / 5-10
-        base = base.filter(r => !(
-            r.caseResolutionCode === "Offsite Solution" &&
-            ["0-3 Days", "3-5 Days", "5-10 Days"].includes(r.caGroup)
-        ));
-
-        // Final result
-        trackerState.filteredCases = base;
-        renderTable();
-        return;
-    }
+    uiState.mode = "negative";
+    applyFilters();
+    return;
+}
 
    
 });
@@ -724,6 +656,7 @@ function setupFilterControls() {
   /* APPLY */
     /* APPLY */
   el.btnApply.onclick = () => {
+     uiState.mode = "normal";
     uiState.search = el.txtSearch.value.trim().toLowerCase();
     uiState.from = el.dateFrom.value;
     uiState.to = el.dateTo.value;
@@ -738,6 +671,8 @@ function setupFilterControls() {
   /* CLEAR */
     /* CLEAR */
   el.btnClear.onclick = () => {
+     uiState.mode = "normal";
+
     uiState.search = "";
     uiState.from = "";
     uiState.to = "";
@@ -959,6 +894,89 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
   renderTable();
   return;
 }
+
+   /* ===============================================================
+   RFC MODE: TOTAL
+   =============================================================== */
+if (uiState.mode === "total") {
+
+    const onsiteList = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Onsite Solution" &&
+        ["Closed - Canceled","Closed - Posted","Open - Completed"]
+        .includes(r.onsiteRFC)
+    );
+
+    const offsiteList = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Offsite Solution" &&
+        r.benchRFC === "Possible completed"
+    );
+
+    const csrList = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Parts Shipped" &&
+        ["Cancelled","Closed","POD"].includes(r.csrRFC)
+    );
+
+    trackerState.filteredCases = [
+        ...onsiteList,
+        ...offsiteList,
+        ...csrList
+    ];
+
+    updateBadges();
+    renderTable();
+    return;
+}
+
+   /* ===============================================================
+   RFC MODE: NEGATIVE
+   =============================================================== */
+if (uiState.mode === "negative") {
+
+    let base = [...trackerState.allCases];
+
+    const onsiteTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Onsite Solution" &&
+        ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
+        .includes(r.onsiteRFC)
+    );
+
+    const offsiteTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Offsite Solution" &&
+        r.benchRFC === "Possible completed"
+    );
+
+    const csrTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Parts Shipped" &&
+        ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
+    );
+
+    const totalCases = [...onsiteTotal, ...offsiteTotal, ...csrTotal]
+        .map(c => c.id);
+
+    base = base.filter(r => !totalCases.includes(r.id));
+
+    base = base.filter(r => !(
+        r.caseResolutionCode === "Onsite Solution" &&
+        ["0-3 Days", "3-5 Days"].includes(r.caGroup)
+    ));
+
+    base = base.filter(r => !(
+        r.caseResolutionCode === "Parts Shipped" &&
+        r.caGroup === "0-3 Days"
+    ));
+
+    base = base.filter(r => !(
+        r.caseResolutionCode === "Offsite Solution" &&
+        ["0-3 Days","3-5 Days","5-10 Days"].includes(r.caGroup)
+    ));
+
+    trackerState.filteredCases = base;
+
+    updateBadges();
+    renderTable();
+    return;
+}
+
 
 
   /* ===============================================================
@@ -1889,6 +1907,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

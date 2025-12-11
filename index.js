@@ -903,8 +903,7 @@ if (uiState.mode === "total") {
 
     const onsiteList = trackerState.allCases.filter(r =>
         r.caseResolutionCode === "Onsite Solution" &&
-        ["Closed - Canceled","Closed - Posted","Open - Completed"]
-        .includes(r.onsiteRFC)
+        ["Closed - Canceled","Closed - Posted","Open - Completed"].includes(r.onsiteRFC)
     );
 
     const offsiteList = trackerState.allCases.filter(r =>
@@ -917,25 +916,29 @@ if (uiState.mode === "total") {
         ["Cancelled","Closed","POD"].includes(r.csrRFC)
     );
 
-    trackerState.filteredCases = [
+    // MERGE RESULT
+    let out = [
         ...onsiteList,
         ...offsiteList,
         ...csrList
     ];
 
-   // APPLY SORTING HERE
-if (uiState.sortByDateAsc !== null) {
-    out.sort((a, b) =>
-        uiState.sortByDateAsc
-            ? a.createdOn.localeCompare(b.createdOn)
-            : b.createdOn.localeCompare(a.createdOn)
-    );
-}
+    // APPLY SORTING (FIXED)
+    if (uiState.sortByDateAsc !== null) {
+        out.sort((a, b) =>
+            uiState.sortByDateAsc
+                ? a.createdOn.localeCompare(b.createdOn)
+                : b.createdOn.localeCompare(a.createdOn)
+        );
+    }
+
+    trackerState.filteredCases = out;
 
     updateBadges();
     renderTable();
     return;
 }
+
 
    /* ===============================================================
    RFC MODE: NEGATIVE
@@ -1926,6 +1929,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

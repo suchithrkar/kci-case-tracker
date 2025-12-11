@@ -478,6 +478,36 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
     transform:scale(1.12);
 }
 
+  /* RFC ROW LAYOUT */
+.rfc-row {
+    display:flex;
+    gap:.6rem;
+    width:100%;
+}
+
+/* FIRST 4 BUTTONS FILL THE ROW EQUALLY */
+.rfcBtn[data-type="onsite"],
+.rfcBtn[data-type="offsite"],
+.rfcBtn[data-type="csr"],
+.rfcBtn[data-type="total"] {
+    flex:1;                /* ⬅ Fills available width EQUALLY */
+    text-align:center;
+}
+
+/* -ve button keeps its natural width */
+.rfcBtn[data-type="negative"] {
+    flex:none;
+}
+
+/* SUBTLE ACTIVE HIGHLIGHT */
+.rfcBtn.active {
+    background:rgba(79,140,240,0.20);     /* light blue tint */
+    border-color:var(--accent);
+    font-weight:600;
+    color:var(--text);
+    box-shadow:0 0 0 1px var(--accent) inset;
+}
+
   
 </style>
 </head>
@@ -600,7 +630,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
         </div>
 
         <div class="filter-body open" style="max-height:none; padding:1rem;">
-            <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
+            <div class="rfc-row">
                 <button class="rfcBtn" data-type="onsite">Onsite</button>
                 <button class="rfcBtn" data-type="offsite">Offsite</button>
                 <button class="rfcBtn" data-type="csr">CSR</button>
@@ -736,6 +766,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

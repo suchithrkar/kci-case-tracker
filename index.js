@@ -519,9 +519,6 @@ document.addEventListener("click", (e) => {
         uiState.primaryLocks[k] = rfcLocked;
     });
 
-   document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
-
-
     buildPrimaryFilters();
 });
 
@@ -1970,6 +1967,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

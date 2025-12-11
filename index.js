@@ -945,25 +945,42 @@ if (uiState.mode === "negative") {
 
     let base = [...trackerState.allCases];
 
-    const onsiteTotal = ...
-    const offsiteTotal = ...
-    const csrTotal = ...
+    // TOTAL building (same as total mode)
+    const onsiteTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Onsite Solution" &&
+        ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
+        .includes(r.onsiteRFC)
+    );
+
+    const offsiteTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Offsite Solution" &&
+        r.benchRFC === "Possible completed"
+    );
+
+    const csrTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Parts Shipped" &&
+        ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
+    );
 
     const totalCases = [...onsiteTotal, ...offsiteTotal, ...csrTotal]
         .map(c => c.id);
 
+    // Remove TOTAL cases
     base = base.filter(r => !totalCases.includes(r.id));
 
+    // Remove Onsite + CA Group 0-3 / 3-5
     base = base.filter(r => !(
         r.caseResolutionCode === "Onsite Solution" &&
         ["0-3 Days", "3-5 Days"].includes(r.caGroup)
     ));
 
+    // Remove Parts Shipped + CA Group 0-3
     base = base.filter(r => !(
         r.caseResolutionCode === "Parts Shipped" &&
         r.caGroup === "0-3 Days"
     ));
 
+    // Remove Offsite + CA Group 0-3 / 3-5 / 5-10
     base = base.filter(r => !(
         r.caseResolutionCode === "Offsite Solution" &&
         ["0-3 Days","3-5 Days","5-10 Days"].includes(r.caGroup)
@@ -971,6 +988,7 @@ if (uiState.mode === "negative") {
 
     rows = base;
 }
+
 
 
 
@@ -1903,6 +1921,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

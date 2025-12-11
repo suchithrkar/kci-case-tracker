@@ -306,7 +306,6 @@ function setupSidebarControls() {
   document.getElementById("btnSideClose").onclick = closeSidebar;
 
   function closeSidebar() {
-     uiState.mode = "normal";
 
      el.sidebar.classList.remove("open");
      el.overlay.classList.remove("show");
@@ -323,7 +322,6 @@ function setupSidebarControls() {
 
   // Sidebar apply (same behavior as page Apply)
   document.getElementById("btnSideApply").onclick = () => {
-     uiState.mode = "normal";
      
     // Bring values from sidebar checkboxes into uiState.primaries then call applyFilters()
     syncPrimaryFiltersFromUI();
@@ -656,7 +654,6 @@ function setupFilterControls() {
   /* APPLY */
     /* APPLY */
   el.btnApply.onclick = () => {
-     uiState.mode = "normal";
     uiState.search = el.txtSearch.value.trim().toLowerCase();
     uiState.from = el.dateFrom.value;
     uiState.to = el.dateTo.value;
@@ -671,7 +668,6 @@ function setupFilterControls() {
   /* CLEAR */
     /* CLEAR */
   el.btnClear.onclick = () => {
-     uiState.mode = "normal";
 
     uiState.search = "";
     uiState.from = "";
@@ -1907,6 +1903,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

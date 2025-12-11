@@ -539,6 +539,12 @@ document.addEventListener("click", (e) => {
     const btn = e.target.closest(".rfcBtn");
     if (!btn || rfcLocked) return;
 
+   // Remember which primary filters were open BEFORE RFC button click
+const previouslyOpenFilters = Array.from(
+    document.querySelectorAll(".filter-body.open")
+).map(el => el.id.replace("filter-body-", ""));
+
+
     const type = btn.dataset.type;
 
     // Clear all filters first
@@ -553,8 +559,14 @@ document.addEventListener("click", (e) => {
             "Open - Completed"
         ];
         buildPrimaryFilters();
-        applyFilters();
-        return;
+
+previouslyOpenFilters.forEach(key => {
+    const body = document.getElementById(`filter-body-${key}`);
+    if (body) body.classList.add("open");
+});
+
+applyFilters();
+return;
     }
 
     if (type === "offsite") {
@@ -562,8 +574,13 @@ document.addEventListener("click", (e) => {
         uiState.primaries.caseResolutionCode = ["Offsite Solution"];
         uiState.primaries.benchRFC = ["Possible completed"];
         buildPrimaryFilters();
-        applyFilters();
-        return;
+previouslyOpenFilters.forEach(key => {
+    const body = document.getElementById(`filter-body-${key}`);
+    if (body) body.classList.add("open");
+});
+applyFilters();
+return;
+
     }
 
     if (type === "csr") {
@@ -571,21 +588,42 @@ document.addEventListener("click", (e) => {
         uiState.primaries.caseResolutionCode = ["Parts Shipped"];
         uiState.primaries.csrRFC = ["Cancelled","Closed","POD"];
         buildPrimaryFilters();
-        applyFilters();
-        return;
+previouslyOpenFilters.forEach(key => {
+    const body = document.getElementById(`filter-body-${key}`);
+    if (body) body.classList.add("open");
+});
+applyFilters();
+return;
+
     }
 
     if (type === "total") {
     uiState.mode = "total";
-    applyFilters();
-    return;
+buildPrimaryFilters();
+
+previouslyOpenFilters.forEach(key => {
+    const body = document.getElementById(`filter-body-${key}`);
+    if (body) body.classList.add("open");
+});
+
+applyFilters();
+return;
+
 }
 
 
        if (type === "negative") {
     uiState.mode = "negative";
-    applyFilters();
-    return;
+    buildPrimaryFilters();
+
+previouslyOpenFilters.forEach(key => {
+    const body = document.getElementById(`filter-body-${key}`);
+    if (body) body.classList.add("open");
+});
+
+applyFilters();
+return;
+
 }
 
    
@@ -1921,6 +1959,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

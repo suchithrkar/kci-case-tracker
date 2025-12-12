@@ -1008,6 +1008,10 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
   }
 
   if (uiState.mode === "unupdated") {
+
+    // 🔥 FIX: start from CURRENT VIEW instead of allCases
+    rows = [...trackerState.filteredCases];
+
     rows = rows.filter(r => {
         // Keep pending-updated rows visible
         if (pendingUnupdated.has(r.id)) return true;
@@ -1024,6 +1028,10 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 
 
   if (uiState.mode === "repeat") {
+
+  // 🔥 FIX: start from CURRENT VIEW instead of allCases
+  rows = [...trackerState.filteredCases];
+
   const count = {};
 
   rows.forEach(r => {
@@ -2058,6 +2066,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

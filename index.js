@@ -556,9 +556,9 @@ openFilters.forEach(key => {
 document.addEventListener("click", (e) => {
 
    // unlock the three RFC filters
-   uiState.primaryLocks.onsiteRFC = false;
-   uiState.primaryLocks.csrRFC = false;
-   uiState.primaryLocks.benchRFC = false;
+   //uiState.primaryLocks.onsiteRFC = false;
+   //uiState.primaryLocks.csrRFC = false;
+   //uiState.primaryLocks.benchRFC = false;
 
    
     const btn = e.target.closest("#rfcClear");
@@ -2066,6 +2066,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

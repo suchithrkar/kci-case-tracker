@@ -462,12 +462,15 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 }
 
 /* ACTIVE RFC BUTTON HIGHLIGHT */
+/* SUBTLE RFC ACTIVE STATE */
 .rfcBtn.active {
-    background:var(--accent);
-    border-color:var(--accent);
-    color:white;
-    font-weight:600;
+    background:rgba(79,140,240,0.12);     /* softer tint */
+    border-color:rgba(79,140,240,0.25);   /* faint border */
+    color:var(--text);                    /* no white text */
+    font-weight:500;                      /* softer (not bold) */
+    box-shadow:none;                      /* remove inset border glow */
 }
+
 
   #rfcLock {
     opacity:0.75;
@@ -766,6 +769,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

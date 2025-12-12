@@ -673,16 +673,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
                 <button class="rfcBtn rfcMainBtn" data-type="offsite">Offsite</button>
                 <button class="rfcBtn rfcMainBtn" data-type="csr">CSR</button>
                 <button class="rfcBtn rfcMainBtn" data-type="total">TOTAL</button>
-                <button class="rfcBtn rfcMainBtn" data-type="negative">
-                  -ve
-                  <span class="tooltip tooltip-right">
-                    Total Open Repair Cases<br>
-                    - Total Ready For Closure Cases (Onsite + Offsite + CSR)<br>
-                    - Onsite Cases with CA Group 0-3 Days / 3-5 Days<br>
-                    - Offsite Cases with CA Group 0-3 Days / 3-5 Days / 5-10 Days<br>
-                    - CSR Cases with CA Group 0-3 Days
-                  </span>
-              </button>
+                <button class="rfcBtn rfcMainBtn" data-type="negative">-ve</button>
             </div>
         </div>
     </div>
@@ -810,9 +801,29 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 <!-- MAIN TRACKER LOGIC (WILL BE SECTION 2 + SECTION 3) -->
 <script type="module" src="./index.js?v=9"></script>
 
+  <div id="globalTooltip" 
+     style="
+       position: fixed;
+       background: var(--panel-2);
+       border: 1px solid var(--border);
+       color: var(--text);
+       padding: 8px 12px;
+       border-radius: 10px;
+       font-size: 12px;
+       width: 280px;
+       line-height: 1.35;
+       display: none;
+       z-index: 99999;
+       pointer-events: none;
+       box-shadow: var(--shadow);
+     ">
+</div>
+
+  
 </body>
 
 </html>
+
 
 
 

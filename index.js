@@ -978,7 +978,9 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 
 
   const today = new Date().toISOString().split("T")[0];
-  let rows = [...trackerState.allCases];
+  let rows = trackerState.filteredCases.length
+  ? [...trackerState.filteredCases]
+  : [...trackerState.allCases];
 
   /* ===============================================================
      MODE OVERRIDES (Option A)
@@ -2066,6 +2068,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

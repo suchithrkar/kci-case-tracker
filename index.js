@@ -525,7 +525,6 @@ let lastRfcMode = null;
 let preventRfcHighlightReset = false;
 
 
-
 // Main lock toggle
 document.addEventListener("click", (e) => {
     const lockBtn = e.target.closest("#rfcLock");
@@ -855,13 +854,11 @@ return;
 
     }
 
-    // NORMAL CLEAR (when not locked)
-    lastRfcMode = null;
-    uiState.mode = "normal";
-
-    if (!preventRfcHighlightReset) {
+    // Only remove highlight if NO RFC mode is active
+if (!lastRfcMode) {
     document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
 }
+
 
 
     uiState.search = "";
@@ -2094,6 +2091,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

@@ -832,12 +832,15 @@ function setupFilterControls() {
 
 
 
-      // ⭐ MUST RESTORE RFC HIGHLIGHT *AFTER* applyFilters()
-      document.querySelectorAll(".rfcBtn").forEach(b => {
-          b.classList.toggle("active", b.dataset.type === uiState.mode);
-      });
-       
-        return;
+      // ⭐ FINAL — restore RFC highlight AFTER DOM is rebuilt
+setTimeout(() => {
+    document.querySelectorAll(".rfcBtn").forEach(b => {
+        b.classList.toggle("active", b.dataset.type === uiState.mode);
+    });
+}, 0);
+
+return;
+
     }
 
     // NORMAL CLEAR (when not locked)
@@ -2076,6 +2079,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

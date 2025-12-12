@@ -277,16 +277,16 @@ if (uiState.mode !== "unupdated") {
     // Special handling for REPEAT mode
     if (uiState.mode === "repeat") {
 
-        // Step 1 — temporarily switch to normal mode
-        // so that filteredCases rebuilds cleanly
-        uiState.mode = "normal";
-        applyFilters();
+    const prev = uiState.mode; // store 'repeat'
 
-        // Step 2 — switch back to repeat mode
-        uiState.mode = "repeat";
-        applyFilters();
+    // rebuild base view first
+    uiState.mode = "normal";
+    applyFilters();
 
-    } else {
+    // re-apply repeat on updated base
+    uiState.mode = prev;
+    applyFilters();
+} else {
         // Normal refresh
         applyFilters();
     }
@@ -2102,6 +2102,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

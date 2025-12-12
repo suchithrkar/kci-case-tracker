@@ -1868,8 +1868,7 @@ function computeUserSummary(userId) {
   const Y = new Set(todayRows.map(r => r.id)).size;  // unique cases followed up
   const Z = X - Y;
 
-  return 
-`Total Cases Closed: ${closedCount}
+  return `Total Cases Closed: ${closedCount}
 Met: ${met} (${pct(met)}%)
 Not Met: ${notMet} (${pct(notMet)}%)
 
@@ -2064,6 +2063,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

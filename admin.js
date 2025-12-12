@@ -1894,7 +1894,7 @@ statsTableWrap.addEventListener("click", (e) => {
   
   if (!user) return;
 
-  userStatsTitle.textContent = `${user.firstName} ${user.lastName}`;
+  userStatsTitle.textContent = `${user.firstName} ${user.lastName} — Today Summary`;
   userStatsBody.textContent = computeUserSummary(uid);
 
   modalUserStats.classList.add("show");
@@ -2063,6 +2063,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

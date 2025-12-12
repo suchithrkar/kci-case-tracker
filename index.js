@@ -521,6 +521,8 @@ setTimeout(() => {
    ============================================================ */
 
 let rfcLocked = false;
+let lastRfcMode = null;
+
 
 // Main lock toggle
 document.addEventListener("click", (e) => {
@@ -601,6 +603,8 @@ const previouslyOpenFilters = Array.from(
 
 
     const type = btn.dataset.type;
+   lastRfcMode = type;   // remember which RFC mode is active
+
 
    // Highlight active RFC button
 document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
@@ -807,37 +811,42 @@ function setupFilterControls() {
     /* CLEAR */
   el.btnClear.onclick = () => {
 
-    const protectedModes = ["onsite", "offsite", "csr", "total", "negative", "repeat", "unupdated"];
-const isProtected = protectedModes.includes(uiState.mode);
+    const protectedModes = ["onsite","offsite","csr","total","negative","repeat","unupdated"];
+    const isProtected = protectedModes.includes(uiState.mode);
 
-if (isProtected && rfcLocked) {
+    if (rfcLocked && isProtected) {
 
-    // Sidebar is locked → DO NOT reset filters or unlock RFC filters
-    uiState.search = "";
-    uiState.from = "";
-    uiState.to = "";
-    uiState.statusList = [];
-    uiState.sortByDateAsc = null;
+        // restore the RFC mode after using any set-2 buttons
+        if (uiState.mode !== lastRfcMode) {
+            uiState.mode = lastRfcMode;
+        }
 
-    el.txtSearch.value = "";
-    el.dateFrom.value = "";
-    el.dateTo.value = "";
+        // clear only main filters
+        uiState.search = "";
+        uiState.from = "";
+        uiState.to = "";
+        uiState.statusList = [];
+        uiState.sortByDateAsc = null;
 
-    buildStatusPanel();
-    applyFilters();
-    return;
-}
+        el.txtSearch.value = "";
+        el.dateFrom.value = "";
+        el.dateTo.value = "";
 
+        buildStatusPanel();
+        applyFilters();
+        return;
+    }
 
-    // NORMAL CLEAR BEHAVIOR (when sidebar not locked or other modes)
-    uiState.search = "";
-    uiState.from = "";
-    uiState.to = "";
-    uiState.statusList = [];
+    // NORMAL CLEAR (when not locked)
+    lastRfcMode = null;
     uiState.mode = "normal";
-   // remove highlight
-   document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
-     
+
+    document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+
+    uiState.search = "";
+    uiState.from = "";
+    uiState.to = "";
+    uiState.statusList = [];
     uiState.sortByDateAsc = null;
 
     el.txtSearch.value = "";
@@ -855,9 +864,6 @@ if (isProtected && rfcLocked) {
 
     buildStatusPanel();
     buildPrimaryFilters();
-
-    el.statusPanel.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
-
     applyFilters();
 };
 
@@ -2067,6 +2073,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

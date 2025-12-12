@@ -815,6 +815,12 @@ function setupFilterControls() {
             uiState.mode = lastRfcMode;
         }
 
+       // Restore RFC highlight
+      document.querySelectorAll(".rfcBtn").forEach(b => {
+          b.classList.toggle("active", b.dataset.type === uiState.mode);
+      });
+
+
         // clear only main filters
         uiState.search = "";
         uiState.from = "";
@@ -2067,6 +2073,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

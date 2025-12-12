@@ -1051,11 +1051,10 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 
   if (uiState.mode === "repeat") {
 
-  // 🔥 FIX: start from CURRENT VIEW instead of allCases
-  rows = [...trackerState.filteredCases];
+  // 🔥 MUST ALWAYS START FROM FULL DATASET
+  rows = [...trackerState.allCases];
 
   const count = {};
-
   rows.forEach(r => {
     const name = (r.customerName || "").trim().toLowerCase();
     if (!name) return;
@@ -1067,7 +1066,7 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
     count[(r.customerName || "").trim().toLowerCase()] > 1
   );
 
-  // NEW: sort alphabetically by customerName
+  // alphabetical sorting
   rows.sort((a, b) =>
     (a.customerName || "").localeCompare(b.customerName || "")
   );
@@ -1077,6 +1076,7 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
   renderTable();
   return;
 }
+
 
   /* ===============================================================
    RFC MODE: TOTAL  (NEW — does NOT return early)
@@ -2088,6 +2088,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

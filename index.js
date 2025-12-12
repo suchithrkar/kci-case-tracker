@@ -618,7 +618,7 @@ btn.classList.add("active");
       uiState.primaryLocks.benchRFC = false;
 
        
-       uiState.mode = "normal";
+       uiState.mode = "onsite";
         uiState.primaries.caseResolutionCode = ["Onsite Solution"];
         uiState.primaries.onsiteRFC = [
             "Closed - Canceled",
@@ -644,7 +644,7 @@ return;
       uiState.primaryLocks.benchRFC = false;
 
        
-       uiState.mode = "normal";
+       uiState.mode = "offsite";
         uiState.primaries.caseResolutionCode = ["Offsite Solution"];
         uiState.primaries.benchRFC = ["Possible completed"];
         buildPrimaryFilters();
@@ -665,7 +665,7 @@ return;
       uiState.primaryLocks.benchRFC = false;
 
        
-       uiState.mode = "normal";
+       uiState.mode = "csr";
         uiState.primaries.caseResolutionCode = ["Parts Shipped"];
         uiState.primaries.csrRFC = ["Cancelled","Closed","POD"];
         buildPrimaryFilters();
@@ -807,7 +807,7 @@ function setupFilterControls() {
     /* CLEAR */
   el.btnClear.onclick = () => {
 
-    const protectedModes = ["total", "negative", "repeat", "unupdated"];
+    const protectedModes = ["onsite", "offsite", "csr", "total", "negative", "repeat", "unupdated"];
 const isProtected = protectedModes.includes(uiState.mode);
 
 if (isProtected && rfcLocked) {
@@ -2067,6 +2067,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

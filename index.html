@@ -279,12 +279,28 @@ button,input,select,textarea{
 .filter:hover {
   filter: brightness(1.05);
 }
-/* TWO-COLUMN layout inside each filter */
+/* COLUMN-FIRST LAYOUT FOR FILTER OPTIONS 
 .chips {
-  columns: 2;              /* ← THIS creates column-first ordering */
+  columns: 2;              /* ← THIS creates column-first ordering 
   column-gap: 2rem;
   padding: 4px 2px;
+} */
+
+/* ROW-FIRST LAYOUT FOR FILTER OPTIONS */
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;          /* vertical | horizontal spacing */
+    padding: 4px 2px;
 }
+.chips > div {
+    width: calc(50% - 20px);   /* exactly 2 columns */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+/* ------------------------------------ */
+
 
 .chips label {
   display: block;          /* MUST be block for column flow */
@@ -762,6 +778,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

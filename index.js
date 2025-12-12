@@ -812,21 +812,20 @@ function setupFilterControls() {
     /* CLEAR */
   el.btnClear.onclick = () => {
 
-    const protectedModes = ["onsite","offsite","csr","total","negative","repeat","unupdated"];
-    const isProtected = protectedModes.includes(uiState.mode);
+    const rfcModes = ["onsite","offsite","csr","total","negative"];
+    const set2Modes = ["due","flagged","repeat","unupdated"];
+    const isRfcMode = rfcModes.includes(uiState.mode);
+    const isSet2 = set2Modes.includes(uiState.mode);
 
-    if (rfcLocked && isProtected) {
+    // ========== CASE 1: RFC ACTIVE + SIDEBAR LOCKED ==========
+    if (rfcLocked && (isRfcMode || isSet2)) {
 
-       // prevent highlight from being removed during CLEAR cycle
-    preventRfcHighlightReset = true;
-
-        // restore the RFC mode after using any set-2 buttons
-        if (uiState.mode !== lastRfcMode) {
+        // restore last known RFC mode
+        if (lastRfcMode) {
             uiState.mode = lastRfcMode;
         }
 
-
-        // clear only main filters
+        // clear ONLY main filters
         uiState.search = "";
         uiState.from = "";
         uiState.to = "";
@@ -840,26 +839,22 @@ function setupFilterControls() {
         buildStatusPanel();
         applyFilters();
 
+        // restore highlight AFTER DOM updates
+        setTimeout(() => {
+            document.querySelectorAll(".rfcBtn").forEach(b => {
+                b.classList.toggle("active", b.dataset.type === uiState.mode);
+            });
+        }, 0);
 
-
-      // ⭐ restore highlight AFTER ALL DOM updates
-    setTimeout(() => {
-        document.querySelectorAll(".rfcBtn").forEach(b => {
-            b.classList.toggle("active", b.dataset.type === uiState.mode);
-        });
-        preventRfcHighlightReset = false; // re-enable normal behavior
-    }, 0);
-
-return;
-
+        return;
     }
 
-    // Only remove highlight if NO RFC mode is active
-if (!lastRfcMode) {
+    // ========== CASE 2: NOT LOCKED — NORMAL CLEAR ==========
+    // normal reset
+    lastRfcMode = null;
+    uiState.mode = "normal";
+
     document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
-}
-
-
 
     uiState.search = "";
     uiState.from = "";
@@ -871,6 +866,7 @@ if (!lastRfcMode) {
     el.dateFrom.value = "";
     el.dateTo.value = "";
 
+    // clear primaries only if not locked
     Object.keys(uiState.primaries).forEach(key => {
         if (!uiState.primaryLocks[key]) {
             uiState.primaries[key] = [];
@@ -884,6 +880,7 @@ if (!lastRfcMode) {
     buildPrimaryFilters();
     applyFilters();
 };
+
 
 
 
@@ -2091,6 +2088,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

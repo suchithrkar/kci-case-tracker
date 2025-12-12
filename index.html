@@ -461,16 +461,6 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
     filter:brightness(1.12);
 }
 
-/* ACTIVE RFC BUTTON HIGHLIGHT */
-/* ULTRA-SUBTLE RFC ACTIVE STATE */
-.rfcBtn.active {
-    background:rgba(255,255,255,0.06);   /* extremely soft neutral glow */
-    border-color:rgba(255,255,255,0.12); /* soft gray border */
-    color:var(--text);                   /* no color change */
-    font-weight:normal;                  /* remove emphasis */
-    box-shadow:none;
-}
-
 
 
   #rfcLock {
@@ -504,13 +494,15 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 }
 
 /* SUBTLE ACTIVE HIGHLIGHT */
+/* SUBTLE RFC ACTIVE STATE */
 .rfcBtn.active {
-    background:rgba(79,140,240,0.20);     /* light blue tint */
-    border-color:var(--accent);
-    font-weight:600;
-    color:var(--text);
-    box-shadow:0 0 0 1px var(--accent) inset;
+    background:rgba(79,140,240,0.12);     /* softer tint */
+    border-color:rgba(79,140,240,0.25);   /* faint border */
+    color:var(--text);                    /* no white text */
+    font-weight:500;                      /* softer (not bold) */
+    box-shadow:none;                      /* remove inset border glow */
 }
+
 
   
 </style>
@@ -770,6 +762,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

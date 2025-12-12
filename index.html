@@ -162,6 +162,20 @@ button,input,select,textarea{
   pointer-events:none;
   z-index:35;
 }
+/* Position tooltip to the RIGHT side for -ve button */
+.tooltip-right {
+  bottom: 50%;
+  left: calc(100% + 10px);   /* pushes tooltip to the right */
+  transform: translateY(50%);
+  white-space: normal;        /* allow multiline text */
+  width: 260px;               /* fixed width for readability */
+  text-align: left;           /* align text */
+  line-height: 1.35;
+}
+.rfcBtn:hover .tooltip {
+  opacity: 1;
+}
+
 
 
 /* Tooltip flips when too close to screen edges */
@@ -656,7 +670,16 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
                 <button class="rfcBtn rfcMainBtn" data-type="offsite">Offsite</button>
                 <button class="rfcBtn rfcMainBtn" data-type="csr">CSR</button>
                 <button class="rfcBtn rfcMainBtn" data-type="total">TOTAL</button>
-                <button class="rfcBtn rfcMainBtn" data-type="negative">-ve</button>
+                <button class="rfcBtn rfcMainBtn" data-type="negative">
+                  -ve
+                  <span class="tooltip tooltip-right">
+                    Total Open Repair Cases<br>
+                    - Total Ready For Closure Cases (Onsite + Offsite + CSR)<br>
+                    - Onsite Cases with CA Group 0-3 Days / 3-5 Days<br>
+                    - Offsite Cases with CA Group 0-3 Days / 3-5 Days / 5-10 Days<br>
+                    - CSR Cases with CA Group 0-3 Days
+                  </span>
+              </button>
             </div>
         </div>
     </div>
@@ -787,6 +810,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

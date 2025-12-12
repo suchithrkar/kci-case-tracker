@@ -1773,7 +1773,7 @@ function renderStatsTableNew() {
   const totalRowHtml = `
     <tr style="font-weight:700;background:rgba(255,255,255,0.03);">
       <td>${t.name}</td>
-      <td>${t.lastActionedX} / ${t.totalActionedY} / ${t.diffZ}</td>
+      <td>${t.lastActionedX}</td>
       <td>${t.closedToday}</td>
       <td>${t.met} (${t.metPct}%)</td>
       <td>${t.notMet} (${t.notMetPct}%)</td>
@@ -1786,8 +1786,10 @@ function renderStatsTableNew() {
   // user rows
   const userRowsHtml = stats.userRows.map(u => `
     <tr>
-      <td>${escapeHtml(u.name)}</td>
-      <td>${u.lastActionedX} / ${u.totalActionedY} / ${u.diffZ}</td>
+      <td class="stats-user-link" data-userid="${u.userId}" style="color:#4F8CF0;cursor:pointer;">
+          ${escapeHtml(u.name)}
+      </td>
+      <td>${u.lastActionedX}</td>
       <td>${u.closedToday}</td>
       <td>${u.met} (${u.metPct}%)</td>
       <td>${u.notMet} (${u.notMetPct}%)</td>
@@ -1820,6 +1822,85 @@ statsTableWrap.querySelectorAll(".no-follow-link").forEach(el => {
 });
    
 }
+
+// ---------------- USER STATS MODAL ---------------- //
+
+const modalUserStats = document.getElementById("modalUserStats");
+const userStatsBody  = document.getElementById("userStatsBody");
+const userStatsTitle = document.getElementById("userStatsTitle");
+const btnUserStatsClose = document.getElementById("btnUserStatsClose");
+const btnUserStatsOk = document.getElementById("btnUserStatsOk");
+
+btnUserStatsClose.onclick = () => modalUserStats.classList.remove("show");
+btnUserStatsOk.onclick    = () => modalUserStats.classList.remove("show");
+
+// Calculate user summary (same logic as user Info modal)
+function computeUserSummary(userId) {
+  const today = new Date().toISOString().split("T")[0];
+
+  const todayRows = statsCases.filter(
+    r => r.lastActionedBy === userId && r.lastActionedOn === today
+  );
+
+  const closed = todayRows.filter(r => r.status === "Closed");
+  const closedCount = closed.length;
+
+  const met = closed.filter(r => (r.sbd || "").toLowerCase() === "met").length;
+  const notMet = closed.filter(r => (r.sbd || "").toLowerCase() === "not met").length;
+
+  const pct = (n) =>
+    closedCount === 0 ? 0 : Math.round((n / closedCount) * 100);
+
+  const statusBreakdown = {
+    "Service Pending": 0,
+    "Monitoring": 0,
+    "NCM 1": 0,
+    "NCM 2": 0,
+    "PNS": 0
+  };
+
+  todayRows.forEach(r => {
+    if (statusBreakdown[r.status] != null) statusBreakdown[r.status]++;
+  });
+
+  // X, Y, Z
+  const X = todayRows.length;
+  const Y = new Set(todayRows.map(r => r.id)).size;  // unique cases followed up
+  const Z = X - Y;
+
+  return `
+Total Cases Closed: ${closedCount}
+Met: ${met} (${pct(met)}%)
+Not Met: ${notMet} (${pct(notMet)}%)
+
+Service Pending: ${statusBreakdown["Service Pending"]}
+Monitoring: ${statusBreakdown["Monitoring"]}
+NCM 1: ${statusBreakdown["NCM 1"]}
+NCM 2: ${statusBreakdown["NCM 2"]}
+PNS: ${statusBreakdown["PNS"]}
+
+Total Actioned Cases: ${X}
+Total Followed Up Cases: ${Y}
+Total Updated Cases: ${Z}
+`;
+}
+
+// Bind click on usernames
+statsTableWrap.addEventListener("click", (e) => {
+  const link = e.target.closest(".stats-user-link");
+  if (!link) return;
+
+  const uid = link.dataset.userid;
+  const user = allUsers.find(u => u.id === uid);
+  
+  if (!user) return;
+
+  userStatsTitle.textContent = `${user.firstName} ${user.lastName}`;
+  userStatsBody.textContent = computeUserSummary(uid);
+
+  modalUserStats.classList.add("show");
+});
+
 
 /* small helper to escape HTML (reused from index.js) */
 function escapeHtml(s) {
@@ -1983,6 +2064,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

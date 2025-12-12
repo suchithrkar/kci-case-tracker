@@ -284,8 +284,15 @@ button,input,select,textarea{
   columns: 2;              /* ← THIS creates column-first ordering 
   column-gap: 2rem;
   padding: 4px 2px;
-} */
-
+} 
+  
+.chips label {
+  display: block;          /* MUST be block for column flow 
+  margin-bottom: 6px;
+  break-inside: avoid;     /* Prevent splitting a label across columns 
+}
+/* ------------------------------------ */
+  
 /* ROW-FIRST LAYOUT FOR FILTER OPTIONS */
 .chips {
     display: flex;
@@ -301,12 +308,6 @@ button,input,select,textarea{
 }
 /* ------------------------------------ */
 
-
-.chips label {
-  display: block;          /* MUST be block for column flow */
-  margin-bottom: 6px;
-  break-inside: avoid;     /* Prevent splitting a label across columns */
-}
 
 .chip{
   display:inline-flex;align-items:center;
@@ -778,6 +779,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

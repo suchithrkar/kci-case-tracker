@@ -191,7 +191,6 @@ button,input,select,textarea{
 .sidebar{
   position:fixed;left:0;top:0;
   height:100%;
-  width: 320px;      /* Adding width for row-first data */
   background:var(--panel);
   border-right:1px solid var(--border);
   box-shadow:none;
@@ -280,34 +279,34 @@ button,input,select,textarea{
 .filter:hover {
   filter: brightness(1.05);
 }
-/* COLUMN-FIRST LAYOUT FOR FILTER OPTIONS 
+/* COLUMN-FIRST LAYOUT FOR FILTER OPTIONS */
 .chips {
-  columns: 2;              /* ← THIS creates column-first ordering 
+  columns: 2;              /* ← THIS creates column-first ordering */
   column-gap: 2rem;
   padding: 4px 2px;
 } 
   
 .chips label {
-  display: block;          /* MUST be block for column flow 
+  display: block;          /* MUST be block for column flow */
   margin-bottom: 6px;
-  break-inside: avoid;     /* Prevent splitting a label across columns 
+  break-inside: avoid;     /* Prevent splitting a label across columns */
 }
 /* ------------------------------------ */
   
-/* ROW-FIRST LAYOUT FOR FILTER OPTIONS */
+/* ROW-FIRST LAYOUT FOR FILTER OPTIONS 
 .chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 20px;          /* vertical | horizontal spacing */
+    gap: 6px 20px;          /* vertical | horizontal spacing 
     padding: 4px 2px;
 }
 .chips > div {
-    width: calc(50% - 20px);   /* exactly 2 columns */
+    width: calc(50% - 20px);   /* exactly 2 columns 
     display: flex;
     align-items: center;
     gap: 6px;
 }
-/* Correct label styling for row-first layout */
+/* Correct label styling for row-first layout 
 .chips label {
     display:flex;
     align-items:center;
@@ -788,6 +787,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

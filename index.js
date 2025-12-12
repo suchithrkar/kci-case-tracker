@@ -540,6 +540,13 @@ document.addEventListener("click", (e) => {
 
 // CLEAR button — clears only primary filters
 document.addEventListener("click", (e) => {
+
+   // unlock the three RFC filters
+   uiState.primaryLocks.onsiteRFC = false;
+   uiState.primaryLocks.csrRFC = false;
+   uiState.primaryLocks.benchRFC = false;
+
+   
     const btn = e.target.closest("#rfcClear");
     if (!btn || rfcLocked) return;
 
@@ -575,6 +582,13 @@ btn.classList.add("active");
     Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
 
     if (type === "onsite") {
+
+       // unlock the three RFC filters
+      uiState.primaryLocks.onsiteRFC = false;
+      uiState.primaryLocks.csrRFC = false;
+      uiState.primaryLocks.benchRFC = false;
+
+       
        uiState.mode = "normal";
         uiState.primaries.caseResolutionCode = ["Onsite Solution"];
         uiState.primaries.onsiteRFC = [
@@ -594,6 +608,13 @@ return;
     }
 
     if (type === "offsite") {
+
+       // unlock the three RFC filters
+      uiState.primaryLocks.onsiteRFC = false;
+      uiState.primaryLocks.csrRFC = false;
+      uiState.primaryLocks.benchRFC = false;
+
+       
        uiState.mode = "normal";
         uiState.primaries.caseResolutionCode = ["Offsite Solution"];
         uiState.primaries.benchRFC = ["Possible completed"];
@@ -608,6 +629,13 @@ return;
     }
 
     if (type === "csr") {
+
+       // unlock the three RFC filters
+      uiState.primaryLocks.onsiteRFC = false;
+      uiState.primaryLocks.csrRFC = false;
+      uiState.primaryLocks.benchRFC = false;
+
+       
        uiState.mode = "normal";
         uiState.primaries.caseResolutionCode = ["Parts Shipped"];
         uiState.primaries.csrRFC = ["Cancelled","Closed","POD"];
@@ -623,32 +651,46 @@ return;
 
     if (type === "total") {
     uiState.mode = "total";
-buildPrimaryFilters();
 
-previouslyOpenFilters.forEach(key => {
-    const body = document.getElementById(`filter-body-${key}`);
-    if (body) body.classList.add("open");
-});
+    // Disable the 3 RFC filters only
+    uiState.primaryLocks.onsiteRFC = true;
+    uiState.primaryLocks.csrRFC = true;
+    uiState.primaryLocks.benchRFC = true;
 
-applyFilters();
-return;
-
-}
-
-
-       if (type === "negative") {
-    uiState.mode = "negative";
     buildPrimaryFilters();
 
-previouslyOpenFilters.forEach(key => {
-    const body = document.getElementById(`filter-body-${key}`);
-    if (body) body.classList.add("open");
-});
+    // restore open filters after rebuild
+    previouslyOpenFilters.forEach(key => {
+        const body = document.getElementById(`filter-body-${key}`);
+        if (body) body.classList.add("open");
+    });
 
-applyFilters();
-return;
-
+    applyFilters();
+    return;
 }
+
+
+
+      if (type === "negative") {
+    uiState.mode = "negative";
+
+    // Disable the 3 RFC filters only
+    uiState.primaryLocks.onsiteRFC = true;
+    uiState.primaryLocks.csrRFC = true;
+    uiState.primaryLocks.benchRFC = true;
+
+    buildPrimaryFilters();
+
+    // restore open filters
+    previouslyOpenFilters.forEach(key => {
+        const body = document.getElementById(`filter-body-${key}`);
+        if (body) body.classList.add("open");
+    });
+
+    applyFilters();
+    return;
+}
+
 
    
 });
@@ -1990,6 +2032,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

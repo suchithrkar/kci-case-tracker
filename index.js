@@ -322,22 +322,38 @@ function setupSidebarControls() {
 
   // Sidebar apply (same behavior as page Apply)
   document.getElementById("btnSideApply").onclick = () => {
-     
-    // Bring values from sidebar checkboxes into uiState.primaries then call applyFilters()
+
+    // 1) Apply sidebar filters to state
     syncPrimaryFiltersFromUI();
-    // Also sync search/dates fields (so sidebar apply works as full apply)
     uiState.search = el.txtSearch.value.trim().toLowerCase();
     uiState.from = el.dateFrom.value;
     uiState.to = el.dateTo.value;
+
     applyFilters();
+
+    // 2) Enable LOCK automatically if not already locked
+    if (!rfcLocked) {
+        rfcLocked = true;
+        const lockBtn = document.getElementById("rfcLock");
+        if (lockBtn) lockBtn.textContent = "🔒";
+
+        // Lock ALL primary filters
+        Object.keys(uiState.primaryLocks).forEach(k => {
+            uiState.primaryLocks[k] = true;
+        });
+
+        buildPrimaryFilters();  // reflect lock visually
+    }
+
+    // 3) Close sidebar afterwards
     closeSidebar();
 
-     // Collapse filters after applying
-document.querySelectorAll(".filter-body.open").forEach(body => {
-    body.classList.remove("open");
-});
-
-  };
+    // 4) Collapse bodies (same behavior as before)
+    document.querySelectorAll(".filter-body.open").forEach(body => {
+        body.classList.remove("open");
+    });
+};
+   
 }
 
 /* =======================================================================
@@ -1974,6 +1990,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

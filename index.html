@@ -163,14 +163,17 @@ button,input,select,textarea{
   z-index:35;
 }
 /* Position tooltip to the RIGHT side for -ve button */
+/* FORCE RFC tooltips to escape the sidebar */
 .tooltip-right {
-  bottom: 50%;
-  left: calc(100% + 10px);   /* pushes tooltip to the right */
-  transform: translateY(50%);
-  white-space: normal;        /* allow multiline text */
-  width: 260px;               /* fixed width for readability */
-  text-align: left;           /* align text */
-  line-height: 1.35;
+  position: fixed !important;
+  left: auto !important;
+  right: 20px;              /* keep tooltip visible on the screen */
+  top: auto;
+  bottom: auto;
+  transform: none !important;
+  white-space: normal;      /* allow multiline text */
+  width: 260px;             /* fixed width for readability */
+  z-index: 9999 !important; /* ensure it stays on top */
 }
 .rfcBtn:hover .tooltip {
   opacity: 1;
@@ -810,6 +813,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

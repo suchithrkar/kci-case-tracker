@@ -545,6 +545,19 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
     box-shadow:none;                      /* remove inset border glow */
 }
 
+/* Tooltip visible state */
+.show-tooltip {
+  display: block !important;
+}
+
+/* Tooltip default (you will adjust these values manually) */
+.tooltip-negative-position {
+  position: fixed !important;
+  top: 180px;     /* ← adjust using inspect */
+  left: 680px;    /* ← adjust using inspect */
+  width: 280px;
+  z-index: 99999 !important;
+}
 
   
 </style>
@@ -801,7 +814,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 <!-- MAIN TRACKER LOGIC (WILL BE SECTION 2 + SECTION 3) -->
 <script type="module" src="./index.js?v=9"></script>
 
-  <div id="globalTooltip" 
+  <div id="globalTooltip" class="tooltip-negative-position"
      style="
        position: fixed;
        background: var(--panel-2);
@@ -823,6 +836,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+
 
 
 

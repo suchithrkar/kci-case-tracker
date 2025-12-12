@@ -781,9 +781,6 @@ function setupFilterControls() {
     const totalOrNeg = (uiState.mode === "total" || uiState.mode === "negative");
 
     if (totalOrNeg && rfcLocked) {
-
-       // remove highlight (important)
-       document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
        
         // Sidebar is locked → DO NOT reset mode or primaries
         // Only clear main-page filters (search, dates, status, sort)
@@ -2032,6 +2029,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

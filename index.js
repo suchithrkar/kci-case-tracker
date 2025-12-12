@@ -548,6 +548,8 @@ openFilters.forEach(key => {
     if (body) body.classList.add("open");
 });
 
+}
+
 
 // CLEAR button — clears only primary filters
 document.addEventListener("click", (e) => {
@@ -2055,6 +2057,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

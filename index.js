@@ -556,40 +556,34 @@ openFilters.forEach(key => {
 
 // CLEAR button — clears only primary filters
 document.addEventListener("click", (e) => {
-
-   // unlock the three RFC filters
-   uiState.primaryLocks.onsiteRFC = false;
-   uiState.primaryLocks.csrRFC = false;
-   uiState.primaryLocks.benchRFC = false;
-
-   
     const btn = e.target.closest("#rfcClear");
-    if (!btn || rfcLocked) return;
+    if (!btn) return;   // Prevents accidental unlocks on ANY other click
+    if (rfcLocked) return;
 
-   uiState.mode = "normal";
+    // Unlock the three RFC filters ONLY when RFC Clear is clicked
+    uiState.primaryLocks.onsiteRFC = false;
+    uiState.primaryLocks.csrRFC = false;
+    uiState.primaryLocks.benchRFC = false;
 
-   // Remove RFC highlights
+    uiState.mode = "normal";
+
     document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
-
     Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
 
-   // Remember open filters
-const openFilters = Array.from(
-    document.querySelectorAll(".filter-body.open")
-).map(el => el.id.replace("filter-body-", ""));
+    const openFilters = Array.from(
+        document.querySelectorAll(".filter-body.open")
+    ).map(el => el.id.replace("filter-body-", ""));
 
-   
     buildPrimaryFilters();
 
-   // Restore open filters
-openFilters.forEach(key => {
-    const body = document.getElementById(`filter-body-${key}`);
-    if (body) body.classList.add("open");
-});
+    openFilters.forEach(key => {
+        const body = document.getElementById(`filter-body-${key}`);
+        if (body) body.classList.add("open");
+    });
 
-   
     applyFilters();
 });
+
 
 // Button Selection Logic
 document.addEventListener("click", (e) => {
@@ -2073,6 +2067,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

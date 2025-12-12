@@ -2115,22 +2115,19 @@ const negativeTooltipText = `
 - CSR Cases with CA Group 0-3 Days
 `;
 
-// Attach hover handlers
-document.getElementById("rfcNegativeBtn").addEventListener("mouseenter", (e) => {
-    const btn = e.target;
-    const rect = btn.getBoundingClientRect();
+// SIMPLE hover: show/hide only (no positioning)
+const negBtn = document.getElementById("rfcNegativeBtn");
 
+negBtn.addEventListener("mouseenter", () => {
     globalTooltip.innerHTML = negativeTooltipText;
-    globalTooltip.style.display = "block";
-
-    // Position to the RIGHT of button inside main table region
-    globalTooltip.style.top = (rect.top + window.scrollY - 10) + "px";
-    globalTooltip.style.left = (rect.right + 12) + "px";
+    globalTooltip.classList.add("show-tooltip");
 });
 
-document.getElementById("rfcNegativeBtn").addEventListener("mouseleave", () => {
-    globalTooltip.style.display = "none";
+negBtn.addEventListener("mouseleave", () => {
+    globalTooltip.classList.remove("show-tooltip");
 });
+
+
 
 
 

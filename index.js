@@ -807,26 +807,27 @@ function setupFilterControls() {
     /* CLEAR */
   el.btnClear.onclick = () => {
 
-    const totalOrNeg = (uiState.mode === "total" || uiState.mode === "negative");
+    const protectedModes = ["total", "negative", "repeat", "unupdated"];
+const isProtected = protectedModes.includes(uiState.mode);
 
-    if (totalOrNeg && rfcLocked) {
-       
-        // Sidebar is locked → DO NOT reset mode or primaries
-        // Only clear main-page filters (search, dates, status, sort)
-        uiState.search = "";
-        uiState.from = "";
-        uiState.to = "";
-        uiState.statusList = [];
-        uiState.sortByDateAsc = null;
+if (isProtected && rfcLocked) {
 
-        el.txtSearch.value = "";
-        el.dateFrom.value = "";
-        el.dateTo.value = "";
+    // Sidebar is locked → DO NOT reset filters or unlock RFC filters
+    uiState.search = "";
+    uiState.from = "";
+    uiState.to = "";
+    uiState.statusList = [];
+    uiState.sortByDateAsc = null;
 
-        buildStatusPanel();
-        applyFilters();
-        return; // ← IMPORTANT
-    }
+    el.txtSearch.value = "";
+    el.dateFrom.value = "";
+    el.dateTo.value = "";
+
+    buildStatusPanel();
+    applyFilters();
+    return;
+}
+
 
     // NORMAL CLEAR BEHAVIOR (when sidebar not locked or other modes)
     uiState.search = "";
@@ -2066,6 +2067,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

@@ -273,7 +273,23 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 }
 
 if (uiState.mode !== "unupdated") {
-    applyFilters();
+
+    // Special handling for REPEAT mode
+    if (uiState.mode === "repeat") {
+
+        // Step 1 — temporarily switch to normal mode
+        // so that filteredCases rebuilds cleanly
+        uiState.mode = "normal";
+        applyFilters();
+
+        // Step 2 — switch back to repeat mode
+        uiState.mode = "repeat";
+        applyFilters();
+
+    } else {
+        // Normal refresh
+        applyFilters();
+    }
 } else {
     trackerState.filteredCases = trackerState.allCases.filter(r => {
     // Keep rows that are empty status OR that are currently pending an update
@@ -1051,8 +1067,7 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 
   if (uiState.mode === "repeat") {
 
-  // 🔥 MUST ALWAYS START FROM FULL DATASET
-  rows = [...trackerState.allCases];
+  rows = [...trackerState.filteredCases];
 
   const count = {};
   rows.forEach(r => {
@@ -1061,12 +1076,10 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
     count[name] = (count[name] || 0) + 1;
   });
 
-  // keep only repeating customers
   rows = rows.filter(r =>
     count[(r.customerName || "").trim().toLowerCase()] > 1
   );
 
-  // alphabetical sorting
   rows.sort((a, b) =>
     (a.customerName || "").localeCompare(b.customerName || "")
   );
@@ -1076,6 +1089,7 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
   renderTable();
   return;
 }
+
 
 
   /* ===============================================================
@@ -2088,6 +2102,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

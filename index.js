@@ -723,6 +723,10 @@ function setupFilterControls() {
     const totalOrNeg = (uiState.mode === "total" || uiState.mode === "negative");
 
     if (totalOrNeg && rfcLocked) {
+
+       // remove highlight (important)
+       document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+       
         // Sidebar is locked → DO NOT reset mode or primaries
         // Only clear main-page filters (search, dates, status, sort)
         uiState.search = "";
@@ -746,6 +750,9 @@ function setupFilterControls() {
     uiState.to = "";
     uiState.statusList = [];
     uiState.mode = "normal";
+   // remove highlight
+   document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+     
     uiState.sortByDateAsc = null;
 
     el.txtSearch.value = "";
@@ -1967,6 +1974,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

@@ -2103,6 +2103,37 @@ function normalizeDate(v) {
   return v || "";
 }
 
+// GLOBAL tooltip container
+const globalTooltip = document.getElementById("globalTooltip");
+
+// Tooltip text for -ve button
+const negativeTooltipText = `
+<b>Total Open Repair Cases</b><br>
+- Total Ready For Closure Cases (Onsite + Offsite + CSR)<br>
+- Onsite Cases with CA Group 0-3 Days / 3-5 Days<br>
+- Offsite Cases with CA Group 0-3 Days / 3-5 Days / 5-10 Days<br>
+- CSR Cases with CA Group 0-3 Days
+`;
+
+// Attach hover handlers
+document.getElementById("rfcNegativeBtn").addEventListener("mouseenter", (e) => {
+    const btn = e.target;
+    const rect = btn.getBoundingClientRect();
+
+    globalTooltip.innerHTML = negativeTooltipText;
+    globalTooltip.style.display = "block";
+
+    // Position to the RIGHT of button inside main table region
+    globalTooltip.style.top = (rect.top + window.scrollY - 10) + "px";
+    globalTooltip.style.left = (rect.right + 12) + "px";
+});
+
+document.getElementById("rfcNegativeBtn").addEventListener("mouseleave", () => {
+    globalTooltip.style.display = "none";
+});
+
+
+
 
 
 

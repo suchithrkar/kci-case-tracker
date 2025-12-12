@@ -522,6 +522,8 @@ setTimeout(() => {
 
 let rfcLocked = false;
 let lastRfcMode = null;
+let preventRfcHighlightReset = false;
+
 
 
 // Main lock toggle
@@ -567,7 +569,10 @@ document.addEventListener("click", (e) => {
 
     uiState.mode = "normal";
 
+    if (!preventRfcHighlightReset) {
     document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+}
+
     Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
 
     const openFilters = Array.from(
@@ -601,7 +606,10 @@ const previouslyOpenFilters = Array.from(
 
 
    // Highlight active RFC button
-document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+if (!preventRfcHighlightReset) {
+    document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+}
+
 btn.classList.add("active");
 
 
@@ -810,6 +818,9 @@ function setupFilterControls() {
 
     if (rfcLocked && isProtected) {
 
+       // prevent highlight from being removed during CLEAR cycle
+    preventRfcHighlightReset = true;
+
         // restore the RFC mode after using any set-2 buttons
         if (uiState.mode !== lastRfcMode) {
             uiState.mode = lastRfcMode;
@@ -832,12 +843,13 @@ function setupFilterControls() {
 
 
 
-      // ⭐ FINAL — restore RFC highlight AFTER DOM is rebuilt
-setTimeout(() => {
-    document.querySelectorAll(".rfcMainBtn").forEach(b => {
-        b.classList.toggle("active", b.dataset.type === uiState.mode);
-    });
-}, 0);
+      // ⭐ restore highlight AFTER ALL DOM updates
+    setTimeout(() => {
+        document.querySelectorAll(".rfcBtn").forEach(b => {
+            b.classList.toggle("active", b.dataset.type === uiState.mode);
+        });
+        preventRfcHighlightReset = false; // re-enable normal behavior
+    }, 0);
 
 return;
 
@@ -847,7 +859,10 @@ return;
     lastRfcMode = null;
     uiState.mode = "normal";
 
+    if (!preventRfcHighlightReset) {
     document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+}
+
 
     uiState.search = "";
     uiState.from = "";
@@ -2079,6 +2094,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

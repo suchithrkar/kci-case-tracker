@@ -834,7 +834,7 @@ function setupFilterControls() {
 
       // ⭐ FINAL — restore RFC highlight AFTER DOM is rebuilt
 setTimeout(() => {
-    document.querySelectorAll(".rfcBtn").forEach(b => {
+    document.querySelectorAll(".rfcMainBtn").forEach(b => {
         b.classList.toggle("active", b.dataset.type === uiState.mode);
     });
 }, 0);
@@ -2079,6 +2079,7 @@ Total Actioned Today: ${totalActioned}`;
 function normalizeDate(v) {
   return v || "";
 }
+
 
 
 

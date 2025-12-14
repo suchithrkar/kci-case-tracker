@@ -553,10 +553,72 @@ th:hover .tooltip {
     <div class="modal-body">
 
       <h3>Create New Team</h3>
-      <div class="create-team-row">
+
+<div style="display:grid; gap:0.75rem; margin-bottom:1rem;">
+
+  <!-- Team Name -->
   <input class="input" id="newTeamName" placeholder="Enter new team name..." />
+
+  <!-- Team Timezone -->
+  <select class="input" id="newTeamTimezone">
+    <option value="">Select Team Timezone</option>
+
+    <!-- EMEA -->
+    <option value="Europe/London">UK (Europe/London)</option>
+    <option value="Europe/Berlin">Central Europe (Europe/Berlin)</option>
+
+    <!-- Americas -->
+    <option value="America/New_York">US – Eastern (America/New_York)</option>
+    <option value="America/Chicago">US – Central (America/Chicago)</option>
+    <option value="America/Los_Angeles">US – Pacific (America/Los_Angeles)</option>
+
+    <!-- Asia -->
+    <option value="Asia/Kolkata">India (Asia/Kolkata)</option>
+    <option value="Asia/Singapore">Singapore (Asia/Singapore)</option>
+    <option value="Asia/Dubai">Middle East (Asia/Dubai)</option>
+
+    <!-- ANZ -->
+    <option value="Australia/Sydney">Australia (Australia/Sydney)</option>
+    <option value="Pacific/Auckland">New Zealand (Pacific/Auckland)</option>
+
+    <!-- Global -->
+    <option value="UTC">UTC</option>
+  </select>
+
+  <!-- Reset Hour -->
+  <select class="input" id="newTeamResetHour">
+    <option value="">Select Daily Reset Time</option>
+    <option value="0">12:00 AM</option>
+    <option value="1">1:00 AM</option>
+    <option value="2">2:00 AM</option>
+    <option value="3">3:00 AM</option>
+    <option value="4">4:00 AM</option>
+    <option value="5">5:00 AM</option>
+    <option value="6">6:00 AM</option>
+    <option value="7">7:00 AM</option>
+    <option value="8">8:00 AM</option>
+    <option value="9">9:00 AM</option>
+    <option value="10">10:00 AM</option>
+    <option value="11">11:00 AM</option>
+    <option value="12">12:00 PM</option>
+    <option value="13">1:00 PM</option>
+    <option value="14">2:00 PM</option>
+    <option value="15">3:00 PM</option>
+    <option value="16">4:00 PM</option>
+    <option value="17">5:00 PM</option>
+    <option value="18">6:00 PM</option>
+    <option value="19">7:00 PM</option>
+    <option value="20">8:00 PM</option>
+    <option value="21">9:00 PM</option>
+    <option value="22">10:00 PM</option>
+    <option value="23">11:00 PM</option>
+  </select>
+
+  <!-- Create Button -->
   <button class="modal-btn" id="btnTeamCreate">Create Team</button>
+
 </div>
+
 
 
       <hr style="margin:1rem 0;border-color:var(--border);" />
@@ -755,6 +817,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

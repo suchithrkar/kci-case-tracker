@@ -147,6 +147,16 @@ button,input,select,textarea{
   border-radius:999px;padding:0 .35rem;
   font-size:11px;border:2px solid var(--bg);
 }
+/* Sort direction arrow badge */
+#sortArrow {
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  padding: 0 .35rem;
+  border-radius: 999px;
+  border: 2px solid var(--bg);
+}
+
 .tooltip{
   position:absolute;
   bottom:-36px;
@@ -634,7 +644,8 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
     </button>
 
     <button class="icon-btn" id="btnSortDate">
-      <span>🕑</span>
+      <span id="sortClock">🕑</span>
+      <span class="badge" id="sortArrow" style="display:none;"></span>
       <span class="tooltip">Sort by Creation Date</span>
     </button>
 
@@ -834,3 +845,4 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 </body>
 
 </html>
+

@@ -1528,7 +1528,7 @@ async function firestoreUpdateCase(caseId, fields) {
      if (err.code === "permission-denied") {
        showPopup("Permission restricted: Read-only access on tracker page.");
      } else {
-       showPopup("Unable to save changes. Please try again.");
+       showPopup("Unable to save changes. Read-only access allowed.");
      }
    }
 }
@@ -2137,6 +2137,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

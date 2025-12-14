@@ -110,6 +110,10 @@ const btnTeamClose        = document.getElementById("btnTeamClose");
 const btnTeamDone         = document.getElementById("btnTeamDone");
 const modalCreateTeam     = document.getElementById("modalCreateTeam");
 
+// Team reset settings inputs
+const newTeamTimezone = document.getElementById("newTeamTimezone");
+const newTeamResetHour = document.getElementById("newTeamResetHour");
+
 const updateTeamList      = document.getElementById("updateTeamList");
 const modalUpdateData     = document.getElementById("modalUpdateData");
 const btnUpdateClose      = document.getElementById("btnUpdateClose");
@@ -772,13 +776,45 @@ modalCreateTeam.addEventListener("click", (e) => {
 
 btnTeamCreate.onclick = async () => {
   const name = newTeamName.value.trim();
-  if (!name) return showPopup("Enter a team name.");
-  const id = name.replace(/\s+/g, "_").toLowerCase();
+  const timezone = newTeamTimezone.value;
+  const resetHour = newTeamResetHour.value;
 
-  await setDoc(doc(db, "teams", id), { name, createdAt: new Date() });
-  newTeamName.value = "";
-  showPopup("Team created.");
-  await loadTeamsForAdmin();
+  // Validation
+  if (!name) {
+    alert("Please enter a team name.");
+    return;
+  }
+
+  if (!timezone) {
+    alert("Please select a team timezone.");
+    return;
+  }
+
+  if (resetHour === "") {
+    alert("Please select a daily reset time.");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "teams"), {
+      name,
+      resetTimezone: timezone,
+      resetHour: Number(resetHour),
+      createdAt: new Date()
+    });
+
+    // Reset UI
+    newTeamName.value = "";
+    newTeamTimezone.value = "";
+    newTeamResetHour.value = "";
+
+    loadTeams(); // refresh team list
+    showPopup("Team created successfully.");
+
+  } catch (err) {
+    console.error(err);
+    alert("Failed to create team.");
+  }
 };
 
 
@@ -796,7 +832,7 @@ function populateTeamList() {
         <div style="display:flex;justify-content:space-between;">
           <div><strong>${t.name}</strong></div>
           <div>
-            <button class="action-btn" data-action="rename" data-id="${t.id}">Rename</button>
+            <button class="action-btn btnUpdateTeam" data-action="rename" data-id="${t.id}">Update</button>
             <button class="action-btn" data-action="delete" data-id="${t.id}">Delete</button>
           </div>
         </div>
@@ -812,6 +848,59 @@ function populateTeamList() {
       teamList.appendChild(row);
     });
 }
+
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".btnUpdateTeam");
+  if (!btn) return;
+
+  const teamId = btn.dataset.id;
+
+  const teamSnap = await getDoc(doc(db, "teams", teamId));
+  if (!teamSnap.exists()) return;
+
+  const team = teamSnap.data();
+
+  // Pre-fill inputs
+  newTeamName.value = team.name || "";
+  newTeamTimezone.value = team.resetTimezone || "UTC";
+  newTeamResetHour.value =
+    typeof team.resetHour === "number" ? team.resetHour : 0;
+
+  // Switch Create → Update mode
+  btnTeamCreate.textContent = "Update Team";
+
+  btnTeamCreate.onclick = async () => {
+    const updatedName = newTeamName.value.trim();
+    const updatedTimezone = newTeamTimezone.value;
+    const updatedResetHour = newTeamResetHour.value;
+
+    if (!updatedName || !updatedTimezone || updatedResetHour === "") {
+      alert("Please fill all team fields.");
+      return;
+    }
+
+    try {
+      await updateDoc(doc(db, "teams", teamId), {
+        name: updatedName,
+        resetTimezone: updatedTimezone,
+        resetHour: Number(updatedResetHour)
+      });
+
+      // Reset UI back to Create mode
+      newTeamName.value = "";
+      newTeamTimezone.value = "";
+      newTeamResetHour.value = "";
+      btnTeamCreate.textContent = "Create Team";
+
+      loadTeams();
+      showPopup("Team updated successfully.");
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update team.");
+    }
+  };
+});
 
 
 /* ---------- RENAME / DELETE TEAM ---------- */
@@ -2062,6 +2151,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

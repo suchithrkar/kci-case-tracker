@@ -245,6 +245,9 @@ function setupRealtimeCases(teamId) {
       customerName: c.customerName || "",
       createdOn: c.createdOn || "",
       createdBy: c.createdBy || "",
+
+      excelOrder: typeof c.excelOrder === "number" ? c.excelOrder : 999999,
+       
       country: c.country || "",
       caseResolutionCode: c.caseResolutionCode || "",
       caseOwner: c.caseOwner || "",
@@ -1244,8 +1247,9 @@ if (uiState.mode === "negative") {
   });
 
 
-  /* SORT */
-  /* SORT */
+/* SORT */
+
+// Explicit date sort (🕑 button)
 if (uiState.sortByDateAsc !== null) {
   rows.sort((a, b) =>
     uiState.sortByDateAsc
@@ -1253,6 +1257,11 @@ if (uiState.sortByDateAsc !== null) {
       : b.createdOn.localeCompare(a.createdOn)
   );
 }
+// DEFAULT — Excel row order
+else {
+  rows.sort((a, b) => a.excelOrder - b.excelOrder);
+}
+
 
 /* APPLY SPECIAL NCM FILTERING */
 rows = restrictNcmCasesForUser(rows, trackerState.user);
@@ -2138,6 +2147,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

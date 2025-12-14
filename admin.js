@@ -139,6 +139,46 @@ $("excelInput").onchange = async (e) => {
   validateReadyState();
 };
 
+/* ============================================================
+   TEAM-AWARE "TODAY" CALCULATION
+   ============================================================ */
+function getTeamToday(teamConfig) {
+  // Backward compatibility
+  const timezone = teamConfig?.resetTimezone || "UTC";
+  const resetHour =
+    typeof teamConfig?.resetHour === "number"
+      ? teamConfig.resetHour
+      : 0;
+
+  const now = new Date();
+
+  // Convert current moment into team timezone
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false
+  });
+
+  const parts = Object.fromEntries(
+    formatter.formatToParts(now).map(p => [p.type, p.value])
+  );
+
+  let teamDate = `${parts.year}-${parts.month}-${parts.day}`;
+  const teamHour = Number(parts.hour);
+
+  // If before reset hour → still previous day
+  if (teamHour < resetHour) {
+    const d = new Date(`${teamDate}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() - 1);
+    teamDate = d.toISOString().split("T")[0];
+  }
+
+  return teamDate;
+}
+
 // ======================================================
 // PARSE EXCEL FILE (fixed + improved)
 // ======================================================
@@ -2151,6 +2191,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

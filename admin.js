@@ -585,7 +585,7 @@ function openAuditModal(userId) {
   document.querySelector("#modalAudit .modal-title").textContent =
     `Audit — ${userName}`;
    
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(teamConfig);
 
   // Get cases actioned today by this user (only status updates)
   const userTodayCases = statsCases.filter(r =>
@@ -896,6 +896,21 @@ document.addEventListener("click", async (e) => {
   const teamId = btn.dataset.id;
 
   const teamSnap = await getDoc(doc(db, "teams", teamId));
+
+  // --------------------------------------------------
+// Team reset configuration (timezone + reset hour)
+// --------------------------------------------------
+const teamData = teamSnap.exists() ? teamSnap.data() : {};
+
+const teamConfig = {
+  resetTimezone: teamData.resetTimezone || "UTC",
+  resetHour:
+    typeof teamData.resetHour === "number"
+      ? teamData.resetHour
+      : 0
+};
+   
+   
   if (!teamSnap.exists()) return;
 
   const team = teamSnap.data();
@@ -1490,7 +1505,8 @@ async function exportBackup(teamId) {
   const blob = new Blob([JSON.stringify(cases, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(teamConfig);
+
   a.href = url;
   a.download = `${teamId}_backup_${today}.json`;
   a.click();
@@ -1560,7 +1576,7 @@ async function importBackup(teamId, cases) {
 async function computeStatsEngine() {
   const cases = adminState.allCases;
   const users = adminState.allUsers;
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(teamConfig);
 
   let filteredCases;
 
@@ -1726,7 +1742,7 @@ const Z_difference = X_lastActionedToday - Y_statusChangedToday;
 */
 
 function computeStatsEngineAdaptive(casesList, usersList) {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(teamConfig);
 
   // TEAM FILTERING
   let filteredCases;
@@ -1964,7 +1980,7 @@ btnUserStatsOk.onclick    = () => modalUserStats.classList.remove("show");
 
 // Calculate user summary (same logic as user Info modal)
 function computeUserSummary(userId) {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(teamConfig);
 
   const todayRows = statsCases.filter(
     r => r.lastActionedBy === userId && r.lastActionedOn === today
@@ -2191,6 +2207,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

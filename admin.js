@@ -255,6 +255,8 @@ function computeDiff() {
   ex.csrRFC !== fs.csrRFC ||
   ex.benchRFC !== fs.benchRFC;
 
+  // ✅ NEW — Excel row order changed
+  ex.excelOrder !== fs.excelOrder;
 
     if (changed) diff.updated.push(ex);
   }
@@ -2060,6 +2062,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

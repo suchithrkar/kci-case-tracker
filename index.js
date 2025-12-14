@@ -1982,10 +1982,6 @@ unupdatedProtect = false;
   return true;
 }
 
-/* ============================================================================
-   PHASE 5 — FINAL FILTERS, REPEATING CUSTOMERS, SUMMARY MODAL, SORTING
-   ============================================================================ */
-
 /* ====================================================================
    REPEATING CUSTOMERS LOGIC
    --------------------------------------------------------------------
@@ -2138,5 +2134,6 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 

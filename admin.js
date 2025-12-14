@@ -184,6 +184,8 @@ async function parseExcelFile(file) {
   onsiteRFC: String(r[33] || "").trim(),                // Col AH
   csrRFC:    String(r[34] || "").trim(),                // Col AI
   benchRFC:  String(r[35] || "").trim()                 // Col AJ
+        // ✅ Excel row position
+         excelOrder: i
 });
       }
 
@@ -402,6 +404,8 @@ async function applyExcelChanges() {
       id: ex.id,
       teamId: excelState.teamId,
 
+      excelOrder: ex.excelOrder, 
+
       customerName: ex.customerName,
       createdOn: ex.createdOn,
       createdBy: ex.createdBy,
@@ -438,6 +442,8 @@ async function applyExcelChanges() {
   await runBatches(
   updated.map(ex => {
     const updateFields = {
+      excelOrder: ex.excelOrder,
+       
       customerName: ex.customerName,
       createdOn: ex.createdOn,
       createdBy: ex.createdBy,
@@ -2054,6 +2060,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -197,7 +197,22 @@ onAuthStateChanged(auth, async (user) => {
    /* Load team name for Excel filename */
 if (trackerState.teamId) {
   const teamSnap = await getDoc(doc(db, "teams", trackerState.teamId));
-  trackerState.teamName = teamSnap.exists() ? teamSnap.data().name : trackerState.teamId;
+
+  if (teamSnap.exists()) {
+    const teamData = teamSnap.data();
+
+    trackerState.teamName = teamData.name;
+    trackerState.teamConfig = {
+      resetTimezone: teamData.resetTimezone || "UTC",
+      resetHour:
+        typeof teamData.resetHour === "number"
+          ? teamData.resetHour
+          : 0
+    };
+  } else {
+    trackerState.teamName = trackerState.teamId;
+    trackerState.teamConfig = { resetTimezone: "UTC", resetHour: 0 };
+  }
 }
 
   /* Header Initialization */
@@ -1087,7 +1102,7 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 }
 
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(trackerState.teamConfig);
   let rows = [...trackerState.allCases];
 
   /* ===============================================================
@@ -1316,7 +1331,7 @@ renderTable();
    BADGE COUNTS (GLOBAL)
    ======================================================================= */
 function updateBadges() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(trackerState.teamConfig);
 
   el.badgeDue.textContent = trackerState.allCases.filter(r =>
     r.lastActionedBy === trackerState.user.uid &&
@@ -1351,7 +1366,7 @@ function escapeHtml(s) {
 /* Render Table — Clean, optimized */
 export function renderTable() {
   const rows = trackerState.filteredCases;
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(trackerState.teamConfig);
 
   tbody.innerHTML = "";
 
@@ -1501,7 +1516,7 @@ if (uiState.mode === "unupdated") {
 }
 
    
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(trackerState.teamConfig);
   const row = trackerState.allCases.find(r => r.id === caseId);
   if (!row) return;
 
@@ -1965,7 +1980,7 @@ async function saveModalData() {
   const r = trackerState.allCases.find(x => x.id === caseId);
   if (!r) return false;
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(trackerState.teamConfig);
 
   const follow = optDate.value
     ? new Date(optDate.value).toISOString().split("T")[0]
@@ -2103,7 +2118,7 @@ infoModal.onclick = (e) => {
 
 function showSummaryInfo() {
   const uid = trackerState.user.uid;
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTeamToday(trackerState.teamConfig);
 
   const todayRows = trackerState.allCases.filter(
     r => r.lastActionedBy === uid && r.lastActionedOn === today
@@ -2186,6 +2201,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

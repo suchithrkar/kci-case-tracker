@@ -1525,9 +1525,12 @@ async function firestoreUpdateCase(caseId, fields) {
   try {
     await updateCase(caseId, fields);
   } catch (err) {
-    showPopup("Permission restricted: only allowed fields can be updated.");
-    console.error(err);
-  }
+     if (err.code === "permission-denied") {
+       showPopup("Permission restricted: Read-only access on tracker page.");
+     } else {
+       showPopup("Unable to save changes. Please try again.");
+     }
+   }
 }
 
 /* =======================================================================
@@ -2134,6 +2137,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

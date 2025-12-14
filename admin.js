@@ -253,7 +253,7 @@ function computeDiff() {
   ex.sbd !== fs.sbd ||
   ex.onsiteRFC !== fs.onsiteRFC ||
   ex.csrRFC !== fs.csrRFC ||
-  ex.benchRFC !== fs.benchRFC;
+  ex.benchRFC !== fs.benchRFC ||
 
   // ✅ NEW — Excel row order changed
   ex.excelOrder !== fs.excelOrder;
@@ -2062,6 +2062,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

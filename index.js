@@ -847,6 +847,7 @@ function setupFilterControls() {
         uiState.to = "";
         uiState.statusList = [];
         uiState.sortByDateAsc = null;
+        updateSortIcon();
 
         el.txtSearch.value = "";
         el.dateFrom.value = "";
@@ -877,6 +878,7 @@ function setupFilterControls() {
     uiState.to = "";
     uiState.statusList = [];
     uiState.sortByDateAsc = null;
+    updateSortIcon();
 
     el.txtSearch.value = "";
     el.dateFrom.value = "";
@@ -908,11 +910,39 @@ function setupFilterControls() {
 
   /* SORT BY DATE BUTTON */
   el.btnSortDate.onclick = () => {
-    uiState.sortByDateAsc =
-      uiState.sortByDateAsc === null ? false : !uiState.sortByDateAsc;
-    applyFilters();
-  };
+  // Cycle: null → desc → asc → null
+  uiState.sortByDateAsc =
+    uiState.sortByDateAsc === null
+      ? false
+      : uiState.sortByDateAsc === false
+      ? true
+      : null;
+
+  updateSortIcon();
+  applyFilters();
+};
+
 }
+
+function updateSortIcon() {
+  const arrow = document.getElementById("sortArrow");
+
+  if (!arrow) return;
+
+  if (uiState.sortByDateAsc === null) {
+    arrow.style.display = "none";
+    arrow.textContent = "";
+  }
+  else if (uiState.sortByDateAsc === false) {
+    arrow.style.display = "inline-block";
+    arrow.textContent = "⬇️"; // Newest → Oldest
+  }
+  else {
+    arrow.style.display = "inline-block";
+    arrow.textContent = "⬆️"; // Oldest → Newest
+  }
+}
+
 
 /* =======================================================================
    STATUS PANEL (MULTI-SELECT) — APPLY ONLY AFTER CLICK
@@ -1992,24 +2022,6 @@ function computeUnupdated(rows) {
   return rows.filter(r => !r.status || r.status.trim() === "");
 }
 
-/* ====================================================================
-   SORT BY CREATION DATE BUTTON (ASC/DESC TOGGLE)
-   -------------------------------------------------------------------- */
-
-el.btnSortDate.onclick = () => {
-  uiState.sortByDateAsc =
-    uiState.sortByDateAsc === null ? false : !uiState.sortByDateAsc;
-
-  showPopup(
-    uiState.sortByDateAsc === null
-      ? "Sorting cleared"
-      : uiState.sortByDateAsc
-      ? "Sorting by oldest first"
-      : "Sorting by newest first"
-  );
-
-  applyFilters();
-};
 
 /* ====================================================================
    INFO SUMMARY (MATCHES YOUR OFFLINE TRACKER EXACTLY)
@@ -2126,4 +2138,5 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 

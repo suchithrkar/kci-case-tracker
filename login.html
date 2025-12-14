@@ -266,8 +266,33 @@ document.getElementById("btnLogin").onclick = async () => {
     const user = await login(email, pass);
     showPopup("Login successful!");
   } catch (err) {
-    showPopup(err.message);
+  switch (err.code) {
+    case "auth/wrong-password":
+      showPopup("Wrong password. Please try again.");
+      break;
+
+    case "auth/user-not-found":
+      showPopup("User ID does not exist.");
+      break;
+
+    case "auth/user-disabled":
+      showPopup("Your account has been disabled.");
+      break;
+
+    case "auth/too-many-requests":
+      showPopup("Too many failed attempts. Try again later.");
+      break;
+
+    default:
+      // covers pending user or unexpected auth errors
+      if (err.message?.toLowerCase().includes("pending")) {
+        showPopup("Your account is pending approval.");
+      } else {
+        showPopup("Login failed. Please check your credentials.");
+      }
   }
+}
+
 };
 
 // SIGNUP
@@ -287,8 +312,23 @@ document.getElementById("btnSignup").onclick = async () => {
     showPopup("Account created. Waiting for admin approval.");
     tabLogin.click();
   } catch (err) {
-    showPopup(err.message);
+  switch (err.code) {
+    case "auth/email-already-in-use":
+      showPopup("An account with this email already exists.");
+      break;
+
+    case "auth/invalid-email":
+      showPopup("Please enter a valid email address.");
+      break;
+
+    case "auth/weak-password":
+      showPopup("Password must be at least 6 characters.");
+      break;
+
+    default:
+      showPopup("Signup failed. Please try again.");
   }
+}
 };
 
 // FORGOT PASSWORD
@@ -300,8 +340,13 @@ document.getElementById("forgot").onclick = async () => {
     await resetPassword(email);
     showPopup("Password reset link sent.");
   } catch (err) {
-    showPopup(err.message);
+  if (err.code === "auth/user-not-found") {
+    showPopup("User ID does not exist.");
+  } else {
+    showPopup("Unable to send reset email. Try again later.");
   }
+}
+
 };
 
 // SIMPLE SHOW / HIDE TEXT TOGGLE
@@ -342,6 +387,7 @@ document.addEventListener("keydown", (e) => {
 </body>
 
 </html>
+
 
 
 

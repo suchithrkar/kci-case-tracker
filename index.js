@@ -2122,9 +2122,9 @@ const negativeTooltipText = `
 <b>Negative Cases = Total Open Repair Cases</b><br>
 EXCLUDING:<br>
 • Ready For Closure Cases (Onsite + Offsite + CSR)<br>
-• Onsite cases with Case Age ≤ 5 days<br>
-• Offsite Cases with Case Age <=10 Days<br>
-• CSR Cases with Case Age <=3 Days
+• Onsite Cases with Case Age ≤ 5 days<br>
+• Offsite Cases with Case Age ≤ 10 Days<br>
+• CSR Cases with Case Age ≤ 3 Days
 `;
 
 // SIMPLE hover: show/hide only (no positioning)
@@ -2138,6 +2138,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

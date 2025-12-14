@@ -1744,7 +1744,7 @@ function renderStatsTableNew() {
         </th>
 
         <th style="position:relative;">
-          Follow-ups X/Y
+          Follow-ups
           <span class="tooltip">
             Cases Due to be followed up today.<br>
             X - Total Due Today Cases.<br>
@@ -2054,6 +2054,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -113,6 +113,7 @@ const modalCreateTeam     = document.getElementById("modalCreateTeam");
 // Team reset settings inputs
 const newTeamTimezone = document.getElementById("newTeamTimezone");
 const newTeamResetHour = document.getElementById("newTeamResetHour");
+const btnTeamCancel = document.getElementById("btnTeamCancel");
 
 const updateTeamList      = document.getElementById("updateTeamList");
 const modalUpdateData     = document.getElementById("modalUpdateData");
@@ -869,6 +870,12 @@ modalCreateTeam.addEventListener("click", (e) => {
     modalCreateTeam.classList.remove("show");
   }
 });
+
+btnTeamCancel.onclick = () => {
+  resetTeamModalState();
+  modalCreateTeam.classList.remove("show");
+};
+
 
 // ============================================================
 // CREATE TEAM HANDLER (DEFAULT MODE)
@@ -2239,6 +2246,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

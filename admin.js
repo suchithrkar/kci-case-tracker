@@ -926,18 +926,6 @@ document.addEventListener("click", async (e) => {
 
   const teamSnap = await getDoc(doc(db, "teams", teamId));
 
-  // --------------------------------------------------
-// Team reset configuration (timezone + reset hour)
-// --------------------------------------------------
-const teamData = teamSnap.exists() ? teamSnap.data() : {};
-
-const teamConfig = {
-  resetTimezone: teamData.resetTimezone || "UTC",
-  resetHour:
-    typeof teamData.resetHour === "number"
-      ? teamData.resetHour
-      : 0
-};
    
    
   if (!teamSnap.exists()) return;
@@ -2249,6 +2237,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

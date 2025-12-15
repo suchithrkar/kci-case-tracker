@@ -684,6 +684,15 @@ export const adminState = {
   selectedStatsTeam: "TOTAL",
 };
 
+// ================================================
+// GLOBAL TEAM CONFIG FOR STATS (Admin)
+// ================================================
+let teamConfig = {
+  resetTimezone: "UTC",
+  resetHour: 0
+};
+
+
 let statsCases = [];
 let allUsers = [];
 
@@ -779,6 +788,26 @@ statsTableWrap.innerHTML = "Loading...";
 
   await loadAllUsersForStats();
   await loadStatsCasesOnce();
+
+  // --------------------------------------------------
+// Initialize teamConfig for first Stats render
+// --------------------------------------------------
+const initialTeam =
+  adminState.selectedStatsTeam === "TOTAL"
+    ? null
+    : adminState.allTeams.find(
+        t => t.id === adminState.selectedStatsTeam
+      );
+
+teamConfig = {
+  resetTimezone: initialTeam?.resetTimezone || "UTC",
+  resetHour:
+    typeof initialTeam?.resetHour === "number"
+      ? initialTeam.resetHour
+      : 0
+};
+
+     
   renderStatsTableNew();
 };
 
@@ -2190,10 +2219,23 @@ if (!isPrimary(adminState.user)) {
 
   sel.value = adminState.selectedStatsTeam;
   sel.onchange = async () => {
-    adminState.selectedStatsTeam = sel.value;
-    await loadStatsCasesOnce();
-    renderStatsTableNew();
+  adminState.selectedStatsTeam = sel.value;
+
+  // Update teamConfig based on selected team
+  const t =
+    sel.value === "TOTAL"
+      ? null
+      : adminState.allTeams.find(x => x.id === sel.value);
+
+  teamConfig = {
+    resetTimezone: t?.resetTimezone || "UTC",
+    resetHour: typeof t?.resetHour === "number" ? t.resetHour : 0
   };
+
+  await loadStatsCasesOnce();
+  renderStatsTableNew();
+};
+
 
   statsControls.prepend(sel);
 
@@ -2207,6 +2249,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

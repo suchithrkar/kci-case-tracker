@@ -877,7 +877,7 @@ btnTeamCreate.onclick = async () => {
     newTeamTimezone.value = "";
     newTeamResetHour.value = "";
 
-    loadTeams(); // refresh team list
+    await loadTeamsForAdmin();  // refresh team list
     showPopup("Team created successfully.");
 
   } catch (err) {
@@ -964,7 +964,7 @@ document.addEventListener("click", async (e) => {
       newTeamResetHour.value = "";
       btnTeamCreate.textContent = "Create Team";
 
-      loadTeams();
+      await loadTeamsForAdmin();
       showPopup("Team updated successfully.");
 
     } catch (err) {
@@ -2183,7 +2183,8 @@ if (!isPrimary(adminState.user)) {
     // Disable the dropdown (secondary cannot switch teams)
     sel.disabled = true;
 
-    return sel; // important: stop here and return the selector
+  statsControls.prepend(sel);
+  return; // important: stop here and return the selector
 }
 
    
@@ -2237,6 +2238,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

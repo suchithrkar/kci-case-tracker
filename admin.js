@@ -975,7 +975,7 @@ document.addEventListener("click", async (e) => {
 });
 
 
-/* ---------- RENAME / DELETE TEAM ---------- */
+/* ---------- DELETE TEAM ONLY (Rename removed) ---------- */
 teamList.addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
   if (!btn || isSecondary(adminState.user)) return;
@@ -983,19 +983,8 @@ teamList.addEventListener("click", async (e) => {
   const action = btn.dataset.action;
   const teamId = btn.dataset.id;
 
-  if (action === "rename") renameTeam(teamId);
   if (action === "delete") deleteTeam(teamId);
 });
-
-async function renameTeam(teamId) {
-  const t = adminState.allTeams.find(x => x.id === teamId);
-  const newName = prompt("Enter new team name:", t.name);
-  if (!newName) return;
-
-  await updateDoc(doc(db, "teams", teamId), { name: newName.trim() });
-  showPopup("Team renamed.");
-  await loadTeamsForAdmin();
-}
 
 /* =======================================================================
    DELETE TEAM — WITH FULL CASE CASCADE DELETE
@@ -2238,6 +2227,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

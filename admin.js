@@ -109,6 +109,7 @@ const btnTeamCreate       = document.getElementById("btnTeamCreate");
 const btnTeamClose        = document.getElementById("btnTeamClose");
 const btnTeamDone         = document.getElementById("btnTeamDone");
 const modalCreateTeam     = document.getElementById("modalCreateTeam");
+const teamModalTitle = document.getElementById("teamModalTitle");
 
 // Team reset settings inputs
 const newTeamTimezone = document.getElementById("newTeamTimezone");
@@ -148,6 +149,9 @@ function resetTeamModalState() {
   newTeamName.value = "";
   newTeamTimezone.value = "";
   newTeamResetHour.value = "";
+
+  // Restore title
+  teamModalTitle.textContent = "Create New Team";
 
   // Restore button state
   btnTeamCreate.textContent = "Create Team";
@@ -964,6 +968,7 @@ document.addEventListener("click", async (e) => {
 
   // Switch Create → Update mode
   btnTeamCreate.textContent = "Update Team";
+  teamModalTitle.textContent = "Update Team";
 
   btnTeamCreate.onclick = async () => {
   const updatedName = newTeamName.value.trim();
@@ -2246,6 +2251,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

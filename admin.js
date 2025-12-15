@@ -139,6 +139,23 @@ $("excelInput").onchange = async (e) => {
   validateReadyState();
 };
 
+// ============================================================
+// RESET CREATE / UPDATE TEAM MODAL STATE
+// ============================================================
+function resetTeamModalState() {
+  // Clear inputs
+  newTeamName.value = "";
+  newTeamTimezone.value = "";
+  newTeamResetHour.value = "";
+
+  // Restore button state
+  btnTeamCreate.textContent = "Create Team";
+
+  // Restore default handler
+  btnTeamCreate.onclick = createTeamHandler;
+}
+
+
 /* ============================================================
    TEAM-AWARE "TODAY" CALCULATION
    ============================================================ */
@@ -836,33 +853,34 @@ btnCreateTeam.onclick = () => {
   modalCreateTeam.classList.add("show");
 };
 
-btnTeamClose.onclick = () => modalCreateTeam.classList.remove("show");
-btnTeamDone.onclick  = () => modalCreateTeam.classList.remove("show");
+btnTeamClose.onclick = () => {
+  resetTeamModalState();
+  modalCreateTeam.classList.remove("show");
+};
+
+btnTeamDone.onclick = () => {
+  resetTeamModalState();
+  modalCreateTeam.classList.remove("show");
+};
 
 modalCreateTeam.addEventListener("click", (e) => {
-  if (e.target === modalCreateTeam) modalCreateTeam.classList.remove("show");
+  if (e.target === modalCreateTeam) {
+    resetTeamModalState();
+    modalCreateTeam.classList.remove("show");
+  }
 });
 
-btnTeamCreate.onclick = async () => {
+// ============================================================
+// CREATE TEAM HANDLER (DEFAULT MODE)
+// ============================================================
+async function createTeamHandler() {
   const name = newTeamName.value.trim();
   const timezone = newTeamTimezone.value;
   const resetHour = newTeamResetHour.value;
 
-  // Validation
-  if (!name) {
-    alert("Please enter a team name.");
-    return;
-  }
-
-  if (!timezone) {
-    alert("Please select a team timezone.");
-    return;
-  }
-
-  if (resetHour === "") {
-    alert("Please select a daily reset time.");
-    return;
-  }
+  if (!name) return alert("Please enter a team name.");
+  if (!timezone) return alert("Please select a team timezone.");
+  if (resetHour === "") return alert("Please select a daily reset time.");
 
   try {
     await addDoc(collection(db, "teams"), {
@@ -872,19 +890,18 @@ btnTeamCreate.onclick = async () => {
       createdAt: new Date()
     });
 
-    // Reset UI
-    newTeamName.value = "";
-    newTeamTimezone.value = "";
-    newTeamResetHour.value = "";
-
-    await loadTeamsForAdmin();  // refresh team list
+    resetTeamModalState();
+    await loadTeamsForAdmin();
     showPopup("Team created successfully.");
-
   } catch (err) {
     console.error(err);
     alert("Failed to create team.");
   }
-};
+}
+
+// Bind default create behavior
+btnTeamCreate.onclick = createTeamHandler;
+
 
 
 /* ---------- TEAM LIST ---------- */
@@ -942,36 +959,31 @@ document.addEventListener("click", async (e) => {
   btnTeamCreate.textContent = "Update Team";
 
   btnTeamCreate.onclick = async () => {
-    const updatedName = newTeamName.value.trim();
-    const updatedTimezone = newTeamTimezone.value;
-    const updatedResetHour = newTeamResetHour.value;
+  const updatedName = newTeamName.value.trim();
+  const updatedTimezone = newTeamTimezone.value;
+  const updatedResetHour = newTeamResetHour.value;
 
-    if (!updatedName || !updatedTimezone || updatedResetHour === "") {
-      alert("Please fill all team fields.");
-      return;
-    }
+  if (!updatedName || !updatedTimezone || updatedResetHour === "") {
+    alert("Please fill all team fields.");
+    return;
+  }
 
-    try {
-      await updateDoc(doc(db, "teams", teamId), {
-        name: updatedName,
-        resetTimezone: updatedTimezone,
-        resetHour: Number(updatedResetHour)
-      });
+  try {
+    await updateDoc(doc(db, "teams", teamId), {
+      name: updatedName,
+      resetTimezone: updatedTimezone,
+      resetHour: Number(updatedResetHour)
+    });
 
-      // Reset UI back to Create mode
-      newTeamName.value = "";
-      newTeamTimezone.value = "";
-      newTeamResetHour.value = "";
-      btnTeamCreate.textContent = "Create Team";
+    resetTeamModalState();
+    await loadTeamsForAdmin();
+    showPopup("Team updated successfully.");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to update team.");
+  }
+};
 
-      await loadTeamsForAdmin();
-      showPopup("Team updated successfully.");
-
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update team.");
-    }
-  };
 });
 
 
@@ -2227,6 +2239,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

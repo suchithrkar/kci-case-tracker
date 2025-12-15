@@ -340,6 +340,67 @@ tbody tr:hover {
   background:var(--panel-2);
 }
 
+/* ============================================================
+   CREATE / MANAGE TEAM — 2-ROW GRID LAYOUT
+   ============================================================ */
+.team-form-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Row 1 */
+.team-name {
+  grid-column: 1 / 2;
+  grid-row: 1;
+}
+
+/* Button spans both rows */
+.team-submit {
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
+  padding: 0.9rem 1.4rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Row 2 inputs */
+.team-tz {
+  grid-column: 1 / 2;
+  grid-row: 2;
+}
+
+.team-reset {
+  grid-column: 1 / 2;
+  grid-row: 2;
+}
+
+/* Make row 2 split evenly */
+.team-tz,
+.team-reset {
+  width: 100%;
+}
+
+/* Split row 2 into two equal columns */
+.team-form-grid {
+  grid-template-columns: 1fr 1fr auto;
+}
+
+.team-tz {
+  grid-column: 1 / 2;
+}
+
+.team-reset {
+  grid-column: 2 / 3;
+}
+
+.team-submit {
+  grid-column: 3 / 4;
+}
+
+
 /* =============================================
    Upload row layout
    ============================================= */
@@ -491,7 +552,7 @@ th:hover .tooltip {
 
   <!-- Visible ONLY to primary admin -->
   <button class="hdr-btn" id="btnUpdateData">Update Data</button>
-  <button class="hdr-btn" id="btnCreateTeam">Create Team</button>
+  <button class="hdr-btn" id="btnCreateTeam">Manage Teams</button>
 
   <!-- Visible to primary & secondary -->
   <button class="hdr-btn" id="btnGotoTracker">Tracker</button>
@@ -554,13 +615,22 @@ th:hover .tooltip {
 
       <h3>Create New Team</h3>
 
-<div style="display:grid; gap:0.75rem; margin-bottom:1rem;">
+<div class="team-form-grid">
 
-  <!-- Team Name -->
-  <input class="input" id="newTeamName" placeholder="Enter new team name..." />
+  <!-- Row 1: Team name -->
+  <input
+    class="input team-name"
+    id="newTeamName"
+    placeholder="Enter team name..."
+  />
 
-  <!-- Team Timezone -->
-  <select class="input" id="newTeamTimezone">
+  <!-- Button spans both rows -->
+  <button class="modal-btn team-submit" id="btnTeamCreate">
+    Create Team
+  </button>
+
+  <!-- Row 2: Timezone -->
+  <select class="input team-tz" id="newTeamTimezone">
     <option value="">Select Team Timezone</option>
 
     <!-- EMEA -->
@@ -568,26 +638,26 @@ th:hover .tooltip {
     <option value="Europe/Berlin">Central Europe (Europe/Berlin)</option>
 
     <!-- Americas -->
-    <option value="America/New_York">US – Eastern (America/New_York)</option>
-    <option value="America/Chicago">US – Central (America/Chicago)</option>
-    <option value="America/Los_Angeles">US – Pacific (America/Los_Angeles)</option>
+    <option value="America/New_York">US – Eastern</option>
+    <option value="America/Chicago">US – Central</option>
+    <option value="America/Los_Angeles">US – Pacific</option>
 
     <!-- Asia -->
-    <option value="Asia/Kolkata">India (Asia/Kolkata)</option>
-    <option value="Asia/Singapore">Singapore (Asia/Singapore)</option>
-    <option value="Asia/Dubai">Middle East (Asia/Dubai)</option>
+    <option value="Asia/Kolkata">India</option>
+    <option value="Asia/Singapore">Singapore</option>
+    <option value="Asia/Dubai">Middle East</option>
 
     <!-- ANZ -->
-    <option value="Australia/Sydney">Australia (Australia/Sydney)</option>
-    <option value="Pacific/Auckland">New Zealand (Pacific/Auckland)</option>
+    <option value="Australia/Sydney">Australia</option>
+    <option value="Pacific/Auckland">New Zealand</option>
 
     <!-- Global -->
     <option value="UTC">UTC</option>
   </select>
 
-  <!-- Reset Hour -->
-  <select class="input" id="newTeamResetHour">
-    <option value="">Select Daily Reset Time</option>
+  <!-- Row 2: Reset hour -->
+  <select class="input team-reset" id="newTeamResetHour">
+    <option value="">Reset Time</option>
     <option value="0">12:00 AM</option>
     <option value="1">1:00 AM</option>
     <option value="2">2:00 AM</option>
@@ -614,11 +684,7 @@ th:hover .tooltip {
     <option value="23">11:00 PM</option>
   </select>
 
-  <!-- Create Button -->
-  <button class="modal-btn" id="btnTeamCreate">Create Team</button>
-
 </div>
-
 
 
       <hr style="margin:1rem 0;border-color:var(--border);" />
@@ -818,6 +884,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

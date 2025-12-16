@@ -1127,26 +1127,6 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 }
 
 
-  if (uiState.mode === "repeat") {
-
-  rows = [...trackerState.allCases];
-
-  const count = {};
-  rows.forEach(r => {
-    const name = (r.customerName || "").trim().toLowerCase();
-    if (!name) return;
-    count[name] = (count[name] || 0) + 1;
-  });
-
-  rows = rows.filter(r =>
-    count[(r.customerName || "").trim().toLowerCase()] > 1
-  );
-
-  rows.sort((a, b) =>
-    (a.customerName || "").localeCompare(b.customerName || "")
-  );
-}
-
 
 
   /* ===============================================================
@@ -1269,6 +1249,37 @@ if (uiState.mode === "negative") {
       return sel.includes(val);
     });
   });
+
+   /* ===============================================================
+   REPEAT CUSTOMERS — OVERLAY FILTER
+   Runs on CURRENT filtered table view
+   =============================================================== */
+if (uiState.mode === "repeat") {
+
+  const freq = {};
+
+  // Count occurrences in CURRENT view
+  rows.forEach(r => {
+    const key = normalizeCustomerName(r.customerName);
+    if (!key) return;
+    freq[key] = (freq[key] || 0) + 1;
+  });
+
+  // Keep only repeating customers
+  rows = rows.filter(r => {
+    const key = normalizeCustomerName(r.customerName);
+    return key && freq[key] > 1;
+  });
+
+  // Sort A → Z by customer name (display-safe)
+  rows.sort((a, b) =>
+    (a.customerName || "").localeCompare(
+      b.customerName || "",
+      undefined,
+      { sensitivity: "base" }
+    )
+  );
+}
 
 
 /* SORT */
@@ -2147,6 +2158,14 @@ function normalizeDate(v) {
   return v || "";
 }
 
+// Normalize customer name for repeat detection
+function normalizeCustomerName(name) {
+  return (name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "") // remove spaces & special characters
+    .trim();
+}
+
 // GLOBAL tooltip container
 const globalTooltip = document.getElementById("globalTooltip");
 
@@ -2171,6 +2190,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -325,27 +325,12 @@ function setupRealtimeCases(teamId) {
     }));
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
-// 🚫 In Unupdated Mode → BLOCK realtime auto-refresh when editing
 if (uiState.mode === "unupdated" && unupdatedProtect) {
-    return; // completely stop refresh
+  return;
 }
 
-if (uiState.mode !== "unupdated") {
-    applyFilters();
-} else {
-        // Normal refresh
-        applyFilters();
-    }
-} else {
-    trackerState.filteredCases = trackerState.allCases.filter(r => {
-    // Keep rows that are empty status OR that are currently pending an update
-    if (pendingUnupdated.has(r.id)) return true;
-    return !r.status || r.status.trim() === "";
-});
-
-    renderTable();
-    updateBadges();
-}
+// Normal realtime refresh
+applyFilters();
 
 
   });
@@ -2178,6 +2163,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

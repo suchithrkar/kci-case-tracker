@@ -880,6 +880,8 @@ function setupFilterControls() {
         uiState.sortByDateAsc = null;
         updateSortIcon();
 
+        uiState.repeatActive = false;
+
         el.txtSearch.value = "";
         el.dateFrom.value = "";
         el.dateTo.value = "";
@@ -901,6 +903,7 @@ function setupFilterControls() {
     // normal reset
     lastRfcMode = null;
     uiState.mode = "normal";
+    uiState.repeatActive = false;
 
     document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
 
@@ -2163,6 +2166,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

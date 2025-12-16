@@ -967,13 +967,9 @@ function setupFilterControls() {
 
   /* SORT BY DATE BUTTON */
   el.btnSortDate.onclick = () => {
-  // Cycle: null → desc → asc → null
+  // Toggle only between DESC ↔ ASC
   uiState.sortByDateAsc =
-    uiState.sortByDateAsc === null
-      ? false
-      : uiState.sortByDateAsc === false
-      ? true
-      : null;
+    uiState.sortByDateAsc === true ? false : true;
 
   updateSortIcon();
   applyFilters();
@@ -986,18 +982,9 @@ function updateSortIcon() {
 
   if (!arrow) return;
 
-  if (uiState.sortByDateAsc === null) {
-    arrow.style.display = "none";
-    arrow.textContent = "";
-  }
-  else if (uiState.sortByDateAsc === false) {
-    arrow.style.display = "inline-block";
-    arrow.textContent = "⬇️"; // Newest → Oldest
-  }
-  else {
-    arrow.style.display = "inline-block";
-    arrow.textContent = "⬆️"; // Oldest → Newest
-  }
+  arrow.style.display = "inline-block";
+arrow.textContent = uiState.sortByDateAsc ? "⬆️" : "⬇️";
+
 }
 
 
@@ -1109,27 +1096,20 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
      MODE OVERRIDES (Option A)
      =============================================================== */
   if (uiState.mode === "due") {
-    rows = rows.filter(r =>
-      r.lastActionedBy === trackerState.user.uid &&
-      r.followDate &&
-      r.followDate <= today &&
-      r.status !== "Closed"
-    );
-    trackerState.filteredCases = rows;
-    updateBadges();
-    renderTable();
-    return;
-  }
+  rows = rows.filter(r =>
+    r.lastActionedBy === trackerState.user.uid &&
+    r.followDate &&
+    r.followDate <= today &&
+    r.status !== "Closed"
+  );
+}
+
 
   if (uiState.mode === "flagged") {
     rows = rows.filter(r =>
       r.flagged &&
       r.lastActionedBy === trackerState.user.uid
     );
-    trackerState.filteredCases = rows;
-    updateBadges();
-    renderTable();
-    return;
   }
 
   if (uiState.mode === "unupdated") {
@@ -1144,11 +1124,6 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
         // Keep rows that are actually unupdated
         return !r.status || r.status.trim() === "";
     });
-
-    trackerState.filteredCases = rows;
-    updateBadges();
-    renderTable();
-    return;
 }
 
 
@@ -1170,11 +1145,6 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
   rows.sort((a, b) =>
     (a.customerName || "").localeCompare(b.customerName || "")
   );
-
-  trackerState.filteredCases = rows;
-  updateBadges();
-  renderTable();
-  return;
 }
 
 
@@ -2201,6 +2171,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

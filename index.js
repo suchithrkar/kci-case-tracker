@@ -1115,7 +1115,7 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
   if (uiState.mode === "unupdated") {
 
     // 🔥 FIX: start from CURRENT VIEW instead of allCases
-    rows = [...trackerState.filteredCases];
+    rows = [...trackerState.allCases];
 
     rows = rows.filter(r => {
         // Keep pending-updated rows visible
@@ -1129,7 +1129,7 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 
   if (uiState.mode === "repeat") {
 
-  rows = [...trackerState.filteredCases];
+  rows = [...trackerState.allCases];
 
   const count = {};
   rows.forEach(r => {
@@ -2171,6 +2171,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

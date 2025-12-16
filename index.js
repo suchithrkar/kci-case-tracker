@@ -154,7 +154,8 @@ const uiState = {
   from: "",
   to: "",
   statusList: [],
-  mode: "normal",   // normal | due | flagged | repeat | unupdated | total | negative
+  mode: "normal",   // normal | due | flagged | unupdated | total | negative
+  repeatActive: false,
   sortByDateAsc: null,     // null = off, true = asc, false = desc
 
   primaries: {
@@ -330,18 +331,6 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 }
 
 if (uiState.mode !== "unupdated") {
-
-    // Special handling for REPEAT mode
-    if (uiState.mode === "repeat") {
-
-    const prev = uiState.mode; // store 'repeat'
-
-    // rebuild base view first
-    uiState.mode = "normal";
-    applyFilters();
-
-    // re-apply repeat on updated base
-    uiState.mode = prev;
     applyFilters();
 } else {
         // Normal refresh
@@ -962,7 +951,10 @@ function setupFilterControls() {
   /* MODE BUTTONS — Direct override (Option A behavior) */
   el.btnDueToday.onclick = () => { uiState.mode = "due"; applyFilters(); };
   el.btnFlagged.onclick = () => { uiState.mode = "flagged"; applyFilters(); };
-  el.btnRepeating.onclick = () => { uiState.mode = "repeat"; applyFilters(); };
+  el.btnRepeating.onclick = () => {
+     uiState.repeatActive = !uiState.repeatActive;
+     applyFilters();
+   };
   el.btnUnupdated.onclick = () => { uiState.mode = "unupdated"; applyFilters(); };
 
   /* SORT BY DATE BUTTON */
@@ -1114,17 +1106,13 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
 
   if (uiState.mode === "unupdated") {
 
-    // 🔥 FIX: start from CURRENT VIEW instead of allCases
-    rows = [...trackerState.allCases];
-
-    rows = rows.filter(r => {
-        // Keep pending-updated rows visible
-        if (pendingUnupdated.has(r.id)) return true;
-
-        // Keep rows that are actually unupdated
-        return !r.status || r.status.trim() === "";
-    });
+  // ❗ DO NOT reset rows — filter CURRENT view
+  rows = rows.filter(r => {
+    if (pendingUnupdated.has(r.id)) return true;
+    return !r.status || r.status.trim() === "";
+  });
 }
+
 
 
 
@@ -1250,28 +1238,26 @@ if (uiState.mode === "negative") {
     });
   });
 
-   /* ===============================================================
+/* ===============================================================
    REPEAT CUSTOMERS — OVERLAY FILTER
-   Runs on CURRENT filtered table view
+   Applies on CURRENT filtered table view
    =============================================================== */
-if (uiState.mode === "repeat") {
+if (uiState.repeatActive) {
 
   const freq = {};
 
-  // Count occurrences in CURRENT view
   rows.forEach(r => {
     const key = normalizeCustomerName(r.customerName);
     if (!key) return;
     freq[key] = (freq[key] || 0) + 1;
   });
 
-  // Keep only repeating customers
   rows = rows.filter(r => {
     const key = normalizeCustomerName(r.customerName);
     return key && freq[key] > 1;
   });
 
-  // Sort A → Z by customer name (display-safe)
+  // Always sort A → Z for repeat view
   rows.sort((a, b) =>
     (a.customerName || "").localeCompare(
       b.customerName || "",
@@ -1282,19 +1268,7 @@ if (uiState.mode === "repeat") {
 }
 
 
-// Explicit date sort (🕑 button)
 /* SORT */
-
-// Repeat mode → ALWAYS A → Z by customer name
-if (uiState.mode === "repeat") {
-  rows.sort((a, b) =>
-    (a.customerName || "").localeCompare(
-      b.customerName || "",
-      undefined,
-      { sensitivity: "base" }
-    )
-  );
-}
 
 // Explicit date sort (🕑 button)
 else if (uiState.sortByDateAsc !== null) {
@@ -2204,6 +2178,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

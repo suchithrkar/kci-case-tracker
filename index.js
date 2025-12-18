@@ -154,7 +154,8 @@ const uiState = {
   from: "",
   to: "",
   statusList: [],
-  mode: "normal",   // normal | due | flagged | unupdated | total | negative
+  mode: "normal",   // normal | due | flagged | total | negative
+  unupdatedActive: false,
   repeatActive: false,
   sortByDateAsc: null,     // null = off, true = asc, false = desc
 
@@ -881,6 +882,7 @@ function setupFilterControls() {
         updateSortIcon();
 
         uiState.repeatActive = false;
+        uiState.unupdatedActive = false;
 
         el.txtSearch.value = "";
         el.dateFrom.value = "";
@@ -904,6 +906,7 @@ function setupFilterControls() {
     lastRfcMode = null;
     uiState.mode = "normal";
     uiState.repeatActive = false;
+    uiState.unupdatedActive = false;
 
     document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
 
@@ -943,7 +946,11 @@ function setupFilterControls() {
      uiState.repeatActive = !uiState.repeatActive;
      applyFilters();
    };
-  el.btnUnupdated.onclick = () => { uiState.mode = "unupdated"; applyFilters(); };
+  el.btnUnupdated.onclick = () => {
+     uiState.unupdatedActive = !uiState.unupdatedActive;
+     applyFilters();
+   };
+
 
   /* SORT BY DATE BUTTON */
   el.btnSortDate.onclick = () => {
@@ -1092,14 +1099,7 @@ if (uiState.mode === "unupdated" && unupdatedProtect) {
     );
   }
 
-  if (uiState.mode === "unupdated") {
-
-  // ❗ DO NOT reset rows — filter CURRENT view
-  rows = rows.filter(r => {
-    if (pendingUnupdated.has(r.id)) return true;
-    return !r.status || r.status.trim() === "";
-  });
-}
+  
 
 
 
@@ -1253,6 +1253,20 @@ if (uiState.repeatActive) {
       { sensitivity: "base" }
     )
   );
+}
+
+/* ===============================================================
+   UNUPDATED CASES — OVERLAY FILTER
+   Applies on CURRENT filtered table view
+   =============================================================== */
+if (uiState.unupdatedActive) {
+  rows = rows.filter(r => {
+    // Keep rows currently being edited in Unupdated mode
+    if (pendingUnupdated.has(r.id)) return true;
+
+    // True unupdated cases
+    return !r.status || r.status.trim() === "";
+  });
 }
 
 
@@ -2166,6 +2180,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

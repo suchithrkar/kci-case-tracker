@@ -539,26 +539,25 @@ tr.active-row {
     transform:scale(1.12);
 }
 
-  /* RFC ROW LAYOUT */
+/* RFC ROW LAYOUT */
 .rfc-row {
-    display:flex;
-    gap:.6rem;
-    width:100%;
+    display: flex;
+    gap: .6rem;
+    width: 100%;
 }
 
-/* FIRST 4 BUTTONS FILL THE ROW EQUALLY */
-.rfcBtn[data-type="onsite"],
-.rfcBtn[data-type="offsite"],
-.rfcBtn[data-type="csr"],
-.rfcBtn[data-type="total"] {
-    flex:1;                /* ⬅ Fills available width EQUALLY */
-    text-align:center;
+/* ROW WITH 3 EQUAL BUTTONS */
+.rfc-row-3 .rfcBtn {
+    flex: 1;
+    text-align: center;
 }
 
-/* -ve button keeps its natural width */
-.rfcBtn[data-type="negative"] {
-    flex:none;
+/* ROW WITH 2 EQUAL BUTTONS */
+.rfc-row-2 .rfcBtn {
+    flex: 1;
+    text-align: center;
 }
+
 
 /* SUBTLE ACTIVE HIGHLIGHT */
 /* SUBTLE RFC ACTIVE STATE */
@@ -870,6 +869,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

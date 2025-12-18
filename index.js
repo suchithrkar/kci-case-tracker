@@ -1705,22 +1705,26 @@ let requireFollowUp = false;
 // =====================================================
 // CLOSURE SURVEY — STAR RATING STATE
 // =====================================================
+
 let selectedStars = 0;
 
 const starContainer = document.getElementById("starRating");
 
 if (starContainer) {
-  starContainer.onclick = (e) => {
-    const rect = starContainer.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
+  starContainer.querySelectorAll("span").forEach(star => {
+    star.onclick = () => {
+      selectedStars = Number(star.dataset.star);
 
-    selectedStars = Math.max(1, Math.min(5, Math.ceil(percent * 5)));
-
-    starContainer.textContent =
-      "★★★★★".slice(0, selectedStars) +
-      "☆☆☆☆☆".slice(selectedStars);
-  };
+      starContainer.querySelectorAll("span").forEach(s => {
+        s.classList.toggle(
+          "active",
+          Number(s.dataset.star) <= selectedStars
+        );
+      });
+    };
+  });
 }
+
 
 
 /* =======================================================================
@@ -1943,10 +1947,11 @@ function openClosureModal(row) {
   // reset state
   selectedStars = 0;
 
-  const starEl = document.getElementById("starRating");
-  if (starEl) {
-    starEl.textContent = "☆☆☆☆☆";
-  }
+  selectedStars = 0;
+   document
+     .querySelectorAll("#starRating span")
+     .forEach(s => s.classList.remove("active"));
+
 
   document.getElementById("predictionComment").value = "";
 
@@ -2551,6 +2556,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

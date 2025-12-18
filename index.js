@@ -326,7 +326,7 @@ function setupRealtimeCases(teamId) {
     }));
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
-if (uiState.mode === "unupdated" && unupdatedProtect) {
+if (uiState.unupdatedActive && unupdatedProtect) {
   return;
 }
 
@@ -1071,8 +1071,8 @@ function restrictNcmCasesForUser(rows, user) {
 export function applyFilters() {
   // 🚫 Global protection: do NOT auto-refresh if modal process is happening in Unupdated mode
   // 🚫 Global fail-safe override:
-if (uiState.mode === "unupdated" && unupdatedProtect) {
-    return;   // BLOCK ALL FILTERING
+if (uiState.unupdatedActive && unupdatedProtect) {
+  return;
 }
 
 
@@ -1477,14 +1477,11 @@ let requireFollowUp = false;
 function handleStatusChange(caseId, newStatus) {
 
    // FINAL FIX: protect instantly before UI auto-refresh
-  if (uiState.mode === "unupdated") {
-      unupdatedProtect = true;
-  }
-
-   // If we're in unupdated mode, mark this case as pending so the listener will keep it visible
-if (uiState.mode === "unupdated") {
+if (uiState.unupdatedActive) {
+  unupdatedProtect = true;
   pendingUnupdated.add(caseId);
 }
+
 
    
   const today = getTeamToday(trackerState.teamConfig);
@@ -2180,6 +2177,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

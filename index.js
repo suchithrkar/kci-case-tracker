@@ -1361,6 +1361,125 @@ function updateBadges() {
 
 }
 
+/* =========================================================
+   RFC REPORT — OPEN MODAL
+   ========================================================= */
+
+document.getElementById("rfcReportBtn")?.addEventListener("click", () => {
+  buildRfcReport();
+  document.getElementById("rfcReportOverlay").classList.add("show");
+});
+
+document.getElementById("btnRfcReportClose")?.addEventListener("click", () => {
+  document.getElementById("rfcReportOverlay").classList.remove("show");
+});
+
+function buildRfcReport() {
+  const body = document.getElementById("rfcReportBody");
+  if (!body) return;
+
+  const all = trackerState.allCases;
+
+  /* ---------------------------------------
+     TOTAL OPEN REPAIR CASES
+     --------------------------------------- */
+  const onsiteAll = all.filter(r => r.caseResolutionCode === "Onsite Solution");
+  const offsiteAll = all.filter(r => r.caseResolutionCode === "Offsite Solution");
+  const csrAll = all.filter(r => r.caseResolutionCode === "Parts Shipped");
+
+  /* ---------------------------------------
+     READY FOR CLOSURE (RFC TOTAL LOGIC)
+     --------------------------------------- */
+  const onsiteRFC = onsiteAll.filter(r =>
+    ["Closed - Canceled","Closed - Posted","Open - Completed"].includes(r.onsiteRFC)
+  );
+
+  const offsiteRFC = offsiteAll.filter(r =>
+    r.benchRFC === "Possible completed"
+  );
+
+  const csrRFC = csrAll.filter(r =>
+    ["Cancelled","Closed","POD"].includes(r.csrRFC)
+  );
+
+  const totalRFC = [...onsiteRFC, ...offsiteRFC, ...csrRFC];
+
+  /* ---------------------------------------
+     OVERDUE (NEGATIVE LOGIC — SAME AS FILTER)
+     --------------------------------------- */
+  let overdue = [...all];
+
+  const rfcIds = new Set(totalRFC.map(r => r.id));
+  overdue = overdue.filter(r => !rfcIds.has(r.id));
+
+  overdue = overdue.filter(r => !(
+    r.caseResolutionCode === "Onsite Solution" &&
+    ["0-3 Days","3-5 Days"].includes(r.caGroup)
+  ));
+
+  overdue = overdue.filter(r => !(
+    r.caseResolutionCode === "Parts Shipped" &&
+    r.caGroup === "0-3 Days"
+  ));
+
+  overdue = overdue.filter(r => !(
+    r.caseResolutionCode === "Offsite Solution" &&
+    ["0-3 Days","3-5 Days","5-10 Days"].includes(r.caGroup)
+  ));
+
+  /* ---------------------------------------
+     SBD METRICS (FROM TOTAL OPEN)
+     --------------------------------------- */
+  const sbdMet = all.filter(r => (r.sbd || "").toLowerCase() === "met").length;
+  const sbdNotMet = all.filter(r => (r.sbd || "").toLowerCase() === "not met").length;
+  const sbdTotal = sbdMet + sbdNotMet;
+
+  const pct = (n) => sbdTotal ? Math.round((n / sbdTotal) * 100) : 0;
+
+  /* ---------------------------------------
+     RENDER
+     --------------------------------------- */
+  body.innerHTML = `
+
+    <div class="rfc-report-section">
+      <h4>Total Open Repair Cases: ${all.length}</h4>
+      <div class="rfc-report-grid">
+        <div class="rfc-report-kv"><span>Onsite</span><span>${onsiteAll.length}</span></div>
+        <div class="rfc-report-kv"><span>Offsite</span><span>${offsiteAll.length}</span></div>
+        <div class="rfc-report-kv"><span>CSR</span><span>${csrAll.length}</span></div>
+      </div>
+    </div>
+
+    <div class="rfc-report-section">
+      <h4>Total Ready for Closure: ${totalRFC.length}</h4>
+      <div class="rfc-report-grid">
+        <div class="rfc-report-kv"><span>Onsite</span><span>${onsiteRFC.length}</span></div>
+        <div class="rfc-report-kv"><span>Offsite</span><span>${offsiteRFC.length}</span></div>
+        <div class="rfc-report-kv"><span>CSR</span><span>${csrRFC.length}</span></div>
+      </div>
+    </div>
+
+    <div class="rfc-report-section">
+      <h4>Total Overdue Cases: ${overdue.length}</h4>
+      <div class="rfc-report-grid">
+        <div class="rfc-report-kv"><span>Onsite</span><span>${overdue.filter(r => r.caseResolutionCode === "Onsite Solution").length}</span></div>
+        <div class="rfc-report-kv"><span>Offsite</span><span>${overdue.filter(r => r.caseResolutionCode === "Offsite Solution").length}</span></div>
+        <div class="rfc-report-kv"><span>CSR</span><span>${overdue.filter(r => r.caseResolutionCode === "Parts Shipped").length}</span></div>
+      </div>
+    </div>
+
+    <div class="rfc-report-section">
+      <h4>SBD (from Total Open Repair Cases)</h4>
+      <div class="rfc-report-grid">
+        <div class="rfc-report-kv"><span>Met</span><span>${sbdMet} (${pct(sbdMet)}%)</span></div>
+        <div class="rfc-report-kv"><span>Not Met</span><span>${sbdNotMet} (${pct(sbdNotMet)}%)</span></div>
+      </div>
+    </div>
+
+  `;
+}
+
+
 /* =======================================================================
    PHASE 2 — TABLE RENDER + ROW INTERACTIONS
    ======================================================================= */
@@ -2235,6 +2354,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

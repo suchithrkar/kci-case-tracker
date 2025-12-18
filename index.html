@@ -1128,10 +1128,57 @@ tr.active-row {
      ">
 </div>
 
+
+<div class="modal" id="closureModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Case Closure Survey</div>
+      <button class="btn" id="btnClosureClose">Close</button>
+    </div>
+
+    <div class="modal-body" style="gap:1rem;">
+
+      <!-- PNS Resolution (conditional) -->
+      <div id="pnsResolutionBlock" style="display:none;">
+        <strong>PNS Resolution</strong>
+        <p style="margin:.3rem 0;">
+          As PNS was marked for this case, is the issue resolved?
+        </p>
+        <label><input type="radio" name="pnsResolved" value="yes"> Yes</label>
+        <label style="margin-left:12px;">
+          <input type="radio" name="pnsResolved" value="no"> No
+        </label>
+      </div>
+
+      <!-- Survey -->
+      <div>
+        <strong>Survey Prediction</strong>
+        <div id="starRating" style="font-size:22px;cursor:pointer;">
+          ★★★★★
+        </div>
+      </div>
+
+      <!-- Comment -->
+      <div>
+        <strong>Comment</strong>
+        <textarea id="predictionComment"
+          class="notes"
+          placeholder="Please enter your comment on the sample prediction provided"></textarea>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="btnClosureSubmit">Submit</button>
+    </div>
+  </div>
+</div>
+
   
 </body>
 
 </html>
+
 
 
 

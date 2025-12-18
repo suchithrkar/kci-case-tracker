@@ -1999,7 +1999,7 @@ if (uiState.unupdatedActive) {
 
 
   // 🚫 Prevent auto-refresh while in Unupdated mode
-if (uiState.mode !== "unupdated") {
+if (!uiState.unupdatedActive) {
   applyFilters();
 }
 
@@ -2171,6 +2171,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

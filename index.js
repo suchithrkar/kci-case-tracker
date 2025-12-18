@@ -1485,7 +1485,7 @@ function buildRfcReport() {
 
   <!-- 4. SBD -->
   <div class="rfc-report-card">
-    <h4>SBD (Quality)</h4>
+    <h4>SBD Data</h4>
 
     <div class="rfc-report-line">
       <span>Met</span>
@@ -2376,6 +2376,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

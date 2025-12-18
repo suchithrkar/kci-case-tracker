@@ -1352,6 +1352,13 @@ function updateBadges() {
     r.lastActionedBy === trackerState.user.uid &&
     r.flagged
   ).length;
+
+  // RFC — Total Open Repair Cases (team-wide)
+  const rfcTotalEl = document.getElementById("rfcTotalCount");
+  if (rfcTotalEl) {
+    rfcTotalEl.textContent = trackerState.allCases.length;
+  }
+
 }
 
 /* =======================================================================
@@ -2228,6 +2235,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

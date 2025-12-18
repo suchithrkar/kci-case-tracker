@@ -1496,20 +1496,20 @@ if (uiState.unupdatedActive) {
   // Update local state
   //row.status = newStatus;
 
-  if (needsFollow) {
-    prevStatusBeforeModal = previousStatus;   // FIXED
-    pendingStatusForModal = newStatus;
-     if (uiState.mode === "unupdated") unupdatedProtect = true;
+if (needsFollow) {
+  prevStatusBeforeModal = previousStatus;
+  pendingStatusForModal = newStatus;
 
-    openCaseModal(caseId, true);
-     
-    if (uiState.mode !== "unupdated") {
-  applyFilters();
+  openCaseModal(caseId, true);
+
+  // Only auto-refresh if NOT in Unupdated overlay
+  if (!uiState.unupdatedActive) {
+    applyFilters();
+  }
+
+  return;
 }
 
-
-    return;
-  }
 
 
   // Normal statuses → update Firestore directly
@@ -1522,28 +1522,15 @@ firestoreUpdateCase(caseId, {
   statusChangedOn: today,
   statusChangedBy: trackerState.user.uid
 }).then(() => {
-  // Firestore confirmed — remove from pending set
   pendingUnupdated.delete(caseId);
 
-  // If we are still viewing unupdated, let filters re-run (this will hide the case if it now has a status)
-  if (uiState.mode === "unupdated") {
-    applyFilters();
-  } else {
-    // otherwise refresh the normal view
-    applyFilters();
-  }
+  applyFilters();
 }).catch(err => {
   // On failure, remove pending and show popup (prevents permanent stuck case)
   pendingUnupdated.delete(caseId);
   showPopup("Failed to update case. Please try again.");
   console.error(err);
 });
-
-
-// CRITICAL FIX: Reset protection after finishing normal update
-//if (uiState.mode === "unupdated") {
-//    unupdatedProtect = false;
-//}
 
 
 }
@@ -1989,8 +1976,8 @@ async function saveModalData() {
 pendingUnupdated.delete(caseId);
 
 // You allowed unupdated list to refresh after modal save
-if (uiState.mode === "unupdated") {
-    applyFilters();
+if (uiState.unupdatedActive) {
+  applyFilters();
 }
 
   } catch (err) {
@@ -2177,6 +2164,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

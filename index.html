@@ -539,24 +539,22 @@ tr.active-row {
     transform:scale(1.12);
 }
 
-/* RFC ROW LAYOUT */
+/* RFC ROW LAYOUT — SINGLE ROW (5 BUTTONS) */
 .rfc-row {
     display: flex;
-    gap: .6rem;
+    gap: .4rem;              /* slightly tighter gap */
     width: 100%;
 }
 
-/* ROW WITH 3 EQUAL BUTTONS */
-.rfc-row-3 .rfcBtn {
+/* 5 buttons, equal width */
+.rfc-row-5 .rfcBtn {
     flex: 1;
     text-align: center;
+    padding: .4rem .45rem;   /* tighter horizontal padding */
+    font-size: 12px;         /* subtle reduction */
+    white-space: nowrap;     /* prevent wrapping */
 }
 
-/* ROW WITH 2 EQUAL BUTTONS */
-.rfc-row-2 .rfcBtn {
-    flex: 1;
-    text-align: center;
-}
 
 
 /* SUBTLE ACTIVE HIGHLIGHT */
@@ -704,24 +702,20 @@ tr.active-row {
             </div>
         </div>
 
-        <div class="filter-body open" style="max-height:none; padding:1rem; display:flex; flex-direction:column; gap:.6rem;">
+        <div class="filter-body open" style="max-height:none; padding:1rem;">
 
-            <!-- ROW 1: Onsite | Offsite | CSR -->
-            <div class="rfc-row rfc-row-3">
-                <button class="rfcBtn rfcMainBtn" data-type="onsite">Onsite</button>
-                <button class="rfcBtn rfcMainBtn" data-type="offsite">Offsite</button>
-                <button class="rfcBtn rfcMainBtn" data-type="csr">CSR</button>
-            </div>
-        
-            <!-- ROW 2: Total RFC | Overdue Cases -->
-            <div class="rfc-row rfc-row-2">
-                <button class="rfcBtn rfcMainBtn" data-type="total">Total RFC</button>
-                <button class="rfcBtn rfcMainBtn" data-type="negative" id="rfcNegativeBtn">
-                    Overdue Cases
-                </button>
-            </div>
+          <div class="rfc-row rfc-row-5">
+            <button class="rfcBtn rfcMainBtn" data-type="onsite">Onsite</button>
+            <button class="rfcBtn rfcMainBtn" data-type="offsite">Offsite</button>
+            <button class="rfcBtn rfcMainBtn" data-type="csr">CSR</button>
+            <button class="rfcBtn rfcMainBtn" data-type="total">Total</button>
+            <button class="rfcBtn rfcMainBtn" data-type="negative" id="rfcNegativeBtn">
+              Overdue
+            </button>
+          </div>
         
         </div>
+
 
     </div>
 
@@ -869,6 +863,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

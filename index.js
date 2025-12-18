@@ -58,6 +58,7 @@ const el = {
 
   badgeDue: document.getElementById("badgeDue"),
   badgeFlag: document.getElementById("badgeFlag"),
+   badgePNS: document.getElementById("badgePNS"),
 };
 
 /* ============================================================
@@ -1372,6 +1373,12 @@ function updateBadges() {
     r.flagged
   ).length;
 
+   el.badgePNS.textContent = trackerState.allCases.filter(r =>
+     r.PNS === true &&
+     r.lastActionedBy === trackerState.user.uid
+   ).length;
+
+
   // RFC — Total Open Repair Cases (team-wide)
   const rfcTotalEl = document.getElementById("rfcTotalCount");
   if (rfcTotalEl) {
@@ -1806,11 +1813,19 @@ async function firestoreUpdateCase(caseId, fields) {
 // SUBMIT CASE CLOSURE (MANDATORY SURVEY)
 // =====================================================
 async function submitClosure(caseId, hadPNS) {
+
+   const submitBtn = document.getElementById("btnClosureSubmit");
+   submitBtn.disabled = true;
+   submitBtn.textContent = "Submitting...";
+
+   
   const comment =
     document.getElementById("predictionComment").value.trim();
 
   if (!selectedStars || !comment) {
     alert("Survey prediction and comment are mandatory.");
+     submitBtn.disabled = false;
+      submitBtn.textContent = "Submit";
     return;
   }
 
@@ -1835,6 +1850,8 @@ async function submitClosure(caseId, hadPNS) {
 
     if (!resolved) {
       alert("Please confirm if the PNS issue was resolved.");
+       submitBtn.disabled = false;
+submitBtn.textContent = "Submit";
       return;
     }
 
@@ -1844,6 +1861,10 @@ async function submitClosure(caseId, hadPNS) {
   }
 
   await firestoreUpdateCase(caseId, update);
+
+   submitBtn.disabled = false;
+submitBtn.textContent = "Submit";
+
 
   document
     .getElementById("closureModal")
@@ -2200,7 +2221,10 @@ document.getElementById("btnExportExcel").onclick = () => {
     "Last Actioned By": userNameMap[r.lastActionedBy] || r.lastActionedBy || "",
      "Last Actioned On": r.lastActionedOn,
    "Status Changed By": userNameMap[r.statusChangedBy] || r.statusChangedBy || "",
-    "Status Changed On": r.statusChangedOn
+    "Status Changed On": r.statusChangedOn,
+     "Survey Prediction": r.surveyPrediction ?? "",
+      "Prediction Comment": r.predictionComment ?? "",
+      "PNS": r.PNS ? "Yes" : "No"
   }));
 
   // Convert to sheet
@@ -2527,6 +2551,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

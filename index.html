@@ -704,6 +704,89 @@ tr.active-row {
   z-index: 99999 !important;
 }
 
+/* =========================================================
+   RFC REPORT MODAL (SIDEBAR-SAFE, CENTERED)
+   ========================================================= */
+
+.rfc-report-overlay {
+  position: fixed;
+  top: 59.7px;                      /* header height */
+  left: 0;
+  right: 400.733px;                 /* sidebar width */
+  bottom: 0;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0,0,0,0.35);
+  z-index: 55;                      /* below main modal, above table */
+}
+
+.rfc-report-overlay.show {
+  display: flex;
+}
+
+.rfc-report-modal {
+  width: min(640px, 90%);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+/* Header */
+.rfc-report-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.rfc-report-title {
+  font-weight: 700;
+}
+
+/* Body */
+.rfc-report-body {
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+  font-size: 13px;
+}
+
+/* Sections */
+.rfc-report-section {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: .75rem;
+  background: var(--panel-2);
+}
+
+.rfc-report-section h4 {
+  margin: 0 0 .5rem 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rfc-report-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .5rem;
+  margin-top: .35rem;
+}
+
+.rfc-report-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.rfc-report-kv span:last-child {
+  font-weight: 600;
+}
+
   
 </style>
 </head>
@@ -973,6 +1056,23 @@ tr.active-row {
   </div>
 </div>
 
+<!-- RFC REPORT MODAL -->
+<div class="rfc-report-overlay" id="rfcReportOverlay">
+  <div class="rfc-report-modal">
+
+    <div class="rfc-report-head">
+      <div class="rfc-report-title">Repair Cases Report</div>
+      <button class="btn" id="btnRfcReportClose">Close</button>
+    </div>
+
+    <div class="rfc-report-body" id="rfcReportBody">
+      <!-- JS will inject content here -->
+    </div>
+
+  </div>
+</div>
+
+
 <!-- TOAST --><!-- TOAST -->
 <div class="toast" id="toast">Copied!</div>
 
@@ -1000,6 +1100,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

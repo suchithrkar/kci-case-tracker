@@ -1272,6 +1272,11 @@ if (uiState.unupdatedActive) {
 
 /* SORT */
 
+// ⛔ Repeat view owns its sorting (Customer A → Z)
+if (uiState.repeatActive) {
+  // already sorted in repeat overlay — do nothing
+}
+
 // Explicit date sort (🕑 button)
 else if (uiState.sortByDateAsc !== null) {
   rows.sort((a, b) =>
@@ -1285,6 +1290,7 @@ else if (uiState.sortByDateAsc !== null) {
 else {
   rows.sort((a, b) => a.excelOrder - b.excelOrder);
 }
+
 
 
 
@@ -2164,6 +2170,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

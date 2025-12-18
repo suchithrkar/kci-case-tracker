@@ -1694,6 +1694,27 @@ let pendingStatusForModal = null;   // temporarily stores status chosen which re
 let prevStatusBeforeModal = null;   // to revert if modal cancelled
 let requireFollowUp = false;
 
+// =====================================================
+// CLOSURE SURVEY — STAR RATING STATE
+// =====================================================
+let selectedStars = 0;
+
+const starContainer = document.getElementById("starRating");
+
+if (starContainer) {
+  starContainer.onclick = (e) => {
+    const rect = starContainer.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+
+    selectedStars = Math.max(1, Math.min(5, Math.ceil(percent * 5)));
+
+    starContainer.textContent =
+      "★★★★★".slice(0, selectedStars) +
+      "☆☆☆☆☆".slice(selectedStars);
+  };
+}
+
+
 /* =======================================================================
    STATUS CHANGE HANDLER
    ======================================================================= */
@@ -1713,6 +1734,11 @@ if (uiState.unupdatedActive) {
   if (!row) return;
 
   const needsFollow = (newStatus === "Service Pending" || newStatus === "Monitoring");
+
+   if (newStatus === "Closed") {
+     openClosureModal(row);
+     return;
+   }
 
   // ❗ STORE true previous status BEFORE overwriting
   const previousStatus = row.status;
@@ -1775,6 +1801,57 @@ async function firestoreUpdateCase(caseId, fields) {
    }
 }
 
+// =====================================================
+// SUBMIT CASE CLOSURE (MANDATORY SURVEY)
+// =====================================================
+async function submitClosure(caseId, hadPNS) {
+  const comment =
+    document.getElementById("predictionComment").value.trim();
+
+  if (!selectedStars || !comment) {
+    alert("Survey prediction and comment are mandatory.");
+    return;
+  }
+
+  const today = getTeamToday(trackerState.teamConfig);
+
+  const update = {
+    status: "Closed",
+    surveyPrediction: selectedStars,
+    predictionComment: comment,
+    lastActionedOn: today,
+    lastActionedBy: trackerState.user.uid,
+    statusChangedOn: today,
+    statusChangedBy: trackerState.user.uid
+  };
+
+  // Conditional PNS resolution
+  if (hadPNS === true) {
+    const resolved =
+      document.querySelector(
+        'input[name="pnsResolved"]:checked'
+      );
+
+    if (!resolved) {
+      alert("Please confirm if the PNS issue was resolved.");
+      return;
+    }
+
+    if (resolved.value === "yes") {
+      update.PNS = false;
+    }
+  }
+
+  await firestoreUpdateCase(caseId, update);
+
+  document
+    .getElementById("closureModal")
+    .classList.remove("show");
+
+  applyFilters();
+}
+
+
 /* =======================================================================
    OPEN CASE MODAL
    ======================================================================= */
@@ -1833,6 +1910,36 @@ if (savedH) {
    setTimeout(resizeNotes, 60);
 
 }
+
+// =====================================================
+// CLOSURE SURVEY MODAL
+// =====================================================
+function openClosureModal(row) {
+  const modal = document.getElementById("closureModal");
+  modal.classList.add("show");
+
+  // reset state
+  selectedStars = 0;
+
+  const starEl = document.getElementById("starRating");
+  if (starEl) {
+    starEl.textContent = "☆☆☆☆☆";
+  }
+
+  document.getElementById("predictionComment").value = "";
+
+  // Conditional PNS block
+  const pnsBlock = document.getElementById("pnsResolutionBlock");
+  if (row.PNS === true) {
+    pnsBlock.style.display = "block";
+  } else {
+    pnsBlock.style.display = "none";
+  }
+
+  document.getElementById("btnClosureSubmit").onclick = () =>
+    submitClosure(row.id, row.PNS);
+}
+
 
 /* =======================================================================
    LAST ACTIONED BY NAME LOOKUP
@@ -2363,6 +2470,7 @@ Total Actioned Today: ${totalActioned}`;
   infoModal.classList.add("show");
 }
 
+
 /* ====================================================================
    FINAL CONSISTENCY PASS — ENSURE FILTERS NEVER BREAK
    -------------------------------------------------------------------- */
@@ -2404,6 +2512,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -1011,13 +1011,20 @@ document.addEventListener("keydown", (e) => {
 
 function updateSortIcon() {
   const arrow = document.getElementById("sortArrow");
-
   if (!arrow) return;
 
-  arrow.style.display = "inline-block";
-arrow.textContent = uiState.sortByDateAsc ? "⬆️" : "⬇️";
+  // Sorting OFF → hide badge completely
+  if (uiState.sortByDateAsc === null) {
+    arrow.style.display = "none";
+    arrow.textContent = "";
+    return;
+  }
 
+  // Sorting ON → show direction
+  arrow.style.display = "inline-block";
+  arrow.textContent = uiState.sortByDateAsc ? "⬆️" : "⬇️";
 }
+
 
 function updateSet2Highlights() {
   el.btnDueToday.classList.toggle("active", uiState.mode === "due");
@@ -2563,6 +2570,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

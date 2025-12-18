@@ -748,44 +748,56 @@ tr.active-row {
   font-weight: 700;
 }
 
-/* Body */
+/* =========================================================
+   RFC REPORT — 2x2 GRID LAYOUT
+   ========================================================= */
+
 .rfc-report-body {
   padding: 1rem;
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   font-size: 13px;
 }
 
-/* Sections */
-.rfc-report-section {
+/* Each quadrant */
+.rfc-report-card {
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: .75rem;
+  border-radius: 14px;
+  padding: .85rem;
   background: var(--panel-2);
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
 }
 
-.rfc-report-section h4 {
-  margin: 0 0 .5rem 0;
+/* Card title */
+.rfc-report-card h4 {
+  margin: 0;
   font-size: 13px;
   font-weight: 700;
 }
 
-.rfc-report-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: .5rem;
-  margin-top: .35rem;
+/* Big number */
+.rfc-report-total {
+  font-size: 22px;
+  font-weight: 800;
+  margin: .2rem 0 .4rem 0;
 }
 
-.rfc-report-kv {
+/* Breakdown rows */
+.rfc-report-line {
   display: flex;
   justify-content: space-between;
-  gap: .5rem;
+  color: var(--muted);
 }
 
-.rfc-report-kv span:last-child {
+.rfc-report-line span:last-child {
+  color: var(--text);
   font-weight: 600;
 }
+
+
 
   
 </style>
@@ -1100,6 +1112,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

@@ -855,8 +855,6 @@ function setupFilterControls() {
     applyFilters();
   };
 
-
-  /* CLEAR */
     /* CLEAR */
   el.btnClear.onclick = () => {
 
@@ -965,6 +963,18 @@ function setupFilterControls() {
 
 }
 
+document.addEventListener("keydown", (e) => {
+  const isMac = navigator.platform.toUpperCase().includes("MAC");
+  const isFind = (isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === "f";
+
+  if (isFind) {
+    e.preventDefault();
+    el.txtSearch.focus();
+    el.txtSearch.select();
+  }
+});
+
+
 function updateSortIcon() {
   const arrow = document.getElementById("sortArrow");
 
@@ -974,6 +984,18 @@ function updateSortIcon() {
 arrow.textContent = uiState.sortByDateAsc ? "⬆️" : "⬇️";
 
 }
+
+function updateSet2Highlights() {
+  el.btnDueToday.classList.toggle("active", uiState.mode === "due");
+  el.btnFlagged.classList.toggle("active", uiState.mode === "flagged");
+  el.btnRepeating.classList.toggle("active", uiState.repeatActive);
+  el.btnUnupdated.classList.toggle("active", uiState.unupdatedActive);
+  el.btnSortDate.classList.toggle(
+    "active",
+    uiState.sortByDateAsc !== null
+  );
+}
+
 
 
 /* =======================================================================
@@ -1100,11 +1122,6 @@ if (uiState.unupdatedActive && unupdatedProtect) {
     );
   }
 
-  
-
-
-
-
 
   /* ===============================================================
    RFC MODE: TOTAL  (NEW — does NOT return early)
@@ -1183,10 +1200,6 @@ if (uiState.mode === "negative") {
 
     rows = base;
 }
-
-
-
-
 
   /* ===============================================================
      NORMAL MODE — APPLY FULL FILTER PIPELINE
@@ -1301,6 +1314,9 @@ rows = restrictNcmCasesForUser(rows, trackerState.user);
 
 trackerState.filteredCases = rows;
 updateBadges();
+
+updateSet2Highlights();
+
 renderTable();
 
 }
@@ -1340,6 +1356,21 @@ function escapeHtml(s) {
     "'": "&#39;"
   }[c]));
 }
+
+let activeRow = null;
+
+function setActiveRow(tr) {
+  if (activeRow === tr) {
+    tr.classList.remove("active-row");
+    activeRow = null;
+    return;
+  }
+
+  if (activeRow) activeRow.classList.remove("active-row");
+  tr.classList.add("active-row");
+  activeRow = tr;
+}
+
 
 /* Render Table — Clean, optimized */
 export function renderTable() {
@@ -1436,10 +1467,21 @@ tbody.addEventListener("click", (e) => {
   openCaseModal(btn.dataset.id);
 });
 
+tbody.addEventListener("click", (e) => {
+  const tr = e.target.closest("tr");
+  if (!tr) return;
+
+  setActiveRow(tr);
+});
+
+
 /* DOUBLE CLICK → COPY CASE ID */
 tbody.addEventListener("dblclick", (e) => {
   const cell = e.target.closest(".caseid");
   if (!cell) return;
+
+  const tr = cell.closest("tr");
+  if (tr) setActiveRow(tr);
 
   const text = cell.textContent.trim();
   navigator.clipboard.writeText(text);
@@ -2171,6 +2213,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

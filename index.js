@@ -2030,8 +2030,8 @@ function computeRepeatingCases(rows) {
    -------------------------------------------------------------------- */
 
 /* NOTE:
-   Phase 1 already applied this logic inside `applyFilters()` when:
-   uiState.mode === "unupdated"
+   Phase 1 already applies this logic inside `applyFilters()`
+   using `uiState.unupdatedActive` overlay.
 
    We re-expose this helper for summary calculations if needed
 */
@@ -2164,6 +2164,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

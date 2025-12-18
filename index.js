@@ -319,6 +319,13 @@ function setupRealtimeCases(teamId) {
       followDate: c.followDate || "",
       flagged: !!c.flagged,
       PNS: !!c.PNS,
+
+      surveyPrediction: typeof c.surveyPrediction === "number"
+        ? c.surveyPrediction
+        : null,
+      
+      predictionComment: c.predictionComment || "",
+       
       notes: c.notes || "",
       lastActionedOn: c.lastActionedOn || "",
       lastActionedBy: c.lastActionedBy || "",
@@ -2556,6 +2563,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

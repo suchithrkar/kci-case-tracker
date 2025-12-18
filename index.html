@@ -705,15 +705,25 @@ tr.active-row {
             </div>
         </div>
 
-        <div class="filter-body open" style="max-height:none; padding:1rem;">
-            <div class="rfc-row">
+        <div class="filter-body open" style="max-height:none; padding:1rem; display:flex; flex-direction:column; gap:.6rem;">
+
+            <!-- ROW 1: Onsite | Offsite | CSR -->
+            <div class="rfc-row rfc-row-3">
                 <button class="rfcBtn rfcMainBtn" data-type="onsite">Onsite</button>
                 <button class="rfcBtn rfcMainBtn" data-type="offsite">Offsite</button>
                 <button class="rfcBtn rfcMainBtn" data-type="csr">CSR</button>
-                <button class="rfcBtn rfcMainBtn" data-type="total">TOTAL</button>
-                <button class="rfcBtn rfcMainBtn" data-type="negative" id="rfcNegativeBtn">-ve</button>
             </div>
+        
+            <!-- ROW 2: Total RFC | Overdue Cases -->
+            <div class="rfc-row rfc-row-2">
+                <button class="rfcBtn rfcMainBtn" data-type="total">Total RFC</button>
+                <button class="rfcBtn rfcMainBtn" data-type="negative" id="rfcNegativeBtn">
+                    Overdue Cases
+                </button>
+            </div>
+        
         </div>
+
     </div>
 
     <div id="filtersContainer"></div>
@@ -860,6 +870,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

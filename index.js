@@ -2210,11 +2210,11 @@ const globalTooltip = document.getElementById("globalTooltip");
 const negativeTooltipText = `
 <b>Overdue Cases = Open Repair Cases needing review</b><br>
 EXCLUDING:<br>
-• Ready for Closure cases (Onsite + Offsite + CSR)<br>
-• Onsite cases ≤ 5 days<br>
-• Offsite cases ≤ 10 days<br>
-• CSR cases ≤ 3 days<br><br>
-These cases should normally be progressing
+• Ready for Closure Cases (Onsite + Offsite + CSR)<br>
+• Onsite Cases ≤ 5 Days<br>
+• Offsite Cases ≤ 10 Days<br>
+• CSR Cases ≤ 3 Days<br><br>
+These cases should normally be progressing<br>
 or ready for closure but are not.
 `;
 ;
@@ -2230,6 +2230,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -51,6 +51,7 @@ const el = {
 
   btnDueToday: document.getElementById("btnDueToday"),
   btnFlagged: document.getElementById("btnFlagged"),
+  btnPNS: document.getElementById("btnPNS"),
   btnRepeating: document.getElementById("btnRepeating"),
   btnUnupdated: document.getElementById("btnUnupdated"),
   btnSortDate: document.getElementById("btnSortDate"),
@@ -960,6 +961,10 @@ function setupFilterControls() {
   /* MODE BUTTONS — Direct override (Option A behavior) */
   el.btnDueToday.onclick = () => { uiState.mode = "due"; applyFilters(); };
   el.btnFlagged.onclick = () => { uiState.mode = "flagged"; applyFilters(); };
+  el.btnPNS.onclick = () => {
+     uiState.mode = "pns";
+     applyFilters();
+   };
   el.btnRepeating.onclick = () => {
      uiState.repeatActive = !uiState.repeatActive;
      applyFilters();
@@ -1008,6 +1013,7 @@ arrow.textContent = uiState.sortByDateAsc ? "⬆️" : "⬇️";
 function updateSet2Highlights() {
   el.btnDueToday.classList.toggle("active", uiState.mode === "due");
   el.btnFlagged.classList.toggle("active", uiState.mode === "flagged");
+  el.btnPNS.classList.toggle("active", uiState.mode === "pns");
   el.btnRepeating.classList.toggle("active", uiState.repeatActive);
   el.btnUnupdated.classList.toggle("active", uiState.unupdatedActive);
   el.btnSortDate.classList.toggle(
@@ -1142,6 +1148,12 @@ if (uiState.unupdatedActive && unupdatedProtect) {
     );
   }
 
+   if (uiState.mode === "pns") {
+     rows = rows.filter(r =>
+       r.PNS === true &&
+       r.lastActionedBy === trackerState.user.uid
+     );
+   }
 
   /* ===============================================================
    RFC MODE: TOTAL  (NEW — does NOT return early)
@@ -2392,6 +2404,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

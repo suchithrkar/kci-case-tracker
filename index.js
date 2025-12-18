@@ -470,8 +470,6 @@ function buildPrimaryFilters() {
     // expand/collapse
     const head = block.querySelector(".filter-head");
     const body = block.querySelector(".filter-body");
-    body.classList.remove("open"); // collapse advanced filters by default
-     
     head.onclick = (e) => {
       // clicking lock should not toggle body
       if (e.target.classList.contains("lock")) return;
@@ -2237,7 +2235,6 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
-
 
 
 

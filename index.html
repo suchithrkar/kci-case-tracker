@@ -365,52 +365,6 @@ button,input,select,textarea{
   opacity:.4;pointer-events:none;filter:blur(1px);
 }
 
-/* =========================================================
-   SIDEBAR SECTION LAYOUT (NEW)
-   ========================================================= */
-
-.side-section {
-  margin-bottom: 1.4rem;
-}
-
-.side-section-title {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  color: var(--muted);
-  margin: 0 0 .6rem .25rem;
-}
-
-/* Summary feels informational */
-.side-summary .rfc-summary-strip {
-  margin-bottom: 0;
-}
-
-/* RFC section emphasis */
-.side-rfc .filter {
-  border-radius: 14px;
-}
-
-/* Advanced filters look lighter */
-.side-advanced .filter {
-  background: var(--panel);
-}
-
-.side-advanced .filter-head {
-  background: transparent;
-  font-weight: 500;
-}
-
-.side-advanced .filter:hover {
-  filter: none;
-}
-
-/* More vertical breathing room */
-.filter {
-  margin-bottom: 1.1rem;
-}
-
-
 /* Table */
 .table-wrap{width:100%}
 table{width:100%;border-collapse:collapse}
@@ -851,33 +805,23 @@ tr.active-row {
 
   <div class="side">
 
-    <!-- ===================== -->
-<!-- SUMMARY SECTION -->
-<!-- ===================== -->
-<div class="side-section side-summary">
-  <div class="side-section-title">Summary</div>
-
-  <div class="rfc-summary-strip">
-    <div class="rfc-summary-strip-text">
-      Total Open Repair Cases:
-      <span id="rfcTotalCount">—</span>
+    <!-- RFC SUMMARY STRIP (NOT A FILTER) -->
+    <div class="rfc-summary-strip">
+    
+      <div class="rfc-summary-strip-text">
+        Total Open Repair Cases:
+        <span id="rfcTotalCount">—</span>
+      </div>
+    
+      <button id="rfcReportBtn" class="rfc-summary-strip-btn">
+        Report
+      </button>
+    
     </div>
 
-    <button id="rfcReportBtn" class="rfc-summary-strip-btn">
-      Report
-    </button>
-  </div>
-</div>
-
-<!-- ===================== -->
-<!-- READY FOR CLOSURE -->
-<!-- ===================== -->
-<div class="side-section side-rfc">
-  <div class="side-section-title">Ready for Closure</div>
-
-  <!-- ⬇️ PASTE YOUR EXISTING RFC FILTER BLOCK HERE (UNCHANGED) -->
-  <div class="filter" style="margin-bottom:1.2rem;">
-    <div class="filter-head" style="background:var(--panel-2); cursor:default; align-items:center;">
+    <!-- READY FOR CLOSURE FILTER BLOCK -->
+    <div class="filter" style="margin-bottom:1.2rem;">
+        <div class="filter-head" style="background:var(--panel-2); cursor:default; align-items:center;">
     <div style="font-weight:600; padding-top:2px;">Ready for Closure</div>
 
     <div style="display:flex; gap:.5rem; align-items:center; padding-top:2px;">
@@ -909,18 +853,10 @@ tr.active-row {
           </div>
           
         </div>
-  </div>
-</div>
 
-<!-- ===================== -->
-<!-- ADVANCED FILTERS -->
-<!-- ===================== -->
-<div class="side-section side-advanced">
-  <div class="side-section-title">Advanced Filters</div>
+    </div>
 
-  <div id="filtersContainer"></div>
-</div>
-
+    <div id="filtersContainer"></div>
 
 </div>
 
@@ -1064,8 +1000,6 @@ tr.active-row {
 </body>
 
 </html>
-
-
 
 
 

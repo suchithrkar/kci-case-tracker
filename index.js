@@ -2208,7 +2208,7 @@ const globalTooltip = document.getElementById("globalTooltip");
 
 // Tooltip text for Overdue Cases button
 const negativeTooltipText = `
-<b>Overdue Cases = Open Repair Cases needing review</b><br>
+<b>Overdue Cases = Total Open Repair Cases</b><br>
 EXCLUDING:<br>
 • Ready for Closure Cases (Onsite + Offsite + CSR)<br>
 • Onsite Cases ≤ 5 Days<br>
@@ -2228,5 +2228,6 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 

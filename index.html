@@ -584,7 +584,48 @@ tr.active-row {
   z-index: 1;
 }
 
+/* =========================================================
+   RFC SUMMARY ROW
+   ========================================================= */
 
+.rfc-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+
+  padding: .45rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+}
+
+/* Left text */
+.rfc-summary-text {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.rfc-summary-text span {
+  color: var(--text);
+  font-weight: 600;
+  margin-left: .25rem;
+}
+
+/* Report button */
+.rfcReportBtn {
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  border-radius: 8px;
+  padding: .3rem .7rem;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.rfcReportBtn:hover {
+  filter: brightness(1.1);
+}
 
 
 /* SUBTLE ACTIVE HIGHLIGHT */
@@ -732,8 +773,8 @@ tr.active-row {
             </div>
         </div>
 
-        <div class="filter-body open" style="max-height:none; padding:1rem;">
-
+        <div class="filter-body open" style="max-height:none; padding:1rem; display:flex; flex-direction:column; gap:.6rem;">       
+          <!-- RFC SEGMENTED CONTROL -->
           <div class="rfc-segmented">
             <button class="rfcBtn rfcMainBtn" data-type="onsite">Onsite</button>
             <button class="rfcBtn rfcMainBtn" data-type="offsite">Offsite</button>
@@ -743,9 +784,17 @@ tr.active-row {
               Overdue
             </button>
           </div>
-        
+          <!-- RFC SUMMARY ROW -->
+          <div class="rfc-summary">
+            <div class="rfc-summary-text">
+              Total Open Repair Cases:
+              <span id="rfcTotalCount">—</span>
+            </div>
+            <button id="rfcReportBtn" class="rfcReportBtn">
+              Report
+            </button>
+          </div>
         </div>
-
 
     </div>
 
@@ -893,6 +942,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

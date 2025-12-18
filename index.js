@@ -2206,15 +2206,18 @@ function normalizeCustomerName(name) {
 // GLOBAL tooltip container
 const globalTooltip = document.getElementById("globalTooltip");
 
-// Tooltip text for -ve button
+// Tooltip text for Overdue Cases button
 const negativeTooltipText = `
-<b>Negative Cases = Total Open Repair Cases</b><br>
+<b>Overdue Cases = Open Repair Cases needing review</b><br>
 EXCLUDING:<br>
-• Ready For Closure Cases (Onsite + Offsite + CSR)<br>
-• Onsite Cases with Case Age ≤ 5 days<br>
-• Offsite Cases with Case Age ≤ 10 Days<br>
-• CSR Cases with Case Age ≤ 3 Days
+• Ready for Closure cases (Onsite + Offsite + CSR)<br>
+• Onsite cases ≤ 5 days<br>
+• Offsite cases ≤ 10 days<br>
+• CSR cases ≤ 3 days<br><br>
+These cases should normally be progressing
+or ready for closure but are not.
 `;
+;
 
 // SIMPLE hover: show/hide only (no positioning)
 const negBtn = document.getElementById("rfcNegativeBtn");
@@ -2227,6 +2230,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

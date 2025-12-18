@@ -954,6 +954,7 @@ function setupFilterControls() {
 
   /* SORT BY DATE BUTTON */
   el.btnSortDate.onclick = () => {
+     if (uiState.repeatActive) return; // ⛔ ignore during repeat
   // Toggle only between DESC ↔ ASC
   uiState.sortByDateAsc =
     uiState.sortByDateAsc === true ? false : true;
@@ -2170,6 +2171,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

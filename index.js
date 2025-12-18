@@ -2213,9 +2213,7 @@ EXCLUDING:<br>
 • Ready for Closure Cases (Onsite + Offsite + CSR)<br>
 • Onsite Cases ≤ 5 Days<br>
 • Offsite Cases ≤ 10 Days<br>
-• CSR Cases ≤ 3 Days<br><br>
-These cases should normally be progressing<br>
-or ready for closure but are not.
+• CSR Cases ≤ 3 Days
 `;
 ;
 
@@ -2230,32 +2228,5 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -1022,10 +1022,25 @@ tr.active-row {
 
       <!-- Flag -->
       <div class="row">
-        <div>Flag Case</div>
-        <div><div id="optFlag" class="switch"
-                  role="switch" aria-checked="false" tabindex="0"></div></div>
+      <div>Flags</div>
+    
+        <div style="display:flex;gap:18px;align-items:center;">
+          <!-- Flag -->
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span>Flag</span>
+            <div id="optFlag" class="switch"
+                 role="switch" aria-checked="false" tabindex="0"></div>
+          </div>
+      
+          <!-- PNS -->
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span>PNS</span>
+            <div id="optPNS" class="switch"
+                 role="switch" aria-checked="false" tabindex="0"></div>
+          </div>
+        </div>
       </div>
+
 
       <!-- Notes -->
       <div class="row" style="align-items:start;">
@@ -1112,6 +1127,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

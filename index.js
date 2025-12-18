@@ -317,6 +317,7 @@ function setupRealtimeCases(teamId) {
       status: c.status || "",
       followDate: c.followDate || "",
       flagged: !!c.flagged,
+      PNS: !!c.PNS,
       notes: c.notes || "",
       lastActionedOn: c.lastActionedOn || "",
       lastActionedBy: c.lastActionedBy || "",
@@ -1936,8 +1937,22 @@ function openClosureModal(row) {
     pnsBlock.style.display = "none";
   }
 
+  // reset PNS radios
+   document
+     .querySelectorAll('input[name="pnsResolved"]')
+     .forEach(r => r.checked = false);
+
   document.getElementById("btnClosureSubmit").onclick = () =>
     submitClosure(row.id, row.PNS);
+}
+
+const btnClosureClose = document.getElementById("btnClosureClose");
+
+if (btnClosureClose) {
+  btnClosureClose.onclick = () => {
+    document.getElementById("closureModal")
+      .classList.remove("show");
+  };
 }
 
 
@@ -2512,6 +2527,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

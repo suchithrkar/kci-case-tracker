@@ -797,6 +797,25 @@ tr.active-row {
   font-weight: 600;
 }
 
+.star-rating {
+  display: flex;
+  gap: 6px;
+  font-size: 26px;
+}
+
+.star-rating span {
+  color: #3a3f4b;
+  cursor: pointer;
+  transition: color .15s, transform .1s;
+}
+
+.star-rating span.active {
+  color: #ffd166;
+}
+
+.star-rating span:hover {
+  transform: scale(1.15);
+}
 
 
   
@@ -871,6 +890,7 @@ tr.active-row {
 
     <button class="icon-btn" id="btnPNS">
       <span>🧠</span>
+      <span class="badge" id="badgePNS">0</span>
       <span class="tooltip">PNS Marked Cases</span>
     </button>
 
@@ -1153,8 +1173,12 @@ tr.active-row {
       <!-- Survey -->
       <div>
         <strong>Survey Prediction</strong>
-        <div id="starRating" style="font-size:22px;cursor:pointer;">
-          ☆☆☆☆☆
+        <div id="starRating" class="star-rating">
+          <span data-star="1">★</span>
+          <span data-star="2">★</span>
+          <span data-star="3">★</span>
+          <span data-star="4">★</span>
+          <span data-star="5">★</span>
         </div>
       </div>
 
@@ -1178,6 +1202,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

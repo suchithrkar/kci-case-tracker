@@ -362,6 +362,12 @@ function setupSidebarControls() {
      document.querySelectorAll(".filter-body.open").forEach(body => {
        body.classList.remove("open");
      });
+
+       // Close RFC Report modal if open
+     const reportOverlay = document.getElementById("rfcReportOverlay");
+        if (reportOverlay) {
+          reportOverlay.classList.remove("show");
+        }   
    }
 
 
@@ -1441,42 +1447,58 @@ function buildRfcReport() {
      --------------------------------------- */
   body.innerHTML = `
 
-    <div class="rfc-report-section">
-      <h4>Total Open Repair Cases: ${all.length}</h4>
-      <div class="rfc-report-grid">
-        <div class="rfc-report-kv"><span>Onsite</span><span>${onsiteAll.length}</span></div>
-        <div class="rfc-report-kv"><span>Offsite</span><span>${offsiteAll.length}</span></div>
-        <div class="rfc-report-kv"><span>CSR</span><span>${csrAll.length}</span></div>
-      </div>
-    </div>
+  <!-- 1. TOTAL OPEN REPAIR CASES -->
+  <div class="rfc-report-card">
+    <h4>Total Open Repair Cases</h4>
+    <div class="rfc-report-total">${all.length}</div>
 
-    <div class="rfc-report-section">
-      <h4>Total Ready for Closure: ${totalRFC.length}</h4>
-      <div class="rfc-report-grid">
-        <div class="rfc-report-kv"><span>Onsite</span><span>${onsiteRFC.length}</span></div>
-        <div class="rfc-report-kv"><span>Offsite</span><span>${offsiteRFC.length}</span></div>
-        <div class="rfc-report-kv"><span>CSR</span><span>${csrRFC.length}</span></div>
-      </div>
-    </div>
+    <div class="rfc-report-line"><span>Onsite</span><span>${onsiteAll.length}</span></div>
+    <div class="rfc-report-line"><span>Offsite</span><span>${offsiteAll.length}</span></div>
+    <div class="rfc-report-line"><span>CSR</span><span>${csrAll.length}</span></div>
+  </div>
 
-    <div class="rfc-report-section">
-      <h4>Total Overdue Cases: ${overdue.length}</h4>
-      <div class="rfc-report-grid">
-        <div class="rfc-report-kv"><span>Onsite</span><span>${overdue.filter(r => r.caseResolutionCode === "Onsite Solution").length}</span></div>
-        <div class="rfc-report-kv"><span>Offsite</span><span>${overdue.filter(r => r.caseResolutionCode === "Offsite Solution").length}</span></div>
-        <div class="rfc-report-kv"><span>CSR</span><span>${overdue.filter(r => r.caseResolutionCode === "Parts Shipped").length}</span></div>
-      </div>
-    </div>
+  <!-- 2. READY FOR CLOSURE -->
+  <div class="rfc-report-card">
+    <h4>Total Ready for Closure</h4>
+    <div class="rfc-report-total">${totalRFC.length}</div>
 
-    <div class="rfc-report-section">
-      <h4>SBD (from Total Open Repair Cases)</h4>
-      <div class="rfc-report-grid">
-        <div class="rfc-report-kv"><span>Met</span><span>${sbdMet} (${pct(sbdMet)}%)</span></div>
-        <div class="rfc-report-kv"><span>Not Met</span><span>${sbdNotMet} (${pct(sbdNotMet)}%)</span></div>
-      </div>
-    </div>
+    <div class="rfc-report-line"><span>Onsite</span><span>${onsiteRFC.length}</span></div>
+    <div class="rfc-report-line"><span>Offsite</span><span>${offsiteRFC.length}</span></div>
+    <div class="rfc-report-line"><span>CSR</span><span>${csrRFC.length}</span></div>
+  </div>
 
-  `;
+  <!-- 3. OVERDUE CASES -->
+  <div class="rfc-report-card">
+    <h4>Overdue Cases</h4>
+    <div class="rfc-report-total">${overdue.length}</div>
+
+    <div class="rfc-report-line"><span>Onsite</span>
+      <span>${overdue.filter(r => r.caseResolutionCode === "Onsite Solution").length}</span>
+    </div>
+    <div class="rfc-report-line"><span>Offsite</span>
+      <span>${overdue.filter(r => r.caseResolutionCode === "Offsite Solution").length}</span>
+    </div>
+    <div class="rfc-report-line"><span>CSR</span>
+      <span>${overdue.filter(r => r.caseResolutionCode === "Parts Shipped").length}</span>
+    </div>
+  </div>
+
+  <!-- 4. SBD -->
+  <div class="rfc-report-card">
+    <h4>SBD (Quality)</h4>
+
+    <div class="rfc-report-line">
+      <span>Met</span>
+      <span>${sbdMet} (${pct(sbdMet)}%)</span>
+    </div>
+    <div class="rfc-report-line">
+      <span>Not Met</span>
+      <span>${sbdNotMet} (${pct(sbdNotMet)}%)</span>
+    </div>
+  </div>
+
+`;
+
 }
 
 
@@ -2354,6 +2376,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

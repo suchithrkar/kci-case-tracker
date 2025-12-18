@@ -1663,6 +1663,7 @@ const modalTitle = document.getElementById("modalTitle");
 const modalWarning = document.getElementById("modalWarning");
 const optDate = document.getElementById("optDate");
 const optFlag = document.getElementById("optFlag");
+const optPNS = document.getElementById("optPNS");
 const optNotes = document.getElementById("optNotes");
 let notesHeightLocked = false;
 const optLastActioned = document.getElementById("optLastActioned");
@@ -1787,6 +1788,9 @@ export function openCaseModal(caseId, enforce = false) {
 
   /* Flag */
   setFlagUI(r.flagged);
+  /* PNS */
+  setPNSUI(!!r.PNS);
+
 
   /* Notes */
   optNotes.value = r.notes || "";
@@ -1849,6 +1853,15 @@ function setFlagUI(on) {
 optFlag.onclick = () => {
   setFlagUI(!optFlag.classList.contains("on"));
 };
+
+function setPNSUI(on) {
+  optPNS.classList.toggle("on", on);
+  optPNS.setAttribute("aria-checked", on ? "true" : "false");
+}
+optPNS.onclick = () => {
+  setPNSUI(!optPNS.classList.contains("on"));
+};
+
 
 /* =======================================================================
    MODAL — SAVE BUTTON
@@ -2165,14 +2178,17 @@ async function saveModalData() {
   r.lastActionedOn = today;
   r.lastActionedBy = trackerState.user.uid;
 
-    // Build the update object
-  const updateObj = {
-    followDate: r.followDate,
-    flagged: r.flagged,
-    notes: r.notes,
-    lastActionedOn: today,
-    lastActionedBy: trackerState.user.uid
-  };
+   r.PNS = optPNS.classList.contains("on");
+   
+   const updateObj = {
+     followDate: r.followDate,
+     flagged: r.flagged,
+     PNS: r.PNS,
+     notes: r.notes,
+     lastActionedOn: today,
+     lastActionedBy: trackerState.user.uid
+   };
+
 
   // If the user selected Service Pending / Monitoring earlier, persist the status now
   if (pendingStatusForModal) {
@@ -2376,6 +2392,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

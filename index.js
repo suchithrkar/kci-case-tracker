@@ -830,13 +830,27 @@ function cssEscapeAttr(s) {
    FILTER CONTROLS — APPLY, CLEAR, SEARCH, DATES
    ======================================================================= */
 function setupFilterControls() {
-  /* SEARCH — On Enter + On Apply */
-  el.txtSearch.onkeydown = (e) => {
-    if (e.key === "Enter") {
-      uiState.search = el.txtSearch.value.trim().toLowerCase();
-      applyFilters();
-    }
-  };
+   /* SEARCH — Enter to apply, Esc to clear & exit */
+   el.txtSearch.onkeydown = (e) => {
+   
+     // ENTER → apply search
+     if (e.key === "Enter") {
+       uiState.search = el.txtSearch.value.trim().toLowerCase();
+       applyFilters();
+     }
+   
+     // ESC → clear search & exit
+     if (e.key === "Escape") {
+       e.preventDefault();
+   
+       el.txtSearch.value = "";
+       uiState.search = "";
+   
+       applyFilters();
+   
+       el.txtSearch.blur();   // exit search bar
+     }
+   };
 
   /* DATE INPUTS */
   el.dateFrom.onchange = () => (uiState.from = el.dateFrom.value);
@@ -2213,6 +2227,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

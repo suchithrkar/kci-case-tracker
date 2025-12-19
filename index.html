@@ -1163,14 +1163,19 @@ tr.active-row {
       <!-- PNS Resolution (conditional) -->
       <div class="row" id="pnsResolutionBlock" style="display:none;">
         <div>PNS Resolution</div>
-        <div>
-          <p style="margin:0 0 .4rem 0;">
-            As PNS was marked for this case, is the issue resolved?
-          </p>
-          <label><input type="radio" name="pnsResolved" value="yes"> Yes</label>
-          <label style="margin-left:12px;">
-            <input type="radio" name="pnsResolved" value="no"> No</label>
-        </div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+            <div style="font-size:13px;">
+              As PNS was marked for this case, is the issue resolved?
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;">
+              <label>
+                <input type="radio" name="pnsResolved" value="yes"> Yes
+              </label>
+              <label>
+                <input type="radio" name="pnsResolved" value="no"> No
+              </label>
+            </div>
+          </div>
       </div>
 
       <!-- Survey -->
@@ -1206,6 +1211,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

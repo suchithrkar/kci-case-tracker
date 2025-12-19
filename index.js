@@ -2156,14 +2156,14 @@ modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 
 
 /* Optional subtle highlight for active flag */
-function refreshFlagUI() {
+/* function refreshFlagUI() {
   if (optFlag.classList.contains("on")) {
     optFlag.style.boxShadow = "0 0 4px rgba(255,107,107,0.55)";
   } else {
     optFlag.style.boxShadow = "none";
   }
 }
-setInterval(refreshFlagUI, 300);
+setInterval(refreshFlagUI, 300); */
 
 /* =======================================================================
    NOTES AREA — AUTO RESIZE + SMOOTH INPUT
@@ -2570,6 +2570,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

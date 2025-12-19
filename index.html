@@ -817,6 +817,18 @@ tr.active-row {
   transform: scale(1.15);
 }
 
+/* FIX: Restore two-column layout inside Case Closure Survey modal */
+#closureModal .row {
+  display: grid !important;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: .6rem;
+}
+
+/* Comment row needs top alignment */
+#closureModal .row textarea {
+  align-self: stretch;
+}
 
   
 </style>
@@ -1216,6 +1228,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

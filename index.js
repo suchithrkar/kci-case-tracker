@@ -1764,6 +1764,7 @@ if (uiState.unupdatedActive) {
 
    // ✅ AUTO-PNS: If status is set to PNS, auto-enable PNS flag
    if (newStatus === "PNS") {
+     row.PNS = true;   // ✅ immediate local update 
      firestoreUpdateCase(caseId, {
        status: "PNS",
        PNS: true,
@@ -2591,6 +2592,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

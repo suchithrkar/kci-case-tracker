@@ -1161,22 +1161,28 @@ tr.active-row {
     <div class="modal-body" style="gap:1rem;">
 
       <!-- PNS Resolution (conditional) -->
-      <div class="row"id="pnsResolutionBlock"style="display:none;grid-template-columns: 140px 1fr;align-items: start;">
-        <div>PNS Resolution</div>
+      <div id="pnsResolutionBlock"
+           style="display:none;display:flex;gap:.6rem;align-items:flex-start;">
+        <!-- Left column -->
+        <div style="width:140px;flex-shrink:0;">
+          PNS Resolution
+        </div>
+        <!-- Right column -->
         <div style="display:flex;flex-direction:column;gap:.45rem;">
-            <div style="font-size:13px;">
-              As PNS was marked for this case, is the issue resolved?
-            </div>
-            <div style="display:flex;align-items:center;gap:16px;">
-              <label>
-                <input type="radio" name="pnsResolved" value="yes"> Yes
-              </label>
-              <label>
-                <input type="radio" name="pnsResolved" value="no"> No
-              </label>
-            </div>
+          <div style="font-size:13px;">
+            As PNS was marked for this case, is the issue resolved?
           </div>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <label>
+              <input type="radio" name="pnsResolved" value="yes"> Yes
+            </label>
+            <label>
+              <input type="radio" name="pnsResolved" value="no"> No
+            </label>
+          </div>
+        </div>
       </div>
+
 
       <!-- Survey -->
       <div class="row">
@@ -1211,6 +1217,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

@@ -1693,6 +1693,7 @@ tbody.addEventListener("dblclick", (e) => {
 
 /* Modal References (shared with Phase 4) */
 const modal = document.getElementById("modal");
+const pnsBlock = document.getElementById("pnsResolutionBlock");
 const modalTitle = document.getElementById("modalTitle");
 const modalWarning = document.getElementById("modalWarning");
 const optDate = document.getElementById("optDate");
@@ -2569,6 +2570,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -1762,6 +1762,27 @@ if (uiState.unupdatedActive) {
 
   const needsFollow = (newStatus === "Service Pending" || newStatus === "Monitoring");
 
+   // ✅ AUTO-PNS: If status is set to PNS, auto-enable PNS flag
+   if (newStatus === "PNS") {
+     firestoreUpdateCase(caseId, {
+       status: "PNS",
+       PNS: true,
+       lastActionedOn: today,
+       lastActionedBy: trackerState.user.uid,
+       statusChangedOn: today,
+       statusChangedBy: trackerState.user.uid
+     }).then(() => {
+       pendingUnupdated.delete(caseId);
+       applyFilters();
+     }).catch(err => {
+       pendingUnupdated.delete(caseId);
+       showPopup("Failed to update case.");
+       console.error(err);
+     });
+   
+     return; // ⛔ stop further processing
+   }
+
    if (newStatus === "Closed") {
      openClosureModal(row);
      return;
@@ -2570,6 +2591,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

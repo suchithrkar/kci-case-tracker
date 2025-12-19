@@ -1970,12 +1970,11 @@ function openClosureModal(row) {
   document.getElementById("predictionComment").value = "";
 
   // Conditional PNS block
-  const pnsBlock = document.getElementById("pnsResolutionBlock");
-  if (row.PNS === true) {
-    pnsBlock.style.display = "block";
-  } else {
-    pnsBlock.style.display = "none";
-  }
+   if (row.PNS === true) {
+     pnsBlock.classList.remove("hidden-force");
+   } else {
+     pnsBlock.classList.add("hidden-force");
+   }
 
   // reset PNS radios
    document
@@ -2570,6 +2569,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

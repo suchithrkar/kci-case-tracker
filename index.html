@@ -590,38 +590,6 @@ tr.active-row {
   border: none;
 }
 
-/* =========================================================
-   SET 2 — SEGMENTED CONTROLS (RFC-STYLE)
-   ========================================================= */
-
-.set2-segmented {
-  display: flex;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--panel-2);
-}
-
-/* Buttons behave like RFC segments */
-.set2-segmented .icon-btn {
-  border: none;
-  border-right: 1px solid var(--border);
-  border-radius: 0;
-  background: transparent;
-}
-
-/* Remove divider on last button */
-.set2-segmented .icon-btn:last-child {
-  border-right: none;
-}
-
-/* Hover (subtle, consistent with RFC) */
-.set2-segmented .icon-btn:hover {
-  background: rgba(255,255,255,0.04);
-}
-
-/* Active state (already handled by .icon-btn.active) */
-
 
 /* =========================================================
    RFC SUMMARY STRIP (INFORMATIONAL — NOT A FILTER)
@@ -931,8 +899,6 @@ tr.active-row {
 
   <div class="set2">
 
-    <!-- SEGMENT 1: FIND MY CASES -->
-    <div class="set2-segmented">
       <button class="icon-btn" id="btnDueToday">
         <span>📅</span><span class="badge" id="badgeDue">0</span>
         <span class="tooltip">Due Today</span>
@@ -949,10 +915,7 @@ tr.active-row {
         <span class="badge" id="badgePNS">0</span>
         <span class="tooltip">PNS Marked Cases</span>
       </button>
-    </div>
 
-    <!-- SEGMENT 2: VIEW MODIFIERS -->
-    <div class="set2-segmented">
       <button class="icon-btn" id="btnRepeating">
         <span>👥</span>
         <span class="tooltip">Repeating Customers</span>
@@ -968,7 +931,7 @@ tr.active-row {
         <span>📝</span>
         <span class="tooltip">Unactioned Cases</span>
       </button>
-    </div>
+
   </div>
 </div>
 
@@ -1276,6 +1239,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

@@ -385,8 +385,6 @@ function setupSidebarControls() {
     // 1) Apply sidebar filters to state
     syncPrimaryFiltersFromUI();
     uiState.search = el.txtSearch.value.trim().toLowerCase();
-    uiState.from = el.dateFrom.value;
-    uiState.to = el.dateTo.value;
 
     applyFilters();
 
@@ -923,15 +921,11 @@ function setupFilterControls() {
     document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
 
     uiState.search = "";
-    uiState.from = "";
-    uiState.to = "";
     uiState.statusList = [];
     uiState.sortByDateAsc = null;
     updateSortIcon();
 
     el.txtSearch.value = "";
-    el.dateFrom.value = "";
-    el.dateTo.value = "";
 
     // clear primaries only if not locked
     Object.keys(uiState.primaries).forEach(key => {
@@ -2572,6 +2566,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

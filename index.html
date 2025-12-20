@@ -115,6 +115,49 @@ button,input,select,textarea{
 }
 .set1,.set2{display:flex;align-items:center;gap:.5rem}
 
+/* ================================
+   SET 2 — VISUAL GROUP CONTAINERS
+   ================================ */
+
+.set2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Base group */
+.set2-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px;
+  border-radius: 12px;
+
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+
+/* Primary group (Due / Flagged / PNS) */
+.set2-group-primary {
+  background: linear-gradient(
+    135deg,
+    var(--panel-2),
+    var(--panel)
+  );
+}
+
+/* Secondary group (Repeat / Sort / Unupdated) */
+.set2-group-secondary {
+  background: var(--panel);
+  opacity: 0.92;
+}
+
+/* Make buttons blend into group */
+.set2-group .icon-btn {
+  border-radius: 8px;
+}
+
 .input{
   background:var(--panel-2);
   border:1px solid var(--border);
@@ -842,18 +885,6 @@ tr.active-row {
 #closureModal .row textarea {
   align-self: stretch;
 }
-
-/* SET 2 — FULL HEIGHT GROUP DIVIDER (INCLUDING PADDING) */
-.set2-divider {
-  width: 1px;
-  background: var(--border);
-  opacity: 0.85;
-
-  /* Extend through parent padding */
-  margin: -0.75rem 10px;   /* MUST match .controls vertical padding */
-
-  align-self: stretch;
-}
   
 </style>
 </head>
@@ -909,42 +940,45 @@ tr.active-row {
   </div>
 
   <div class="set2">
-    <div class="set2-divider"></div>
 
-    <button class="icon-btn" id="btnDueToday">
-      <span>📅</span><span class="badge" id="badgeDue">0</span>
-      <span class="tooltip">Due Today</span>
-    </button>
+    <!-- GROUP 1: FIND MY CASES -->
+    <div class="set2-group set2-group-primary">
+      <button class="icon-btn" id="btnDueToday">
+        <span>📅</span><span class="badge" id="badgeDue">0</span>
+        <span class="tooltip">Due Today</span>
+      </button>
+  
+      <button class="icon-btn" id="btnFlagged">
+        <span>🚩</span>
+        <span class="badge" id="badgeFlag">0</span>
+        <span class="tooltip">Flagged Cases</span>
+      </button>
+  
+      <button class="icon-btn" id="btnPNS">
+        <span>📌</span>
+        <span class="badge" id="badgePNS">0</span>
+        <span class="tooltip">PNS Marked Cases</span>
+      </button>
+    </div>
 
-    <button class="icon-btn" id="btnFlagged">
-      <span>🚩</span>
-      <span class="badge" id="badgeFlag">0</span>
-      <span class="tooltip">Flagged Cases</span>
-    </button>
-
-    <button class="icon-btn" id="btnPNS">
-      <span>📌</span>
-      <span class="badge" id="badgePNS">0</span>
-      <span class="tooltip">PNS Marked Cases</span>
-    </button>
-
-    <div class="set2-divider"></div>
-
-    <button class="icon-btn" id="btnRepeating">
-      <span>👥</span>
-      <span class="tooltip">Repeating Customers</span>
-    </button>
-
-    <button class="icon-btn" id="btnSortDate">
-      <span id="sortClock">🕑</span>
-      <span class="badge" id="sortArrow" style="display:none;"></span>
-      <span class="tooltip">Sort by Creation Date</span>
-    </button>
-
-    <button class="icon-btn" id="btnUnupdated">
-      <span>📝</span>
-      <span class="tooltip">Unactioned Cases</span>
-    </button>
+      <!-- GROUP 2: VIEW MODIFIERS -->
+    <div class="set2-group set2-group-secondary">
+      <button class="icon-btn" id="btnRepeating">
+        <span>👥</span>
+        <span class="tooltip">Repeating Customers</span>
+      </button>
+  
+      <button class="icon-btn" id="btnSortDate">
+        <span id="sortClock">🕑</span>
+        <span class="badge" id="sortArrow" style="display:none;"></span>
+        <span class="tooltip">Sort by Creation Date</span>
+      </button>
+  
+      <button class="icon-btn" id="btnUnupdated">
+        <span>📝</span>
+        <span class="tooltip">Unactioned Cases</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1252,6 +1286,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

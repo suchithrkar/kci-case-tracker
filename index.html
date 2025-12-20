@@ -115,49 +115,6 @@ button,input,select,textarea{
 }
 .set1,.set2{display:flex;align-items:center;gap:.5rem}
 
-/* ================================
-   SET 2 — VISUAL GROUP CONTAINERS
-   ================================ */
-
-.set2 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Base group */
-.set2-group {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-
-  padding: 6px;
-  border-radius: 12px;
-
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-}
-
-/* Primary group (Due / Flagged / PNS) */
-.set2-group-primary {
-  background: linear-gradient(
-    135deg,
-    var(--panel-2),
-    var(--panel)
-  );
-}
-
-/* Secondary group (Repeat / Sort / Unupdated) */
-.set2-group-secondary {
-  background: var(--panel);
-  opacity: 0.92;
-}
-
-/* Make buttons blend into group */
-.set2-group .icon-btn {
-  border-radius: 8px;
-}
-
 .input{
   background:var(--panel-2);
   border:1px solid var(--border);
@@ -634,6 +591,39 @@ tr.active-row {
 }
 
 /* =========================================================
+   SET 2 — SEGMENTED CONTROLS (RFC-STYLE)
+   ========================================================= */
+
+.set2-segmented {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--panel-2);
+}
+
+/* Buttons behave like RFC segments */
+.set2-segmented .icon-btn {
+  border: none;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Remove divider on last button */
+.set2-segmented .icon-btn:last-child {
+  border-right: none;
+}
+
+/* Hover (subtle, consistent with RFC) */
+.set2-segmented .icon-btn:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+/* Active state (already handled by .icon-btn.active) */
+
+
+/* =========================================================
    RFC SUMMARY STRIP (INFORMATIONAL — NOT A FILTER)
    ========================================================= */
 
@@ -941,8 +931,8 @@ tr.active-row {
 
   <div class="set2">
 
-    <!-- GROUP 1: FIND MY CASES -->
-    <div class="set2-group set2-group-primary">
+    <!-- SEGMENT 1: FIND MY CASES -->
+    <div class="set2-segmented">
       <button class="icon-btn" id="btnDueToday">
         <span>📅</span><span class="badge" id="badgeDue">0</span>
         <span class="tooltip">Due Today</span>
@@ -961,8 +951,8 @@ tr.active-row {
       </button>
     </div>
 
-      <!-- GROUP 2: VIEW MODIFIERS -->
-    <div class="set2-group set2-group-secondary">
+    <!-- SEGMENT 2: VIEW MODIFIERS -->
+    <div class="set2-segmented">
       <button class="icon-btn" id="btnRepeating">
         <span>👥</span>
         <span class="tooltip">Repeating Customers</span>
@@ -1286,6 +1276,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

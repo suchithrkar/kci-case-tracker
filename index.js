@@ -39,9 +39,6 @@ const el = {
   overlay: document.getElementById("overlay"),
 
   txtSearch: document.getElementById("txtSearch"),
-  dateFrom: document.getElementById("dateFrom"),
-  dateTo: document.getElementById("dateTo"),
-
   statusBox: document.getElementById("statusBox"),
   statusLabel: document.getElementById("statusLabel"),
   statusPanel: document.getElementById("statusPanel"),
@@ -153,8 +150,6 @@ const userNameMap = {};
    ======================================================================= */
 const uiState = {
   search: "",
-  from: "",
-  to: "",
   statusList: [],
   mode: "normal",   // normal | due | flagged | total | negative
   unupdatedActive: false,
@@ -868,16 +863,9 @@ function setupFilterControls() {
      }
    };
 
-  /* DATE INPUTS */
-  el.dateFrom.onchange = () => (uiState.from = el.dateFrom.value);
-  el.dateTo.onchange = () => (uiState.to = el.dateTo.value);
-
-  /* APPLY */
     /* APPLY */
   el.btnApply.onclick = () => {
     uiState.search = el.txtSearch.value.trim().toLowerCase();
-    uiState.from = el.dateFrom.value;
-    uiState.to = el.dateTo.value;
 
     // Also sync any primary filter checkboxes currently visible in the sidebar
     syncPrimaryFiltersFromUI();
@@ -903,8 +891,6 @@ function setupFilterControls() {
 
         // clear ONLY main filters
         uiState.search = "";
-        uiState.from = "";
-        uiState.to = "";
         uiState.statusList = [];
         uiState.sortByDateAsc = null;
         updateSortIcon();
@@ -913,8 +899,6 @@ function setupFilterControls() {
         uiState.unupdatedActive = false;
 
         el.txtSearch.value = "";
-        el.dateFrom.value = "";
-        el.dateTo.value = "";
 
         buildStatusPanel();
         applyFilters();
@@ -1266,10 +1250,6 @@ if (uiState.mode === "negative") {
       (r.sbd || "").toLowerCase().includes(q)
     );
   }
-
-  /* DATE RANGE */
-  if (uiState.from) rows = rows.filter(r => r.createdOn >= uiState.from);
-  if (uiState.to) rows = rows.filter(r => r.createdOn <= uiState.to);
 
   /* STATUS MULTI-SELECT */
   if (uiState.statusList.length > 0)
@@ -2592,6 +2572,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

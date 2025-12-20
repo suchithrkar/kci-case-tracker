@@ -843,27 +843,6 @@ tr.active-row {
   align-self: stretch;
 }
 
-.side-title {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-/* Main title */
-.side-title-main {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-/* Subtitle */
-.side-title-sub {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 500;
-  line-height: 1.2;
-}
-
   
 </style>
 </head>
@@ -962,10 +941,7 @@ tr.active-row {
 <div class="overlay" id="overlay"></div>
 <aside class="sidebar" id="sidebar">
   <div class="side-head">
-  <div class="side-title">
-    <div class="side-title-main">Case Controls</div>
-    <div class="side-title-sub">Filter, group &amp; manage case views</div>
-  </div>
+  <div class="side-title">Case Controls &amp; Filters</div>
   <div class="side-actions">
     <button id="btnSideApply" class="btn small">Apply</button>
     <button id="btnSideClose" class="btn small">Close</button>
@@ -1265,6 +1241,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

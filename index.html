@@ -843,13 +843,16 @@ tr.active-row {
   align-self: stretch;
 }
 
-/* SET 2 — FULL HEIGHT GROUP DIVIDER */
+/* SET 2 — FULL HEIGHT GROUP DIVIDER (INCLUDING PADDING) */
 .set2-divider {
-  align-self: stretch;          /* fills parent height */
   width: 1px;
   background: var(--border);
-  opacity: 0.8;
-  margin: 0 8px;
+  opacity: 0.85;
+
+  /* Extend through parent padding */
+  margin: -0.75rem 10px;   /* MUST match .controls vertical padding */
+
+  align-self: stretch;
 }
   
 </style>
@@ -1249,6 +1252,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

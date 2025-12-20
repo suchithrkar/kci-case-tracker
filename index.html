@@ -843,13 +843,13 @@ tr.active-row {
   align-self: stretch;
 }
 
-/* SET 2 GROUP DIVIDER */
+/* SET 2 — FULL HEIGHT GROUP DIVIDER */
 .set2-divider {
+  align-self: stretch;          /* fills parent height */
   width: 1px;
-  height: 26px;
   background: var(--border);
-  opacity: 0.6;
-  margin: 0 6px;
+  opacity: 0.8;
+  margin: 0 8px;
 }
   
 </style>
@@ -906,6 +906,8 @@ tr.active-row {
   </div>
 
   <div class="set2">
+    <div class="set2-divider"></div>
+
     <button class="icon-btn" id="btnDueToday">
       <span>📅</span><span class="badge" id="badgeDue">0</span>
       <span class="tooltip">Due Today</span>
@@ -1247,6 +1249,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

@@ -246,20 +246,20 @@ tbody tr:hover {
 }
 
 /* ============================================================
-   STATS TABLE — CLICKABLE USER CELL (SUBTLE)
+   STATS TABLE — CLICKABLE USER CELL (SOFT FADE HOVER)
    ============================================================ */
 .stats-user-link {
-  color: var(--text);          /* Same as normal text */
+  color: var(--text);
   cursor: pointer;
   font-weight: 500;
-  transition: background 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 
+/* Soft, edge-fading hover (no border, no box) */
 .stats-user-link:hover {
-  background: rgba(79, 140, 240, 0.12);  /* subtle hover highlight */
-  box-shadow: inset 0 0 0 1px rgba(79, 140, 240, 0.35);
-  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.06);
 }
+
 
 .action-btn{
   padding:0.35rem 0.6rem;
@@ -902,6 +902,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

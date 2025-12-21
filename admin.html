@@ -246,45 +246,24 @@ tbody tr:hover {
 }
 
 /* ============================================================
-   STATS TABLE — CLICKABLE USER CELL (BASE)
+   STATS TABLE — CLICKABLE USER CELL (SOFT ACCENT WASH)
    ============================================================ */
 .stats-user-link {
   color: var(--text);
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.18s ease;
-  position: relative;
+  transition: background 0.18s ease;
 }
 
-.stats-user-link::after {
-  content: "";
-  position: absolute;
-  left: 20%;
-  right: 20%;
-  bottom: 6px;
-  height: 2px;
-  background: var(--accent);
-  opacity: 0;
-  transition: opacity 0.18s ease;
+/* Soft accent wash with edge fade */
+.stats-user-link:hover {
+  background: linear-gradient(
+    to right,
+    rgba(79, 140, 240, 0.00),
+    rgba(79, 140, 240, 0.14),
+    rgba(79, 140, 240, 0.00)
+  );
 }
-
-.stats-user-link:hover::after {
-  opacity: 1;
-}
-
-.stats-user-link::before {
-  content: "•";
-  position: absolute;
-  left: 6px;
-  opacity: 0;
-  color: var(--accent);
-  transition: opacity 0.15s ease;
-}
-
-.stats-user-link:hover::before {
-  opacity: 1;
-}
-
 
 .action-btn{
   padding:0.35rem 0.6rem;
@@ -927,6 +906,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

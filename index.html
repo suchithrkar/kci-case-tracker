@@ -49,48 +49,6 @@ button,input,select,textarea{
   font:inherit;color:inherit;
 }
 
-/* ===================================================
-   Cross-browser form control normalization
-   (Chrome ↔ Firefox consistency)
-   =================================================== */
-
-/* Remove native appearance differences */
-input,
-select,
-textarea,
-button {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-/* Unified vertical rhythm */
-input,
-select,
-textarea {
-  line-height: 1.4;
-  height: 38px;              /* consistent control height */
-  padding: 0.45rem 0.75rem;  /* Firefox-like balance */
-  display: flex;
-  align-items: center;
-}
-
-/* Dropdown arrow handling (keep native arrow but align text) */
-select {
-  background-color: var(--panel-2);
-}
-
-/* Date input alignment fix (Chrome issue) */
-input[type="date"] {
-  padding-top: 0.4rem;
-  padding-bottom: 0.4rem;
-}
-
-/* Prevent Chrome text jumping */
-input::-webkit-input-placeholder {
-  line-height: normal;
-}
-
 /* Header ---- */
 .header{
   position:sticky;top:0;z-index:40;
@@ -1282,6 +1240,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

@@ -246,22 +246,30 @@ tbody tr:hover {
 }
 
 /* ============================================================
-   STATS TABLE — CLICKABLE USER CELL (SOFT FADE HOVER)
+   STATS TABLE — CLICKABLE USER CELL (BASE)
    ============================================================ */
-/* Soft gradient fade — no border, no box */
-.stats-user-link:hover {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(79, 140, 240, 0.16) 0%,
-    rgba(79, 140, 240, 0.10) 35%,
-    rgba(79, 140, 240, 0.05) 55%,
-    rgba(79, 140, 240, 0.00) 75%
-  );
+.stats-user-link {
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.18s ease;
+  position: relative;
 }
 
-/* Soft, edge-fading hover (no border, no box) */
-.stats-user-link:hover {
-  background-color: rgba(255, 255, 255, 0.06);
+.stats-user-link::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: 6px;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.stats-user-link:hover::after {
+  opacity: 1;
 }
 
 
@@ -906,6 +914,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

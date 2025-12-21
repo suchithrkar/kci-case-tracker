@@ -248,11 +248,15 @@ tbody tr:hover {
 /* ============================================================
    STATS TABLE — CLICKABLE USER CELL (SOFT FADE HOVER)
    ============================================================ */
-.stats-user-link {
-  color: var(--text);
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.15s ease;
+/* Soft gradient fade — no border, no box */
+.stats-user-link:hover {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(79, 140, 240, 0.16) 0%,
+    rgba(79, 140, 240, 0.10) 35%,
+    rgba(79, 140, 240, 0.05) 55%,
+    rgba(79, 140, 240, 0.00) 75%
+  );
 }
 
 /* Soft, edge-fading hover (no border, no box) */
@@ -902,6 +906,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

@@ -1804,18 +1804,33 @@ function computeStatsEngineAdaptive(casesList, usersList) {
     const userCases = filteredCases.filter(r => r.lastActionedBy === u.id);
 
 
-    // STATUS UPDATED TODAY (only statusChangedOn matters, not lastActionedOn)
-const todayCases = filteredCases.filter(r =>
-  r.statusChangedOn === today && r.statusChangedBy === u.id
-);
+       // STATUS UPDATED TODAY (only statusChangedOn matters, not lastActionedOn)
+   const todayCases = filteredCases.filter(r =>
+     r.statusChangedOn === today && r.statusChangedBy === u.id
+   );
+   
+   // Unique case IDs only
+   const totalActioned = new Set(todayCases.map(r => r.id)).size;
+   
+   
+   // Closed Today — based on STATUS CHANGED today (no duplicates)
+   const closedTodayMap = new Map();
+   
+   filteredCases.forEach(r => {
+     if (
+       r.statusChangedBy === u.id &&
+       r.statusChangedOn === today &&
+       r.status === "Closed"
+     ) {
+       if (!closedTodayMap.has(r.id)) {
+         closedTodayMap.set(r.id, r);
+       }
+     }
+   });
+   
+   const closedTodayList = Array.from(closedTodayMap.values());
+   const closedToday = closedTodayList.length;
 
-// Unique case IDs only
-const totalActioned = new Set(todayCases.map(r => r.id)).size;
-
-
-    // Closed Today
-    const closedTodayList = userCases.filter(r => r.lastActionedOn === today && r.status === "Closed");
-    const closedToday = closedTodayList.length;
 
     // Met / Not Met (from closedTodayList)
     const met = closedTodayList.filter(r => (r.sbd || "").toLowerCase() === "met").length;
@@ -2292,6 +2307,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

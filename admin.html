@@ -241,10 +241,24 @@ body[data-role="secondary"] #usersTableWrap table td {
   width: 25%;
 }
 
-
-
 tbody tr:hover {
   background: rgba(255,255,255,0.05);
+}
+
+/* ============================================================
+   STATS TABLE — CLICKABLE USER CELL (SUBTLE)
+   ============================================================ */
+.stats-user-link {
+  color: var(--text);          /* Same as normal text */
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stats-user-link:hover {
+  background: rgba(79, 140, 240, 0.12);  /* subtle hover highlight */
+  box-shadow: inset 0 0 0 1px rgba(79, 140, 240, 0.35);
+  border-radius: 6px;
 }
 
 .action-btn{
@@ -888,6 +902,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

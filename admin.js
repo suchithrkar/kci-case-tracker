@@ -1975,7 +1975,7 @@ function renderStatsTableNew() {
   // user rows
   const userRowsHtml = stats.userRows.map(u => `
     <tr>
-      <td class="stats-user-link" data-userid="${u.userId}" style="color:#4F8CF0;cursor:pointer;">
+      <td class="stats-user-link" data-userid="${u.userId}">
           ${escapeHtml(u.name)}
       </td>
       <td>${u.totalActionedY}</td>
@@ -2307,6 +2307,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

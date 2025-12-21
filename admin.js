@@ -1913,7 +1913,7 @@ function renderStatsTableNew() {
     <thead>
       <tr style="text-align:left;border-bottom:1px solid var(--border);">
         <th>User</th>
-        <th>Total Actioned</th>
+        <th>Total Followed Up</th>
         <th>Closed Today</th>
         <th>Met</th>
         <th>Not Met</th>
@@ -1947,7 +1947,7 @@ function renderStatsTableNew() {
   const totalRowHtml = `
     <tr style="font-weight:700;background:rgba(255,255,255,0.03);">
       <td>${t.name}</td>
-      <td>${t.lastActionedX}</td>
+      <td>${t.totalActionedY}</td>
       <td>${t.closedToday}</td>
       <td>${t.met} (${t.metPct}%)</td>
       <td>${t.notMet} (${t.notMetPct}%)</td>
@@ -1963,7 +1963,7 @@ function renderStatsTableNew() {
       <td class="stats-user-link" data-userid="${u.userId}" style="color:#4F8CF0;cursor:pointer;">
           ${escapeHtml(u.name)}
       </td>
-      <td>${u.lastActionedX}</td>
+      <td>${u.totalActionedY}</td>
       <td>${u.closedToday}</td>
       <td>${u.met} (${u.metPct}%)</td>
       <td>${u.notMet} (${u.notMetPct}%)</td>
@@ -2012,19 +2012,44 @@ btnUserStatsOk.onclick    = () => modalUserStats.classList.remove("show");
 function computeUserSummary(userId) {
   const today = getTeamToday(teamConfig);
 
-  const todayRows = statsCases.filter(
-    r => r.lastActionedBy === userId && r.lastActionedOn === today
+  // -------------------------------
+  // 1. ALL STATUS CHANGES DONE TODAY BY USER (NO DUPLICATES)
+  // -------------------------------
+  const todayStatusChanges = statsCases.filter(r =>
+    r.statusChangedBy === userId &&
+    r.statusChangedOn === today
   );
 
-  const closed = todayRows.filter(r => r.status === "Closed");
-  const closedCount = closed.length;
+  // Unique cases only
+  const uniqueCasesMap = new Map();
+  todayStatusChanges.forEach(r => {
+    if (!uniqueCasesMap.has(r.id)) {
+      uniqueCasesMap.set(r.id, r);
+    }
+  });
 
-  const met = closed.filter(r => (r.sbd || "").toLowerCase() === "met").length;
-  const notMet = closed.filter(r => (r.sbd || "").toLowerCase() === "not met").length;
+  const uniqueCases = Array.from(uniqueCasesMap.values());
+
+  // -------------------------------
+  // 2. CLOSED CASES (TODAY)
+  // -------------------------------
+  const closedCases = uniqueCases.filter(r => r.status === "Closed");
+  const closedCount = closedCases.length;
+
+  const met = closedCases.filter(
+    r => (r.sbd || "").toLowerCase() === "met"
+  ).length;
+
+  const notMet = closedCases.filter(
+    r => (r.sbd || "").toLowerCase() === "not met"
+  ).length;
 
   const pct = (n) =>
     closedCount === 0 ? 0 : Math.round((n / closedCount) * 100);
 
+  // -------------------------------
+  // 3. STATUS BREAKDOWN (TODAY)
+  // -------------------------------
   const statusBreakdown = {
     "Service Pending": 0,
     "Monitoring": 0,
@@ -2033,15 +2058,29 @@ function computeUserSummary(userId) {
     "PNS": 0
   };
 
-  todayRows.forEach(r => {
-    if (statusBreakdown[r.status] != null) statusBreakdown[r.status]++;
+  uniqueCases.forEach(r => {
+    if (statusBreakdown[r.status] != null) {
+      statusBreakdown[r.status]++;
+    }
   });
 
-  // X, Y, Z
-  const X = todayRows.length;
-  const Y = new Set(todayRows.map(r => r.id)).size;  // unique cases followed up
-  const Z = X - Y;
+  // -------------------------------
+  // 4. TOTAL FOLLOWED UP / ACTIONED / UPDATED
+  // -------------------------------
+  const totalFollowedUp = uniqueCases.length;
 
+  const totalActioned = new Set(
+    statsCases.filter(r =>
+      r.lastActionedBy === userId &&
+      r.lastActionedOn === today
+    ).map(r => r.id)
+  ).size;
+
+  const totalUpdated = totalActioned - totalFollowedUp;
+
+  // -------------------------------
+  // 5. FINAL TEXT OUTPUT
+  // -------------------------------
   return `Total Cases Closed: ${closedCount}
 Met: ${met} (${pct(met)}%)
 Not Met: ${notMet} (${pct(notMet)}%)
@@ -2052,11 +2091,13 @@ NCM 1: ${statusBreakdown["NCM 1"]}
 NCM 2: ${statusBreakdown["NCM 2"]}
 PNS: ${statusBreakdown["PNS"]}
 
-Total Actioned Cases: ${X}
-Total Followed Up Cases: ${Y}
-Total Updated Cases: ${Z}
+Total Followed Up Cases: ${totalFollowedUp}
+Total Updated Cases: ${totalUpdated}
+
+Total Actioned Cases: ${totalActioned}
 `;
 }
+
 
 // Bind click on usernames
 statsTableWrap.addEventListener("click", (e) => {
@@ -2251,6 +2292,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

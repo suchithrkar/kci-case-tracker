@@ -83,17 +83,21 @@ html,body{
    ============================================================ */
 /* Header buttons identical to tracker */
 .hdr-btn {
-  padding: .55rem 1.15rem !important;  /* EXACT padding from tracker */
+  height: 38px;                 /* fixed height = no drift */
+  padding: 0 1.15rem !important;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--panel-2);
   cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;                     /* Same as tracker */
-  white-space: nowrap;
-  display: flex;
+
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;               /* CRITICAL for Chrome */
+  white-space: nowrap;
 }
 
 
@@ -906,6 +910,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

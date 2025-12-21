@@ -2475,19 +2475,30 @@ function showSummaryInfo() {
   const uid = trackerState.user.uid;
   const today = getTeamToday(trackerState.teamConfig);
 
-  const todayRows = trackerState.allCases.filter(
-    r => r.lastActionedBy === uid && r.lastActionedOn === today
+  /* ---------------------------------------------
+     1️⃣ STATUS CHANGED TODAY (FOLLOWED UP CASES)
+     --------------------------------------------- */
+  const statusChangedToday = trackerState.allCases.filter(r =>
+    r.statusChangedBy === uid &&
+    r.statusChangedOn === today
   );
 
-  const closed = todayRows.filter(r => r.status === "Closed");
-  const closedCount = closed.length;
+  // Closed
+  const closedCases = statusChangedToday.filter(r => r.status === "Closed");
+  const closedCount = closedCases.length;
 
-  const met = closed.filter(r => (r.sbd || "").toLowerCase() === "met").length;
-  const notMet = closed.filter(r => (r.sbd || "").toLowerCase() === "not met").length;
+  const met = closedCases.filter(
+    r => (r.sbd || "").toLowerCase() === "met"
+  ).length;
+
+  const notMet = closedCases.filter(
+    r => (r.sbd || "").toLowerCase() === "not met"
+  ).length;
 
   const pct = (n) =>
     closedCount === 0 ? 0 : Math.round((n / closedCount) * 100);
 
+  // Other status breakdowns
   const statusBreakdown = {
     "Service Pending": 0,
     "Monitoring": 0,
@@ -2496,20 +2507,34 @@ function showSummaryInfo() {
     "PNS": 0
   };
 
-  todayRows.forEach(r => {
-    if (statusBreakdown[r.status] != null) statusBreakdown[r.status]++;
+  statusChangedToday.forEach(r => {
+    if (statusBreakdown[r.status] !== undefined) {
+      statusBreakdown[r.status]++;
+    }
   });
 
-  const totalActioned =
-    closedCount +
-    statusBreakdown["Service Pending"] +
-    statusBreakdown["Monitoring"] +
-    statusBreakdown["NCM 1"] +
-    statusBreakdown["NCM 2"] +
-    statusBreakdown["PNS"];
+  const totalFollowedUp = statusChangedToday.length;
 
+  /* ---------------------------------------------
+     2️⃣ TOTAL ACTIONED CASES (ANY ACTION TODAY)
+     --------------------------------------------- */
+  const actionedToday = trackerState.allCases.filter(r =>
+    r.lastActionedBy === uid &&
+    r.lastActionedOn === today
+  );
+
+  const totalActioned = actionedToday.length;
+
+  /* ---------------------------------------------
+     3️⃣ UPDATED CASES (NON-STATUS UPDATES)
+     --------------------------------------------- */
+  const totalUpdated = totalActioned - totalFollowedUp;
+
+  /* ---------------------------------------------
+     4️⃣ RENDER SUMMARY
+     --------------------------------------------- */
   infoModalBody.textContent =
-`Total Cases Closed Today: ${closedCount}
+`Total Cases Closed: ${closedCount}
 Met: ${met} (${pct(met)}%)
 Not Met: ${notMet} (${pct(notMet)}%)
 
@@ -2519,10 +2544,14 @@ NCM 1: ${statusBreakdown["NCM 1"]}
 NCM 2: ${statusBreakdown["NCM 2"]}
 PNS: ${statusBreakdown["PNS"]}
 
-Total Actioned Today: ${totalActioned}`;
+Total Followed Up Cases: ${totalFollowedUp}
+Total Updated Cases: ${totalUpdated}
+
+Total Actioned Cases: ${totalActioned}`;
 
   infoModal.classList.add("show");
 }
+
 
 
 /* ====================================================================
@@ -2566,6 +2595,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

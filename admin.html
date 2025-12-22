@@ -555,6 +555,134 @@ th:hover .tooltip {
   opacity: 1;
 }
 
+/* ==========================================================
+   CUSTOM DROPDOWN (REPLACES <select>)
+   ========================================================== */
+
+.custom-select {
+  position: relative;
+  min-width: 150px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.custom-select-trigger {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 28px 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.custom-select-trigger::after {
+  content: "▾";
+  position: absolute;
+  right: 10px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.custom-select.open .custom-select-trigger {
+  box-shadow: 0 0 0 2px rgba(79,140,240,.25);
+}
+
+/* Dropdown panel */
+.custom-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  display: none;
+  z-index: 200;
+  box-shadow: var(--shadow);
+}
+
+.custom-select.open .custom-options {
+  display: block;
+}
+
+/* Each option */
+.custom-option {
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  background: transparent;
+}
+
+.custom-option:last-child {
+  margin-bottom: 0;
+}
+
+.custom-option:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.custom-option.selected {
+  background: rgba(79,140,240,0.18);
+  font-weight: 600;
+}
+
+/* ==========================================================
+   CUSTOM DATE PICKER
+   ========================================================== */
+
+.date-input {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* Calendar modal */
+.calendar {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: var(--shadow);
+  z-index: 300;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day {
+  padding: 6px;
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.calendar-day:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.calendar-day.selected {
+  background: rgba(79,140,240,0.3);
+  font-weight: 700;
+}
+
 
 </style>
 
@@ -906,6 +1034,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

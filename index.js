@@ -1604,15 +1604,22 @@ function renderStatusSelect(row) {
   ];
 
   return `
-    <select class="status-select" data-action="status" data-id="${row.id}">
-      ${statuses.map(s => `
-        <option value="${s}" ${row.status === s ? "selected" : ""}>
-          ${s}
-        </option>
-      `).join("")}
-    </select>
+    <div class="custom-select" data-id="${row.id}">
+      <div class="custom-select-trigger">
+        <span>${row.status || "Select"}</span>
+      </div>
+      <div class="custom-options">
+        ${statuses.map(s => `
+          <div class="custom-option ${row.status === s ? "selected" : ""}"
+               data-value="${s}">
+            ${s || "(Blank)"}
+          </div>
+        `).join("")}
+      </div>
+    </div>
   `;
 }
+
 
 /* =======================================================================
    ROW EVENT HANDLERS
@@ -1628,6 +1635,38 @@ tbody.addEventListener("change", (e) => {
 
   handleStatusChange(cid, newStatus);
 });
+
+tbody.addEventListener("click", (e) => {
+  const select = e.target.closest(".custom-select");
+  if (!select) return;
+
+  select.classList.toggle("open");
+
+  const option = e.target.closest(".custom-option");
+  if (!option) return;
+
+  const caseId = select.dataset.id;
+  const value = option.dataset.value;
+
+  handleStatusChange(caseId, value);
+
+  select.querySelectorAll(".custom-option")
+    .forEach(o => o.classList.remove("selected"));
+
+  option.classList.add("selected");
+  select.querySelector(".custom-select-trigger span").textContent =
+    value || "Select";
+
+  select.classList.remove("open");
+});
+
+/* Close on outside click */
+document.addEventListener("click", (e) => {
+  document.querySelectorAll(".custom-select.open").forEach(sel => {
+    if (!sel.contains(e.target)) sel.classList.remove("open");
+  });
+});
+
 
 /* GEAR BUTTON → OPEN MODAL */
 tbody.addEventListener("click", (e) => {
@@ -2595,6 +2634,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

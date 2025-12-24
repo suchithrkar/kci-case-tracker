@@ -1606,13 +1606,13 @@ function renderStatusSelect(row) {
   return `
     <div class="custom-select" data-id="${row.id}">
       <div class="custom-select-trigger">
-        <span>${row.status || "Select"}</span>
+        <span>${row.status || ""}</span>
       </div>
       <div class="custom-options">
         ${statuses.map(s => `
           <div class="custom-option ${row.status === s ? "selected" : ""}"
                data-value="${s}">
-            ${s || "(Blank)"}
+            ${s}
           </div>
         `).join("")}
       </div>
@@ -2678,6 +2678,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

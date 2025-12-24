@@ -324,6 +324,7 @@ tbody tr:hover {
   border-radius:16px;
   border:1px solid var(--border);
   box-shadow:var(--shadow);
+  overflow: visible; /* ✅ allow dropdown escape */
 }
 .modal-head{
   display:flex;
@@ -339,7 +340,16 @@ tbody tr:hover {
 .modal-body{
   padding:1rem;
   max-height:60vh;
-  overflow:auto;
+  overflow: auto;
+  position: relative;
+}
+/* Allow custom select dropdowns to overflow modal body */
+.modal-body .custom-select.open {
+  z-index: 999;
+}
+.modal-body .custom-select.open .custom-options {
+  position: absolute;
+  z-index: 1000;
 }
 .modal-foot{
   display:flex;
@@ -646,7 +656,7 @@ th:hover .tooltip {
   border-radius: 8px;
 
   padding: 4px;
-  z-index: 300;
+  z-index: 1200;
 
   box-shadow: 0 12px 30px rgba(0,0,0,0.6);
 
@@ -1037,6 +1047,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

@@ -130,43 +130,6 @@ function initCustomSelect(root) {
   });
 }
 
-  function closeDropdown() {
-    if (!portalActive) return;
-
-    root.appendChild(options);
-    options.style.position = "";
-    options.style.top = "";
-    options.style.left = "";
-    options.style.width = "";
-    options.style.zIndex = "";
-
-    root.classList.remove("open");
-    portalActive = false;
-  }
-
-  trigger.addEventListener("click", (e) => {
-    e.stopPropagation();
-    closeAllCustomSelects();
-
-    if (portalActive) {
-      closeDropdown();
-    } else {
-      openDropdown();
-    }
-  });
-
-  options.querySelectorAll(".custom-option").forEach(opt => {
-    opt.addEventListener("click", () => {
-      trigger.textContent = opt.textContent;
-      root.dataset.value = opt.dataset.value;
-
-      closeDropdown();
-      root.dispatchEvent(new Event("change"));
-    });
-  });
-}
-}
-
 function closeAllCustomSelects() {
   document.querySelectorAll(".custom-select.open").forEach(root => {
     const options = root.querySelector(".custom-options");
@@ -2524,6 +2487,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

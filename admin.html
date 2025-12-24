@@ -765,59 +765,61 @@ th:hover .tooltip {
   </button>
 
   <!-- Row 2: Timezone -->
-  <select class="input team-tz" id="newTeamTimezone">
-    <option value="">Select Team Timezone</option>
-
-    <!-- EMEA -->
-    <option value="Europe/London">UK (Europe/London)</option>
-    <option value="Europe/Berlin">Central Europe (Europe/Berlin)</option>
-
-    <!-- Americas -->
-    <option value="America/New_York">US – Eastern</option>
-    <option value="America/Chicago">US – Central</option>
-    <option value="America/Los_Angeles">US – Pacific</option>
-
-    <!-- Asia -->
-    <option value="Asia/Kolkata">India</option>
-    <option value="Asia/Singapore">Singapore</option>
-    <option value="Asia/Dubai">Middle East</option>
-
-    <!-- ANZ -->
-    <option value="Australia/Sydney">Australia</option>
-    <option value="Pacific/Auckland">New Zealand</option>
-
-    <!-- Global -->
-    <option value="UTC">UTC</option>
-  </select>
-
-  <!-- Row 2: Reset hour -->
-  <select class="input team-reset" id="newTeamResetHour">
-    <option value="">Reset Time</option>
-    <option value="0">12:00 AM</option>
-    <option value="1">1:00 AM</option>
-    <option value="2">2:00 AM</option>
-    <option value="3">3:00 AM</option>
-    <option value="4">4:00 AM</option>
-    <option value="5">5:00 AM</option>
-    <option value="6">6:00 AM</option>
-    <option value="7">7:00 AM</option>
-    <option value="8">8:00 AM</option>
-    <option value="9">9:00 AM</option>
-    <option value="10">10:00 AM</option>
-    <option value="11">11:00 AM</option>
-    <option value="12">12:00 PM</option>
-    <option value="13">1:00 PM</option>
-    <option value="14">2:00 PM</option>
-    <option value="15">3:00 PM</option>
-    <option value="16">4:00 PM</option>
-    <option value="17">5:00 PM</option>
-    <option value="18">6:00 PM</option>
-    <option value="19">7:00 PM</option>
-    <option value="20">8:00 PM</option>
-    <option value="21">9:00 PM</option>
-    <option value="22">10:00 PM</option>
-    <option value="23">11:00 PM</option>
-  </select>
+   <div class="custom-select team-tz" id="newTeamTimezone">
+     <div class="custom-select-trigger">Select Team Timezone</div>
+     <div class="custom-options">
+       <div class="custom-option" data-value="">Select Team Timezone</div>
+   
+       <div class="custom-option" data-value="Europe/London">UK (Europe/London)</div>
+       <div class="custom-option" data-value="Europe/Berlin">Central Europe</div>
+   
+       <div class="custom-option" data-value="America/New_York">US – Eastern</div>
+       <div class="custom-option" data-value="America/Chicago">US – Central</div>
+       <div class="custom-option" data-value="America/Los_Angeles">US – Pacific</div>
+   
+       <div class="custom-option" data-value="Asia/Kolkata">India</div>
+       <div class="custom-option" data-value="Asia/Singapore">Singapore</div>
+       <div class="custom-option" data-value="Asia/Dubai">Middle East</div>
+   
+       <div class="custom-option" data-value="Australia/Sydney">Australia</div>
+       <div class="custom-option" data-value="Pacific/Auckland">New Zealand</div>
+   
+       <div class="custom-option" data-value="UTC">UTC</div>
+     </div>
+   </div>
+   
+   <!-- Row 2: Reset hour -->
+   <div class="custom-select team-reset" id="newTeamResetHour">
+     <div class="custom-select-trigger">Reset Time</div>
+     <div class="custom-options">
+       <div class="custom-option" data-value="">Reset Time</div>
+   
+       <div class="custom-option" data-value="0">12:00 AM</div>
+       <div class="custom-option" data-value="1">1:00 AM</div>
+       <div class="custom-option" data-value="2">2:00 AM</div>
+       <div class="custom-option" data-value="3">3:00 AM</div>
+       <div class="custom-option" data-value="4">4:00 AM</div>
+       <div class="custom-option" data-value="5">5:00 AM</div>
+       <div class="custom-option" data-value="6">6:00 AM</div>
+       <div class="custom-option" data-value="7">7:00 AM</div>
+       <div class="custom-option" data-value="8">8:00 AM</div>
+       <div class="custom-option" data-value="9">9:00 AM</div>
+       <div class="custom-option" data-value="10">10:00 AM</div>
+       <div class="custom-option" data-value="11">11:00 AM</div>
+       <div class="custom-option" data-value="12">12:00 PM</div>
+       <div class="custom-option" data-value="13">1:00 PM</div>
+       <div class="custom-option" data-value="14">2:00 PM</div>
+       <div class="custom-option" data-value="15">3:00 PM</div>
+       <div class="custom-option" data-value="16">4:00 PM</div>
+       <div class="custom-option" data-value="17">5:00 PM</div>
+       <div class="custom-option" data-value="18">6:00 PM</div>
+       <div class="custom-option" data-value="19">7:00 PM</div>
+       <div class="custom-option" data-value="20">8:00 PM</div>
+       <div class="custom-option" data-value="21">9:00 PM</div>
+       <div class="custom-option" data-value="22">10:00 PM</div>
+       <div class="custom-option" data-value="23">11:00 PM</div>
+     </div>
+   </div>
 
 </div>
 
@@ -1019,6 +1021,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

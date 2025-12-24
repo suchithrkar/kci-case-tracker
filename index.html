@@ -873,13 +873,19 @@ tr.active-row {
 }
 
 .custom-select-trigger::after {
-  content: "⌄";
+  content: "";
   position: absolute;
   right: 12px;
-  top: 40%;
-  transform: translateY(-50%); /* ✅ true vertical center */
-  font-size: 14px;
-  line-height: 1;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 10px;
+  height: 6px;
+
+  border-left: 2px solid #cfd6e4;
+  border-bottom: 2px solid #cfd6e4;
+  transform: translateY(-50%) rotate(-45deg);
+
   opacity: 0.9;
   pointer-events: none;
 }
@@ -891,7 +897,7 @@ tr.active-row {
   left: 0;
   right: 0;
 
-  background: #111827;
+  background: #151923;
   border: 1px solid #30364a;
   border-radius: 8px;
 
@@ -909,8 +915,8 @@ tr.active-row {
 
 /* Each option */
 .custom-option {
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 4.5px 6px;
+  border-radius: 4px;
 
   color: #ffffff;
   font-weight: 500;
@@ -923,7 +929,7 @@ tr.active-row {
 }
 
 .custom-option:hover {
-  background: #2a3042;              /* matches reference hover */
+  background: #31343d;              /* matches reference hover */
 }
   
 /* ==========================================================
@@ -1376,6 +1382,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

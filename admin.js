@@ -153,8 +153,12 @@ function closeAllCustomSelects() {
 }
 
 // Close dropdowns when clicking outside
-document.addEventListener("click", closeAllCustomSelects);
+document.addEventListener("pointerdown", (e) => {
+  // If click is inside an open custom select → ignore
+  if (e.target.closest(".custom-select")) return;
 
+  closeAllCustomSelects();
+});
 
 // Update text in the progress box
 function updateProgress(msg) {
@@ -2488,6 +2492,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

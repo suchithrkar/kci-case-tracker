@@ -70,6 +70,42 @@ let processing = false;
 // Quick DOM helpers
 const $ = (id) => document.getElementById(id);
 
+/* =========================================================
+   ADMIN — CUSTOM SELECT ENGINE (Tracker-aligned)
+   ========================================================= */
+function initCustomSelect(root) {
+  const trigger = root.querySelector(".custom-select-trigger");
+  const options = root.querySelector(".custom-options");
+
+  if (!trigger || !options) return;
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeAllCustomSelects();
+    root.classList.toggle("open");
+  });
+
+  options.querySelectorAll(".custom-option").forEach(opt => {
+    opt.addEventListener("click", () => {
+      trigger.textContent = opt.textContent;
+      root.dataset.value = opt.dataset.value;
+      root.classList.remove("open");
+
+      // fire change event (used later)
+      root.dispatchEvent(new Event("change"));
+    });
+  });
+}
+
+function closeAllCustomSelects() {
+  document.querySelectorAll(".custom-select.open")
+    .forEach(el => el.classList.remove("open"));
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener("click", closeAllCustomSelects);
+
+
 // Update text in the progress box
 function updateProgress(msg) {
   const box = $("excelProgress");
@@ -147,8 +183,13 @@ $("excelInput").onchange = async (e) => {
 function resetTeamModalState() {
   // Clear inputs
   newTeamName.value = "";
-  newTeamTimezone.value = "";
-  newTeamResetHour.value = "";
+   newTeamTimezone.dataset.value = "";
+   newTeamTimezone.querySelector(".custom-select-trigger").textContent =
+     "Select Team Timezone";
+   
+   newTeamResetHour.dataset.value = "";
+   newTeamResetHour.querySelector(".custom-select-trigger").textContent =
+     "Reset Time";
 
   // Restore title
   teamModalTitle.textContent = "Create New Team";
@@ -780,6 +821,15 @@ document.body.dataset.authready = "true";
 
   // Load Teams + Stats + Users
   await loadTeamsForAdmin();
+   // --------------------------------------------------
+   // Init custom selects in Create / Manage Team modal
+   // --------------------------------------------------
+   const tzSelect = document.getElementById("newTeamTimezone");
+   const resetSelect = document.getElementById("newTeamResetHour");
+   
+   if (tzSelect) initCustomSelect(tzSelect);
+   if (resetSelect) initCustomSelect(resetSelect);
+
   loadUsersForAdmin();
   
   buildTeamSelector();
@@ -886,8 +936,8 @@ btnTeamCancel.onclick = () => {
 // ============================================================
 async function createTeamHandler() {
   const name = newTeamName.value.trim();
-  const timezone = newTeamTimezone.value;
-  const resetHour = newTeamResetHour.value;
+   const timezone = newTeamTimezone.dataset.value;
+   const resetHour = newTeamResetHour.dataset.value;
 
   if (!name) return alert("Please enter a team name.");
   if (!timezone) return alert("Please select a team timezone.");
@@ -962,9 +1012,17 @@ document.addEventListener("click", async (e) => {
 
   // Pre-fill inputs
   newTeamName.value = team.name || "";
-  newTeamTimezone.value = team.resetTimezone || "UTC";
-  newTeamResetHour.value =
-    typeof team.resetHour === "number" ? team.resetHour : 0;
+  newTeamTimezone.dataset.value = team.resetTimezone || "";
+   newTeamTimezone.querySelector(".custom-select-trigger").textContent =
+     team.resetTimezone || "Select Team Timezone";
+   
+   newTeamResetHour.dataset.value =
+     typeof team.resetHour === "number" ? String(team.resetHour) : "";
+   newTeamResetHour.querySelector(".custom-select-trigger").textContent =
+     typeof team.resetHour === "number"
+       ? `${team.resetHour}:00`
+       : "Reset Time";
+
 
   // Switch Create → Update mode
   btnTeamCreate.textContent = "Update Team";
@@ -2307,6 +2365,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

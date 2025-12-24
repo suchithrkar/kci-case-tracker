@@ -1028,7 +1028,32 @@ tr.active-row {
   font-weight: 600;
 }
 
+/* Follow-up date input (custom calendar) */
+.date-input {
+  padding: .45rem .6rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+}
 
+/* Placeholder color — theme aware */
+.date-input::placeholder {
+  color: var(--muted);
+  opacity: 0.9;
+}
+
+/* Date field wrapper */
+.date-field {
+  position: relative;
+  display: inline-block;
+}
+
+/* Calendar should appear directly below input */
+.date-field .calendar {
+  top: calc(100% + 6px);
+  left: 0;
+}
   
 </style>
 </head>
@@ -1250,14 +1275,18 @@ tr.active-row {
           <span style="font-size:18px;padding:.25rem .35rem;
                        border:1px solid var(--border);
                        border-radius:10px;">📅</span>
-          <input
-            id="optDate"
-            type="text"
-            class="date-input"
-            placeholder="Select date"
-            readonly
-          />
-          <div id="calendarContainer" style="position:relative;"></div>
+        
+          <!-- NEW wrapper -->
+          <div class="date-field">
+            <input
+              id="optDate"
+              type="text"
+              class="date-input"
+              placeholder="Select date"
+              readonly
+            />
+            <div id="calendarContainer"></div>
+          </div>
         </div>
       </div>
 
@@ -1432,6 +1461,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

@@ -152,13 +152,17 @@ function closeAllCustomSelects() {
   });
 }
 
-// Close dropdowns when clicking outside
-document.addEventListener("pointerdown", (e) => {
-  // If click is inside an open custom select → ignore
-  if (e.target.closest(".custom-select")) return;
+// Close custom selects on outside interaction (GLOBAL, CAPTURED)
+window.addEventListener(
+  "pointerdown",
+  (e) => {
+    // Ignore clicks inside any custom select
+    if (e.target.closest(".custom-select")) return;
 
-  closeAllCustomSelects();
-});
+    closeAllCustomSelects();
+  },
+  true // ✅ CAPTURE PHASE — CRITICAL
+);
 
 // Update text in the progress box
 function updateProgress(msg) {
@@ -2492,6 +2496,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

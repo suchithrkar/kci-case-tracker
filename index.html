@@ -869,6 +869,7 @@ tr.active-row {
 
   text-align: left;
   color: #e6ebf3;
+  min-height: 32px;
 }
 
 .custom-select-trigger::after {
@@ -876,8 +877,9 @@ tr.active-row {
   position: absolute;
   right: 12px;
   top: 50%;
-  transform: translateY(-48%);
+  transform: translateY(-50%); /* ✅ true vertical center */
   font-size: 14px;
+  line-height: 1;
   opacity: 0.9;
   pointer-events: none;
 }
@@ -1375,6 +1377,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

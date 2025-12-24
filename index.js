@@ -1755,7 +1755,7 @@ function renderCalendar() {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const selected = optDate.value;
+  const selected = optDate.dataset.iso || "";
 
   container.innerHTML = `
     <div class="calendar" onclick="event.stopPropagation()">
@@ -2729,6 +2729,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

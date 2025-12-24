@@ -561,10 +561,13 @@ th:hover .tooltip {
 
 .custom-select {
   position: relative;
-  min-width: 150px;
+  width: 140px;              /* ✅ fixed max width */
+  max-width: 140px;
+  margin: 0 auto;            /* ✅ center inside table cell */
   cursor: pointer;
   font-size: 13px;
 }
+
 
 .custom-select-trigger {
   background: var(--panel);
@@ -573,9 +576,11 @@ th:hover .tooltip {
   padding: 6px 28px 6px 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start; /* ✅ left aligned */
   gap: 8px;
+  text-align: left;
 }
+
 
 .custom-select-trigger::after {
   content: "▾";
@@ -1034,6 +1039,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

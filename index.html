@@ -62,6 +62,20 @@
   --option-hover: #e5e7eb;
 }
 
+/* =====================================================
+   THEME VARIABLES — SWITCH TOGGLE
+   ===================================================== */
+
+:root[data-theme="dark"] {
+  --switch-bg: #2a2f3a;     /* original dark track */
+  --switch-knob: #9aa4b2;   /* muted grey knob */
+}
+
+:root[data-theme="light"] {
+  --switch-bg: #e5e7eb;     /* light grey track */
+  --switch-knob: #6b7280;   /* dark grey knob */
+}
+
 *{box-sizing:border-box}
 html,body{
   height:100%;
@@ -493,7 +507,7 @@ tr.active-row {
   position:relative;
   width:47px;
   height:26px;
-  background:var(--panel-2);   /* ✅ theme-aware */
+  background:var(--switch-bg);   /* ✅ theme-aware */
   border-radius:999px;
   border:1px solid var(--border);
   cursor:pointer;
@@ -1492,6 +1506,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

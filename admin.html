@@ -642,17 +642,15 @@ th:hover .tooltip {
 
 /* Dropdown panel */
 .custom-options {
-  position: absolute;
-  top: calc(100% + 0px);
-  left: 0;
-  right: 0;
+  /* ❗ DO NOT position here — JS controls it */
+  position: fixed;
 
   background: var(--dropdown-bg);
   border: 1px solid var(--dropdown-border);
   border-radius: 8px;
 
   padding: 4px;
-  z-index: 3000;
+  z-index: 5000;
 
   box-shadow: 0 12px 30px rgba(0,0,0,0.6);
 
@@ -1043,6 +1041,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

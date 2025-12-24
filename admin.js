@@ -2341,34 +2341,93 @@ function buildTeamSelector() {
   statsControls.innerHTML = ""; // reset
   buildStatsControls();
 
-  const sel = document.createElement("select");
-  sel.className = "input";
-sel.style.width = "auto";
-
-  sel.id = "statsTeamSelect";
-
-   // 🔒 If secondary admin/user → lock selector to their team
-if (!isPrimary(adminState.user)) {
-    // Set selected team to user's own team
+  /* =====================================================
+     🔒 SECONDARY ADMIN / NON-PRIMARY — LOCKED TO OWN TEAM
+     ===================================================== */
+  if (!isPrimary(adminState.user)) {
+    // force selected team
     adminState.selectedStatsTeam = adminState.user.teamId;
 
-    // Clear any default options
-    sel.innerHTML = "";
+    const myTeam =
+      adminState.allTeams.find(t => t.id === adminState.user.teamId);
 
-    // Add only their team as the single option
-    const myTeamOpt = document.createElement("option");
-    myTeamOpt.value = adminState.user.teamId;
+    const label = myTeam ? myTeam.name : adminState.user.teamId;
 
-    const myTeam = adminState.allTeams.find(t => t.id === adminState.user.teamId);
-    myTeamOpt.textContent = myTeam ? myTeam.name : adminState.user.teamId;
+    const locked = document.createElement("div");
+    locked.className = "custom-select stats-team-select";
+    locked.dataset.value = adminState.user.teamId;
 
-    sel.appendChild(myTeamOpt);
+    locked.innerHTML = `
+      <div class="custom-select-trigger" style="opacity:0.7; cursor:not-allowed;">
+        ${label}
+      </div>
+    `;
 
-    // Disable the dropdown (secondary cannot switch teams)
-    sel.disabled = true;
+    // ❌ no options
+    // ❌ no initCustomSelect
+    // ❌ no change handler
 
-  statsControls.prepend(sel);
-  return; // important: stop here and return the selector
+    statsControls.prepend(locked);
+    return; // 🔴 IMPORTANT: stop here exactly like original
+  }
+
+  /* =====================================================
+     🟢 PRIMARY ADMIN — FULL TEAM SELECTOR
+     ===================================================== */
+
+  let optionsHtml = `
+    <div class="custom-option" data-value="TOTAL">TOTAL</div>
+  `;
+
+  adminState.allTeams
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach(t => {
+      optionsHtml += `
+        <div class="custom-option" data-value="${t.id}">
+          ${t.name}
+        </div>
+      `;
+    });
+
+  const currentLabel =
+    adminState.selectedStatsTeam === "TOTAL"
+      ? "TOTAL"
+      : adminState.allTeams.find(t => t.id === adminState.selectedStatsTeam)?.name
+        || "TOTAL";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "custom-select stats-team-select";
+  wrapper.dataset.value = adminState.selectedStatsTeam || "TOTAL";
+
+  wrapper.innerHTML = `
+    <div class="custom-select-trigger">${currentLabel}</div>
+    <div class="custom-options">
+      ${optionsHtml}
+    </div>
+  `;
+
+  statsControls.prepend(wrapper);
+
+  initCustomSelect(wrapper);
+
+  wrapper.addEventListener("change", () => {
+    const val = wrapper.dataset.value || "TOTAL";
+    adminState.selectedStatsTeam = val;
+
+    const team =
+      val === "TOTAL"
+        ? null
+        : adminState.allTeams.find(t => t.id === val);
+
+    teamConfig = {
+      resetTimezone: team?.resetTimezone || "UTC",
+      resetHour:
+        typeof team?.resetHour === "number" ? team.resetHour : 0
+    };
+
+    renderStatsTableNew();
+  });
 }
 
    
@@ -2422,6 +2481,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

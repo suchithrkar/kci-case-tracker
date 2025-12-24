@@ -1,4 +1,4 @@
-/* =======================================================
+/* ========================================================
    ADMIN.JS — CLEAN FINAL VERSION
    Contains:
    - Initialization & Roles
@@ -7,11 +7,11 @@
    - Excel Upload + Backup
    - Stats Engine
    - Audit Modal
-   ====================================================== */
+   ======================================================= */
 
-/* ======================================================
+/* =======================================================
    SINGLE IMPORT BLOCK (Do NOT add any more imports)
-   ====================================================== */
+   ======================================================= */
 import {
   auth,
   onAuthStateChanged,
@@ -79,90 +79,32 @@ function initCustomSelect(root) {
 
   if (!trigger || !options) return;
 
-  function openDropdown() {
-    const rect = trigger.getBoundingClientRect();
-
-    options.style.position = "fixed";
-    options.style.top = `${rect.bottom}px`;
-    options.style.left = `${rect.left}px`;
-    options.style.width = `${rect.width}px`;
-    options.style.zIndex = "2000";
-    options.style.display = "block"; // ✅ CRITICAL
-
-    document.body.appendChild(options);
-    root.classList.add("open");
-  }
-
-  function closeDropdown() {
-    if (options.parentElement === document.body) {
-      root.appendChild(options);
-    }
-
-    options.style.display = "none"; // ✅ CRITICAL
-    options.style.position = "";
-    options.style.top = "";
-    options.style.left = "";
-    options.style.width = "";
-    options.style.zIndex = "";
-
-    root.classList.remove("open");
-  }
-
   trigger.addEventListener("click", (e) => {
-     // ❌ DO NOT stop propagation here
-     // This allows document click handler to work
-   
-     if (root.classList.contains("open")) {
-       closeDropdown();
-     } else {
-       closeAllCustomSelects();
-       openDropdown();
-     }
-   });
+    e.stopPropagation();
+    closeAllCustomSelects();
+    root.classList.toggle("open");
+  });
 
   options.querySelectorAll(".custom-option").forEach(opt => {
     opt.addEventListener("click", () => {
       trigger.textContent = opt.textContent;
       root.dataset.value = opt.dataset.value;
+      root.classList.remove("open");
 
-      closeDropdown();
+      // fire change event (used later)
       root.dispatchEvent(new Event("change"));
     });
   });
 }
 
 function closeAllCustomSelects() {
-  document.querySelectorAll(".custom-select.open").forEach(root => {
-    const options = root.querySelector(".custom-options");
-
-    if (options && options.parentElement === document.body) {
-      root.appendChild(options);
-    }
-
-    if (options) {
-      options.style.display = "none"; // ✅ CRITICAL
-      options.style.position = "";
-      options.style.top = "";
-      options.style.left = "";
-      options.style.width = "";
-      options.style.zIndex = "";
-    }
-
-    root.classList.remove("open");
-  });
+  document.querySelectorAll(".custom-select.open")
+    .forEach(el => el.classList.remove("open"));
 }
 
-// Close custom selects on outside interaction (GLOBAL, CAPTURED)
-window.addEventListener(
-  "pointerdown",
-  (e) => {
-    // Ignore clicks inside any custom select
-    if (e.target.closest(".custom-select")) return;
+// Close dropdowns when clicking outside
+document.addEventListener("click", closeAllCustomSelects);
 
-    closeAllCustomSelects();
-  },
-  true // ✅ CAPTURE PHASE — CRITICAL
-);
 
 // Update text in the progress box
 function updateProgress(msg) {
@@ -2496,16 +2438,6 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

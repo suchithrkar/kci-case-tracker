@@ -79,22 +79,46 @@ function initCustomSelect(root) {
 
   if (!trigger || !options) return;
 
+  let portal = null;
+
   trigger.addEventListener("click", (e) => {
     e.stopPropagation();
     closeAllCustomSelects();
-    root.classList.toggle("open");
+
+    const rect = trigger.getBoundingClientRect();
+
+    portal = options;
+    portal.style.position = "fixed";
+    portal.style.top = `${rect.bottom}px`;
+    portal.style.left = `${rect.left}px`;
+    portal.style.width = `${rect.width}px`;
+    portal.style.zIndex = 5000;
+    portal.style.display = "block";
+
+    document.body.appendChild(portal);
+    root.classList.add("open");
   });
 
   options.querySelectorAll(".custom-option").forEach(opt => {
     opt.addEventListener("click", () => {
       trigger.textContent = opt.textContent;
       root.dataset.value = opt.dataset.value;
-      root.classList.remove("open");
 
-      // fire change event (used later)
+      closePortal();
       root.dispatchEvent(new Event("change"));
     });
   });
+
+  function closePortal() {
+    if (portal) {
+      portal.style.display = "none";
+      root.appendChild(portal);
+      portal = null;
+    }
+    root.classList.remove("open");
+  }
+
+  document.addEventListener("click", closePortal);
 }
 
 function closeAllCustomSelects() {
@@ -2438,6 +2462,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

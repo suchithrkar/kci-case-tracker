@@ -1611,7 +1611,7 @@ function renderStatusSelect(row) {
       <div class="custom-options">
         ${statuses.map(s => `
            <div class="custom-option" data-value="${s}">
-             ${s}
+             ${s || "&nbsp;"}
            </div>
          `).join("")}
       </div>
@@ -1649,8 +1649,8 @@ tbody.addEventListener("click", (e) => {
 
   handleStatusChange(caseId, value);
 
-  select.querySelector(".custom-select-trigger span").textContent =
-    value || "Select";
+  select.querySelector(".custom-select-trigger span").innerHTML =
+     value || "&nbsp;";
 
   select.classList.remove("open");
 });
@@ -2673,6 +2673,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

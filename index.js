@@ -1650,10 +1650,6 @@ tbody.addEventListener("click", (e) => {
 
   handleStatusChange(caseId, value);
 
-  select.querySelectorAll(".custom-option")
-    .forEach(o => o.classList.remove("selected"));
-
-  option.classList.add("selected");
   select.querySelector(".custom-select-trigger span").textContent =
     value || "Select";
 
@@ -2678,6 +2674,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

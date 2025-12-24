@@ -39,6 +39,32 @@
   --shadow:0 4px 12px rgba(0,0,0,.08);
 }
 
+/* =====================================================
+   THEME VARIABLES — CUSTOM SELECT
+   ===================================================== */
+
+:root[data-theme="dark"] {
+  --select-bg: #0f1420;
+  --select-border: #2f3546;
+  --select-text: #e6ebf3;
+
+  --dropdown-bg: #111827;
+  --dropdown-border: #30364a;
+
+  --option-hover: #2a3042;
+}
+
+:root[data-theme="light"] {
+  --select-bg: #ffffff;
+  --select-border: #c9d1e2;
+  --select-text: #1f2937;
+
+  --dropdown-bg: #f9fafb;
+  --dropdown-border: #cfd6e4;
+
+  --option-hover: #e5e7eb;
+}
+
 *{box-sizing:border-box}
 html,body{
   height:100%;
@@ -993,6 +1019,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

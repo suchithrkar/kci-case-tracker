@@ -1028,6 +1028,14 @@ tr.active-row {
   font-weight: 600;
 }
 
+/* When TODAY is also SELECTED → filled wins */
+.calendar-day.today.selected {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  outline: 1px solid rgba(255,255,255,0.35); /* subtle contrast ring */
+}
+
 /* Follow-up date input (custom calendar) */
 .date-input {
   padding: .45rem .6rem;
@@ -1473,6 +1481,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

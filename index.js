@@ -1725,6 +1725,93 @@ let pendingStatusForModal = null;   // temporarily stores status chosen which re
 let prevStatusBeforeModal = null;   // to revert if modal cancelled
 let requireFollowUp = false;
 
+/* =========================================================
+   CUSTOM CALENDAR — CLICK TO OPEN
+   ========================================================= */
+
+let calendarMonth = new Date();
+
+optDate.addEventListener("click", (e) => {
+  e.stopPropagation();
+  renderCalendar();
+});
+
+document.addEventListener("click", () => {
+  closeCalendar();
+});
+
+function closeCalendar() {
+  const c = document.getElementById("calendarContainer");
+  c.innerHTML = "";
+}
+
+function renderCalendar() {
+  const container = document.getElementById("calendarContainer");
+  const today = new Date();
+
+  const year = calendarMonth.getFullYear();
+  const month = calendarMonth.getMonth();
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const selected = optDate.value;
+
+  container.innerHTML = `
+    <div class="calendar" onclick="event.stopPropagation()">
+      <div class="calendar-header">
+        <span class="calendar-nav" id="prevMonth">‹</span>
+        <span>${calendarMonth.toLocaleString("default", { month: "long" })} ${year}</span>
+        <span class="calendar-nav" id="nextMonth">›</span>
+      </div>
+
+      <div class="calendar-weekdays">
+        ${["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => `<div>${d}</div>`).join("")}
+      </div>
+
+      <div class="calendar-grid">
+        ${Array(firstDay).fill("").map(() => `<div></div>`).join("")}
+        ${Array.from({ length: daysInMonth }, (_, i) => {
+          const day = i + 1;
+          const iso =
+            `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+          const isToday =
+            day === today.getDate() &&
+            month === today.getMonth() &&
+            year === today.getFullYear();
+
+          return `
+            <div class="calendar-day
+              ${isToday ? "today" : ""}
+              ${iso === selected ? "selected" : ""}"
+              data-date="${iso}">
+              ${day}
+            </div>`;
+        }).join("")}
+      </div>
+    </div>
+  `;
+
+  container.querySelector("#prevMonth").onclick = () => {
+    calendarMonth.setMonth(calendarMonth.getMonth() - 1);
+    renderCalendar();
+  };
+
+  container.querySelector("#nextMonth").onclick = () => {
+    calendarMonth.setMonth(calendarMonth.getMonth() + 1);
+    renderCalendar();
+  };
+
+  container.querySelectorAll(".calendar-day").forEach(d => {
+    d.onclick = () => {
+      optDate.value = d.dataset.date;
+      closeCalendar();
+    };
+  });
+}
+
+
 // =====================================================
 // CLOSURE SURVEY — STAR RATING STATE
 // =====================================================
@@ -2319,50 +2406,6 @@ optDate.addEventListener("contextmenu", (e) => {
   }
 });
 
-/* =========================================================
-   CUSTOM CALENDAR — CLICK TO OPEN
-   ========================================================= */
-
-optDate.onclick = () => {
-  const cal = document.getElementById("calendarContainer");
-  cal.innerHTML = buildCalendar(new Date());
-};
-
-/* Calendar builder */
-function buildCalendar(date) {
-  const d = new Date(date);
-  const month = d.getMonth();
-  const year = d.getFullYear();
-
-  return `
-    <div class="calendar">
-      <div class="calendar-header">
-        <strong>
-          ${d.toLocaleString("default", { month: "long" })} ${year}
-        </strong>
-      </div>
-
-      <div class="calendar-grid">
-        ${[...Array(31)].map((_, i) => `
-          <div class="calendar-day"
-               onclick="selectDate(${year},${month},${i + 1})">
-            ${i + 1}
-          </div>
-        `).join("")}
-      </div>
-    </div>
-  `;
-}
-
-/* Date select handler */
-window.selectDate = (y, m, d) => {
-  const val =
-    `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-
-  optDate.value = val;
-  document.getElementById("calendarContainer").innerHTML = "";
-};
-
 /* =======================================================================
    WARNING UI — SMALL VIBRATION EFFECT FOR ERROR
    ======================================================================= */
@@ -2673,6 +2716,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

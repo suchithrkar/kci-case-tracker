@@ -164,7 +164,8 @@ function initCustomSelect(root) {
       root.dispatchEvent(new Event("change"));
     });
   });
-
+}
+}
 
 function closeAllCustomSelects() {
   document.querySelectorAll(".custom-select.open").forEach(root => {
@@ -2523,6 +2524,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

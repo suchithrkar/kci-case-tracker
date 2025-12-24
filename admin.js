@@ -856,6 +856,8 @@ export async function loadTeamsForAdmin() {
 btnCreateTeam.onclick = () => {
   if (!isPrimary(adminState.user)) return;
   modalCreateTeam.classList.add("show");
+  buildCustomSelect(newTeamTimezone, { width: "100%" });
+  buildCustomSelect(newTeamResetHour, { width: "100%" });
 };
 
 btnTeamClose.onclick = () => {
@@ -1266,6 +1268,7 @@ function bindRoleDropdowns() {
   if (!isPrimary(adminState.user)) return;
 
   document.querySelectorAll(".user-role-dd").forEach(sel => {
+    buildCustomSelect(sel, { width: "160px" });
     sel.onchange = async () => {
       const uid = sel.dataset.uid;
       const newRole = sel.value;
@@ -1307,6 +1310,7 @@ function bindTeamDropdowns() {
   if (!isPrimary(adminState.user)) return;
 
   document.querySelectorAll(".user-team-dd").forEach(sel => {
+    buildCustomSelect(sel, { width: "180px" });
     sel.onchange = async () => {
       const uid = sel.dataset.uid;
       const newTeam = sel.value;
@@ -2228,7 +2232,8 @@ function buildTeamSelector() {
 
   const sel = document.createElement("select");
   sel.className = "input";
-sel.style.width = "auto";
+  buildCustomSelect(sel, { width: "180px" });
+  sel.style.width = "auto";
 
   sel.id = "statsTeamSelect";
 
@@ -2308,82 +2313,60 @@ function subscribeStatsCases() {
   return;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* ==========================================================
+   CUSTOM SELECT — ADMIN (shared with tracker)
+   ========================================================== */
+
+function buildCustomSelect(nativeSelect, { width = null } = {}) {
+  if (!nativeSelect || nativeSelect.dataset.customized) return;
+
+  nativeSelect.dataset.customized = "true";
+  nativeSelect.style.display = "none";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "custom-select";
+  if (width) wrapper.style.width = width;
+
+  const trigger = document.createElement("div");
+  trigger.className = "custom-select-trigger";
+  trigger.textContent =
+    nativeSelect.options[nativeSelect.selectedIndex]?.text || "Select";
+
+  const optionsBox = document.createElement("div");
+  optionsBox.className = "custom-options";
+
+  [...nativeSelect.options].forEach(opt => {
+    const optionEl = document.createElement("div");
+    optionEl.className = "custom-option";
+    optionEl.textContent = opt.text;
+    optionEl.dataset.value = opt.value;
+
+    optionEl.onclick = () => {
+      nativeSelect.value = opt.value;
+      nativeSelect.dispatchEvent(new Event("change"));
+      trigger.textContent = opt.text;
+      wrapper.classList.remove("open");
+    };
+
+    optionsBox.appendChild(optionEl);
+  });
+
+  trigger.onclick = () => {
+    document.querySelectorAll(".custom-select.open")
+      .forEach(cs => cs !== wrapper && cs.classList.remove("open"));
+    wrapper.classList.toggle("open");
+  };
+
+  wrapper.appendChild(trigger);
+  wrapper.appendChild(optionsBox);
+  nativeSelect.parentNode.insertBefore(wrapper, nativeSelect.nextSibling);
+}
+
+/* Close on outside click */
+document.addEventListener("click", (e) => {
+  document.querySelectorAll(".custom-select.open").forEach(cs => {
+    if (!cs.contains(e.target)) cs.classList.remove("open");
+  });
+});
 
 

@@ -528,6 +528,13 @@ select.user-team-dd,
   gap: 0.6rem;
 }
 
+/* Ensure stats team select + refresh stay in one row */
+#statsControls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .stats-header select {
   width: auto !important;
   min-width: 150px;
@@ -668,6 +675,15 @@ th:hover .tooltip {
 .custom-option:hover {
   background: var(--option-hover);
 }
+
+/* ==========================================================
+   CREATE / MANAGE TEAM MODAL — FULL WIDTH SELECTS
+   ========================================================== */
+.team-form-grid .custom-select {
+  width: 100%;
+  max-width: 100%;
+}
+
 
 </style>
 
@@ -1021,6 +1037,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

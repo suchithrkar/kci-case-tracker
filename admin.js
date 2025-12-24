@@ -129,16 +129,27 @@ function initCustomSelect(root) {
       root.dispatchEvent(new Event("change"));
     });
   });
-
-  // Close when clicking outside
-  document.addEventListener("click", () => {
-    closeDropdown();
-  });
 }
 
 function closeAllCustomSelects() {
-  document.querySelectorAll(".custom-select.open")
-    .forEach(el => el.classList.remove("open"));
+  document.querySelectorAll(".custom-select.open").forEach(root => {
+    const options = root.querySelector(".custom-options");
+
+    // If dropdown was portaled, put it back
+    if (options && options.parentElement === document.body) {
+      root.appendChild(options);
+    }
+
+    root.classList.remove("open");
+
+    if (options) {
+      options.style.position = "";
+      options.style.top = "";
+      options.style.left = "";
+      options.style.width = "";
+      options.style.zIndex = "";
+    }
+  });
 }
 
 // Close dropdowns when clicking outside
@@ -2477,6 +2488,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

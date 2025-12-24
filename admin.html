@@ -692,25 +692,24 @@ th:hover .tooltip {
    CREATE / MANAGE TEAM MODAL
    Scrollable dropdown with hidden scrollbar
    (ONLY for timezone & reset selectors)
+
+   Scrollable dropdown (portal-safe)
    ========================================================== */
 
-#modalCreateTeam .team-tz .custom-options,
-#modalCreateTeam .team-reset .custom-options {
-  max-height: 220px;          /* ✅ adjust if needed */
+.custom-options.team-modal-dropdown {
+  max-height: 220px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 /* Hide scrollbar — Chrome, Edge, Safari */
-#modalCreateTeam .team-tz .custom-options::-webkit-scrollbar,
-#modalCreateTeam .team-reset .custom-options::-webkit-scrollbar {
+.custom-options.team-modal-dropdown::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
 
 /* Hide scrollbar — Firefox */
-#modalCreateTeam .team-tz .custom-options,
-#modalCreateTeam .team-reset .custom-options {
+.custom-options.team-modal-dropdown {
   scrollbar-width: none;
 }
 
@@ -1068,6 +1067,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

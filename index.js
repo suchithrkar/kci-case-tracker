@@ -2120,7 +2120,7 @@ if (btnClosureClose) {
 async function loadLastActionedByName(uid) {
   if (!uid) {
     optLastActionedByName.textContent = "—";
-    optLastActionedByName.style.opacity = 0.7;
+    optLastActionedByName.style.opacity = 1;
     return;
   }
 
@@ -2716,6 +2716,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -79,8 +79,6 @@ function initCustomSelect(root) {
 
   if (!trigger || !options) return;
 
-  let portalActive = false;
-
   function openDropdown() {
     const rect = trigger.getBoundingClientRect();
 
@@ -89,11 +87,48 @@ function initCustomSelect(root) {
     options.style.left = `${rect.left}px`;
     options.style.width = `${rect.width}px`;
     options.style.zIndex = "2000";
+    options.style.display = "block"; // ✅ CRITICAL
 
     document.body.appendChild(options);
     root.classList.add("open");
-    portalActive = true;
   }
+
+  function closeDropdown() {
+    if (options.parentElement === document.body) {
+      root.appendChild(options);
+    }
+
+    options.style.display = "none"; // ✅ CRITICAL
+    options.style.position = "";
+    options.style.top = "";
+    options.style.left = "";
+    options.style.width = "";
+    options.style.zIndex = "";
+
+    root.classList.remove("open");
+  }
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    if (root.classList.contains("open")) {
+      closeDropdown();
+    } else {
+      closeAllCustomSelects();
+      openDropdown();
+    }
+  });
+
+  options.querySelectorAll(".custom-option").forEach(opt => {
+    opt.addEventListener("click", () => {
+      trigger.textContent = opt.textContent;
+      root.dataset.value = opt.dataset.value;
+
+      closeDropdown();
+      root.dispatchEvent(new Event("change"));
+    });
+  });
+}
 
   function closeDropdown() {
     if (!portalActive) return;
@@ -135,20 +170,20 @@ function closeAllCustomSelects() {
   document.querySelectorAll(".custom-select.open").forEach(root => {
     const options = root.querySelector(".custom-options");
 
-    // If dropdown was portaled, put it back
     if (options && options.parentElement === document.body) {
       root.appendChild(options);
     }
 
-    root.classList.remove("open");
-
     if (options) {
+      options.style.display = "none"; // ✅ CRITICAL
       options.style.position = "";
       options.style.top = "";
       options.style.left = "";
       options.style.width = "";
       options.style.zIndex = "";
     }
+
+    root.classList.remove("open");
   });
 }
 
@@ -2488,6 +2523,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

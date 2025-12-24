@@ -145,12 +145,15 @@ $("excelInput").onchange = async (e) => {
 function resetTeamModalState() {
   // Clear inputs
   newTeamName.value = "";
-  document
-     .querySelector('[data-select="team-timezone"]')
-     ?.dataset.value || "" = "";
-  document
-     .querySelector('[data-select="team-reset"]')
-     ?.dataset.value || "" = "";
+   const timezoneSelect = document.querySelector('[data-select="team-timezone"]');
+   if (timezoneSelect) {
+     timezoneSelect.dataset.value = "";
+   }
+   
+   const resetSelect = document.querySelector('[data-select="team-reset"]');
+   if (resetSelect) {
+     resetSelect.dataset.value = "";
+   }
 
   // Restore title
   teamModalTitle.textContent = "Create New Team";
@@ -2385,6 +2388,7 @@ document.addEventListener("click", (e) => {
     if (!sel.contains(e.target)) sel.classList.remove("open");
   });
 });
+
 
 
 

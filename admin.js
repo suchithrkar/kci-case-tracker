@@ -1292,11 +1292,11 @@ function renderUsersTable(users) {
   html += `</tbody></table>`;
   usersTableWrap.innerHTML = html;
 
-  if (isPrimary(adminState.user)) {
-    bindRoleDropdowns();
-    bindTeamDropdowns();
-    bindUserActions();
-  }
+   if (isPrimary(adminState.user)) {
+     bindUserRoleCustomSelects();
+     bindUserTeamCustomSelects(); // (we add this next)
+     bindUserActions();
+   }
 }
 
 // Helper function for capitalization
@@ -1309,56 +1309,113 @@ function capitalize(str) {
    FIXED ROLE DROPDOWN
    ----------------------------------------------------------------------- */
 function renderRoleDropdown(u) {
-  if (u.role === "primary") return `<strong>Primary Admin</strong>`;
-  if (!isPrimary(adminState.user)) return u.role;
+  // Primary admin role should not be editable
+  if (u.role === "primary") {
+    return `<strong>Primary Admin</strong>`;
+  }
+
+  // Secondary admins cannot edit roles
+  if (!isPrimary(adminState.user)) {
+    return capitalize(u.role);
+  }
+
+  const currentLabel =
+    u.role === "secondary" ? "Secondary Admin" : "General User";
 
   return `
-    <select class="input user-role-dd" data-uid="${u.id}">
-      <option value="general"   ${u.role === "general"   ? "selected" : ""}>General User</option>
-      <option value="secondary" ${u.role === "secondary" ? "selected" : ""}>Secondary Admin</option>
-    </select>
+    <div class="custom-select user-role-dd" data-uid="${u.id}" data-value="${u.role}">
+      <div class="custom-select-trigger">${currentLabel}</div>
+      <div class="custom-options">
+        <div class="custom-option" data-value="general">General User</div>
+        <div class="custom-option" data-value="secondary">Secondary Admin</div>
+      </div>
+    </div>
   `;
 }
 
-function bindRoleDropdowns() {
+function bindUserRoleCustomSelects() {
   if (!isPrimary(adminState.user)) return;
 
-  document.querySelectorAll(".user-role-dd").forEach(sel => {
-    sel.onchange = async () => {
-      const uid = sel.dataset.uid;
-      const newRole = sel.value;
+  document.querySelectorAll(".custom-select.user-role-dd").forEach(cs => {
+    initCustomSelect(cs);
 
-      await updateDoc(doc(db, "users", uid), { role: newRole });
-      showPopup("Role updated.");
-    };
+    cs.addEventListener("change", async () => {
+      const uid = cs.dataset.uid;
+      const newRole = cs.dataset.value;
+
+      if (!uid || !newRole) return;
+
+      try {
+        await updateDoc(doc(db, "users", uid), { role: newRole });
+        showPopup("Role updated.");
+      } catch (err) {
+        console.error(err);
+        showPopup("Failed to update role.");
+      }
+    });
   });
 }
+
+function bindUserTeamCustomSelects() {
+  if (!isPrimary(adminState.user)) return;
+
+  document.querySelectorAll(".custom-select.user-team-dd").forEach(cs => {
+    initCustomSelect(cs);
+
+    cs.addEventListener("change", async () => {
+      const uid = cs.dataset.uid;
+      const newTeam = cs.dataset.value || "";
+
+      if (!uid) return;
+
+      try {
+        await updateDoc(doc(db, "users", uid), { teamId: newTeam });
+        showPopup(`Team updated${newTeam ? "" : " (removed)"}.`);
+      } catch (err) {
+        console.error(err);
+        showPopup("Failed to update team.");
+      }
+    });
+  });
+}
+
+
 
 /* -----------------------------------------------------------------------
    FIXED TEAM DROPDOWN
    ----------------------------------------------------------------------- */
 function renderTeamDropdown(u) {
-  if (!isPrimary(adminState.user)) return u.teamId || "—";
+  if (!isPrimary(adminState.user)) {
+    return u.teamId || "—";
+  }
 
-  const teams = adminState.allTeams.sort((a, b) =>
-    a.name.localeCompare(b.name)
-  );
+  const teams = adminState.allTeams
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name));
 
-  const blankOption = u.teamId === "" ? "selected" : "";
+  const currentTeam =
+    teams.find(t => t.id === u.teamId)?.name || "— No Team —";
 
-  let html = `<select class="input user-team-dd" data-uid="${u.id}">`;
-  html += `<option value="" ${blankOption}>— No Team —</option>`;
+  let optionsHtml = `<div class="custom-option" data-value="">— No Team —</div>`;
 
   teams.forEach(t => {
-    html += `
-      <option value="${t.id}" 
-        ${u.teamId === t.id ? "selected" : ""}>
+    optionsHtml += `
+      <div class="custom-option" data-value="${t.id}">
         ${t.name}
-      </option>`;
+      </div>
+    `;
   });
 
-  html += `</select>`;
-  return html;
+  return `
+    <div class="custom-select user-team-dd"
+         data-uid="${u.id}"
+         data-value="${u.teamId || ""}">
+      <div class="custom-select-trigger">${currentTeam}</div>
+      <div class="custom-options">
+        ${optionsHtml}
+      </div>
+    </div>
+  `;
 }
 
 function bindTeamDropdowns() {
@@ -2365,6 +2422,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

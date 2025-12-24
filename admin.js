@@ -109,15 +109,16 @@ function initCustomSelect(root) {
   }
 
   trigger.addEventListener("click", (e) => {
-    e.stopPropagation();
-
-    if (root.classList.contains("open")) {
-      closeDropdown();
-    } else {
-      closeAllCustomSelects();
-      openDropdown();
-    }
-  });
+     // ❌ DO NOT stop propagation here
+     // This allows document click handler to work
+   
+     if (root.classList.contains("open")) {
+       closeDropdown();
+     } else {
+       closeAllCustomSelects();
+       openDropdown();
+     }
+   });
 
   options.querySelectorAll(".custom-option").forEach(opt => {
     opt.addEventListener("click", () => {
@@ -2487,6 +2488,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

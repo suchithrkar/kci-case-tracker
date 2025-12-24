@@ -112,8 +112,6 @@ const modalCreateTeam     = document.getElementById("modalCreateTeam");
 const teamModalTitle = document.getElementById("teamModalTitle");
 
 // Team reset settings inputs
-const newTeamTimezone = document.getElementById("newTeamTimezone");
-const newTeamResetHour = document.getElementById("newTeamResetHour");
 const btnTeamCancel = document.getElementById("btnTeamCancel");
 
 const updateTeamList      = document.getElementById("updateTeamList");
@@ -147,8 +145,12 @@ $("excelInput").onchange = async (e) => {
 function resetTeamModalState() {
   // Clear inputs
   newTeamName.value = "";
-  newTeamTimezone.value = "";
-  newTeamResetHour.value = "";
+  document
+     .querySelector('[data-select="team-timezone"]')
+     ?.dataset.value || "" = "";
+  document
+     .querySelector('[data-select="team-reset"]')
+     ?.dataset.value || "" = "";
 
   // Restore title
   teamModalTitle.textContent = "Create New Team";
@@ -582,7 +584,6 @@ btnUpdateDone.onclick = () => {
 
 
 const modalReassign       = document.getElementById("modalReassign");
-const reassignTeamSelect  = document.getElementById("reassignTeamSelect");
 const btnReassignClose    = document.getElementById("btnReassignClose");
 const btnReassignDone     = document.getElementById("btnReassignDone");
 const btnReassignConfirm  = document.getElementById("btnReassignConfirm");
@@ -856,6 +857,22 @@ export async function loadTeamsForAdmin() {
 btnCreateTeam.onclick = () => {
   if (!isPrimary(adminState.user)) return;
   modalCreateTeam.classList.add("show");
+     /* Reset custom selects */
+   document
+     .querySelector('[data-select="team-timezone"]')
+     ?.querySelector(".custom-select-trigger span").innerHTML = "&nbsp;";
+   
+   document
+     .querySelector('[data-select="team-timezone"]')
+     ?.removeAttribute("data-value");
+   
+   document
+     .querySelector('[data-select="team-reset"]')
+     ?.querySelector(".custom-select-trigger span").innerHTML = "&nbsp;";
+   
+   document
+     .querySelector('[data-select="team-reset"]')
+     ?.removeAttribute("data-value");
 };
 
 btnTeamClose.onclick = () => {
@@ -886,8 +903,12 @@ btnTeamCancel.onclick = () => {
 // ============================================================
 async function createTeamHandler() {
   const name = newTeamName.value.trim();
-  const timezone = newTeamTimezone.value;
-  const resetHour = newTeamResetHour.value;
+  const timezone = document
+     .querySelector('[data-select="team-timezone"]')
+     ?.dataset.value || "";
+  const resetHour = document
+     .querySelector('[data-select="team-reset"]')
+     ?.dataset.value || "";
 
   if (!name) return alert("Please enter a team name.");
   if (!timezone) return alert("Please select a team timezone.");
@@ -962,9 +983,13 @@ document.addEventListener("click", async (e) => {
 
   // Pre-fill inputs
   newTeamName.value = team.name || "";
-  newTeamTimezone.value = team.resetTimezone || "UTC";
-  newTeamResetHour.value =
-    typeof team.resetHour === "number" ? team.resetHour : 0;
+  document
+     .querySelector('[data-select="team-timezone"]')
+     ?.dataset.value || "" = team.resetTimezone || "UTC";
+  document
+     .querySelector('[data-select="team-reset"]')
+     ?.dataset.value || "" =
+       typeof team.resetHour === "number" ? team.resetHour : 0;
 
   // Switch Create → Update mode
   btnTeamCreate.textContent = "Update Team";
@@ -972,8 +997,12 @@ document.addEventListener("click", async (e) => {
 
   btnTeamCreate.onclick = async () => {
   const updatedName = newTeamName.value.trim();
-  const updatedTimezone = newTeamTimezone.value;
-  const updatedResetHour = newTeamResetHour.value;
+  const updatedTimezone = document
+     .querySelector('[data-select="team-timezone"]')
+     ?.dataset.value || "";
+  const updatedResetHour = document
+     .querySelector('[data-select="team-reset"]')
+     ?.dataset.value || "";
 
   if (!updatedName || !updatedTimezone || updatedResetHour === "") {
     alert("Please fill all team fields.");
@@ -1050,6 +1079,13 @@ function openReassignModal(teamId, qs) {
 
   populateReassignTeams();
   modalReassign.classList.add("show");
+     document
+     .querySelector('[data-select="reassign-team"]')
+     ?.querySelector(".custom-select-trigger span").innerHTML = "&nbsp;";
+   
+   document
+     .querySelector('[data-select="reassign-team"]')
+     ?.removeAttribute("data-value");
 }
 
 btnReassignClose.onclick = () => modalReassign.classList.remove("show");
@@ -1075,7 +1111,9 @@ function populateReassignTeams() {
 
 /* CONFIRM BUTTON — Reassign Users THEN Delete Team */
 btnReassignConfirm.onclick = async () => {
-  const newTeam = reassignTeamSelect.value;
+  const newTeam = document
+     .querySelector('[data-select="reassign-team"]')
+     ?.dataset.value || "";
   if (!newTeam) return showPopup("Please select a team.");
 
   showPopup("Reassigning users...");
@@ -2307,6 +2345,48 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
+/* =========================================================
+   CUSTOM SELECT — ADMIN (same as tracker)
+   ========================================================= */
+
+document.addEventListener("click", (e) => {
+  const select = e.target.closest(".custom-select");
+
+  /* Close other selects */
+  document.querySelectorAll(".custom-select.open").forEach(s => {
+    if (s !== select) s.classList.remove("open");
+  });
+
+  if (!select) return;
+
+  /* Toggle dropdown */
+  select.classList.toggle("open");
+
+  const option = e.target.closest(".custom-option");
+  if (!option) return;
+
+  const value = option.dataset.value ?? "";
+  const label = option.textContent || "\u00A0";
+
+  /* Store selected value */
+  select.dataset.value = value;
+
+  /* Update visible label */
+  select.querySelector(".custom-select-trigger span").innerHTML =
+    label || "&nbsp;";
+
+  select.classList.remove("open");
+});
+
+/* Close on outside click */
+document.addEventListener("click", (e) => {
+  document.querySelectorAll(".custom-select.open").forEach(sel => {
+    if (!sel.contains(e.target)) sel.classList.remove("open");
+  });
+});
+
+
 
 
 

@@ -1733,6 +1733,15 @@ let calendarMonth = new Date();
 
 optDate.addEventListener("click", (e) => {
   e.stopPropagation();
+
+  // ✅ Jump calendar to selected date's month (if exists)
+  if (optDate.dataset.iso) {
+    const [y, m] = optDate.dataset.iso.split("-");
+    calendarMonth = new Date(Number(y), Number(m) - 1, 1);
+  } else {
+    calendarMonth = new Date(); // fallback to today
+  }
+
   renderCalendar();
 });
 
@@ -2729,6 +2738,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

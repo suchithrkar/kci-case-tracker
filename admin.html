@@ -554,94 +554,7 @@ th .tooltip {
 th:hover .tooltip {
   opacity: 1;
 }
-
-/* ==========================================================
-   CUSTOM DROPDOWN (REPLACES <select>)
-   ========================================================== */
-
-.custom-select {
-  position: relative;
-  width: 140px;              /* ✅ fixed max width */
-  max-width: 140px;
-  margin: 0 auto;            /* ✅ center inside table cell */
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.custom-select-trigger {
-  background: var(--select-bg);
-  border: 1px solid var(--select-border);
-  border-radius: 8px;
-  padding: 6px 28px 6px 12px;
-
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-
-  text-align: left;
-  color: var(--select-text);
-  min-height: 32px;
-}
-
-.custom-select-trigger::after {
-  content: "";
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-
-  width: 6px;
-  height: 6px;
-
-  border-left: 2px solid var(--select-text);
-  border-bottom: 2px solid var(--select-text);
-  transform: translateY(-50%) rotate(-45deg);
-
-  opacity: 0.9;
-  pointer-events: none;
-}
-
-/* Dropdown panel */
-.custom-options {
-  position: absolute;
-  top: calc(100% + 0px);
-  left: 0;
-  right: 0;
-
-  background: var(--dropdown-bg);
-  border: 1px solid var(--dropdown-border);
-  border-radius: 8px;
-
-  padding: 4px;
-  z-index: 300;
-
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-
-  display: none;
-}
-
-.custom-select.open .custom-options {
-  display: block;
-}
-
-/* Each option */
-.custom-option {
-  padding: 4.8px 6px;
-  border-radius: 4px;
-
-  color: var(--select-text);
-  font-weight: 500;
-  background: transparent;
-  text-align: left;
-}
-
-.custom-option:last-child {
-  margin-bottom: 0;
-}
-
-.custom-option:hover {
-  background: var(--option-hover);
-}
+   
 
 </style>
 
@@ -739,64 +652,59 @@ th:hover .tooltip {
   </button>
 
   <!-- Row 2: Timezone -->
-   <div class="custom-select input team-tz" data-select="team-timezone">
-     <div class="custom-select-trigger">
-       <span>&nbsp;</span>
-     </div>
-     <div class="custom-options" id="newTeamTimezoneOptions">
-       <div class="custom-option" data-value="">Select Team Timezone</div>
-   
-       <div class="custom-option" data-value="Europe/London">UK (Europe/London)</div>
-       <div class="custom-option" data-value="Europe/Berlin">Central Europe (Europe/Berlin)</div>
-   
-       <div class="custom-option" data-value="America/New_York">US – Eastern</div>
-       <div class="custom-option" data-value="America/Chicago">US – Central</div>
-       <div class="custom-option" data-value="America/Los_Angeles">US – Pacific</div>
-   
-       <div class="custom-option" data-value="Asia/Kolkata">India</div>
-       <div class="custom-option" data-value="Asia/Singapore">Singapore</div>
-       <div class="custom-option" data-value="Asia/Dubai">Middle East</div>
-   
-       <div class="custom-option" data-value="Australia/Sydney">Australia</div>
-       <div class="custom-option" data-value="Pacific/Auckland">New Zealand</div>
-   
-       <div class="custom-option" data-value="UTC">UTC</div>
-     </div>
-   </div>
+  <select class="input team-tz" id="newTeamTimezone">
+    <option value="">Select Team Timezone</option>
+
+    <!-- EMEA -->
+    <option value="Europe/London">UK (Europe/London)</option>
+    <option value="Europe/Berlin">Central Europe (Europe/Berlin)</option>
+
+    <!-- Americas -->
+    <option value="America/New_York">US – Eastern</option>
+    <option value="America/Chicago">US – Central</option>
+    <option value="America/Los_Angeles">US – Pacific</option>
+
+    <!-- Asia -->
+    <option value="Asia/Kolkata">India</option>
+    <option value="Asia/Singapore">Singapore</option>
+    <option value="Asia/Dubai">Middle East</option>
+
+    <!-- ANZ -->
+    <option value="Australia/Sydney">Australia</option>
+    <option value="Pacific/Auckland">New Zealand</option>
+
+    <!-- Global -->
+    <option value="UTC">UTC</option>
+  </select>
 
   <!-- Row 2: Reset hour -->
-   <div class="custom-select input team-reset" data-select="team-reset">
-     <div class="custom-select-trigger">
-       <span>&nbsp;</span>
-     </div>
-     <div class="custom-options" id="newTeamResetHourOptions">
-       <div class="custom-option" data-value="">Reset Time</div>
-       <div class="custom-option" data-value="0">12:00 AM</div>
-       <div class="custom-option" data-value="1">1:00 AM</div>
-       <div class="custom-option" data-value="2">2:00 AM</div>
-       <div class="custom-option" data-value="3">3:00 AM</div>
-       <div class="custom-option" data-value="4">4:00 AM</div>
-       <div class="custom-option" data-value="5">5:00 AM</div>
-       <div class="custom-option" data-value="6">6:00 AM</div>
-       <div class="custom-option" data-value="7">7:00 AM</div>
-       <div class="custom-option" data-value="8">8:00 AM</div>
-       <div class="custom-option" data-value="9">9:00 AM</div>
-       <div class="custom-option" data-value="10">10:00 AM</div>
-       <div class="custom-option" data-value="11">11:00 AM</div>
-       <div class="custom-option" data-value="12">12:00 PM</div>
-       <div class="custom-option" data-value="13">1:00 PM</div>
-       <div class="custom-option" data-value="14">2:00 PM</div>
-       <div class="custom-option" data-value="15">3:00 PM</div>
-       <div class="custom-option" data-value="16">4:00 PM</div>
-       <div class="custom-option" data-value="17">5:00 PM</div>
-       <div class="custom-option" data-value="18">6:00 PM</div>
-       <div class="custom-option" data-value="19">7:00 PM</div>
-       <div class="custom-option" data-value="20">8:00 PM</div>
-       <div class="custom-option" data-value="21">9:00 PM</div>
-       <div class="custom-option" data-value="22">10:00 PM</div>
-       <div class="custom-option" data-value="23">11:00 PM</div>
-     </div>
-   </div>
+  <select class="input team-reset" id="newTeamResetHour">
+    <option value="">Reset Time</option>
+    <option value="0">12:00 AM</option>
+    <option value="1">1:00 AM</option>
+    <option value="2">2:00 AM</option>
+    <option value="3">3:00 AM</option>
+    <option value="4">4:00 AM</option>
+    <option value="5">5:00 AM</option>
+    <option value="6">6:00 AM</option>
+    <option value="7">7:00 AM</option>
+    <option value="8">8:00 AM</option>
+    <option value="9">9:00 AM</option>
+    <option value="10">10:00 AM</option>
+    <option value="11">11:00 AM</option>
+    <option value="12">12:00 PM</option>
+    <option value="13">1:00 PM</option>
+    <option value="14">2:00 PM</option>
+    <option value="15">3:00 PM</option>
+    <option value="16">4:00 PM</option>
+    <option value="17">5:00 PM</option>
+    <option value="18">6:00 PM</option>
+    <option value="19">7:00 PM</option>
+    <option value="20">8:00 PM</option>
+    <option value="21">9:00 PM</option>
+    <option value="22">10:00 PM</option>
+    <option value="23">11:00 PM</option>
+  </select>
 
 </div>
 
@@ -954,14 +862,7 @@ th:hover .tooltip {
     <div class="modal-body">
       <p>You must reassign all users before deleting this team.</p>
       <p>Select a new team:</p>
-      <div class="custom-select input" data-select="reassign-team">
-        <div class="custom-select-trigger">
-          <span>&nbsp;</span>
-        </div>
-        <div class="custom-options" id="reassignTeamSelectOptions">
-          <!-- options injected by JS -->
-        </div>
-      </div>
+      <select class="input" id="reassignTeamSelect"></select>
 
       <button class="modal-btn" id="btnReassignConfirm" style="margin-top:0.8rem;">
         Reassign Users
@@ -1005,7 +906,6 @@ th:hover .tooltip {
 </body>
 
 </html>
-
 
 
 

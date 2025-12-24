@@ -36,6 +36,32 @@
   --shadow:0 4px 12px rgba(0,0,0,.08);
 }
 
+/* =====================================================
+   THEME VARIABLES — CUSTOM SELECT
+   ===================================================== */
+
+:root[data-theme="dark"] {
+  --select-bg: #0f1420;
+  --select-border: #2f3546;
+  --select-text: #e6ebf3;
+
+  --dropdown-bg: #111827;
+  --dropdown-border: #30364a;
+
+  --option-hover: #2a3042;
+}
+
+:root[data-theme="light"] {
+  --select-bg: #ffffff;
+  --select-border: #c9d1e2;
+  --select-text: #1f2937;
+
+  --dropdown-bg: #f9fafb;
+  --dropdown-border: #cfd6e4;
+
+  --option-hover: #e5e7eb;
+}
+
 *{box-sizing:border-box}
 html,body{
   height:100%;
@@ -858,8 +884,8 @@ tr.active-row {
 }
 
 .custom-select-trigger {
-  background: #0f1420;
-  border: 1px solid #2f3546;
+  background: var(--select-bg);
+  border: 1px solid var(--select-border);
   border-radius: 8px;
   padding: 6px 28px 6px 12px;
 
@@ -868,7 +894,7 @@ tr.active-row {
   justify-content: flex-start;
 
   text-align: left;
-  color: #e6ebf3;
+  color: var(--select-text);
   min-height: 32px;
 }
 
@@ -882,8 +908,8 @@ tr.active-row {
   width: 6px;
   height: 6px;
 
-  border-left: 2px solid #cfd6e4;
-  border-bottom: 2px solid #cfd6e4;
+  border-left: 2px solid var(--select-text);
+  border-bottom: 2px solid var(--select-text);
   transform: translateY(-50%) rotate(-45deg);
 
   opacity: 0.9;
@@ -897,8 +923,8 @@ tr.active-row {
   left: 0;
   right: 0;
 
-  background: #151923;
-  border: 1px solid #30364a;
+  background: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
   border-radius: 8px;
 
   padding: 4px;
@@ -929,7 +955,7 @@ tr.active-row {
 }
 
 .custom-option:hover {
-  background: #31343d;              /* matches reference hover */
+  background: var(--option-hover);
 }
   
 /* ==========================================================
@@ -1382,6 +1408,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

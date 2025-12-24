@@ -1610,11 +1610,10 @@ function renderStatusSelect(row) {
       </div>
       <div class="custom-options">
         ${statuses.map(s => `
-          <div class="custom-option ${row.status === s ? "selected" : ""}"
-               data-value="${s}">
-            ${s}
-          </div>
-        `).join("")}
+           <div class="custom-option" data-value="${s}">
+             ${s}
+           </div>
+         `).join("")}
       </div>
     </div>
   `;
@@ -2674,6 +2673,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -506,8 +506,12 @@ tr.active-row {
   width:20px;
   height:20px;
   border-radius:50%;
-  background:var(--switch-knob); /* ✅ theme-aware */
-  transition:left .15s ease;
+
+  background: var(--switch-knob);
+  border: 1px solid rgba(0,0,0,0.15);     /* ✅ visibility */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.25); /* ✅ depth */
+
+  transition: left .15s ease, background .15s ease;
 }
 .switch.on{background:#2e7dff}
 .switch.on::after{left:22px;background:white}
@@ -1488,6 +1492,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

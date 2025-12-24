@@ -89,6 +89,14 @@ function initCustomSelect(root) {
 
     portal = options;
     portal.dataset.portalFor = root.id;
+
+     // ✅ Mark team modal dropdowns for styling
+      if (root.id === "newTeamTimezone" || root.id === "newTeamResetHour") {
+        portal.classList.add("team-modal-dropdown");
+      } else {
+        portal.classList.remove("team-modal-dropdown");
+      }
+   
     portal.style.position = "fixed";
     portal.style.top = `${rect.bottom}px`;
     portal.style.left = `${rect.left}px`;
@@ -2474,6 +2482,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

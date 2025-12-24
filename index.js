@@ -1766,7 +1766,10 @@ function renderCalendar() {
       </div>
 
       <div class="calendar-weekdays">
-        ${["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => `<div>${d}</div>`).join("")}
+        ${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+        .map((d, i) =>
+          `<div class="${i === 0 || i === 6 ? "weekend" : ""}">${d}</div>`
+        ).join("")}
       </div>
 
       <div class="calendar-grid">
@@ -1781,13 +1784,17 @@ function renderCalendar() {
             month === today.getMonth() &&
             year === today.getFullYear();
 
-          return `
-            <div class="calendar-day
-              ${isToday ? "today" : ""}
-              ${iso === selected ? "selected" : ""}"
-              data-date="${iso}">
-              ${day}
-            </div>`;
+         const weekday = new Date(iso).getDay(); // 0 = Sun, 6 = Sat
+         const isWeekend = weekday === 0 || weekday === 6;
+         
+         return `
+           <div class="calendar-day
+             ${isToday ? "today" : ""}
+             ${iso === selected ? "selected" : ""}
+             ${isWeekend ? "weekend" : ""}"
+             data-date="${iso}">
+             ${day}
+           </div>`;
         }).join("")}
       </div>
     </div>
@@ -1805,9 +1812,11 @@ function renderCalendar() {
 
   container.querySelectorAll(".calendar-day").forEach(d => {
     d.onclick = () => {
-      optDate.value = d.dataset.date;
-      closeCalendar();
-    };
+     const iso = d.dataset.date;      // YYYY-MM-DD
+     optDate.dataset.iso = iso;       // store internally
+     optDate.value = formatDMY(iso);  // show DD-MM-YYYY
+     closeCalendar();
+   };
   });
 }
 
@@ -2031,7 +2040,13 @@ export function openCaseModal(caseId, enforce = false) {
   loadLastActionedByName(r.lastActionedBy);
 
   /* Follow Date */
-  optDate.value = r.followDate || "";
+  if (r.followDate) {
+     optDate.dataset.iso = r.followDate;
+     optDate.value = formatDMY(r.followDate);
+   } else {
+     optDate.dataset.iso = "";
+     optDate.value = "";
+   }
 
   /* Flag */
   setFlagUI(r.flagged);
@@ -2455,9 +2470,7 @@ async function saveModalData() {
 
   const today = getTeamToday(trackerState.teamConfig);
 
-  const follow = optDate.value
-    ? new Date(optDate.value).toISOString().split("T")[0]
-    : null;
+  const follow = optDate.dataset.iso || null;
 
   /* Follow-up required */
   if (requireFollowUp && !follow) {
@@ -2716,6 +2729,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

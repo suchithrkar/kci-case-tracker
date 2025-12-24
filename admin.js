@@ -79,21 +79,60 @@ function initCustomSelect(root) {
 
   if (!trigger || !options) return;
 
+  let portalActive = false;
+
+  function openDropdown() {
+    const rect = trigger.getBoundingClientRect();
+
+    options.style.position = "fixed";
+    options.style.top = `${rect.bottom}px`;
+    options.style.left = `${rect.left}px`;
+    options.style.width = `${rect.width}px`;
+    options.style.zIndex = "2000";
+
+    document.body.appendChild(options);
+    root.classList.add("open");
+    portalActive = true;
+  }
+
+  function closeDropdown() {
+    if (!portalActive) return;
+
+    root.appendChild(options);
+    options.style.position = "";
+    options.style.top = "";
+    options.style.left = "";
+    options.style.width = "";
+    options.style.zIndex = "";
+
+    root.classList.remove("open");
+    portalActive = false;
+  }
+
   trigger.addEventListener("click", (e) => {
     e.stopPropagation();
     closeAllCustomSelects();
-    root.classList.toggle("open");
+
+    if (portalActive) {
+      closeDropdown();
+    } else {
+      openDropdown();
+    }
   });
 
   options.querySelectorAll(".custom-option").forEach(opt => {
     opt.addEventListener("click", () => {
       trigger.textContent = opt.textContent;
       root.dataset.value = opt.dataset.value;
-      root.classList.remove("open");
 
-      // fire change event (used later)
+      closeDropdown();
       root.dispatchEvent(new Event("change"));
     });
+  });
+
+  // Close when clicking outside
+  document.addEventListener("click", () => {
+    closeDropdown();
   });
 }
 
@@ -2438,6 +2477,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

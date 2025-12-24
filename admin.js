@@ -88,6 +88,7 @@ function initCustomSelect(root) {
     const rect = trigger.getBoundingClientRect();
 
     portal = options;
+    portal.dataset.portalFor = root.id;
     portal.style.position = "fixed";
     portal.style.top = `${rect.bottom}px`;
     portal.style.left = `${rect.left}px`;
@@ -122,8 +123,19 @@ function initCustomSelect(root) {
 }
 
 function closeAllCustomSelects() {
-  document.querySelectorAll(".custom-select.open")
-    .forEach(el => el.classList.remove("open"));
+  document.querySelectorAll(".custom-select.open").forEach(root => {
+    const options = document.querySelector(
+      ".custom-options[data-portal-for='" + root.id + "']"
+    );
+
+    if (options) {
+      options.style.display = "none";
+      root.appendChild(options);
+      options.removeAttribute("data-portal-for");
+    }
+
+    root.classList.remove("open");
+  });
 }
 
 // Close dropdowns when clicking outside
@@ -2462,6 +2474,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

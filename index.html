@@ -858,22 +858,27 @@ tr.active-row {
 }
 
 .custom-select-trigger {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 6px 28px 6px 10px;
+  background: #0f1420;
+  border: 1px solid #2f3546;
+  border-radius: 999px;
+  padding: 6px 28px 6px 12px;
+
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* ✅ left aligned */
-  gap: 8px;
+  justify-content: flex-start;
+
   text-align: left;
+  color: #e6ebf3;
 }
 
 .custom-select-trigger::after {
-  content: "▾";
+  content: "⌄";
   position: absolute;
-  right: 10px;
-  opacity: 0.7;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-48%);
+  font-size: 14px;
+  opacity: 0.9;
   pointer-events: none;
 }
 
@@ -883,13 +888,17 @@ tr.active-row {
   top: calc(100% + 6px);
   left: 0;
   right: 0;
-  background: #1e2330;              /* subtle grey */
-  border: 1px solid #2f3546;
-  border-radius: 10px;
-  padding: 6px;
+
+  background: #111827;
+  border: 1px solid #30364a;
+  border-radius: 12px;
+
+  padding: 6px 6px;
+  z-index: 300;
+
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+
   display: none;
-  z-index: 200;
-  box-shadow: var(--shadow);
 }
 
 .custom-select.open .custom-options {
@@ -898,10 +907,14 @@ tr.active-row {
 
 /* Each option */
 .custom-option {
-  padding: 6px 8px;
+  padding: 6px 10px;
   border-radius: 6px;
-  margin-bottom: 4px;
+  margin: 2px 0;
+
+  color: #ffffff;
+  font-weight: 500;
   background: transparent;
+  text-align: left;
 }
 
 .custom-option:last-child {
@@ -1362,6 +1375,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

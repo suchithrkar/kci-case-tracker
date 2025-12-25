@@ -1459,7 +1459,7 @@ function buildRfcReport() {
    const sbdTotal = all.length;
    
    const pct = (n) =>
-     sbdTotal ? Math.round((n / sbdTotal) * 100) : 0;
+     sbdTotal ? ((n / sbdTotal) * 100).toFixed(1) : "0.0";
 
   /* ---------------------------------------
      RENDER
@@ -2753,6 +2753,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

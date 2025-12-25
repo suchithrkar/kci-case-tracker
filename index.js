@@ -1913,6 +1913,13 @@ if (uiState.unupdatedActive) {
    }
 
    if (newStatus === "Closed") {
+   
+     // store previous status so UI can revert if modal is cancelled
+     prevStatusBeforeModal = row.status || "";
+   
+     // mark pending "Closed" (same concept as SP / Monitoring)
+     pendingStatusForModal = "Closed";
+   
      openClosureModal(row);
      return;
    }
@@ -2216,15 +2223,17 @@ btnModalClear.onclick = () => {
 
 function closeModal() {
   // If modal was enforcing follow-up and user cancels → revert status
-   /*
-  if (requireFollowUp && pendingStatusForModal && currentModalCaseId) {
-    const r = trackerState.allCases.find(x => x.id === currentModalCaseId);
-    if (r) {
-      r.status = prevStatusBeforeModal || "";
-    }
-    pendingStatusForModal = null;
-    prevStatusBeforeModal = null;
-  }*/
+   if (pendingStatusForModal && currentModalCaseId) {
+     const r = trackerState.allCases.find(x => x.id === currentModalCaseId);
+     if (r) {
+       r.status = prevStatusBeforeModal || "";
+     }
+     pendingStatusForModal = null;
+     prevStatusBeforeModal = null;
+   
+     // refresh UI so dropdown reverts visually
+     applyFilters();
+   }
 
   requireFollowUp = false;
   currentModalCaseId = null;
@@ -2753,6 +2762,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

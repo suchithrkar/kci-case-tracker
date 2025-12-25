@@ -1664,9 +1664,6 @@ tbody.addEventListener("click", (e) => {
 
   handleStatusChange(caseId, value);
 
-  select.querySelector(".custom-select-trigger span").innerHTML =
-     value || "&nbsp;";
-
   select.classList.remove("open");
 });
 
@@ -2762,6 +2759,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

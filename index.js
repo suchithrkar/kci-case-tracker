@@ -1444,11 +1444,22 @@ function buildRfcReport() {
   /* ---------------------------------------
      SBD METRICS (FROM TOTAL OPEN)
      --------------------------------------- */
-  const sbdMet = all.filter(r => (r.sbd || "").toLowerCase() === "met").length;
-  const sbdNotMet = all.filter(r => (r.sbd || "").toLowerCase() === "not met").length;
-  const sbdTotal = sbdMet + sbdNotMet;
-
-  const pct = (n) => sbdTotal ? Math.round((n / sbdTotal) * 100) : 0;
+   const sbdMet = all.filter(
+     r => (r.sbd || "").toLowerCase() === "met"
+   ).length;
+   
+   const sbdNotMet = all.filter(
+     r => (r.sbd || "").toLowerCase() === "not met"
+   ).length;
+   
+   // NA = everything else
+   const sbdNA = all.length - sbdMet - sbdNotMet;
+   
+   // Percentages are based on TOTAL open repair cases
+   const sbdTotal = all.length;
+   
+   const pct = (n) =>
+     sbdTotal ? Math.round((n / sbdTotal) * 100) : 0;
 
   /* ---------------------------------------
      RENDER
@@ -2738,6 +2749,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

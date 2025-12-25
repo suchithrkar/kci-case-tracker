@@ -1514,6 +1514,10 @@ function buildRfcReport() {
       <span>Not Met</span>
       <span>${sbdNotMet} (${pct(sbdNotMet)}%)</span>
     </div>
+    <div class="rfc-report-line">
+     <span>NA</span>
+     <span>${sbdNA} (${pct(sbdNA)}%)</span>
+   </div>
   </div>
 
 `;
@@ -2749,6 +2753,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

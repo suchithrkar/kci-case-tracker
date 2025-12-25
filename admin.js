@@ -90,11 +90,25 @@ function initCustomSelect(root) {
     portal = options;
     portal.dataset.portalFor = root.id;
 
-     // ✅ Mark team modal dropdowns for styling
+      // ✅ Mark dropdowns for scroll styling (portal-safe)
+      portal.classList.remove(
+        "team-modal-dropdown",
+        "admin-team-dropdown"
+      );
+      
+      // Create / Manage Team modal selects
       if (root.id === "newTeamTimezone" || root.id === "newTeamResetHour") {
         portal.classList.add("team-modal-dropdown");
-      } else {
-        portal.classList.remove("team-modal-dropdown");
+      }
+      
+      // Admin Users → Team dropdown
+      if (root.classList.contains("user-team-dd")) {
+        portal.classList.add("admin-team-dropdown");
+      }
+      
+      // Admin Stats → Team selector
+      if (root.classList.contains("stats-team-select")) {
+        portal.classList.add("admin-team-dropdown");
       }
    
     portal.style.position = "fixed";
@@ -2482,6 +2496,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

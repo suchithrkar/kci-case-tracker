@@ -702,6 +702,28 @@ th:hover .tooltip {
   overflow-x: hidden;
 }
 
+/* ==========================================================
+   ADMIN PAGE — USER TEAM & STATS TEAM DROPDOWNS
+   Scrollable dropdown with hidden scrollbar
+   ========================================================== */
+
+.custom-options.admin-team-dropdown {
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar — Chrome, Edge, Safari */
+.custom-options.admin-team-dropdown::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Hide scrollbar — Firefox */
+.custom-options.admin-team-dropdown {
+  scrollbar-width: none;
+}
+
 /* Hide scrollbar — Chrome, Edge, Safari */
 .custom-options.team-modal-dropdown::-webkit-scrollbar {
   width: 0;
@@ -1067,6 +1089,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

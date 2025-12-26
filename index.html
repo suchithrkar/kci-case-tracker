@@ -456,6 +456,15 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 .due-today{
   background:rgba(255,209,102,.15)!important;
 }
+/* Due today with specific time (subtle emphasis) */
+.due-today-time {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    to right,
+    var(--due-bg),
+    rgba(255, 255, 255, 0.04)
+  );
+}
 .flagged{
   background:rgba(255,107,107,.15)!important;
 }
@@ -1550,6 +1559,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

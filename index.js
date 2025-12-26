@@ -1863,6 +1863,7 @@ let currentModalCaseId = null;
 let pendingStatusForModal = null;   // temporarily stores status chosen which requires follow-up
 let prevStatusBeforeModal = null;   // to revert if modal cancelled
 let requireFollowUp = false;
+let closureSurveyCompleted = false;
 
 /* =========================================================
    CUSTOM CALENDAR — CLICK TO OPEN
@@ -2043,6 +2044,8 @@ if (uiState.unupdatedActive) {
    
      // mark pending "Closed" (same concept as SP / Monitoring)
      pendingStatusForModal = "Closed";
+
+     closureSurveyCompleted = false; // 🔒 reset until survey submits
    
      openClosureModal(row);
      return;
@@ -2194,9 +2197,11 @@ submitBtn.textContent = "Submit";
   }
 
   await firestoreUpdateCase(caseId, update);
+  closureSurveyCompleted = true;
+  pendingStatusForModal = null; // prevent double handling
 
    submitBtn.disabled = false;
-submitBtn.textContent = "Submit";
+   submitBtn.textContent = "Submit";
 
 
   document
@@ -2465,6 +2470,7 @@ function closeModal() {
    unupdatedProtect = false;
 
    window.__fromReminder = false;
+   closureSurveyCompleted = false;
 }
 
 
@@ -2772,12 +2778,21 @@ async function saveModalData() {
      lastActionedBy: trackerState.user.uid
    };
 
-  // If the user selected Service Pending / Monitoring earlier, persist the status now
-  if (pendingStatusForModal) {
-    updateObj.status = pendingStatusForModal;
-    updateObj.statusChangedOn = today;
-    updateObj.statusChangedBy = trackerState.user.uid;
-  }
+   // If the user selected Service Pending / Monitoring earlier, persist the status now
+   // ⛔ BLOCK Closed unless survey was submitted
+   if (pendingStatusForModal === "Closed" && !closureSurveyCompleted) {
+     showModalWarning(
+       'Please complete the Case Closure Survey before closing this case.'
+     );
+     return false;
+   }
+   
+   // Persist pending status (SP / Monitoring / Closed-after-survey)
+   if (pendingStatusForModal) {
+     updateObj.status = pendingStatusForModal;
+     updateObj.statusChangedOn = today;
+     updateObj.statusChangedBy = trackerState.user.uid;
+   }
 
   try {
     await firestoreUpdateCase(caseId, updateObj);
@@ -3004,6 +3019,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

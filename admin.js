@@ -1509,7 +1509,7 @@ if (u.role === "primary") {
   return `<span style="opacity:0.6;">—</span>`; // or return "" to show nothing
 }
 
-return `<button class="action-btn" data-remove="${u.id}">Remove</button>`;
+return `<button class="action-btn btn-boxed" data-remove="${u.id}">Remove</button>`;
 
 }
 
@@ -2165,7 +2165,7 @@ function renderStatsTableNew() {
   }
 </td>
       <td>${u.followX} / ${u.followY}</td>
-      <td><button class="action-btn" data-audit="${u.userId}">Audit</button></td>
+      <td><button class="action-btn btn-boxed" data-audit="${u.userId}">Audit</button></td>
     </tr>
   `).join("");
 
@@ -2496,6 +2496,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -1154,6 +1154,48 @@ tr.active-row {
 .segment-field[type="time"] {
   min-width: 90px;
 }
+
+/* ================================
+   TIME WHEEL PICKER
+   ================================ */
+
+.time-wheel {
+  gap: 6px;
+  padding-right: 6px;
+}
+
+.wheel {
+  width: 42px;
+  height: 110px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  text-align: center;
+  border-left: 1px solid var(--border);
+}
+
+.wheel::-webkit-scrollbar {
+  display: none;
+}
+
+.wheel div {
+  padding: 6px 0;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.wheel div.active {
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.ampm-toggle {
+  width: 44px;
+  text-align: center;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--accent);
+  user-select: none;
+}
   
 </style>
 </head>
@@ -1415,15 +1457,18 @@ tr.active-row {
           <div id="calendarContainer"></div>
         
           <!-- TIME SEGMENT — CUSTOM 12h PICKER -->
-          <div class="segmented-input">
-            <span class="segment-icon">⏰</span>
-          
-            <div class="custom-select time-select" id="optTime">
-              <div class="custom-select-trigger">
-                <span>Select time</span>
-              </div>
+            <div class="segmented-input time-wheel" id="optTime">
+              <span class="segment-icon">⏰</span>
+            
+              <!-- HOURS -->
+              <div class="wheel" data-type="hour"></div>
+            
+              <!-- MINUTES -->
+              <div class="wheel" data-type="minute"></div>
+            
+              <!-- AM / PM TOGGLE -->
+              <div class="ampm-toggle" id="ampmToggle">AM</div>
             </div>
-          </div>
           
           <!-- ✅ TIME OPTIONS — OUTSIDE clipped container -->
           <div id="timeOptionsContainer"></div>
@@ -1605,6 +1650,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

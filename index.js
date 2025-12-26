@@ -1897,11 +1897,22 @@ document.addEventListener("click", () => {
 function closeCalendar() {
   const c = document.getElementById("calendarContainer");
   c.innerHTML = "";
+  c.removeAttribute("style");
 }
 
 function renderCalendar() {
   const container = document.getElementById("calendarContainer");
   const today = new Date();
+
+  // 🔗 Anchor calendar to the date segment
+  const segment = optDate.closest(".segmented-input");
+  const rect = segment.getBoundingClientRect();
+
+  // Position calendar directly below date segment
+  container.style.position = "fixed";
+  container.style.left = rect.left + "px";
+  container.style.top = rect.bottom + 6 + "px";
+  container.style.zIndex = 500;
 
   const year = calendarMonth.getFullYear();
   const month = calendarMonth.getMonth();
@@ -3063,6 +3074,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

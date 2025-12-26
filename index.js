@@ -2721,12 +2721,29 @@ async function saveModalData() {
   const optTime = document.getElementById("optTime");
   r.followTime = optTime?.value || "";
 
-  /* Follow-up required */
-  if (requireFollowUp && !follow) {
-    showModalWarning("Please select a follow-up date.");
-    return false;
-  }
-  hideModalWarning();
+   /* =====================================================
+      FOLLOW-UP VALIDATION (TABLE + REMINDER FLOWS)
+      ===================================================== */
+   
+   const effectiveStatus =
+     pendingStatusForModal || r.status || "";
+   
+   const needsFollowUpEnforced =
+     requireFollowUp ||
+     (
+       window.__fromReminder &&
+       (effectiveStatus === "Service Pending" ||
+        effectiveStatus === "Monitoring")
+     );
+   
+   if (needsFollowUpEnforced && !follow) {
+     showModalWarning(
+       `Status "${effectiveStatus}" requires a follow-up date.`
+     );
+     return false;
+   }
+   
+   hideModalWarning();
 
   r.followDate = follow;
   r.flagged = optFlag.classList.contains("on");
@@ -2978,6 +2995,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -1509,7 +1509,7 @@ if (u.role === "primary") {
   return `<span style="opacity:0.6;">—</span>`; // or return "" to show nothing
 }
 
-return `<button class="action-btn btn-boxed" data-remove="${u.id}">Remove</button>`;
+return `<button class="action-btn btn-boxed" style="padding: 0.35rem 0.6rem; border-radius: 8px;" data-remove="${u.id}">Remove</button>`;
 
 }
 
@@ -2165,7 +2165,7 @@ function renderStatsTableNew() {
   }
 </td>
       <td>${u.followX} / ${u.followY}</td>
-      <td><button class="action-btn btn-boxed" data-audit="${u.userId}">Audit</button></td>
+      <td><button class="action-btn btn-boxed" style="padding: 0.35rem 0.6rem; border-radius: 8px;" data-audit="${u.userId}">Audit</button></td>
     </tr>
   `).join("");
 
@@ -2378,7 +2378,7 @@ async function loadStatsCasesOnce() {
 ------------------------------------------------------------ */
 function buildStatsControls() {
   statsControls.innerHTML = `
-    <button class="action-btn btn-boxed" id="btnStatsRefresh" title="Refresh">
+    <button class="action-btn btn-boxed" style="padding:0.55rem 0.65rem;font-size:18px;" id="btnStatsRefresh" title="Refresh">
       🔄
     </button>
 `;
@@ -2496,6 +2496,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

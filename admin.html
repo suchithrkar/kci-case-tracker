@@ -90,11 +90,6 @@ html,body{
   height: 58px;           /* Exact tracker header height */
 }
 
-/* Match header button height from tracker */
-.header .hdr-btn {
-  padding: 0.55rem 1.15rem;
-}
-
 .title{
   font-size:1.25rem;
   font-weight:700;
@@ -105,21 +100,6 @@ html,body{
 /* ============================================================
    MATCH TRACKER HEADER BUTTON STYLE
    ============================================================ */
-/* Header buttons identical to tracker */
-.hdr-btn {
-  padding: .55rem 1.15rem !important;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--panel-2);
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 
 .hdr-btn:hover{
   filter:brightness(1.08);
@@ -292,8 +272,6 @@ tbody tr:hover {
 }
 
 .action-btn{
-  padding:0.35rem 0.6rem;
-  border-radius:8px;
   border:1px solid var(--border);
   background:var(--panel-2);
   cursor:pointer;
@@ -355,10 +333,8 @@ tbody tr:hover {
   border-top:1px solid var(--border);
 }
 .modal-btn{
-  padding:0.55rem 1rem;
   background:var(--panel-2);
   border:1px solid var(--border);
-  border-radius:999px;
   cursor:pointer;
 }
 .modal-btn:hover{
@@ -546,11 +522,6 @@ select.user-team-dd,
   min-width: 150px;
 }
 
-#btnStatsRefresh {
-  padding: 0.55rem 0.65rem !important;
-  font-size: 18px;
-}
-
 /* ============================================================
    PREVIEW MODAL + PROGRESS UI
    ============================================================ */
@@ -736,33 +707,25 @@ th:hover .tooltip {
 }
 
 /* ============================================================
-   BUTTON SYSTEM — TRACKER-ALIGNED (FINAL)
+   BUTTON SYSTEM — TRACKER SOURCE OF TRUTH
    ============================================================ */
 
 button,
-.hdr-btn,
-.action-btn,
-.modal-btn {
-  appearance: none;
+.btn,
+.hdr-btn {
   border: 1px solid var(--border);
   background: var(--panel-2);
-  color: var(--text);
-
-  font: inherit;
-  font-size: 14px;
-  font-weight: 500;
-
-  padding: 0.55rem 1.15rem;   /* ← TRACKER MAGIC */
   border-radius: 999px;
+  padding: .6rem 1rem;
 
   cursor: pointer;
+  font: inherit;
   white-space: nowrap;
 }
 
 button:hover,
-.hdr-btn:hover,
-.action-btn:hover,
-.modal-btn:hover {
+.btn:hover,
+.hdr-btn:hover {
   filter: brightness(1.08);
 }
 
@@ -1118,6 +1081,7 @@ button:hover,
 </body>
 
 </html>
+
 
 
 

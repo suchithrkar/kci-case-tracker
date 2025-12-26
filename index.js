@@ -242,11 +242,11 @@ if (btnReminderFollowUp) {
       .getElementById("followUpReminderModal")
       .classList.remove("show");
 
-    // 🔗 Open Case Options modal from reminder
-    openCaseModal(r.id);
-
-    // Mark that modal was opened from reminder
+    // ✅ IMPORTANT: mark context FIRST
     window.__fromReminder = true;
+
+    // 🔗 Now open Case Options modal
+    openCaseModal(r.id);
 
     activeReminderCase = null;
   };
@@ -2906,6 +2906,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

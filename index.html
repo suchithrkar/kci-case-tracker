@@ -462,6 +462,22 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 .has-notes{
   background:rgba(79,140,240,0.15)!important;
 }
+/* Follow-up with TIME today */
+.due-today-time {
+  background: rgba(255, 120, 120, 0.22) !important;
+}
+
+/* Follow-up within next 30 minutes */
+.due-soon {
+  background: rgba(255, 80, 80, 0.35) !important;
+  animation: pulseDue 1.6s infinite;
+}
+
+@keyframes pulseDue {
+  0% { box-shadow: 0 0 0 0 rgba(255,80,80,0.5); }
+  70% { box-shadow: 0 0 0 6px rgba(255,80,80,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,80,80,0); }
+}
 /* ACTIVE ROW HIGHLIGHT */
 tr.active-row {
   outline: 2px solid rgba(79,140,240,0.55);
@@ -1550,6 +1566,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

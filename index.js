@@ -232,6 +232,12 @@ if (btnReminderFollowUp) {
     const r = activeReminderCase;
     if (!r) return;
 
+    // ⛔ stop this reminder from firing again
+    if (followUpTimers.has(r.id)) {
+      clearTimeout(followUpTimers.get(r.id));
+      followUpTimers.delete(r.id);
+    }
+
     document
       .getElementById("followUpReminderModal")
       .classList.remove("show");
@@ -2896,6 +2902,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

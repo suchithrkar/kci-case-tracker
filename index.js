@@ -1910,7 +1910,6 @@ function renderCalendar() {
    container.style.position = "absolute";
    container.style.left = "0";
    container.style.top = "100%";
-   container.style.marginTop = "6px";
    container.style.zIndex = "500";
 
   const year = calendarMonth.getFullYear();
@@ -3073,6 +3072,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

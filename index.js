@@ -2551,6 +2551,78 @@ function formatDMY(iso) {
 }
 
 /* =========================================================
+   SIMPLE TIME PICKER (HH / MM / AMPM)
+   ========================================================= */
+
+const timePopup = document.getElementById("timeWheelPopup");
+const hhPart = document.getElementById("hhPart");
+const mmPart = document.getElementById("mmPart");
+const ampmPart = document.getElementById("ampmPart");
+
+let timeState = { hh: null, mm: null, ampm: "AM" };
+
+function openWheel(anchor, values, key) {
+  const rect = anchor.getBoundingClientRect();
+
+  timePopup.style.left = rect.left + "px";
+  timePopup.style.top = rect.bottom + "px";
+
+  timePopup.innerHTML = `
+    <div class="time-wheel">
+      ${values.map(v =>
+        `<div data-v="${v}">${String(v).padStart(2,"0")}</div>`
+      ).join("")}
+    </div>
+  `;
+}
+
+hhPart.onclick = (e) => {
+  e.stopPropagation();
+  openWheel(hhPart, [1,2,3,4,5,6,7,8,9,10,11,12], "hh");
+};
+
+mmPart.onclick = (e) => {
+  e.stopPropagation();
+  openWheel(mmPart, [0,5,10,15,20,25,30,35,40,45,50,55], "mm");
+};
+
+ampmPart.onclick = () => {
+  timeState.ampm = timeState.ampm === "AM" ? "PM" : "AM";
+  ampmPart.textContent = timeState.ampm;
+  syncTime();
+};
+
+timePopup.onclick = (e) => {
+  const opt = e.target.closest("[data-v]");
+  if (!opt) return;
+
+  const v = Number(opt.dataset.v);
+  if (timePopup.innerHTML.includes("12")) {
+    timeState.hh = v;
+    hhPart.textContent = String(v).padStart(2,"0");
+  } else {
+    timeState.mm = v;
+    mmPart.textContent = String(v).padStart(2,"0");
+  }
+
+  syncTime();
+  closeTimePopup();
+};
+
+document.addEventListener("click", closeTimePopup);
+
+function closeTimePopup() {
+  timePopup.innerHTML = "";
+}
+
+function syncTime() {
+  if (timeState.hh !== null && timeState.mm !== null) {
+    document.getElementById("optTime").dataset.value =
+      `${timeState.hh}:${String(timeState.mm).padStart(2,"0")} ${timeState.ampm}`;
+  }
+}
+
+/* =========================================================
    INFINITE TIME WHEEL PICKER
    ========================================================= */
 
@@ -3161,6 +3233,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

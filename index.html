@@ -1196,6 +1196,40 @@ tr.active-row {
   color: var(--accent);
   user-select: none;
 }
+
+.time-part {
+  min-width: 36px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.time-part.ampm {
+  color: var(--accent);
+}
+
+#timeWheelPopup {
+  position: absolute;
+  z-index: 700;
+}
+
+.time-wheel {
+  max-height: 120px;
+  overflow-y: auto;
+  background: var(--panel);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.time-wheel div {
+  padding: 6px 14px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.time-wheel div:hover {
+  background: var(--hover);
+}
   
 </style>
 </head>
@@ -1457,18 +1491,16 @@ tr.active-row {
           <div id="calendarContainer"></div>
         
           <!-- TIME SEGMENT — CUSTOM 12h PICKER -->
-            <div class="segmented-input time-wheel" id="optTime">
+            <div class="segmented-input time-picker" id="optTime">
               <span class="segment-icon">⏰</span>
             
-              <!-- HOURS -->
-              <div class="wheel" data-type="hour"></div>
-            
-              <!-- MINUTES -->
-              <div class="wheel" data-type="minute"></div>
-            
-              <!-- AM / PM TOGGLE -->
-              <div class="ampm-toggle" id="ampmToggle">AM</div>
+              <div class="time-part" id="hhPart">HH</div>
+              <div class="time-part" id="mmPart">MM</div>
+              <div class="time-part ampm" id="ampmPart">AM</div>
             </div>
+            
+            <!-- Dropdown container (shared) -->
+            <div id="timeWheelPopup"></div>
         
         </div>
       </div>
@@ -1647,6 +1679,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

@@ -1471,7 +1471,13 @@ tr.active-row {
       <!-- JS will inject case details -->
     </div>
 
-    <div class="modal-foot">
+    <div class="modal-foot" style="justify-content:space-between;">
+      <div style="display:flex;gap:8px;">
+        <button class="btn" data-snooze="10">Snooze 10m</button>
+        <button class="btn" data-snooze="30">Snooze 30m</button>
+        <button class="btn" data-snooze="60">Snooze 1h</button>
+      </div>
+    
       <button class="btn" id="btnReminderFollowUp">Follow Up</button>
     </div>
 
@@ -1544,6 +1550,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

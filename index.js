@@ -142,15 +142,28 @@ function scheduleFollowUpReminder(r) {
 
   const delay = reminderTs - now;
 
-  const timerId = setTimeout(() => {
-    console.log(
-      "⏰ Follow-up reminder fired:",
-      r.id,
-      r.customerName
-    );
-  }, delay);
+   const timerId = setTimeout(() => {
+     openFollowUpReminderModal(r);
+   }, delay);
 
   followUpTimers.set(r.id, timerId);
+}
+
+function openFollowUpReminderModal(r) {
+  activeReminderCase = r;
+
+  const body = document.getElementById("followUpReminderBody");
+  body.innerHTML = `
+    <div><strong>Case ID:</strong> ${r.caseId || r.id}</div>
+    <div><strong>Customer:</strong> ${r.customerName || "—"}</div>
+    <div><strong>Follow-up scheduled:</strong>
+      ${r.followDate} ${r.followTime}
+    </div>
+  `;
+
+  document
+    .getElementById("followUpReminderModal")
+    .classList.add("show");
 }
 
 /* =======================================================================
@@ -201,7 +214,11 @@ const pendingUnupdated = new Set();
 
 const followUpTimers = new Map(); // caseId → timeoutId
 
+/* =========================================================
+   FOLLOW-UP REMINDER MODAL (PHASE 3A)
+   ========================================================= */
 
+let activeReminderCase = null;
 
 
 /* =======================================================================
@@ -2797,6 +2814,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

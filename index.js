@@ -2550,6 +2550,76 @@ function formatDMY(iso) {
   return `${d}-${m}-${y}`;
 }
 
+/* =========================================================
+   INFINITE TIME WHEEL PICKER
+   ========================================================= */
+
+const hourWheel = document.querySelector('.wheel[data-type="hour"]');
+const minuteWheel = document.querySelector('.wheel[data-type="minute"]');
+const ampmToggle = document.getElementById('ampmToggle');
+
+let timeState = {
+  hour: 1,
+  minute: 0,
+  ampm: "AM"
+};
+
+function buildWheel(el, values) {
+  el.innerHTML = "";
+
+  // duplicate values 3 times to fake infinite scroll
+  const pool = [...values, ...values, ...values];
+
+  pool.forEach(v => {
+    const d = document.createElement("div");
+    d.textContent = v;
+    el.appendChild(d);
+  });
+
+  // center on middle set
+  el.scrollTop = el.scrollHeight / 3;
+}
+
+function attachWheelLogic(el, values, key) {
+  el.addEventListener("scroll", () => {
+    const itemHeight = el.firstChild.offsetHeight;
+    const index = Math.round(el.scrollTop / itemHeight) % values.length;
+    timeState[key] = values[index];
+    highlight(el, index);
+    syncTimeValue();
+  });
+}
+
+function highlight(el, index) {
+  el.querySelectorAll("div").forEach(d => d.classList.remove("active"));
+  const items = el.querySelectorAll("div");
+  const mid = Math.floor(items.length / 3);
+  items[mid + index].classList.add("active");
+}
+
+function syncTimeValue() {
+  const formatted =
+    `${timeState.hour}:${String(timeState.minute).padStart(2,"0")} ${timeState.ampm}`;
+
+  document.getElementById("optTime").dataset.value = formatted;
+}
+
+/* AM / PM toggle */
+ampmToggle.onclick = () => {
+  timeState.ampm = timeState.ampm === "AM" ? "PM" : "AM";
+  ampmToggle.textContent = timeState.ampm;
+  syncTimeValue();
+};
+
+/* INIT */
+buildWheel(hourWheel, [1,2,3,4,5,6,7,8,9,10,11,12]);
+buildWheel(minuteWheel, [0,5,10,15,20,25,30,35,40,45,50,55]);
+
+attachWheelLogic(hourWheel, [1,2,3,4,5,6,7,8,9,10,11,12], "hour");
+attachWheelLogic(minuteWheel, [0,5,10,15,20,25,30,35,40,45,50,55], "minute");
+
+syncTimeValue();
+
 function convert12hTo24h(t) {
   if (!t) return "";
   const [time, period] = t.split(" ");
@@ -3091,6 +3161,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

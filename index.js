@@ -2113,6 +2113,13 @@ document.addEventListener("click", (e) => {
    const label = select.querySelector(".custom-select-trigger span");
    label.innerHTML = value || "&nbsp;";
    
+   // 🔄 If switching to NON follow-up status, clear enforcement
+   if (value !== "Service Pending" && value !== "Monitoring") {
+     pendingStatusForModal = null;
+     requireFollowUp = false;
+     hideModalWarning();
+   }
+   
    // Then process logic
    handleStatusChange(caseId, value);
    
@@ -2995,6 +3002,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

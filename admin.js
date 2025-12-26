@@ -1,4 +1,4 @@
-/* ======================================================
+/* =======================================================
    ADMIN.JS — CLEAN FINAL VERSION
    Contains:
    - Initialization & Roles
@@ -7,11 +7,11 @@
    - Excel Upload + Backup
    - Stats Engine
    - Audit Modal
-   ===================================================== */
+   ====================================================== */
 
-/* =====================================================
+/* ======================================================
    SINGLE IMPORT BLOCK (Do NOT add any more imports)
-   ===================================================== */
+   ====================================================== */
 import {
   auth,
   onAuthStateChanged,
@@ -1035,10 +1035,10 @@ function populateTeamList() {
 
       row.innerHTML = `
         <div style="display:flex;justify-content:space-between;">
-          <div style="display:flex;align-items:center;"><strong>${t.name}</strong></div>
+          <div><strong>${t.name}</strong></div>
           <div>
-            <button class="action-btn btnUpdateTeam btn-boxed" style="border-radius:8px;padding:0.35rem 0.6rem;" data-action="rename" data-id="${t.id}">Update</button>
-            <button class="action-btn btn-boxed" style="border-radius:8px;padding:0.35rem 0.6rem;" data-action="delete" data-id="${t.id}">Delete</button>
+            <button class="action-btn btnUpdateTeam" data-action="rename" data-id="${t.id}">Update</button>
+            <button class="action-btn" data-action="delete" data-id="${t.id}">Delete</button>
           </div>
         </div>
       `;
@@ -1229,9 +1229,9 @@ function populateUpdateDataTeams() {
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;">
           <div><strong>${t.name}</strong></div>
           <div style="display:flex;gap:0.4rem;">
-            <button class="action-btn btn-boxed" data-action="upload" data-id="${t.id}">Upload Excel</button>
-            <button class="action-btn btn-boxed" data-action="export" data-id="${t.id}">Export Backup</button>
-            <button class="action-btn btn-boxed" data-action="import" data-id="${t.id}">Import Backup</button>
+            <button class="action-btn" data-action="upload" data-id="${t.id}">Upload Excel</button>
+            <button class="action-btn" data-action="export" data-id="${t.id}">Export Backup</button>
+            <button class="action-btn" data-action="import" data-id="${t.id}">Import Backup</button>
           </div>
         </div>
       `;
@@ -1509,7 +1509,7 @@ if (u.role === "primary") {
   return `<span style="opacity:0.6;">—</span>`; // or return "" to show nothing
 }
 
-return `<button class="action-btn btn-boxed" data-remove="${u.id}">Remove</button>`;
+return `<button class="action-btn" data-remove="${u.id}">Remove</button>`;
 
 }
 
@@ -2165,7 +2165,7 @@ function renderStatsTableNew() {
   }
 </td>
       <td>${u.followX} / ${u.followY}</td>
-      <td><button class="action-btn btn-boxed" data-audit="${u.userId}">Audit</button></td>
+      <td><button class="action-btn" data-audit="${u.userId}">Audit</button></td>
     </tr>
   `).join("");
 
@@ -2378,7 +2378,7 @@ async function loadStatsCasesOnce() {
 ------------------------------------------------------------ */
 function buildStatsControls() {
   statsControls.innerHTML = `
-    <button class="action-btn btn-boxed" id="btnStatsRefresh" title="Refresh">
+    <button class="action-btn" id="btnStatsRefresh" title="Refresh">
       🔄
     </button>
 `;
@@ -2496,12 +2496,6 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
-
-
-
-
-
-
 
 
 

@@ -2378,7 +2378,7 @@ async function loadStatsCasesOnce() {
 ------------------------------------------------------------ */
 function buildStatsControls() {
   statsControls.innerHTML = `
-    <button class="action-btn" id="btnStatsRefresh" title="Refresh">
+    <button class="action-btn btn-boxed" id="btnStatsRefresh" title="Refresh">
       🔄
     </button>
 `;
@@ -2496,6 +2496,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

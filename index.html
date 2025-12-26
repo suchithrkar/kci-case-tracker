@@ -1315,13 +1315,16 @@ tr.active-row {
 
       <!-- Follow-up -->
       <div class="row">
-        <div>Follow-up Date</div>
+        <div>Follow-up</div>
+      
         <div class="date-wrap">
+      
+          <!-- Calendar icon -->
           <span style="font-size:18px;padding:.25rem .35rem;
                        border:1px solid var(--border);
                        border-radius:10px;">📅</span>
-        
-          <!-- NEW wrapper -->
+      
+          <!-- Date -->
           <div class="date-field">
             <input
               id="optDate"
@@ -1332,6 +1335,20 @@ tr.active-row {
             />
             <div id="calendarContainer"></div>
           </div>
+      
+          <!-- ⏰ TIME (NEW) -->
+          <input
+            id="optTime"
+            type="time"
+            style="
+              margin-left:6px;
+              padding:.45rem .5rem;
+              border-radius:10px;
+              border:1px solid var(--border);
+              background:var(--panel-2);
+              color:var(--text);
+            "
+          />
         </div>
       </div>
 
@@ -1527,6 +1544,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

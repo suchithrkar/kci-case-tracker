@@ -2052,6 +2052,24 @@ firestoreUpdateCase(caseId, {
 
 }
 
+// Status selector inside Case Options modal (reminder flow)
+document.addEventListener("click", (e) => {
+  const select = e.target.closest(".reminder-status-select");
+  if (!select) return;
+
+  select.classList.toggle("open");
+
+  const option = e.target.closest(".custom-option");
+  if (!option) return;
+
+  const caseId = select.dataset.id;
+  const value = option.dataset.value;
+
+  handleStatusChange(caseId, value);
+
+  select.classList.remove("open");
+});
+
 /* =======================================================================
    FIRESTORE UPDATE — SAFE FOR GENERAL USERS
    ======================================================================= */
@@ -2159,26 +2177,41 @@ export function openCaseModal(caseId, enforce = false) {
    
    const statusRowId = "reminderStatusRow";
    document.getElementById(statusRowId)?.remove();
-   
+
    if (window.__fromReminder) {
+     const statusRowId = "reminderStatusRow";
+     document.getElementById(statusRowId)?.remove();
+   
      const row = document.createElement("div");
      row.className = "row";
      row.id = statusRowId;
    
-      const currentStatus = r.status || "";
-      
-      row.innerHTML = `
-        <div>Status</div>
-        <select id="reminderStatusSelect" class="status-select">
-          <option value="">— Select —</option>
-          <option ${currentStatus === "Closed" ? "selected" : ""}>Closed</option>
-          <option ${currentStatus === "Service Pending" ? "selected" : ""}>Service Pending</option>
-          <option ${currentStatus === "Monitoring" ? "selected" : ""}>Monitoring</option>
-          <option ${currentStatus === "NCM 1" ? "selected" : ""}>NCM 1</option>
-          <option ${currentStatus === "NCM 2" ? "selected" : ""}>NCM 2</option>
-          <option ${currentStatus === "PNS" ? "selected" : ""}>PNS</option>
-        </select>
-      `;
+     row.innerHTML = `
+       <div>Status</div>
+       <div>
+         <div class="custom-select reminder-status-select"
+              data-id="${r.id}">
+           <div class="custom-select-trigger">
+             <span>${r.status || "&nbsp;"}</span>
+           </div>
+           <div class="custom-options">
+             ${[
+               "",
+               "Closed",
+               "NCM 1",
+               "NCM 2",
+               "PNS",
+               "Service Pending",
+               "Monitoring"
+             ].map(s => `
+               <div class="custom-option" data-value="${s}">
+                 ${s || "&nbsp;"}
+               </div>
+             `).join("")}
+           </div>
+         </div>
+       </div>
+     `;
    
      document
        .querySelector("#modal .modal-body")
@@ -2661,19 +2694,6 @@ async function saveModalData() {
      lastActionedBy: trackerState.user.uid
    };
 
-   // Save status if coming from reminder
-   if (window.__fromReminder) {
-     const sel = document.getElementById("reminderStatusSelect");
-     if (sel && sel.value) {
-       updateObj.status = sel.value;
-       updateObj.statusChangedOn = today;
-       updateObj.statusChangedBy = trackerState.user.uid;
-     }
-   
-     window.__fromReminder = false;
-   }
-
-
   // If the user selected Service Pending / Monitoring earlier, persist the status now
   if (pendingStatusForModal) {
     updateObj.status = pendingStatusForModal;
@@ -2906,6 +2926,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

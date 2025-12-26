@@ -1801,23 +1801,33 @@ document.addEventListener("click", (e) => {
   });
 });
 
-/* TIME PICKER — CLICK HANDLER */
+/* TIME PICKER — CLICK HANDLER (ESCAPED DROPDOWN) */
 document.addEventListener("click", (e) => {
   const select = e.target.closest(".time-select");
-  if (!select) return;
 
-  select.classList.toggle("open");
+  // Open picker
+  if (select && !e.target.closest(".custom-option")) {
+    e.stopPropagation();
+    buildTimeOptions(select);
+    return;
+  }
 
-  const option = e.target.closest(".custom-option");
-  if (!option) return;
+  // Select time
+  const option = e.target.closest("#timeOptionsContainer .custom-option");
+  if (option) {
+    const time = option.dataset.value;
+    const label =
+      document.querySelector(".time-select .custom-select-trigger span");
 
-  const label = select.querySelector(".custom-select-trigger span");
-  label.textContent = option.dataset.value;
+    label.textContent = time;
+    document.querySelector(".time-select").dataset.value = time;
 
-  // Save in a hidden data attribute
-  select.dataset.value = option.dataset.value;
+    document.getElementById("timeOptionsContainer").innerHTML = "";
+    return;
+  }
 
-  select.classList.remove("open");
+  // Outside click → close
+  document.getElementById("timeOptionsContainer").innerHTML = "";
 });
 
 
@@ -2573,12 +2583,24 @@ function formatDMY(iso) {
    CUSTOM TIME PICKER — 12 HOUR AM/PM
    ========================================================= */
 
-function buildTimeOptions() {
-  const timeSelect = document.querySelector(".time-select .custom-options");
-  if (!timeSelect) return;
+function buildTimeOptions(anchorEl) {
+  const container = document.getElementById("timeOptionsContainer");
+  if (!container || !anchorEl) return;
 
-  timeSelect.innerHTML = "";
+  const rect = anchorEl.getBoundingClientRect();
 
+  container.style.left = rect.left + "px";
+  container.style.top = rect.bottom + "px";
+  container.style.width = rect.width + "px";
+
+  container.innerHTML = `
+    <div class="custom-options" style="display:block;">
+      ${generateTimeOptionsHTML()}
+    </div>
+  `;
+}
+
+function generateTimeOptionsHTML() {
   const times = [];
 
   for (let h = 1; h <= 12; h++) {
@@ -2589,13 +2611,9 @@ function buildTimeOptions() {
     }
   }
 
-  times.forEach(t => {
-    const div = document.createElement("div");
-    div.className = "custom-option";
-    div.dataset.value = t;
-    div.textContent = t;
-    timeSelect.appendChild(div);
-  });
+  return times.map(t =>
+    `<div class="custom-option" data-value="${t}">${t}</div>`
+  ).join("");
 }
 
 function convert12hTo24h(t) {
@@ -3139,6 +3157,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

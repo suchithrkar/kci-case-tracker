@@ -134,7 +134,7 @@ function scheduleFollowUpReminder(r) {
 
   // Build exact timestamp
   const reminderTs = new Date(
-    `${r.followDate}T${r.followTime}:00`
+    `${r.followDate}T${convert12hTo24h(r.followTime)}:00`
   ).getTime();
 
   const now = Date.now();
@@ -1801,6 +1801,25 @@ document.addEventListener("click", (e) => {
   });
 });
 
+/* TIME PICKER — CLICK HANDLER */
+document.addEventListener("click", (e) => {
+  const select = e.target.closest(".time-select");
+  if (!select) return;
+
+  select.classList.toggle("open");
+
+  const option = e.target.closest(".custom-option");
+  if (!option) return;
+
+  const label = select.querySelector(".custom-select-trigger span");
+  label.textContent = option.dataset.value;
+
+  // Save in a hidden data attribute
+  select.dataset.value = option.dataset.value;
+
+  select.classList.remove("open");
+});
+
 
 /* GEAR BUTTON → OPEN MODAL */
 tbody.addEventListener("click", (e) => {
@@ -2317,7 +2336,18 @@ export function openCaseModal(caseId, enforce = false) {
           optDate.value = "";
         }
       
-        if (optTime) optTime.value = r.followTime || "";
+         const timeSelect = document.querySelector(".time-select");
+         if (timeSelect) {
+           if (r.followTime) {
+             timeSelect.dataset.value = r.followTime;
+             timeSelect.querySelector(".custom-select-trigger span").textContent =
+               r.followTime;
+           } else {
+             timeSelect.dataset.value = "";
+             timeSelect.querySelector(".custom-select-trigger span").textContent =
+               "Select time";
+           }
+         }
       }
 
   /* Flag */
@@ -2539,6 +2569,45 @@ function formatDMY(iso) {
   return `${d}-${m}-${y}`;
 }
 
+/* =========================================================
+   CUSTOM TIME PICKER — 12 HOUR AM/PM
+   ========================================================= */
+
+function buildTimeOptions() {
+  const timeSelect = document.querySelector(".time-select .custom-options");
+  if (!timeSelect) return;
+
+  timeSelect.innerHTML = "";
+
+  const times = [];
+
+  for (let h = 1; h <= 12; h++) {
+    for (let m of [0, 15, 30, 45]) {
+      const mm = String(m).padStart(2, "0");
+      times.push(`${h}:${mm} AM`);
+      times.push(`${h}:${mm} PM`);
+    }
+  }
+
+  times.forEach(t => {
+    const div = document.createElement("div");
+    div.className = "custom-option";
+    div.dataset.value = t;
+    div.textContent = t;
+    timeSelect.appendChild(div);
+  });
+}
+
+function convert12hTo24h(t) {
+  if (!t) return "";
+  const [time, period] = t.split(" ");
+  let [h, m] = time.split(":").map(Number);
+
+  if (period === "PM" && h !== 12) h += 12;
+  if (period === "AM" && h === 12) h = 0;
+
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
 
 /* =======================================================================
    PHASE 4 — MODAL UI / UX ENHANCEMENTS
@@ -2773,8 +2842,8 @@ async function saveModalData() {
   const today = getTeamToday(trackerState.teamConfig);
 
   const follow = optDate.dataset.iso || null;
-  const optTime = document.getElementById("optTime");
-  r.followTime = optTime?.value || "";
+   const timeSelect = document.querySelector(".time-select");
+   r.followTime = timeSelect?.dataset.value || "";
 
    /* =====================================================
       FOLLOW-UP VALIDATION (TABLE + REMINDER FLOWS)
@@ -3070,6 +3139,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

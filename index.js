@@ -1687,29 +1687,21 @@ export function renderTable() {
   rows.forEach((r, index) => {
     const tr = document.createElement("tr");
 
-    /* Row Styling Logic */
+   /* Row Styling Logic */
    if (r.followDate && r.followDate <= today && r.status !== "Closed") {
      tr.classList.add("due-today");
    
+     // ⏰ Subtle emphasis if follow-up time is set for today
      if (r.followTime && r.followDate === today) {
-       const now = new Date();
-       const dueTs = new Date(`${r.followDate}T${r.followTime}:00`);
-       const diffMs = dueTs - now;
-   
-       // Time-based emphasis
        tr.classList.add("due-today-time");
-   
-       // Escalate if within 30 minutes
-       if (diffMs > 0 && diffMs <= 30 * 60 * 1000) {
-         tr.classList.add("due-soon");
-       }
      }
-   } else if (r.flagged) {
-      tr.classList.add("flagged");
-    } 
-    else if (r.notes && r.notes.trim() !== "") {
-      tr.classList.add("has-notes");
-    }
+   } 
+   else if (r.flagged) {
+     tr.classList.add("flagged");
+   } 
+   else if (r.notes && r.notes.trim() !== "") {
+     tr.classList.add("has-notes");
+   }
 
     /* Build row */
     tr.innerHTML = `
@@ -2986,6 +2978,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

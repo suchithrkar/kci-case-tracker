@@ -2176,18 +2176,20 @@ export function openCaseModal(caseId, enforce = false) {
      row.className = "row";
      row.id = statusRowId;
    
-     row.innerHTML = `
-       <div>Status</div>
-       <select id="reminderStatusSelect" class="status-select">
-         <option value="">— Select —</option>
-         <option>Closed</option>
-         <option>Service Pending</option>
-         <option>Monitoring</option>
-         <option>NCM 1</option>
-         <option>NCM 2</option>
-         <option>PNS</option>
-       </select>
-     `;
+      const currentStatus = r.status || "";
+      
+      row.innerHTML = `
+        <div>Status</div>
+        <select id="reminderStatusSelect" class="status-select">
+          <option value="">— Select —</option>
+          <option ${currentStatus === "Closed" ? "selected" : ""}>Closed</option>
+          <option ${currentStatus === "Service Pending" ? "selected" : ""}>Service Pending</option>
+          <option ${currentStatus === "Monitoring" ? "selected" : ""}>Monitoring</option>
+          <option ${currentStatus === "NCM 1" ? "selected" : ""}>NCM 1</option>
+          <option ${currentStatus === "NCM 2" ? "selected" : ""}>NCM 2</option>
+          <option ${currentStatus === "PNS" ? "selected" : ""}>PNS</option>
+        </select>
+      `;
    
      document
        .querySelector("#modal .modal-body")
@@ -2902,6 +2904,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

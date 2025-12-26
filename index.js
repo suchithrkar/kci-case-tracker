@@ -2733,7 +2733,9 @@ async function saveModalData() {
       ===================================================== */
    
    const effectiveStatus =
-     pendingStatusForModal || r.status || "";
+     pendingStatusForModal !== null
+       ? pendingStatusForModal
+       : r.status || "";
    
    const needsFollowUpEnforced =
      requireFollowUp ||
@@ -3002,6 +3004,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

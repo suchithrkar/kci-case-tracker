@@ -129,6 +129,29 @@ function getTeamToday(teamConfig) {
   return teamDate;
 }
 
+function scheduleFollowUpReminder(r) {
+  if (!r.followDate || !r.followTime) return;
+
+  // Build exact timestamp
+  const reminderTs = new Date(
+    `${r.followDate}T${r.followTime}:00`
+  ).getTime();
+
+  const now = Date.now();
+  if (reminderTs <= now) return; // past → ignore
+
+  const delay = reminderTs - now;
+
+  const timerId = setTimeout(() => {
+    console.log(
+      "⏰ Follow-up reminder fired:",
+      r.id,
+      r.customerName
+    );
+  }, delay);
+
+  followUpTimers.set(r.id, timerId);
+}
 
 /* =======================================================================
    TRACKER STATE
@@ -171,6 +194,13 @@ const uiState = {
 let unupdatedProtect = false;
 // track specific caseIds that are being updated while in Unupdated mode
 const pendingUnupdated = new Set();
+
+/* =========================================================
+   FOLLOW-UP REMINDER ENGINE (PHASE 2)
+   ========================================================= */
+
+const followUpTimers = new Map(); // caseId → timeoutId
+
 
 
 
@@ -312,6 +342,7 @@ function setupRealtimeCases(teamId) {
       benchRFC: c.benchRFC || "",
       status: c.status || "",
       followDate: c.followDate || "",
+      followTime: c.followTime || "",
       flagged: !!c.flagged,
       PNS: !!c.PNS,
 
@@ -1562,6 +1593,10 @@ export function renderTable() {
   const rows = trackerState.filteredCases;
   const today = getTeamToday(trackerState.teamConfig);
 
+  // 🔁 Clear existing follow-up timers before re-render
+  followUpTimers.forEach(clearTimeout);
+  followUpTimers.clear();
+
   tbody.innerHTML = "";
 
   rows.forEach((r, index) => {
@@ -1593,6 +1628,8 @@ export function renderTable() {
     `;
 
     tbody.appendChild(tr);
+    // ⏰ Schedule follow-up reminder (Phase 2)
+    scheduleFollowUpReminder(r);
   });
 }
 
@@ -2519,6 +2556,7 @@ async function saveModalData() {
    
    const updateObj = {
      followDate: r.followDate,
+     followTime: r.followTime || null,
      flagged: r.flagged,
      PNS: r.PNS,
      notes: r.notes,
@@ -2759,6 +2797,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -499,17 +499,26 @@ button, input, select, textarea {
 }
 
 /* ============================================================
-   FIX: Chrome vertical text centering for ALL admin buttons
+   GLOBAL BUTTON PRIMITIVE — Chrome & Firefox SAFE
    ============================================================ */
 
+button,
 .hdr-btn,
+.btn,
 .action-btn,
 .modal-btn,
-button {
-  line-height: 1;              /* 🔑 critical fix */
+.icon-btn,
+.rfcBtn,
+.rfcClearBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  /* CRITICAL: no height, no line-height */
+  line-height: normal;
+
+  /* Optical balance */
+  padding-block: 0.55rem;
 }
 
 .hdr-btn {
@@ -758,26 +767,6 @@ th:hover .tooltip {
 /* Hide scrollbar — Firefox */
 .custom-options.team-modal-dropdown {
   scrollbar-width: none;
-}
-
-/* ============================================================
-   CHROME FIX — force optical vertical centering (system-ui bug)
-   ============================================================ */
-
-.hdr-btn,
-.action-btn,
-.modal-btn {
-  height: 38px;            /* explicit box */
-  line-height: 38px;       /* 🔑 overrides Chrome font ascent */
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-/* Smaller buttons */
-.action-btn,
-.modal-btn {
-  height: 34px;
-  line-height: 34px;
 }
 
 
@@ -1133,6 +1122,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

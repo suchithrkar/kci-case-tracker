@@ -498,6 +498,29 @@ button, input, select, textarea {
   color: var(--text);
 }
 
+/* ============================================================
+   FIX: Chrome vertical text centering for ALL admin buttons
+   ============================================================ */
+
+.hdr-btn,
+.action-btn,
+.modal-btn,
+button {
+  line-height: 1;              /* 🔑 critical fix */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hdr-btn {
+  height: 38px;   /* matches tracker header buttons */
+}
+
+.action-btn,
+.modal-btn {
+  min-height: 34px;
+}
+
 /* Dropdown background + border visible in dark mode */
 select.input,
 select.user-role-dd,
@@ -1091,6 +1114,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

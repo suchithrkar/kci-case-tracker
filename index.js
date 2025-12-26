@@ -252,6 +252,42 @@ if (btnReminderFollowUp) {
   };
 }
 
+// =====================================================
+// SNOOZE HANDLERS (PHASE 4A)
+// =====================================================
+
+document
+  .getElementById("followUpReminderModal")
+  .addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-snooze]");
+    if (!btn || !activeReminderCase) return;
+
+    const minutes = Number(btn.dataset.snooze);
+    const r = activeReminderCase;
+
+    // ⛔ cancel existing timer
+    if (followUpTimers.has(r.id)) {
+      clearTimeout(followUpTimers.get(r.id));
+      followUpTimers.delete(r.id);
+    }
+
+    // ⏱ schedule new reminder
+    const delay = minutes * 60 * 1000;
+
+    const timerId = setTimeout(() => {
+      openFollowUpReminderModal(r);
+    }, delay);
+
+    followUpTimers.set(r.id, timerId);
+
+    // close modal
+    document
+      .getElementById("followUpReminderModal")
+      .classList.remove("show");
+
+    activeReminderCase = null;
+  });
+
 
 /* =======================================================================
    AUTH STATE LISTENER
@@ -1652,10 +1688,23 @@ export function renderTable() {
     const tr = document.createElement("tr");
 
     /* Row Styling Logic */
-    if (r.followDate && r.followDate <= today && r.status !== "Closed") {
-      tr.classList.add("due-today");
-    } 
-    else if (r.flagged) {
+   if (r.followDate && r.followDate <= today && r.status !== "Closed") {
+     tr.classList.add("due-today");
+   
+     if (r.followTime && r.followDate === today) {
+       const now = new Date();
+       const dueTs = new Date(`${r.followDate}T${r.followTime}:00`);
+       const diffMs = dueTs - now;
+   
+       // Time-based emphasis
+       tr.classList.add("due-today-time");
+   
+       // Escalate if within 30 minutes
+       if (diffMs > 0 && diffMs <= 30 * 60 * 1000) {
+         tr.classList.add("due-soon");
+       }
+     }
+   } else if (r.flagged) {
       tr.classList.add("flagged");
     } 
     else if (r.notes && r.notes.trim() !== "") {
@@ -2937,6 +2986,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

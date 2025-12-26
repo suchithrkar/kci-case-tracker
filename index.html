@@ -1103,45 +1103,6 @@ tr.active-row {
 .calendar-day.weekend {
   color: var(--danger);
 }
-
-/* ================================
-   SEGMENTED INPUT (ICON + FIELD)
-   ================================ */
-
-.segmented-input {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--panel-2);
-}
-
-.segment-icon {
-  padding: .45rem .6rem;
-  font-size: 16px;
-  border-right: 1px solid var(--border);
-  background: var(--panel);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Shared input styling */
-.segment-field {
-  border: none !important;
-  outline: none;
-  background: transparent;
-  padding: .45rem .6rem;
-  color: var(--text);
-  min-width: 100px;
-  text-align: center;
-}
-
-/* Time input alignment fix */
-.segment-field[type="time"] {
-  min-width: 90px;
-}
   
 </style>
 </head>
@@ -1360,36 +1321,37 @@ tr.active-row {
       <div class="row">
         <div>Follow-up</div>
       
-        <div class="date-wrap">
-
-          <!-- DATE SEGMENT -->
-          <div class="segmented-input">
-            <span class="segment-icon">📅</span>
-        
+          <div class="date-wrap">
+          
+            <!-- Calendar icon -->
+            <span style="font-size:18px;padding:.25rem .35rem;
+                         border:1px solid var(--border);
+                         border-radius:10px;">📅</span>
+          
+            <!-- Date -->
             <div class="date-field">
               <input
                 id="optDate"
                 type="text"
-                class="date-input segment-field"
+                class="date-input"
                 placeholder="Select date..."
                 readonly
               />
               <div id="calendarContainer"></div>
             </div>
-          </div>
-        
-          <!-- TIME SEGMENT -->
-          <div class="segmented-input">
-            <span class="segment-icon">⏰</span>
-        
+
+            <!-- Calendar icon -->
+            <span style="font-size:18px;padding:.25rem .35rem;
+                         border:1px solid var(--border);
+                         border-radius:10px;">⏰</span>
+          
+            <!-- ⏰ TIME -->
             <input
               id="optTime"
               type="time"
-              class="segment-field"
+              style="..."
             />
           </div>
-        
-        </div>
       </div>
 
       <!-- Flag -->
@@ -1590,6 +1552,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

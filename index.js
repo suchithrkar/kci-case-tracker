@@ -2013,19 +2013,22 @@ if (uiState.unupdatedActive) {
   // Update local state
   //row.status = newStatus;
 
-if (needsFollow) {
-  prevStatusBeforeModal = previousStatus;
-  pendingStatusForModal = newStatus;
-
-  openCaseModal(caseId, true);
-
-  // Only auto-refresh if NOT in Unupdated overlay
-  if (!uiState.unupdatedActive) {
-    applyFilters();
-  }
-
-  return;
-}
+   if (needsFollow) {
+     prevStatusBeforeModal = previousStatus;
+     pendingStatusForModal = newStatus;
+     requireFollowUp = true;
+   
+     // 🔑 DIFFERENT BEHAVIOR BASED ON CONTEXT
+     if (window.__fromReminder) {
+       // Already inside Case Options modal → just warn
+       showModalWarning(`Status "${newStatus}" needs a follow-up date.`);
+     } else {
+       // Status selected from table → open modal as usual
+       openCaseModal(caseId, true);
+     }
+   
+     return;
+   }
 
 
 
@@ -2065,9 +2068,14 @@ document.addEventListener("click", (e) => {
   const caseId = select.dataset.id;
   const value = option.dataset.value;
 
-  handleStatusChange(caseId, value);
-
-  select.classList.remove("open");
+   // ✅ VISUAL UPDATE FIRST
+   const label = select.querySelector(".custom-select-trigger span");
+   label.innerHTML = value || "&nbsp;";
+   
+   // Then process logic
+   handleStatusChange(caseId, value);
+   
+   select.classList.remove("open");
 });
 
 /* =======================================================================
@@ -2221,19 +2229,28 @@ export function openCaseModal(caseId, enforce = false) {
        );
    }
 
-  /* Follow Date */
-  if (r.followDate) {
-     optDate.dataset.iso = r.followDate;
-     optDate.value = formatDMY(r.followDate);
-   } else {
+   /* Follow Date & Time */
+   const optTime = document.getElementById("optTime");
+   
+   if (window.__fromReminder) {
+     // ✅ Reset follow-up completely
      optDate.dataset.iso = "";
      optDate.value = "";
-   }
-
-   /* Follow Time */
-   const optTime = document.getElementById("optTime");
-   if (optTime) {
-     optTime.value = r.followTime || "";
+     if (optTime) optTime.value = "";
+   
+     window.__fromReminder = false; // consume flag
+   } else {
+     if (r.followDate) {
+       optDate.dataset.iso = r.followDate;
+       optDate.value = formatDMY(r.followDate);
+     } else {
+       optDate.dataset.iso = "";
+       optDate.value = "";
+     }
+   
+     if (optTime) {
+       optTime.value = r.followTime || "";
+     }
    }
 
   /* Flag */
@@ -2926,6 +2943,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

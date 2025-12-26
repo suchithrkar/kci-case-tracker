@@ -2197,6 +2197,12 @@ export function openCaseModal(caseId, enforce = false) {
      optDate.value = "";
    }
 
+   /* Follow Time */
+   const optTime = document.getElementById("optTime");
+   if (optTime) {
+     optTime.value = r.followTime || "";
+   }
+
   /* Flag */
   setFlagUI(r.flagged);
   /* PNS */
@@ -2335,7 +2341,12 @@ modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 btnModalClear.onclick = () => {
   optNotes.value = "";
   optDate.value = "";
-  resizeNotes();   // keep textarea visually correct
+  optDate.dataset.iso = "";
+
+  const optTime = document.getElementById("optTime");
+  if (optTime) optTime.value = "";
+
+  resizeNotes();
 };
 
 
@@ -2622,6 +2633,8 @@ async function saveModalData() {
   const today = getTeamToday(trackerState.teamConfig);
 
   const follow = optDate.dataset.iso || null;
+  const optTime = document.getElementById("optTime");
+  r.followTime = optTime?.value || "";
 
   /* Follow-up required */
   if (requireFollowUp && !follow) {
@@ -2893,6 +2906,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

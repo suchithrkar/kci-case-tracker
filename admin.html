@@ -92,9 +92,7 @@ html,body{
 
 /* Match header button height from tracker */
 .header .hdr-btn {
-  padding: .6rem 1.2rem !important;
-  font-size: 14px;
-  line-height: 1.3;
+  padding: 0.55rem 1.15rem;
 }
 
 .title{
@@ -498,38 +496,6 @@ button, input, select, textarea {
   color: var(--text);
 }
 
-/* ============================================================
-   GLOBAL BUTTON PRIMITIVE — Chrome & Firefox SAFE
-   ============================================================ */
-
-button,
-.hdr-btn,
-.btn,
-.action-btn,
-.modal-btn,
-.icon-btn,
-.rfcBtn,
-.rfcClearBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  /* CRITICAL: no height, no line-height */
-  line-height: normal;
-
-  /* Optical balance */
-  padding-block: 0.55rem;
-}
-
-.hdr-btn {
-  height: 38px;   /* matches tracker header buttons */
-}
-
-.action-btn,
-.modal-btn {
-  min-height: 34px;
-}
-
 /* Dropdown background + border visible in dark mode */
 select.input,
 select.user-role-dd,
@@ -769,6 +735,36 @@ th:hover .tooltip {
   scrollbar-width: none;
 }
 
+/* ============================================================
+   BUTTON SYSTEM — TRACKER-ALIGNED (FINAL)
+   ============================================================ */
+
+button,
+.hdr-btn,
+.action-btn,
+.modal-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+
+  padding: 0.55rem 1.15rem;   /* ← TRACKER MAGIC */
+  border-radius: 999px;
+
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button:hover,
+.hdr-btn:hover,
+.action-btn:hover,
+.modal-btn:hover {
+  filter: brightness(1.08);
+}
 
 </style>
 
@@ -1122,6 +1118,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

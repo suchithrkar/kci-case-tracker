@@ -2581,7 +2581,6 @@ function closeModalAnimated() {
 
 /* Replace close handlers */
 btnModalClose.onclick = closeModal;
-modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 
 
 /* =======================================================================
@@ -3071,6 +3070,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

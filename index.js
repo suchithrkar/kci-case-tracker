@@ -2811,8 +2811,13 @@ async function saveModalData() {
    // If the user selected Service Pending / Monitoring earlier, persist the status now
    // ⛔ BLOCK Closed unless survey was submitted
    if (pendingStatusForModal === "Closed" && !closureSurveyCompleted) {
-     // Auto-open closure survey instead of blocking silently
-     openClosureModal(casesMap.get(currentModalCaseId));
+     const row = trackerState.allCases.find(
+       c => c.id === currentModalCaseId
+     );
+   
+     if (row) {
+       openClosureModal(row);
+     }
    
      showClosureWarning(
        "Please complete the Case Closure Survey before closing this case."
@@ -3053,6 +3058,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

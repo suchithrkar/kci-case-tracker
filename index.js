@@ -2248,7 +2248,6 @@ export function openCaseModal(caseId, enforce = false) {
       
         if (optTime) optTime.value = r.followTime || "";
       }
-   }
 
   /* Flag */
   setFlagUI(r.flagged);
@@ -2938,6 +2937,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

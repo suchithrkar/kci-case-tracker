@@ -2197,6 +2197,10 @@ submitBtn.textContent = "Submit";
   }
 
   await firestoreUpdateCase(caseId, update);
+  // ✅ Clear closure warning after successful submission
+   const warn = document.getElementById("closureWarning");
+   if (warn) warn.remove();
+
   closureSurveyCompleted = true;
   pendingStatusForModal = null; // prevent double handling
 
@@ -2373,7 +2377,13 @@ const btnClosureClose = document.getElementById("btnClosureClose");
 
 if (btnClosureClose) {
   btnClosureClose.onclick = () => {
-    document.getElementById("closureModal")
+    // 🧹 Clear closure warning if present
+    const warn = document.getElementById("closureWarning");
+    if (warn) warn.remove();
+
+    // Close survey modal
+    document
+      .getElementById("closureModal")
       .classList.remove("show");
   };
 }
@@ -2485,6 +2495,26 @@ function showModalWarning(msg) {
 }
 function hideModalWarning() {
   modalWarning.style.display = "none";
+}
+
+function showClosureWarning(msg) {
+  let warn = document.getElementById("closureWarning");
+  if (!warn) {
+    warn = document.createElement("div");
+    warn.id = "closureWarning";
+    warn.style.cssText = `
+      background: rgba(255,107,107,0.2);
+      border: 1px solid var(--danger);
+      padding: .5rem;
+      border-radius: 10px;
+      color: var(--danger);
+      font-weight: 600;
+      margin-bottom: .5rem;
+    `;
+    const body = document.querySelector("#closureModal .modal-body");
+    body.prepend(warn);
+  }
+  warn.textContent = msg;
 }
 
 /* =======================================================================
@@ -2781,9 +2811,13 @@ async function saveModalData() {
    // If the user selected Service Pending / Monitoring earlier, persist the status now
    // ⛔ BLOCK Closed unless survey was submitted
    if (pendingStatusForModal === "Closed" && !closureSurveyCompleted) {
-     showModalWarning(
-       'Please complete the Case Closure Survey before closing this case.'
+     // Auto-open closure survey instead of blocking silently
+     openClosureModal(casesMap.get(currentModalCaseId));
+   
+     showClosureWarning(
+       "Please complete the Case Closure Survey before closing this case."
      );
+   
      return false;
    }
    
@@ -3019,6 +3053,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

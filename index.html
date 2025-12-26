@@ -1114,6 +1114,9 @@ tr.active-row {
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--panel-2);
+
+  /* ✅ ensure clean clipping of child backgrounds */
+  overflow: hidden;
 }
 
 .segment-icon {
@@ -1121,9 +1124,14 @@ tr.active-row {
   font-size: 16px;
   border-right: 1px solid var(--border);
   background: var(--panel);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  /* ✅ FIX rounded left edge */
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 
 /* Shared input styling */
@@ -1587,6 +1595,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

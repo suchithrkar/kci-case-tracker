@@ -2198,6 +2198,7 @@ export function openCaseModal(caseId, enforce = false) {
        <div>Status</div>
        <div>
          <div class="custom-select reminder-status-select"
+              style="margin:0;"
               data-id="${r.id}">
            <div class="custom-select-trigger">
              <span>${r.status || "&nbsp;"}</span>
@@ -2943,6 +2944,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

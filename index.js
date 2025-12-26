@@ -1,6 +1,6 @@
-/* =======================================================
+/* =============================================================
    PHASE 1 — CORE ENGINE REBUILD
-   ======================================================= */
+   ============================================================= */
 
 import {
   auth,
@@ -134,7 +134,7 @@ function scheduleFollowUpReminder(r) {
 
   // Build exact timestamp
   const reminderTs = new Date(
-    `${r.followDate}T${convert12hTo24h(r.followTime)}:00`
+    `${r.followDate}T${r.followTime}:00`
   ).getTime();
 
   const now = Date.now();
@@ -2317,18 +2317,7 @@ export function openCaseModal(caseId, enforce = false) {
           optDate.value = "";
         }
       
-         const timeSelect = document.querySelector(".time-select");
-         if (timeSelect) {
-           if (r.followTime) {
-             timeSelect.dataset.value = r.followTime;
-             timeSelect.querySelector(".custom-select-trigger span").textContent =
-               r.followTime;
-           } else {
-             timeSelect.dataset.value = "";
-             timeSelect.querySelector(".custom-select-trigger span").textContent =
-               "Select time";
-           }
-         }
+        if (optTime) optTime.value = r.followTime || "";
       }
 
   /* Flag */
@@ -2550,158 +2539,6 @@ function formatDMY(iso) {
   return `${d}-${m}-${y}`;
 }
 
-/* =========================================================
-   SIMPLE TIME PICKER (HH / MM / AMPM)
-   ========================================================= */
-
-const timePopup = document.getElementById("timeWheelPopup");
-const hhPart = document.getElementById("hhPart");
-const mmPart = document.getElementById("mmPart");
-const ampmPart = document.getElementById("ampmPart");
-
-let timeState = { hh: null, mm: null, ampm: "AM" };
-
-function openWheel(anchor, values, key) {
-  const rect = anchor.getBoundingClientRect();
-
-  timePopup.style.left = rect.left + "px";
-  timePopup.style.top = rect.bottom + "px";
-
-  timePopup.innerHTML = `
-    <div class="time-wheel">
-      ${values.map(v =>
-        `<div data-v="${v}">${String(v).padStart(2,"0")}</div>`
-      ).join("")}
-    </div>
-  `;
-}
-
-hhPart.onclick = (e) => {
-  e.stopPropagation();
-  openWheel(hhPart, [1,2,3,4,5,6,7,8,9,10,11,12], "hh");
-};
-
-mmPart.onclick = (e) => {
-  e.stopPropagation();
-  openWheel(mmPart, [0,5,10,15,20,25,30,35,40,45,50,55], "mm");
-};
-
-ampmPart.onclick = () => {
-  timeState.ampm = timeState.ampm === "AM" ? "PM" : "AM";
-  ampmPart.textContent = timeState.ampm;
-  syncTime();
-};
-
-timePopup.onclick = (e) => {
-  const opt = e.target.closest("[data-v]");
-  if (!opt) return;
-
-  const v = Number(opt.dataset.v);
-  if (timePopup.innerHTML.includes("12")) {
-    timeState.hh = v;
-    hhPart.textContent = String(v).padStart(2,"0");
-  } else {
-    timeState.mm = v;
-    mmPart.textContent = String(v).padStart(2,"0");
-  }
-
-  syncTime();
-  closeTimePopup();
-};
-
-document.addEventListener("click", closeTimePopup);
-
-function closeTimePopup() {
-  timePopup.innerHTML = "";
-}
-
-function syncTime() {
-  if (timeState.hh !== null && timeState.mm !== null) {
-    document.getElementById("optTime").dataset.value =
-      `${timeState.hh}:${String(timeState.mm).padStart(2,"0")} ${timeState.ampm}`;
-  }
-}
-
-/* =========================================================
-   INFINITE TIME WHEEL PICKER
-   ========================================================= */
-
-const hourWheel = document.querySelector('.wheel[data-type="hour"]');
-const minuteWheel = document.querySelector('.wheel[data-type="minute"]');
-const ampmToggle = document.getElementById('ampmToggle');
-
-let timeState = {
-  hour: 1,
-  minute: 0,
-  ampm: "AM"
-};
-
-function buildWheel(el, values) {
-  el.innerHTML = "";
-
-  // duplicate values 3 times to fake infinite scroll
-  const pool = [...values, ...values, ...values];
-
-  pool.forEach(v => {
-    const d = document.createElement("div");
-    d.textContent = v;
-    el.appendChild(d);
-  });
-
-  // center on middle set
-  el.scrollTop = el.scrollHeight / 3;
-}
-
-function attachWheelLogic(el, values, key) {
-  el.addEventListener("scroll", () => {
-    const itemHeight = el.firstChild.offsetHeight;
-    const index = Math.round(el.scrollTop / itemHeight) % values.length;
-    timeState[key] = values[index];
-    highlight(el, index);
-    syncTimeValue();
-  });
-}
-
-function highlight(el, index) {
-  el.querySelectorAll("div").forEach(d => d.classList.remove("active"));
-  const items = el.querySelectorAll("div");
-  const mid = Math.floor(items.length / 3);
-  items[mid + index].classList.add("active");
-}
-
-function syncTimeValue() {
-  const formatted =
-    `${timeState.hour}:${String(timeState.minute).padStart(2,"0")} ${timeState.ampm}`;
-
-  document.getElementById("optTime").dataset.value = formatted;
-}
-
-/* AM / PM toggle */
-ampmToggle.onclick = () => {
-  timeState.ampm = timeState.ampm === "AM" ? "PM" : "AM";
-  ampmToggle.textContent = timeState.ampm;
-  syncTimeValue();
-};
-
-/* INIT */
-buildWheel(hourWheel, [1,2,3,4,5,6,7,8,9,10,11,12]);
-buildWheel(minuteWheel, [0,5,10,15,20,25,30,35,40,45,50,55]);
-
-attachWheelLogic(hourWheel, [1,2,3,4,5,6,7,8,9,10,11,12], "hour");
-attachWheelLogic(minuteWheel, [0,5,10,15,20,25,30,35,40,45,50,55], "minute");
-
-syncTimeValue();
-
-function convert12hTo24h(t) {
-  if (!t) return "";
-  const [time, period] = t.split(" ");
-  let [h, m] = time.split(":").map(Number);
-
-  if (period === "PM" && h !== 12) h += 12;
-  if (period === "AM" && h === 12) h = 0;
-
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
 
 /* =======================================================================
    PHASE 4 — MODAL UI / UX ENHANCEMENTS
@@ -2936,8 +2773,8 @@ async function saveModalData() {
   const today = getTeamToday(trackerState.teamConfig);
 
   const follow = optDate.dataset.iso || null;
-   const timeSelect = document.querySelector(".time-select");
-   r.followTime = timeSelect?.dataset.value || "";
+  const optTime = document.getElementById("optTime");
+  r.followTime = optTime?.value || "";
 
    /* =====================================================
       FOLLOW-UP VALIDATION (TABLE + REMINDER FLOWS)
@@ -3233,15 +3070,6 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
-
-
-
-
-
-
-
-
-
 
 
 

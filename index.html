@@ -36,9 +36,9 @@
   --shadow:0 4px 12px rgba(0,0,0,.08);
 }
 
-/* ==================================================
+/* =====================================================
    THEME VARIABLES — CUSTOM SELECT
-   ================================================== */
+   ===================================================== */
 
 :root[data-theme="dark"] {
   --select-bg: #1A1F2B;
@@ -968,15 +968,6 @@ tr.active-row {
   display: block;
 }
 
-/* ================================
-   TIME PICKER DROPDOWN (ESCAPE SEGMENT)
-   ================================ */
-
-#timeOptionsContainer {
-  position: absolute;
-  z-index: 600;
-}
-
 /* Each option */
 .custom-option {
   padding: 4.8px 6px;
@@ -1153,82 +1144,6 @@ tr.active-row {
 /* Time input alignment fix */
 .segment-field[type="time"] {
   min-width: 90px;
-}
-
-/* ================================
-   TIME WHEEL PICKER
-   ================================ */
-
-.time-wheel {
-  gap: 6px;
-  padding-right: 6px;
-}
-
-.wheel {
-  width: 42px;
-  height: 110px;
-  overflow-y: auto;
-  scrollbar-width: none;
-  text-align: center;
-  border-left: 1px solid var(--border);
-}
-
-.wheel::-webkit-scrollbar {
-  display: none;
-}
-
-.wheel div {
-  padding: 6px 0;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.wheel div.active {
-  color: var(--accent);
-  font-size: 15px;
-}
-
-.ampm-toggle {
-  width: 44px;
-  text-align: center;
-  font-weight: 700;
-  cursor: pointer;
-  color: var(--accent);
-  user-select: none;
-}
-
-.time-part {
-  min-width: 36px;
-  text-align: center;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.time-part.ampm {
-  color: var(--accent);
-}
-
-#timeWheelPopup {
-  position: absolute;
-  z-index: 700;
-}
-
-.time-wheel {
-  max-height: 120px;
-  overflow-y: auto;
-  background: var(--panel);
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0,0,0,.25);
-}
-
-.time-wheel div {
-  padding: 6px 14px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.time-wheel div:hover {
-  background: var(--hover);
 }
   
 </style>
@@ -1490,17 +1405,16 @@ tr.active-row {
           <!-- ✅ MOVE calendar OUTSIDE clipped container -->
           <div id="calendarContainer"></div>
         
-          <!-- TIME SEGMENT — CUSTOM 12h PICKER -->
-            <div class="segmented-input time-picker" id="optTime">
-              <span class="segment-icon">⏰</span>
-            
-              <div class="time-part" id="hhPart">HH</div>
-              <div class="time-part" id="mmPart">MM</div>
-              <div class="time-part ampm" id="ampmPart">AM</div>
-            </div>
-            
-            <!-- Dropdown container (shared) -->
-            <div id="timeWheelPopup"></div>
+          <!-- TIME SEGMENT -->
+          <div class="segmented-input">
+            <span class="segment-icon">⏰</span>
+        
+            <input
+              id="optTime"
+              type="time"
+              class="segment-field"
+            />
+          </div>
         
         </div>
       </div>
@@ -1679,18 +1593,6 @@ tr.active-row {
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

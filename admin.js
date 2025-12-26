@@ -1229,9 +1229,15 @@ function populateUpdateDataTeams() {
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;">
           <div><strong>${t.name}</strong></div>
           <div style="display:flex;gap:0.4rem;">
-            <button class="action-btn btn-boxed" data-action="upload" data-id="${t.id}">Upload Excel</button>
-            <button class="action-btn btn-boxed" data-action="export" data-id="${t.id}">Export Backup</button>
-            <button class="action-btn btn-boxed" data-action="import" data-id="${t.id}">Import Backup</button>
+            <button class="action-btn btn-boxed" data-action="upload" 
+               style="padding: 0.35rem 0.6rem;font-size: 13px;height: 30px;" 
+               data-id="${t.id}">Upload Excel</button>
+            <button class="action-btn btn-boxed" data-action="export" 
+               style="padding: 0.35rem 0.6rem;font-size: 13px;height: 30px;" 
+               data-id="${t.id}">Export Backup</button>
+            <button class="action-btn btn-boxed" data-action="import" 
+               style="padding: 0.35rem 0.6rem;font-size: 13px;height: 30px;" 
+               data-id="${t.id}">Import Backup</button>
           </div>
         </div>
       `;
@@ -2496,6 +2502,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

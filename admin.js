@@ -1037,8 +1037,8 @@ function populateTeamList() {
         <div style="display:flex;justify-content:space-between;">
           <div><strong>${t.name}</strong></div>
           <div>
-            <button class="action-btn btnUpdateTeam" data-action="rename" data-id="${t.id}">Update</button>
-            <button class="action-btn" data-action="delete" data-id="${t.id}">Delete</button>
+            <button class="action-btn btnUpdateTeam btn-boxed" data-action="rename" data-id="${t.id}">Update</button>
+            <button class="action-btn btn-boxed" data-action="delete" data-id="${t.id}">Delete</button>
           </div>
         </div>
       `;
@@ -1229,9 +1229,9 @@ function populateUpdateDataTeams() {
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;">
           <div><strong>${t.name}</strong></div>
           <div style="display:flex;gap:0.4rem;">
-            <button class="action-btn" data-action="upload" data-id="${t.id}">Upload Excel</button>
-            <button class="action-btn" data-action="export" data-id="${t.id}">Export Backup</button>
-            <button class="action-btn" data-action="import" data-id="${t.id}">Import Backup</button>
+            <button class="action-btn btn-boxed" data-action="upload" data-id="${t.id}">Upload Excel</button>
+            <button class="action-btn btn-boxed" data-action="export" data-id="${t.id}">Export Backup</button>
+            <button class="action-btn btn-boxed" data-action="import" data-id="${t.id}">Import Backup</button>
           </div>
         </div>
       `;
@@ -2496,6 +2496,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

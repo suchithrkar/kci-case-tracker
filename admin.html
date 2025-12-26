@@ -760,6 +760,25 @@ th:hover .tooltip {
   scrollbar-width: none;
 }
 
+/* ============================================================
+   CHROME FIX — force optical vertical centering (system-ui bug)
+   ============================================================ */
+
+.hdr-btn,
+.action-btn,
+.modal-btn {
+  height: 38px;            /* explicit box */
+  line-height: 38px;       /* 🔑 overrides Chrome font ascent */
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Smaller buttons */
+.action-btn,
+.modal-btn {
+  height: 34px;
+  line-height: 34px;
+}
 
 
 </style>
@@ -1114,6 +1133,7 @@ th:hover .tooltip {
 </body>
 
 </html>
+
 
 
 

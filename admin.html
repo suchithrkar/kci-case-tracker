@@ -106,13 +106,23 @@ html,body{
 }
 
 .theme-toggle{
-  width:38px;height:38px;
+  width:38px;
+  height:38px;
   border-radius:50%;
   border:1px solid var(--border);
   background:var(--panel-2);
-  display:grid;place-items:center;
+
+  /* 🔑 MATCH TRACKER BUTTONS */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   cursor:pointer;
+  padding: 0;                /* important for emoji centering */
+  line-height: 1;            /* Chrome emoji fix */
+  font-size: 16px;           /* same as tracker icon buttons */
 }
+
 .theme-toggle:hover{
   filter:brightness(1.08);
 }
@@ -1081,6 +1091,7 @@ button:hover,
 </body>
 
 </html>
+
 
 
 

@@ -252,17 +252,6 @@ if (btnReminderFollowUp) {
   };
 }
 
-if (btnReminderFollowUp) {
-  btnReminderFollowUp.onclick = () => {
-    document
-      .getElementById("followUpReminderModal")
-      .classList.remove("show");
-
-    // Phase 3B will hook Case Options modal here
-    activeReminderCase = null;
-  };
-}
-
 
 /* =======================================================================
    AUTH STATE LISTENER
@@ -2904,6 +2893,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

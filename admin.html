@@ -90,13 +90,6 @@ html,body{
   height: 58px;           /* Exact tracker header height */
 }
 
-/* Match header button height from tracker */
-.header .hdr-btn {
-  padding: .6rem 1.2rem !important;
-  font-size: 14px;
-  line-height: 1.3;
-}
-
 .title{
   font-size:1.25rem;
   font-weight:700;
@@ -107,34 +100,29 @@ html,body{
 /* ============================================================
    MATCH TRACKER HEADER BUTTON STYLE
    ============================================================ */
-/* Header buttons identical to tracker */
-.hdr-btn {
-  padding: .55rem 1.15rem !important;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--panel-2);
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 
 .hdr-btn:hover{
   filter:brightness(1.08);
 }
 
 .theme-toggle{
-  width:38px;height:38px;
+  width:38px;
+  height:38px;
   border-radius:50%;
   border:1px solid var(--border);
   background:var(--panel-2);
-  display:grid;place-items:center;
+
+  /* 🔑 MATCH TRACKER BUTTONS */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   cursor:pointer;
+  padding: 0;                /* important for emoji centering */
+  line-height: 1;            /* Chrome emoji fix */
+  font-size: 16px;           /* same as tracker icon buttons */
 }
+
 .theme-toggle:hover{
   filter:brightness(1.08);
 }
@@ -294,8 +282,6 @@ tbody tr:hover {
 }
 
 .action-btn{
-  padding:0.35rem 0.6rem;
-  border-radius:8px;
   border:1px solid var(--border);
   background:var(--panel-2);
   cursor:pointer;
@@ -357,10 +343,8 @@ tbody tr:hover {
   border-top:1px solid var(--border);
 }
 .modal-btn{
-  padding:0.55rem 1rem;
   background:var(--panel-2);
   border:1px solid var(--border);
-  border-radius:999px;
   cursor:pointer;
 }
 .modal-btn:hover{
@@ -548,11 +532,6 @@ select.user-team-dd,
   min-width: 150px;
 }
 
-#btnStatsRefresh {
-  padding: 0.55rem 0.65rem !important;
-  font-size: 18px;
-}
-
 /* ============================================================
    PREVIEW MODAL + PROGRESS UI
    ============================================================ */
@@ -737,7 +716,36 @@ th:hover .tooltip {
   scrollbar-width: none;
 }
 
+/* ============================================================
+   BUTTON SYSTEM — TRACKER SOURCE OF TRUTH
+   ============================================================ */
 
+button,
+.btn,
+.hdr-btn {
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  border-radius: 999px;
+  padding: .6rem 1rem;
+
+  cursor: pointer;
+  font: inherit;
+  white-space: nowrap;
+}
+
+button:hover,
+.btn:hover,
+.hdr-btn:hover {
+  filter: brightness(1.08);
+}
+
+/* ============================================================
+   ADMIN — BOXED BUTTON VARIANT (SELECTIVE ONLY)
+   ============================================================ */
+
+.btn-boxed {
+  border-radius: 10px;
+}
 
 </style>
 
@@ -941,7 +949,7 @@ th:hover .tooltip {
   <div id="selectedFileName" style="opacity:0.8; font-size:13px;">No file selected</div>
 
   <!-- PREVIEW CHANGES button -->
-  <button class="modal-btn" id="btnPreviewChanges" disabled>
+  <button class="modal-btn btn-boxed" id="btnPreviewChanges" disabled>
     PREVIEW CHANGES
   </button>
 
@@ -974,7 +982,7 @@ th:hover .tooltip {
 
   <!-- Preview Buttons -->
   <div style="margin-top:1rem; display:flex; gap:0.6rem;">
-    <button class="modal-btn" id="btnConfirmImport" disabled>Confirm Update</button>
+    <button class="modal-btn btn-boxed" id="btnConfirmImport" disabled>Confirm Update</button>
     <button class="modal-btn" id="btnPreviewCancel">Cancel Preview</button>
   </div>
 
@@ -1091,6 +1099,15 @@ th:hover .tooltip {
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
 
 
 

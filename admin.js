@@ -1035,10 +1035,10 @@ function populateTeamList() {
 
       row.innerHTML = `
         <div style="display:flex;justify-content:space-between;">
-          <div><strong>${t.name}</strong></div>
+          <div style="display:flex;align-items:center;><strong>${t.name}</strong></div>
           <div>
-            <button class="action-btn btnUpdateTeam btn-boxed" data-action="rename" data-id="${t.id}">Update</button>
-            <button class="action-btn btn-boxed" data-action="delete" data-id="${t.id}">Delete</button>
+            <button class="action-btn btnUpdateTeam btn-boxed" style="border-radius:8px;padding:0.35rem 0.6rem;" data-action="rename" data-id="${t.id}">Update</button>
+            <button class="action-btn btn-boxed" style="border-radius:8px;padding:0.35rem 0.6rem;" data-action="delete" data-id="${t.id}">Delete</button>
           </div>
         </div>
       `;
@@ -2496,6 +2496,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

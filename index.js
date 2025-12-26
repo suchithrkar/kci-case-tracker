@@ -227,11 +227,20 @@ let activeReminderCase = null;
 const btnReminderClose = document.getElementById("btnReminderClose");
 const btnReminderFollowUp = document.getElementById("btnReminderFollowUp");
 
-if (btnReminderClose) {
-  btnReminderClose.onclick = () => {
+if (btnReminderFollowUp) {
+  btnReminderFollowUp.onclick = () => {
+    const r = activeReminderCase;
+    if (!r) return;
+
     document
       .getElementById("followUpReminderModal")
       .classList.remove("show");
+
+    // 🔗 Open Case Options modal from reminder
+    openCaseModal(r.id);
+
+    // Mark that modal was opened from reminder
+    window.__fromReminder = true;
 
     activeReminderCase = null;
   };
@@ -2149,6 +2158,39 @@ export function openCaseModal(caseId, enforce = false) {
   /* Last Actioned By (NAME LOOKUP) */
   loadLastActionedByName(r.lastActionedBy);
 
+   /* ===============================
+      STATUS (REMINDER CONTEXT ONLY)
+      =============================== */
+   
+   const statusRowId = "reminderStatusRow";
+   document.getElementById(statusRowId)?.remove();
+   
+   if (window.__fromReminder) {
+     const row = document.createElement("div");
+     row.className = "row";
+     row.id = statusRowId;
+   
+     row.innerHTML = `
+       <div>Status</div>
+       <select id="reminderStatusSelect" class="status-select">
+         <option value="">— Select —</option>
+         <option>Closed</option>
+         <option>Service Pending</option>
+         <option>Monitoring</option>
+         <option>NCM 1</option>
+         <option>NCM 2</option>
+         <option>PNS</option>
+       </select>
+     `;
+   
+     document
+       .querySelector("#modal .modal-body")
+       .insertBefore(
+         row,
+         document.querySelector("#optNotes").closest(".row")
+       );
+   }
+
   /* Follow Date */
   if (r.followDate) {
      optDate.dataset.iso = r.followDate;
@@ -2609,6 +2651,18 @@ async function saveModalData() {
      lastActionedBy: trackerState.user.uid
    };
 
+   // Save status if coming from reminder
+   if (window.__fromReminder) {
+     const sel = document.getElementById("reminderStatusSelect");
+     if (sel && sel.value) {
+       updateObj.status = sel.value;
+       updateObj.statusChangedOn = today;
+       updateObj.statusChangedBy = trackerState.user.uid;
+     }
+   
+     window.__fromReminder = false;
+   }
+
 
   // If the user selected Service Pending / Monitoring earlier, persist the status now
   if (pendingStatusForModal) {
@@ -2842,6 +2896,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

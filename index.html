@@ -1322,36 +1322,39 @@ tr.active-row {
         <div>Follow-up</div>
       
           <div class="date-wrap">
-          
-            <!-- Calendar icon -->
-            <span style="font-size:18px;padding:.25rem .35rem;
-                         border:1px solid var(--border);
-                         border-radius:10px;">📅</span>
-          
-            <!-- Date -->
-            <div class="date-field">
-              <input
-                id="optDate"
-                type="text"
-                class="date-input"
-                placeholder="Select date..."
-                readonly
-              />
-              <div id="calendarContainer"></div>
-            </div>
-
-            <!-- Calendar icon -->
-            <span style="font-size:18px;padding:.25rem .35rem;
-                         border:1px solid var(--border);
-                         border-radius:10px;">⏰</span>
-          
-            <!-- ⏰ TIME -->
+        
+          <!-- Calendar icon -->
+          <span style="font-size:16px;opacity:.85;">📅</span>
+        
+          <!-- Date -->
+          <div class="date-field">
             <input
-              id="optTime"
-              type="time"
-              style="..."
+              id="optDate"
+              type="text"
+              class="date-input"
+              placeholder="Select date..."
+              readonly
             />
+            <div id="calendarContainer"></div>
           </div>
+        
+          <!-- Clock icon -->
+          <span style="font-size:15px;opacity:.75;margin-left:6px;">⏰</span>
+        
+          <!-- Time -->
+          <input
+            id="optTime"
+            type="time"
+            style="
+              padding:.45rem .5rem;
+              border-radius:10px;
+              border:1px solid var(--border);
+              background:var(--panel-2);
+              color:var(--text);
+            "
+          />
+        
+        </div>
       </div>
 
       <!-- Flag -->
@@ -1552,6 +1555,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

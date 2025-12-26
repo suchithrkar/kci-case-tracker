@@ -1405,15 +1405,16 @@ tr.active-row {
           <!-- ✅ MOVE calendar OUTSIDE clipped container -->
           <div id="calendarContainer"></div>
         
-          <!-- TIME SEGMENT -->
+          <!-- TIME SEGMENT — CUSTOM 12h PICKER -->
           <div class="segmented-input">
             <span class="segment-icon">⏰</span>
-        
-            <input
-              id="optTime"
-              type="time"
-              class="segment-field"
-            />
+          
+            <div class="custom-select time-select" id="optTime">
+              <div class="custom-select-trigger">
+                <span>Select time</span>
+              </div>
+              <div class="custom-options"></div>
+            </div>
           </div>
         
         </div>
@@ -1593,6 +1594,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

@@ -1866,20 +1866,25 @@ let requireFollowUp = false;
 let closureSurveyCompleted = false;
 
 /* =========================================================
-   CUSTOM CALENDAR — CLICK TO OPEN
+   CUSTOM CALENDAR — CLICK TO OPEN (SEGMENTED FIX)
    ========================================================= */
 
 let calendarMonth = new Date();
 
-optDate.addEventListener("click", (e) => {
+const dateSegment = optDate.closest(".segmented-input");
+
+dateSegment.addEventListener("click", (e) => {
   e.stopPropagation();
 
-  // ✅ Jump calendar to selected date's month (if exists)
+  // Focus input for accessibility
+  optDate.focus();
+
+  // Jump calendar to selected month if exists
   if (optDate.dataset.iso) {
     const [y, m] = optDate.dataset.iso.split("-");
     calendarMonth = new Date(Number(y), Number(m) - 1, 1);
   } else {
-    calendarMonth = new Date(); // fallback to today
+    calendarMonth = new Date();
   }
 
   renderCalendar();
@@ -3058,6 +3063,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

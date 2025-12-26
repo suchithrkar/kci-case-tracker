@@ -156,7 +156,7 @@ function openFollowUpReminderModal(r) {
   body.innerHTML = `
     <div><strong>Case ID:</strong> ${r.caseId || r.id}</div>
     <div><strong>Customer:</strong> ${r.customerName || "—"}</div>
-    <div><strong>Follow-up scheduled:</strong>
+    <div><strong>Scheduled:</strong>
       ${r.followDate} ${r.followTime}
     </div>
   `;
@@ -2978,6 +2978,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

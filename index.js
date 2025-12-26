@@ -1904,15 +1904,14 @@ function renderCalendar() {
   const container = document.getElementById("calendarContainer");
   const today = new Date();
 
-  // 🔗 Anchor calendar to the date segment
-  const segment = optDate.closest(".segmented-input");
-  const rect = segment.getBoundingClientRect();
-
-  // Position calendar directly below date segment
-  container.style.position = "fixed";
-  container.style.left = rect.left + "px";
-  container.style.top = rect.bottom + 6 + "px";
-  container.style.zIndex = 500;
+   const segment = optDate.closest(".segmented-input");
+   
+   // Reset any previous inline styles
+   container.style.position = "absolute";
+   container.style.left = "0";
+   container.style.top = "100%";
+   container.style.marginTop = "6px";
+   container.style.zIndex = "500";
 
   const year = calendarMonth.getFullYear();
   const month = calendarMonth.getMonth();
@@ -3074,6 +3073,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -1801,35 +1801,6 @@ document.addEventListener("click", (e) => {
   });
 });
 
-/* TIME PICKER — CLICK HANDLER (ESCAPED DROPDOWN) */
-document.addEventListener("click", (e) => {
-  const select = e.target.closest(".time-select");
-
-  // Open picker
-  if (select && !e.target.closest(".custom-option")) {
-    e.stopPropagation();
-    buildTimeOptions(select);
-    return;
-  }
-
-  // Select time
-  const option = e.target.closest("#timeOptionsContainer .custom-option");
-  if (option) {
-    const time = option.dataset.value;
-    const label =
-      document.querySelector(".time-select .custom-select-trigger span");
-
-    label.textContent = time;
-    document.querySelector(".time-select").dataset.value = time;
-
-    document.getElementById("timeOptionsContainer").innerHTML = "";
-    return;
-  }
-
-  // Outside click → close
-  document.getElementById("timeOptionsContainer").innerHTML = "";
-});
-
 
 /* GEAR BUTTON → OPEN MODAL */
 tbody.addEventListener("click", (e) => {
@@ -2579,43 +2550,6 @@ function formatDMY(iso) {
   return `${d}-${m}-${y}`;
 }
 
-/* =========================================================
-   CUSTOM TIME PICKER — 12 HOUR AM/PM
-   ========================================================= */
-
-function buildTimeOptions(anchorEl) {
-  const container = document.getElementById("timeOptionsContainer");
-  if (!container || !anchorEl) return;
-
-  const rect = anchorEl.getBoundingClientRect();
-
-  container.style.left = rect.left + "px";
-  container.style.top = rect.bottom + "px";
-  container.style.width = rect.width + "px";
-
-  container.innerHTML = `
-    <div class="custom-options" style="display:block;">
-      ${generateTimeOptionsHTML()}
-    </div>
-  `;
-}
-
-function generateTimeOptionsHTML() {
-  const times = [];
-
-  for (let h = 1; h <= 12; h++) {
-    for (let m of [0, 15, 30, 45]) {
-      const mm = String(m).padStart(2, "0");
-      times.push(`${h}:${mm} AM`);
-      times.push(`${h}:${mm} PM`);
-    }
-  }
-
-  return times.map(t =>
-    `<div class="custom-option" data-value="${t}">${t}</div>`
-  ).join("");
-}
-
 function convert12hTo24h(t) {
   if (!t) return "";
   const [time, period] = t.split(" ");
@@ -3157,6 +3091,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

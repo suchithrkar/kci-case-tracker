@@ -1103,6 +1103,45 @@ tr.active-row {
 .calendar-day.weekend {
   color: var(--danger);
 }
+
+/* ================================
+   SEGMENTED INPUT (ICON + FIELD)
+   ================================ */
+
+.segmented-input {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--panel-2);
+}
+
+.segment-icon {
+  padding: .45rem .6rem;
+  font-size: 16px;
+  border-right: 1px solid var(--border);
+  background: var(--panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Shared input styling */
+.segment-field {
+  border: none !important;
+  outline: none;
+  background: transparent;
+  padding: .45rem .6rem;
+  color: var(--text);
+  min-width: 100px;
+  text-align: center;
+}
+
+/* Time input alignment fix */
+.segment-field[type="time"] {
+  min-width: 90px;
+}
   
 </style>
 </head>
@@ -1322,37 +1361,33 @@ tr.active-row {
         <div>Follow-up</div>
       
           <div class="date-wrap">
+
+          <!-- DATE SEGMENT -->
+          <div class="segmented-input">
+            <span class="segment-icon">📅</span>
         
-          <!-- Calendar icon -->
-          <span style="font-size:16px;opacity:.85;">📅</span>
-        
-          <!-- Date -->
-          <div class="date-field">
-            <input
-              id="optDate"
-              type="text"
-              class="date-input"
-              placeholder="Select date..."
-              readonly
-            />
-            <div id="calendarContainer"></div>
+            <div class="date-field">
+              <input
+                id="optDate"
+                type="text"
+                class="date-input segment-field"
+                placeholder="Select date..."
+                readonly
+              />
+              <div id="calendarContainer"></div>
+            </div>
           </div>
         
-          <!-- Clock icon -->
-          <span style="font-size:15px;opacity:.75;margin-left:6px;">⏰</span>
+          <!-- TIME SEGMENT -->
+          <div class="segmented-input">
+            <span class="segment-icon">⏰</span>
         
-          <!-- Time -->
-          <input
-            id="optTime"
-            type="time"
-            style="
-              padding:.45rem .5rem;
-              border-radius:10px;
-              border:1px solid var(--border);
-              background:var(--panel-2);
-              color:var(--text);
-            "
-          />
+            <input
+              id="optTime"
+              type="time"
+              class="segment-field"
+            />
+          </div>
         
         </div>
       </div>
@@ -1555,6 +1590,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

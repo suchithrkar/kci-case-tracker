@@ -220,6 +220,34 @@ const followUpTimers = new Map(); // caseId → timeoutId
 
 let activeReminderCase = null;
 
+/* =========================================================
+   FOLLOW-UP REMINDER MODAL — BUTTON HANDLERS (PHASE 3A)
+   ========================================================= */
+
+const btnReminderClose = document.getElementById("btnReminderClose");
+const btnReminderFollowUp = document.getElementById("btnReminderFollowUp");
+
+if (btnReminderClose) {
+  btnReminderClose.onclick = () => {
+    document
+      .getElementById("followUpReminderModal")
+      .classList.remove("show");
+
+    activeReminderCase = null;
+  };
+}
+
+if (btnReminderFollowUp) {
+  btnReminderFollowUp.onclick = () => {
+    document
+      .getElementById("followUpReminderModal")
+      .classList.remove("show");
+
+    // Phase 3B will hook Case Options modal here
+    activeReminderCase = null;
+  };
+}
+
 
 /* =======================================================================
    AUTH STATE LISTENER
@@ -2814,6 +2842,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

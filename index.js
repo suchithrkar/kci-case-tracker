@@ -2592,8 +2592,8 @@ let timeState = {
 function openTimeDropdown(anchor, values, type) {
   const r = anchor.getBoundingClientRect();
 
-  timeDropdown.style.left = r.left + "px";
-  timeDropdown.style.top = r.bottom + "px";
+  timeDropdown.style.left = 0 + "px";
+  timeDropdown.style.top = 0 + "px";
 
   timeDropdown.innerHTML = `
     <div class="time-dropdown" data-type="${type}">
@@ -3183,6 +3183,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

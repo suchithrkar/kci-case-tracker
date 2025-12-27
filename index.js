@@ -2346,12 +2346,7 @@ export function openCaseModal(caseId, enforce = false) {
            timeMM.textContent = "MM";
            timeAMPM.textContent = "AM";
            document.getElementById("optTime").dataset.value = "";
-         } else {
-           timeHH.textContent = "HH";
-           timeMM.textContent = "MM";
-           timeAMPM.textContent = "AM";
-           document.getElementById("optTime").dataset.value = "";
-         }
+         } 
       }
 
   /* Flag */
@@ -3230,6 +3225,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -313,6 +313,59 @@ async function parseExcelFile(file) {
       const sheet = wb.Sheets[wb.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+      // ======================================================
+      // OPTIONAL SAFETY GUARD — EXCEL HEADER VALIDATION
+      // ======================================================
+      
+      // Expected headers by position (0-based index)
+      // We only check for KEY PHRASES, not full header text
+      const expectedHeaders = {
+        0: "case id",
+        1: "full name",                 // matches "Full Name (Primary Contact)"
+        2: "created",                   // matches "Created On"
+        3: "created by",
+        6: "country",
+        8: "resolution",                // matches "Case Resolution Code"
+        9: "owning user",               // ✅ matches "Full Name (Owning User) (User)"
+        15: "otc",                      // OTC Code
+        18: "ca group",
+        21: "tl",
+        30: "sbd",
+        34: "onsite",
+        35: "csr",
+        36: "bench",
+        37: "market"
+      };
+
+      const headerRow = rows[0] || [];
+      const headerErrors = [];
+      
+      Object.entries(expectedHeaders).forEach(([index, expected]) => {
+        const actual = String(headerRow[index] || "").trim();
+      
+        if (!actual || !actual.toLowerCase().includes(expected.toLowerCase())) {
+          headerErrors.push(
+            `Column ${String.fromCharCode(65 + Number(index))}: expected "${expected}", found "${actual || "EMPTY"}"`
+          );
+        }
+      });
+      
+      if (headerErrors.length > 0) {
+        clearProgress();
+      
+        showPopup(
+          "Excel format validation failed.\n\n" +
+          headerErrors.join("\n") +
+          "\n\nPlease upload the correct Excel template."
+        );
+      
+        excelState.excelCases = [];
+        excelState.rawRows = [];
+      
+        resolve(); // stop parsing
+        return;
+      }
+       
       excelState.rawRows = rows;
 
       updateProgress("Excel loaded. Processing rows...");
@@ -2510,6 +2563,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

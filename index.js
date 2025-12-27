@@ -2639,13 +2639,13 @@ timeMM.onclick = (e) => {
   e.stopPropagation();
   closeTimeDropdowns();
 
-  mmDropdown.innerHTML = `
-    <div class="time-dropdown">
-      ${[0,5,10,15,20,25,30,35,40,45,50,55]
-        .map(m => `<div data-mm="${m}">${String(m).padStart(2,"0")}</div>`)
-        .join("")}
-    </div>
-  `;
+   mmDropdown.innerHTML = `
+     <div class="time-dropdown">
+       ${Array.from({ length: 60 }, (_, m) =>
+         `<div data-mm="${m}">${String(m).padStart(2,"0")}</div>`
+       ).join("")}
+     </div>
+   `;
 
   mmDropdown.style.display = "block";
 };
@@ -3197,6 +3197,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

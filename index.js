@@ -2327,18 +2327,25 @@ export function openCaseModal(caseId, enforce = false) {
       
          const t = r.followTime || "";
          if (t) {
-           const [hm, ap] = t.split(" ");
-           const [h, m] = hm.split(":");
+           let [h, m] = t.split(":").map(Number);
          
-           timeState.hh = Number(h);
-           timeState.mm = Number(m);
-           timeState.ampm = ap;
+           timeState.ampm = h >= 12 ? "PM" : "AM";
+           if (h === 0) h = 12;
+           else if (h > 12) h -= 12;
          
-           timeHH.textContent = h.padStart(2,"0");
-           timeMM.textContent = m.padStart(2,"0");
-           timeAMPM.textContent = ap;
+           timeState.hh = h;
+           timeState.mm = m;
+         
+           timeHH.textContent = String(h).padStart(2, "0");
+           timeMM.textContent = String(m).padStart(2, "0");
+           timeAMPM.textContent = timeState.ampm;
          
            document.getElementById("optTime").dataset.value = t;
+         } else {
+           timeHH.textContent = "HH";
+           timeMM.textContent = "MM";
+           timeAMPM.textContent = "AM";
+           document.getElementById("optTime").dataset.value = "";
          } else {
            timeHH.textContent = "HH";
            timeMM.textContent = "MM";
@@ -2600,8 +2607,20 @@ function closeTimeDropdowns() {
 
 function syncTimeValue() {
   if (timeState.hh !== null && timeState.mm !== null) {
-    document.getElementById("optTime").dataset.value =
-      `${timeState.hh}:${String(timeState.mm).padStart(2, "0")} ${timeState.ampm}`;
+
+    // Convert to 24h for storage (CRITICAL)
+    const time24h = convert12hTo24h(
+      timeState.hh,
+      timeState.mm,
+      timeState.ampm
+    );
+
+    // Store ONLY 24h internally
+    document.getElementById("optTime").dataset.value = time24h;
+
+    // Optional: store display value if ever needed
+    document.getElementById("optTime").dataset.display =
+      `${String(timeState.hh).padStart(2, "0")}:${String(timeState.mm).padStart(2, "0")} ${timeState.ampm}`;
   }
 }
 
@@ -2672,6 +2691,20 @@ timeAMPM.onclick = () => {
 /* ---------- global close ---------- */
 
 document.addEventListener("click", closeTimeDropdowns);
+
+/* =========================================================
+   TIME FORMAT HELPERS
+   ========================================================= */
+
+function convert12hTo24h(hh, mm, ampm) {
+  let h = Number(hh);
+  const m = Number(mm);
+
+  if (ampm === "PM" && h !== 12) h += 12;
+  if (ampm === "AM" && h === 12) h = 0;
+
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
 
 
 /* =======================================================================
@@ -3197,6 +3230,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

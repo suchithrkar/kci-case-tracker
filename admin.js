@@ -327,31 +327,31 @@ async function parseExcelFile(file) {
         if (!id) continue;
 
         parsed.push({
-  id,                                                   // Col A
-  customerName: String(r[1] || "").trim(),              // Col B
+           id,                                                   // Col A
+           customerName: String(r[1] || "").trim(),              // Col B
+           createdOn: excelToDate(r[2]),                         // Col C
+           createdBy: String(r[3] || "").trim(),                 // Col D
+           country: String(r[6] || "").trim(),                   // Col G
+           caseResolutionCode: String(r[8] || "").trim(),        // Col I
+           caseOwner: String(r[9] || "").trim(),                 // Col J
 
-  createdOn: excelToDate(r[2]),                         // Col C (Excel serial → YYYY-MM-DD)
+           // ✅ NEW COLUMN — OTC Code
+           otcCode: String(r[15] || "").trim(),                  // Col P
 
-  createdBy: String(r[3] || "").trim(),                 // Col D
+           // ⬇️ ALL BELOW SHIFTED BY +1
+           caGroup: String(r[18] || "").trim(),                  // Col S
+           tl: String(r[21] || "").trim(),                       // Col V
+           sbd: String(r[30] || "").trim(),                      // Col AE
+         
+           onsiteRFC: String(r[34] || "").trim(),                // Col AI
+           csrRFC:    String(r[35] || "").trim(),                // Col AJ
+           benchRFC:  String(r[36] || "").trim(),                // Col AK
 
-  country: String(r[6] || "").trim(),                   // Col G
-
-  caseResolutionCode: String(r[8] || "").trim(),        // Col I
-
-  caseOwner: String(r[9] || "").trim(),                 // Col J
-
-  caGroup: String(r[17] || "").trim(),                  // Col R
-
-  tl: String(r[20] || "").trim(),                       // Col U
-
-  sbd: String(r[29] || "").trim(),                      // Col AD
-
-  onsiteRFC: String(r[33] || "").trim(),                // Col AH
-  csrRFC:    String(r[34] || "").trim(),                // Col AI
-  benchRFC:  String(r[35] || "").trim(),                // Col AJ
-        // ✅ Excel row position
-         excelOrder: i
-});
+           // ✅ NEW LAST COLUMN — Market
+           market: String(r[37] || "").trim(),                   // Col AL
+         
+           excelOrder: i
+         });
       }
 
       excelState.excelCases = parsed;
@@ -407,21 +407,21 @@ function computeDiff() {
     }
 
     const changed =
-  ex.customerName !== fs.customerName ||
-  ex.createdOn !== fs.createdOn ||
-  ex.createdBy !== fs.createdBy ||
-  ex.country !== fs.country ||
-  ex.caseResolutionCode !== fs.caseResolutionCode ||
-  ex.caseOwner !== fs.caseOwner ||
-  ex.caGroup !== fs.caGroup ||
-  ex.tl !== fs.tl ||
-  ex.sbd !== fs.sbd ||
-  ex.onsiteRFC !== fs.onsiteRFC ||
-  ex.csrRFC !== fs.csrRFC ||
-  ex.benchRFC !== fs.benchRFC ||
-
-  // ✅ NEW — Excel row order changed
-  ex.excelOrder !== fs.excelOrder;
+        ex.customerName !== fs.customerName ||
+        ex.createdOn !== fs.createdOn ||
+        ex.createdBy !== fs.createdBy ||
+        ex.country !== fs.country ||
+        ex.caseResolutionCode !== fs.caseResolutionCode ||
+        ex.caseOwner !== fs.caseOwner ||
+        ex.otcCode !== fs.otcCode ||
+        ex.caGroup !== fs.caGroup ||
+        ex.tl !== fs.tl ||
+        ex.sbd !== fs.sbd ||
+        ex.onsiteRFC !== fs.onsiteRFC ||
+        ex.csrRFC !== fs.csrRFC ||
+        ex.benchRFC !== fs.benchRFC ||
+        ex.market !== fs.market ||
+        ex.excelOrder !== fs.excelOrder;
 
     if (changed) diff.updated.push(ex);
   }
@@ -579,17 +579,23 @@ async function applyExcelChanges() {
       country: ex.country,
       caseResolutionCode: ex.caseResolutionCode,
       caseOwner: ex.caseOwner,
+      otcCode: ex.otcCode,
       caGroup: ex.caGroup,
       tl: ex.tl,
       sbd: ex.sbd,
       onsiteRFC: ex.onsiteRFC,
       csrRFC: ex.csrRFC,
       benchRFC: ex.benchRFC,
+      market: ex.market,
 
       // default fields
       status: "",
       followDate: "",
+      followTime: "",                 // ✅ NEW
       flagged: false,
+      pns: false,                     // ✅ NEW
+      surveyPrediction: "",           // ✅ NEW
+      predictionComment: "",          // ✅ NEW
       notes: "",
       lastActionedOn: "",
       lastActionedBy: "",
@@ -617,12 +623,14 @@ async function applyExcelChanges() {
       country: ex.country,
       caseResolutionCode: ex.caseResolutionCode,
       caseOwner: ex.caseOwner,
+      otcCode: ex.otcCode,
       caGroup: ex.caGroup,
       tl: ex.tl,
       sbd: ex.sbd,
       onsiteRFC: ex.onsiteRFC,
       csrRFC: ex.csrRFC,
-      benchRFC: ex.benchRFC
+      benchRFC: ex.benchRFC,
+      market: ex.market 
     };
 
     return updateDoc(doc(db, "cases", ex.id), updateFields);
@@ -2502,6 +2510,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

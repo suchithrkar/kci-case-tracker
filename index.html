@@ -1182,11 +1182,40 @@ tr.active-row {
   overflow-y: auto;
 }
 
+/* ================================
+   HIDE SCROLLBAR — TIME DROPDOWNS
+   ================================ */
+
+/* Chrome / Edge / Safari */
+.time-dropdown::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Firefox */
+.time-dropdown {
+  scrollbar-width: none;
+}
+
+/* ================================
+   TIME DROPDOWN POSITIONING (CSS)
+   ================================ */
+
 .time-dropdown-wrap {
   position: absolute;
   top: calc(100% + 6px);
   z-index: 600;
   display: none;
+}
+
+/* HH dropdown aligns under HH */
+#hhDropdown {
+  left: 42px;   /* tweakable */
+}
+
+/* MM dropdown aligns under MM */
+#mmDropdown {
+  left: 82px;   /* tweakable */
 }
 
 .time-dropdown div {
@@ -1647,6 +1676,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

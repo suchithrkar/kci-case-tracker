@@ -301,6 +301,23 @@ function getTeamToday(teamConfig) {
 }
 
 // ======================================================
+// Helper — Convert 0-based column index to Excel letter
+// Example: 0 → A, 25 → Z, 26 → AA, 27 → AB, 37 → AL
+// ======================================================
+function excelColLetter(index) {
+  let col = "";
+  let n = index + 1; // convert 0-based to 1-based
+
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    col = String.fromCharCode(65 + rem) + col;
+    n = Math.floor((n - 1) / 26);
+  }
+
+  return col;
+}
+
+// ======================================================
 // PARSE EXCEL FILE (fixed + improved)
 // ======================================================
 async function parseExcelFile(file) {
@@ -345,7 +362,7 @@ async function parseExcelFile(file) {
       
         if (!actual || !actual.toLowerCase().includes(expected.toLowerCase())) {
           headerErrors.push(
-            `Column ${String.fromCharCode(65 + Number(index))}: expected "${expected}", found "${actual || "EMPTY"}"`
+            `Column ${excelColLetter(Number(index))}: expected "${expected}", found "${actual || "EMPTY"}"`
           );
         }
       });
@@ -2563,6 +2580,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

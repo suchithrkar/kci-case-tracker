@@ -2317,7 +2317,26 @@ export function openCaseModal(caseId, enforce = false) {
           optDate.value = "";
         }
       
-        if (optTime) optTime.value = r.followTime || "";
+         const t = r.followTime || "";
+         if (t) {
+           const [hm, ap] = t.split(" ");
+           const [h, m] = hm.split(":");
+         
+           timeState.hh = Number(h);
+           timeState.mm = Number(m);
+           timeState.ampm = ap;
+         
+           timeHH.textContent = h.padStart(2,"0");
+           timeMM.textContent = m.padStart(2,"0");
+           timeAMPM.textContent = ap;
+         
+           document.getElementById("optTime").dataset.value = t;
+         } else {
+           timeHH.textContent = "HH";
+           timeMM.textContent = "MM";
+           timeAMPM.textContent = "AM";
+           document.getElementById("optTime").dataset.value = "";
+         }
       }
 
   /* Flag */
@@ -2537,6 +2556,84 @@ function showClosureWarning(msg) {
 function formatDMY(iso) {
   const [y, m, d] = iso.split("-");
   return `${d}-${m}-${y}`;
+}
+
+/* =========================================================
+   SIMPLE CUSTOM TIME PICKER (HH / MM / AMPM)
+   ========================================================= */
+
+const timeDropdown = document.getElementById("timeDropdown");
+const timeHH = document.getElementById("timeHH");
+const timeMM = document.getElementById("timeMM");
+const timeAMPM = document.getElementById("timeAMPM");
+
+let timeState = {
+  hh: null,
+  mm: null,
+  ampm: "AM"
+};
+
+function openTimeDropdown(anchor, values, type) {
+  const r = anchor.getBoundingClientRect();
+
+  timeDropdown.style.left = r.left + "px";
+  timeDropdown.style.top = r.bottom + "px";
+
+  timeDropdown.innerHTML = `
+    <div class="time-dropdown" data-type="${type}">
+      ${values.map(v =>
+        `<div data-val="${v}">${String(v).padStart(2,"0")}</div>`
+      ).join("")}
+    </div>
+  `;
+}
+
+timeHH.onclick = (e) => {
+  e.stopPropagation();
+  openTimeDropdown(timeHH, [1,2,3,4,5,6,7,8,9,10,11,12], "hh");
+};
+
+timeMM.onclick = (e) => {
+  e.stopPropagation();
+  openTimeDropdown(timeMM, [0,5,10,15,20,25,30,35,40,45,50,55], "mm");
+};
+
+timeAMPM.onclick = () => {
+  timeState.ampm = timeState.ampm === "AM" ? "PM" : "AM";
+  timeAMPM.textContent = timeState.ampm;
+  syncTimeValue();
+};
+
+timeDropdown.onclick = (e) => {
+  const opt = e.target.closest("[data-val]");
+  if (!opt) return;
+
+  const type = timeDropdown.querySelector(".time-dropdown").dataset.type;
+  const val = Number(opt.dataset.val);
+
+  if (type === "hh") {
+    timeState.hh = val;
+    timeHH.textContent = String(val).padStart(2,"0");
+  } else {
+    timeState.mm = val;
+    timeMM.textContent = String(val).padStart(2,"0");
+  }
+
+  syncTimeValue();
+  closeTimeDropdown();
+};
+
+document.addEventListener("click", closeTimeDropdown);
+
+function closeTimeDropdown() {
+  timeDropdown.innerHTML = "";
+}
+
+function syncTimeValue() {
+  if (timeState.hh !== null && timeState.mm !== null) {
+    document.getElementById("optTime").dataset.value =
+      `${timeState.hh}:${String(timeState.mm).padStart(2,"0")} ${timeState.ampm}`;
+  }
 }
 
 
@@ -2773,8 +2870,8 @@ async function saveModalData() {
   const today = getTeamToday(trackerState.teamConfig);
 
   const follow = optDate.dataset.iso || null;
-  const optTime = document.getElementById("optTime");
-  r.followTime = optTime?.value || "";
+   const optTime = document.getElementById("optTime");
+   r.followTime = optTime?.dataset.value || "";
 
    /* =====================================================
       FOLLOW-UP VALIDATION (TABLE + REMINDER FLOWS)
@@ -3070,6 +3167,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

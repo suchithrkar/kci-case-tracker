@@ -2619,7 +2619,6 @@ timeHH.onclick = (e) => {
     </div>
   `;
 
-  hhDropdown.style.left = timeHH.offsetLeft + "px";
   hhDropdown.style.display = "block";
 };
 
@@ -2648,7 +2647,6 @@ timeMM.onclick = (e) => {
     </div>
   `;
 
-  mmDropdown.style.left = timeMM.offsetLeft + "px";
   mmDropdown.style.display = "block";
 };
 
@@ -3199,6 +3197,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

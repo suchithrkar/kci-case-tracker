@@ -1176,7 +1176,8 @@ tr.active-row {
 .time-dropdown {
   background: var(--dropdown-bg);
   border: 1px solid var(--dropdown-border);
-  border-radius: 10px;
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
   box-shadow: var(--shadow);
   max-height: 140px;
   overflow-y: auto;
@@ -1203,19 +1204,19 @@ tr.active-row {
 
 .time-dropdown-wrap {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 0px);
   z-index: 600;
   display: none;
 }
 
 /* HH dropdown aligns under HH */
 #hhDropdown {
-  left: 42px;   /* tweakable */
+  left: 186px;   /* tweakable */
 }
 
 /* MM dropdown aligns under MM */
 #mmDropdown {
-  left: 82px;   /* tweakable */
+  left: 226px;   /* tweakable */
 }
 
 .time-dropdown div {
@@ -1676,6 +1677,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

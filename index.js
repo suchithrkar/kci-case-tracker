@@ -2590,13 +2590,7 @@ let timeState = {
 };
 
 function openTimeDropdown(anchor, values, type) {
-  const r = anchor.getBoundingClientRect();
-
-  timeDropdown.style.position = "absolute";
-  timeDropdown.style.left = `${r.left + window.scrollX}px`;
-  timeDropdown.style.top = `${r.bottom + window.scrollY + 6}px`;
-  timeDropdown.style.zIndex = "600";
-
+  // Anchor dropdown inside the same date-wrap container
   timeDropdown.innerHTML = `
     <div class="time-dropdown" data-type="${type}">
       ${values.map(v =>
@@ -3178,6 +3172,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

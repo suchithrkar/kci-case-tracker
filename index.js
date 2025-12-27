@@ -2307,7 +2307,15 @@ export function openCaseModal(caseId, enforce = false) {
       if (window.__fromReminder) {
         optDate.dataset.iso = "";
         optDate.value = "";
-        if (optTime) optTime.value = "";
+         timeState.hh = null;
+         timeState.mm = null;
+         timeState.ampm = "AM";
+         
+         timeHH.textContent = "HH";
+         timeMM.textContent = "MM";
+         timeAMPM.textContent = "AM";
+         
+         document.getElementById("optTime").dataset.value = "";
       } else if (!window.__fromReminder) {
         if (r.followDate) {
           optDate.dataset.iso = r.followDate;
@@ -2481,8 +2489,16 @@ btnModalClear.onclick = () => {
   optDate.value = "";
   optDate.dataset.iso = "";
 
-  const optTime = document.getElementById("optTime");
-  if (optTime) optTime.value = "";
+  // Reset custom time picker
+  timeState.hh = null;
+  timeState.mm = null;
+  timeState.ampm = "AM";
+
+  timeHH.textContent = "HH";
+  timeMM.textContent = "MM";
+  timeAMPM.textContent = "AM";
+
+  document.getElementById("optTime").dataset.value = "";
 
   resizeNotes();
 };
@@ -3167,6 +3183,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

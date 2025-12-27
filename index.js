@@ -2575,13 +2575,15 @@ function formatDMY(iso) {
 }
 
 /* =========================================================
-   SIMPLE CUSTOM TIME PICKER (HH / MM / AMPM)
+   CUSTOM TIME PICKER — SEPARATE HH / MM DROPDOWNS
    ========================================================= */
 
-const timeDropdown = document.getElementById("timeDropdown");
 const timeHH = document.getElementById("timeHH");
 const timeMM = document.getElementById("timeMM");
 const timeAMPM = document.getElementById("timeAMPM");
+
+const hhDropdown = document.getElementById("hhDropdown");
+const mmDropdown = document.getElementById("mmDropdown");
 
 let timeState = {
   hh: null,
@@ -2589,26 +2591,79 @@ let timeState = {
   ampm: "AM"
 };
 
-function openTimeDropdown(anchor, values, type) {
-  // Anchor dropdown inside the same date-wrap container
-  timeDropdown.innerHTML = `
-    <div class="time-dropdown" data-type="${type}">
-      ${values.map(v =>
-        `<div data-val="${v}">${String(v).padStart(2, "0")}</div>`
-      ).join("")}
-    </div>
-  `;
+/* ---------- helpers ---------- */
+
+function closeTimeDropdowns() {
+  hhDropdown.style.display = "none";
+  mmDropdown.style.display = "none";
 }
+
+function syncTimeValue() {
+  if (timeState.hh !== null && timeState.mm !== null) {
+    document.getElementById("optTime").dataset.value =
+      `${timeState.hh}:${String(timeState.mm).padStart(2, "0")} ${timeState.ampm}`;
+  }
+}
+
+/* ---------- HH dropdown ---------- */
 
 timeHH.onclick = (e) => {
   e.stopPropagation();
-  openTimeDropdown(timeHH, [1,2,3,4,5,6,7,8,9,10,11,12], "hh");
+  closeTimeDropdowns();
+
+  hhDropdown.innerHTML = `
+    <div class="time-dropdown">
+      ${[1,2,3,4,5,6,7,8,9,10,11,12]
+        .map(h => `<div data-hh="${h}">${String(h).padStart(2,"0")}</div>`)
+        .join("")}
+    </div>
+  `;
+
+  hhDropdown.style.left = timeHH.offsetLeft + "px";
+  hhDropdown.style.display = "block";
 };
+
+hhDropdown.onclick = (e) => {
+  const opt = e.target.closest("[data-hh]");
+  if (!opt) return;
+
+  timeState.hh = Number(opt.dataset.hh);
+  timeHH.textContent = String(timeState.hh).padStart(2, "0");
+
+  syncTimeValue();
+  closeTimeDropdowns();
+};
+
+/* ---------- MM dropdown ---------- */
 
 timeMM.onclick = (e) => {
   e.stopPropagation();
-  openTimeDropdown(timeMM, [0,5,10,15,20,25,30,35,40,45,50,55], "mm");
+  closeTimeDropdowns();
+
+  mmDropdown.innerHTML = `
+    <div class="time-dropdown">
+      ${[0,5,10,15,20,25,30,35,40,45,50,55]
+        .map(m => `<div data-mm="${m}">${String(m).padStart(2,"0")}</div>`)
+        .join("")}
+    </div>
+  `;
+
+  mmDropdown.style.left = timeMM.offsetLeft + "px";
+  mmDropdown.style.display = "block";
 };
+
+mmDropdown.onclick = (e) => {
+  const opt = e.target.closest("[data-mm]");
+  if (!opt) return;
+
+  timeState.mm = Number(opt.dataset.mm);
+  timeMM.textContent = String(timeState.mm).padStart(2, "0");
+
+  syncTimeValue();
+  closeTimeDropdowns();
+};
+
+/* ---------- AM / PM toggle ---------- */
 
 timeAMPM.onclick = () => {
   timeState.ampm = timeState.ampm === "AM" ? "PM" : "AM";
@@ -2616,37 +2671,9 @@ timeAMPM.onclick = () => {
   syncTimeValue();
 };
 
-timeDropdown.onclick = (e) => {
-  const opt = e.target.closest("[data-val]");
-  if (!opt) return;
+/* ---------- global close ---------- */
 
-  const type = timeDropdown.querySelector(".time-dropdown").dataset.type;
-  const val = Number(opt.dataset.val);
-
-  if (type === "hh") {
-    timeState.hh = val;
-    timeHH.textContent = String(val).padStart(2,"0");
-  } else {
-    timeState.mm = val;
-    timeMM.textContent = String(val).padStart(2,"0");
-  }
-
-  syncTimeValue();
-  closeTimeDropdown();
-};
-
-document.addEventListener("click", closeTimeDropdown);
-
-function closeTimeDropdown() {
-  timeDropdown.innerHTML = "";
-}
-
-function syncTimeValue() {
-  if (timeState.hh !== null && timeState.mm !== null) {
-    document.getElementById("optTime").dataset.value =
-      `${timeState.hh}:${String(timeState.mm).padStart(2,"0")} ${timeState.ampm}`;
-  }
-}
+document.addEventListener("click", closeTimeDropdowns);
 
 
 /* =======================================================================
@@ -3172,6 +3199,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

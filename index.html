@@ -1145,6 +1145,49 @@ tr.active-row {
 .segment-field[type="time"] {
   min-width: 90px;
 }
+
+/* ================================
+   CUSTOM TIME PICKER
+   ================================ */
+
+.time-picker {
+  gap: 6px;
+}
+
+.time-part {
+  min-width: 34px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.time-part.time-ampm {
+  color: var(--accent);
+}
+
+#timeDropdown {
+  position: absolute;
+  z-index: 600;
+}
+
+.time-dropdown {
+  background: var(--dropdown-bg);
+  border: 1px solid var(--dropdown-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.time-dropdown div {
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.time-dropdown div:hover {
+  background: var(--option-hover);
+}
   
 </style>
 </head>
@@ -1405,16 +1448,17 @@ tr.active-row {
           <!-- ✅ MOVE calendar OUTSIDE clipped container -->
           <div id="calendarContainer"></div>
         
-          <!-- TIME SEGMENT -->
-          <div class="segmented-input">
+          <!-- TIME SEGMENT — CUSTOM -->
+          <div class="segmented-input time-picker" id="optTime">
             <span class="segment-icon">⏰</span>
-        
-            <input
-              id="optTime"
-              type="time"
-              class="segment-field"
-            />
+          
+            <div class="time-part" id="timeHH">HH</div>
+            <div class="time-part" id="timeMM">MM</div>
+            <div class="time-part time-ampm" id="timeAMPM">AM</div>
           </div>
+          
+          <!-- TIME DROPDOWN (shared popup) -->
+          <div id="timeDropdown"></div>
         
         </div>
       </div>
@@ -1593,6 +1637,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

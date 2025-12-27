@@ -2592,13 +2592,15 @@ let timeState = {
 function openTimeDropdown(anchor, values, type) {
   const r = anchor.getBoundingClientRect();
 
-  timeDropdown.style.left = 0 + "px";
-  timeDropdown.style.top = 0 + "px";
+  timeDropdown.style.position = "absolute";
+  timeDropdown.style.left = `${r.left + window.scrollX}px`;
+  timeDropdown.style.top = `${r.bottom + window.scrollY + 6}px`;
+  timeDropdown.style.zIndex = "600";
 
   timeDropdown.innerHTML = `
     <div class="time-dropdown" data-type="${type}">
       ${values.map(v =>
-        `<div data-val="${v}">${String(v).padStart(2,"0")}</div>`
+        `<div data-val="${v}">${String(v).padStart(2, "0")}</div>`
       ).join("")}
     </div>
   `;
@@ -2683,13 +2685,6 @@ function animateModalClose(callback) {
     card.style.transform = "";
     card.style.opacity = "";
   }, 120);
-}
-
-
-
-/* Override modal close to animate */
-function closeModalAnimated() {
-  animateModalClose(() => modal.classList.remove("show"));
 }
 
 /* Replace close handlers */
@@ -3183,6 +3178,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

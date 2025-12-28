@@ -2812,28 +2812,39 @@ document.getElementById("btnExportExcel").onclick = () => {
   }
 
   // Build rows for Excel
-  const rows = trackerState.filteredCases.map(r => ({
-    "Case ID": r.id,
-    "Customer Name": r.customerName,
-    "Country": r.country,
-    "Case Resolution Code": r.caseResolutionCode,
-    "Case Owner": r.caseOwner,
-    "TL": r.tl,
-    "Created On": r.createdOn,
-    "CA Group": r.caGroup,
-    "SBD": r.sbd,
-    "Status": r.status,
-    "Follow Up Date": r.followDate,
-    "Flagged": r.flagged ? "Yes" : "No",
-    "Notes": r.notes,
-    "Last Actioned By": userNameMap[r.lastActionedBy] || r.lastActionedBy || "",
-     "Last Actioned On": r.lastActionedOn,
-   "Status Changed By": userNameMap[r.statusChangedBy] || r.statusChangedBy || "",
-    "Status Changed On": r.statusChangedOn,
+   const rows = trackerState.filteredCases.map(r => ({
+     "Case ID": r.id,
+     "Team ID": trackerState.teamId,
+   
+     "Customer Name": r.customerName,
+     "Created On": r.createdOn,
+     "Created By": r.createdBy || "",
+     "Country": r.country,
+     "Case Resolution Code": r.caseResolutionCode,
+     "Case Owner": r.caseOwner,
+   
+     "OTC Code": r.otcCode || "",
+     "CA Group": r.caGroup,
+     "TL": r.tl,
+     "SBD": r.sbd,
+     "Market": r.market || "",
+   
+     "Status": r.status || "",
+     "Follow Date": r.followDate || "",
+     "Follow Time": r.followTime || "",
+   
+     "Flagged": r.flagged ? "Yes" : "No",
+     "PNS": r.PNS ? "Yes" : "No",
+   
      "Survey Prediction": r.surveyPrediction ?? "",
-      "Prediction Comment": r.predictionComment ?? "",
-      "PNS": r.PNS ? "Yes" : "No"
-  }));
+     "Prediction Comment": r.predictionComment ?? "",
+     "Notes": r.notes || "",
+   
+     "Last Actioned On": r.lastActionedOn || "",
+     "Last Actioned By": userNameMap[r.lastActionedBy] || r.lastActionedBy || "",
+     "Status Changed On": r.statusChangedOn || "",
+     "Status Changed By": userNameMap[r.statusChangedBy] || r.statusChangedBy || ""
+   }));
 
   // Convert to sheet
   const ws = XLSX.utils.json_to_sheet(rows, { origin: "A1" });
@@ -3225,6 +3236,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

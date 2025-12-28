@@ -71,29 +71,6 @@ let processing = false;
 // Quick DOM helpers
 const $ = (id) => document.getElementById(id);
 
-async function writeDailyRepairReport(teamId) {
-  const today = getTeamToday(teamConfig);
-
-  const snap = await getDocs(
-    query(collection(db, "cases"), where("teamId", "==", teamId))
-  );
-
-  const cases = snap.docs.map(d => d.data());
-
-  const report = {
-    totalOpen: cases.length,
-    onsite: cases.filter(c => c.caseResolutionCode === "Onsite Solution").length,
-    offsite: cases.filter(c => c.caseResolutionCode === "Offsite Solution").length,
-    csr: cases.filter(c => c.caseResolutionCode === "Parts Shipped").length,
-    generatedAt: new Date().toISOString()
-  };
-
-  await setDoc(
-    doc(db, "dailyRepairReports", teamId, "reports", today),
-    report
-  );
-}
-
 /* =========================================================
    ADMIN — CUSTOM SELECT ENGINE (Tracker-aligned)
    ========================================================= */
@@ -813,8 +790,6 @@ async function applyExcelChanges() {
 
   showPopup("Excel update complete!");
    processing = false;
-
-   await writeDailyRepairReport(excelState.teamId);
 
 }
 
@@ -2720,6 +2695,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

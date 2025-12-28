@@ -69,7 +69,6 @@ let processing = false;
 
 // Quick DOM helpers
 const $ = (id) => document.getElementById(id);
-const overwriteToggle = $("overwriteUserActions");
 
 /* =========================================================
    ADMIN — CUSTOM SELECT ENGINE (Tracker-aligned)
@@ -596,8 +595,11 @@ function openPreviewModal() {
   }
 }
 
-
-
+$("btnPreviewCancel").onclick = () => {
+  $("previewSection").style.display = "none";
+  clearProgress();
+  excelState.diff = { new: [], updated: [], deleted: [] };
+};
 
 
 // ======================================================
@@ -1869,6 +1871,7 @@ function importBackupPrompt(teamId) {
 
     resetExcelUI();               // 🔁 reuse Excel UI
     excelState.teamId = teamId;
+    $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> ${teamId}`;
     excelState.file = file;
 
     clearProgress();
@@ -2626,6 +2629,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -370,11 +370,11 @@ async function parseExcelFile(file) {
       if (headerErrors.length > 0) {
         clearProgress();
       
-        showPopup(
-          "Excel format validation failed.\n\n" +
-          headerErrors.join("\n") +
-          "\n\nPlease upload the correct Excel template."
-        );
+         alert(
+           "Excel format validation failed.\n\n" +
+           headerErrors.join("\n") +
+           "\n\nPlease upload the correct Excel template."
+         );
       
         excelState.excelCases = [];
         excelState.rawRows = [];
@@ -471,6 +471,9 @@ async function parseBackupFile(data) {
 
   // Normalize to Excel engine
   excelState.excelCases = backup.cases;
+  // 🔧 Backup import needs full overwrite capability.
+  // Mark backup imports so we can force-update cases later.
+  excelState.isBackupImport = true;
 }
 
 // ======================================================
@@ -504,32 +507,39 @@ function computeDiff() {
 
   // Detect new + updated
   for (const ex of excelState.excelCases) {
-    const fs = fsMap.get(ex.id);
-
-    if (!fs) {
-      diff.new.push(ex);
-      continue;
-    }
-
-    const changed =
-        ex.customerName !== fs.customerName ||
-        ex.createdOn !== fs.createdOn ||
-        ex.createdBy !== fs.createdBy ||
-        ex.country !== fs.country ||
-        ex.caseResolutionCode !== fs.caseResolutionCode ||
-        ex.caseOwner !== fs.caseOwner ||
-        ex.otcCode !== fs.otcCode ||
-        ex.caGroup !== fs.caGroup ||
-        ex.tl !== fs.tl ||
-        ex.sbd !== fs.sbd ||
-        ex.onsiteRFC !== fs.onsiteRFC ||
-        ex.csrRFC !== fs.csrRFC ||
-        ex.benchRFC !== fs.benchRFC ||
-        ex.market !== fs.market ||
-        ex.excelOrder !== fs.excelOrder;
-
-    if (changed) diff.updated.push(ex);
-  }
+     const fs = fsMap.get(ex.id);
+   
+     if (!fs) {
+       diff.new.push(ex);
+       continue;
+     }
+   
+     // 🔥 BACKUP FULL RESTORE MODE:
+     // Treat ALL existing cases as updated
+     if (excelState.isBackupImport && $("overwriteUserActions")?.checked) {
+       diff.updated.push(ex);
+       continue;
+     }
+   
+     const changed =
+       ex.customerName !== fs.customerName ||
+       ex.createdOn !== fs.createdOn ||
+       ex.createdBy !== fs.createdBy ||
+       ex.country !== fs.country ||
+       ex.caseResolutionCode !== fs.caseResolutionCode ||
+       ex.caseOwner !== fs.caseOwner ||
+       ex.otcCode !== fs.otcCode ||
+       ex.caGroup !== fs.caGroup ||
+       ex.tl !== fs.tl ||
+       ex.sbd !== fs.sbd ||
+       ex.onsiteRFC !== fs.onsiteRFC ||
+       ex.csrRFC !== fs.csrRFC ||
+       ex.benchRFC !== fs.benchRFC ||
+       ex.market !== fs.market ||
+       ex.excelOrder !== fs.excelOrder;
+   
+     if (changed) diff.updated.push(ex);
+   }
 
   // Detect deleted
   for (const fs of excelState.firestoreCases) {
@@ -1749,8 +1759,8 @@ function resetExcelUI() {
   $("allowDeletion").disabled = false;
 
    $("previewSection").style.display = "none";
-$("previewCounts").innerHTML = "";
-
+   $("previewCounts").innerHTML = "";
+   excelState.isBackupImport = false;
 }
 
 
@@ -2629,6 +2639,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

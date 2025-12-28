@@ -2290,7 +2290,6 @@ submitBtn.textContent = "Submit";
    
    // PHASE 3 — ARCHIVE CLOSED CASE
    await archiveClosedCase(caseId);
-   await incrementClosedCount(trackerState.teamId);
    
   // ✅ Clear closure warning after successful submission
    const warn = document.getElementById("closureWarning");
@@ -2680,33 +2679,6 @@ let timeState = {
 };
 
 /* ---------- helpers ---------- */
-
-async function incrementClosedCount(teamId) {
-  const todayISO = getTeamToday(trackerState.teamConfig);
-
-  const reportRef = doc(
-    db,
-    "dailyRepairReports",
-    teamId,
-    "reports",
-    todayISO
-  );
-
-  const snap = await getDoc(reportRef);
-
-  const prevCount =
-    snap.exists() && typeof snap.data().closedCount === "number"
-      ? snap.data().closedCount
-      : 0;
-
-  await setDoc(
-    reportRef,
-    {
-      closedCount: prevCount + 1
-    },
-    { merge: true }
-  );
-}
 
 function closeTimeDropdowns() {
   hhDropdown.style.display = "none";
@@ -3349,6 +3321,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

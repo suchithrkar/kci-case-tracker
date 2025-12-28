@@ -2534,6 +2534,7 @@ function closeModal() {
   animateModalClose(() => {
     modal.classList.remove("show");
   });
+   pendingUnupdated.delete(currentModalCaseId);
    unupdatedProtect = false;
 
    window.__fromReminder = false;
@@ -3243,6 +3244,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -2247,6 +2247,8 @@ submitBtn.textContent = "Submit";
   await firestoreUpdateCase(caseId, update);
    // PHASE 3 — ARCHIVE CLOSED CASE
    await archiveClosedCase(caseId);
+   await incrementClosedCount(trackerState.teamId);
+   
   // ✅ Clear closure warning after successful submission
    const warn = document.getElementById("closureWarning");
    if (warn) warn.remove();
@@ -2635,6 +2637,18 @@ let timeState = {
 };
 
 /* ---------- helpers ---------- */
+
+async function incrementClosedCount(teamId) {
+  const today = getTeamToday(trackerState.teamConfig);
+
+  const ref = doc(db, "dailyRepairReports", teamId, "reports", today);
+
+  await setDoc(
+    ref,
+    { closedCount: increment(1) },
+    { merge: true }
+  );
+}
 
 function closeTimeDropdowns() {
   hhDropdown.style.display = "none";
@@ -3277,6 +3291,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

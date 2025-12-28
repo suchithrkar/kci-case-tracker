@@ -2186,10 +2186,6 @@ async function handleClosedCaseArchival(caseId) {
     }
   );
 
-  // 🔐 Ensure team container exists (no data, just anchor doc)
-   const teamContainerRef = doc(db, "dailyRepairReports", teamId);
-   await setDoc(teamContainerRef, {}, { merge: true });
-
   // 4️⃣ Increment closedCount for team/day
   const reportRef = doc(
     db,
@@ -3305,6 +3301,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

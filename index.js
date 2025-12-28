@@ -2229,9 +2229,6 @@ async function archiveClosedCase(caseId) {
       archivedAt: new Date().toISOString()
     }
   );
-
-  // Remove from active cases
-  await deleteDoc(ref);
 }
 
 // =====================================================
@@ -3337,6 +3334,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

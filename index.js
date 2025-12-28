@@ -25,21 +25,9 @@ import {
 
 import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
 import { showPopup } from "./js/utils.js";
-
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc
-} from "./js/firebase.js";
-
-import {
-  cleanupClosedCases
-} from "./js/utils.js";
-
-import {
-  cleanupDailyReports
-} from "./js/utils.js";
+import { setDoc } from "./js/firebase.js";
+import { cleanupClosedCases } from "./js/utils.js";
+import { cleanupDailyReports } from "./js/utils.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -3349,6 +3337,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

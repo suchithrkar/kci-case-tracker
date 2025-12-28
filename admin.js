@@ -69,6 +69,7 @@ let processing = false;
 
 // Quick DOM helpers
 const $ = (id) => document.getElementById(id);
+const overwriteToggle = $("overwriteUserActions");
 
 /* =========================================================
    ADMIN — CUSTOM SELECT ENGINE (Tracker-aligned)
@@ -719,27 +720,34 @@ async function applyExcelChanges() {
 
   await runBatches(
   updated.map(ex => {
-    const updateFields = {
-      excelOrder: ex.excelOrder,
-       
-      customerName: ex.customerName,
-      createdOn: ex.createdOn,
-      createdBy: ex.createdBy,
-      country: ex.country,
-      caseResolutionCode: ex.caseResolutionCode,
-      caseOwner: ex.caseOwner,
-      otcCode: ex.otcCode,
-      caGroup: ex.caGroup,
-      tl: ex.tl,
-      sbd: ex.sbd,
-      onsiteRFC: ex.onsiteRFC,
-      csrRFC: ex.csrRFC,
-      benchRFC: ex.benchRFC,
-      market: ex.market 
-    };
-
-    return updateDoc(doc(db, "cases", ex.id), updateFields);
-  }),
+     const existing = excelState.firestoreCases.find(c => c.id === ex.id);
+     const overwrite = $("overwriteUserActions")?.checked;
+   
+     let data = { ...ex, teamId: excelState.teamId };
+   
+     if (!overwrite && existing) {
+       const preserve = [
+         "status",
+         "followDate",
+         "followTime",
+         "flagged",
+         "notes",
+         "pns",
+         "surveyPrediction",
+         "predictionComment",
+         "lastActionedOn",
+         "lastActionedBy",
+         "statusChangedOn",
+         "statusChangedBy"
+       ];
+   
+       preserve.forEach(f => {
+         if (existing[f] !== undefined) data[f] = existing[f];
+       });
+     }
+   
+     return setDoc(doc(db, "cases", ex.id), data);
+   }),
   "Updated"
 );
 
@@ -1876,23 +1884,6 @@ function importBackupPrompt(teamId) {
   input.click();
 }
 
-async function importBackup(teamId, cases) {
-  const snap = await getDocs(collection(db, "cases"));
-  snap.forEach(async d => {
-    if (d.data().teamId === teamId)
-      await deleteDoc(doc(db, "cases", d.id));
-  });
-
-  for (const c of cases)
-    await setDoc(doc(db, "cases", c.id), c);
-
-  uploadSummary.innerHTML = `
-    <strong>Backup Imported</strong><br>
-    Cases: ${cases.length}
-  `;
-}
-
-
 
 /* ============================================================
    SECTION 6 — STATS ENGINE
@@ -2635,6 +2626,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

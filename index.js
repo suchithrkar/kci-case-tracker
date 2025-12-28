@@ -2211,7 +2211,6 @@ async function handleClosedCaseArchival(caseId) {
 
   // 5️⃣ Cleanup (rolling 4 months)
   await cleanupClosedCases(todayISO);
-  await cleanupDailyReports(teamId, todayISO);
 }
 
 // =====================================================
@@ -3302,6 +3301,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

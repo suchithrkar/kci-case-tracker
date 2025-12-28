@@ -9,7 +9,7 @@ import {
   collection,
   doc,
   getDoc,
-   getDocs,
+  getDocs,
   query,
   where,
   onSnapshot,
@@ -25,6 +25,17 @@ import {
 
 import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
 import { showPopup } from "./js/utils.js";
+
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc
+} from "./js/firebase.js";
+
+import {
+  cleanupClosedCases
+} from "./js/utils.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -2162,6 +2173,26 @@ async function firestoreUpdateCase(caseId, fields) {
    }
 }
 
+async function archiveClosedCase(caseId) {
+  const ref = doc(db, "cases", caseId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  // Write to archive
+  await setDoc(
+    doc(db, "closedCasesHistory", caseId),
+    {
+      ...data,
+      archivedAt: new Date().toISOString()
+    }
+  );
+
+  // Remove from active cases
+  await deleteDoc(ref);
+}
+
 // =====================================================
 // SUBMIT CASE CLOSURE (MANDATORY SURVEY)
 // =====================================================
@@ -2214,6 +2245,8 @@ submitBtn.textContent = "Submit";
   }
 
   await firestoreUpdateCase(caseId, update);
+   // PHASE 3 — ARCHIVE CLOSED CASE
+   await archiveClosedCase(caseId);
   // ✅ Clear closure warning after successful submission
    const warn = document.getElementById("closureWarning");
    if (warn) warn.remove();
@@ -3244,6 +3277,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

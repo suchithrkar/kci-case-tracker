@@ -37,6 +37,10 @@ import {
   cleanupClosedCases
 } from "./js/utils.js";
 
+import {
+  cleanupDailyReports
+} from "./js/utils.js";
+
 /* =======================================================================
    DOM REFERENCES
    ======================================================================= */
@@ -2173,6 +2177,55 @@ async function firestoreUpdateCase(caseId, fields) {
    }
 }
 
+async function handleClosedCaseArchival(caseId) {
+  // 1️⃣ Read final case state
+  const caseRef = doc(db, "cases", caseId);
+  const snap = await getDoc(caseRef);
+  if (!snap.exists()) return;
+
+  const caseData = snap.data();
+
+  // 2️⃣ Team-aware closed date
+  const todayISO = getTeamToday(trackerState.teamConfig);
+  const teamId = caseData.teamId;
+
+  // 3️⃣ Store full snapshot in history
+  await setDoc(
+    doc(db, "closedCasesHistory", caseId),
+    {
+      ...caseData,
+      closedDate: todayISO
+    }
+  );
+
+  // 4️⃣ Increment closedCount for team/day
+  const reportRef = doc(
+    db,
+    "dailyRepairReports",
+    teamId,
+    "reports",
+    todayISO
+  );
+
+  const reportSnap = await getDoc(reportRef);
+
+  if (reportSnap.exists()) {
+    await setDoc(
+      reportRef,
+      {
+        closedCount: (reportSnap.data().closedCount || 0) + 1
+      },
+      { merge: true }
+    );
+  } else {
+    await setDoc(reportRef, { closedCount: 1 });
+  }
+
+  // 5️⃣ Cleanup (rolling 4 months)
+  await cleanupClosedCases(todayISO);
+  await cleanupDailyReports(teamId, todayISO);
+}
+
 async function archiveClosedCase(caseId) {
   const ref = doc(db, "cases", caseId);
   const snap = await getDoc(ref);
@@ -2245,6 +2298,11 @@ submitBtn.textContent = "Submit";
   }
 
   await firestoreUpdateCase(caseId, update);
+   // ===============================
+   // PHASE 2 — CLOSED CASE ARCHIVAL
+   // ===============================
+   await handleClosedCaseArchival(caseId);
+   
    // PHASE 3 — ARCHIVE CLOSED CASE
    await archiveClosedCase(caseId);
    await incrementClosedCount(trackerState.teamId);
@@ -3291,6 +3349,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

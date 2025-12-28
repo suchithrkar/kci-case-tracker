@@ -2238,6 +2238,8 @@ submitBtn.textContent = "Submit";
    ======================================================================= */
 
 export function openCaseModal(caseId, enforce = false) {
+  hideModalWarning();   // ✅ reset leftover warning
+   
   requireFollowUp = enforce;
   currentModalCaseId = caseId;
 
@@ -2525,6 +2527,8 @@ function closeModal() {
 
   requireFollowUp = false;
   currentModalCaseId = null;
+
+  hideModalWarning();   // ✅ FIX: clear stale warning
 
   // Animate close, THEN hide modal
   animateModalClose(() => {
@@ -3239,6 +3243,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

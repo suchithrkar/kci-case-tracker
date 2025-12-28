@@ -438,6 +438,41 @@ async function parseExcelFile(file) {
   });
 }
 
+async function parseBackupFile(data) {
+  let backup;
+
+  // v1 backup (array)
+  if (Array.isArray(data)) {
+    backup = {
+      version: 1,
+      teamId: null,
+      cases: data
+    };
+  }
+  // v2 backup (object)
+  else if (data.version === 2 && Array.isArray(data.cases)) {
+    backup = data;
+  }
+  else {
+    showPopup("Invalid backup format.");
+    return;
+  }
+
+  // 🔒 TEAM SAFETY CHECK
+  if (backup.teamId && backup.teamId !== excelState.teamId) {
+    showPopup(
+      `This backup belongs to another team.\n\nBackup Team: ${backup.teamId}`
+    );
+    return;
+  }
+
+  updateProgress(`Backup loaded (v${backup.version}).`);
+  updateProgress(`Cases in backup: ${backup.cases.length}`);
+
+  // Normalize to Excel engine
+  excelState.excelCases = backup.cases;
+}
+
 // ======================================================
 // ENABLE/DISABLE PREVIEW BUTTON BASED ON STATE
 // ======================================================
@@ -1781,22 +1816,37 @@ if (fileLabel && excelInputEl) {
    BACKUP EXPORT / IMPORT
    ============================================================ */
 async function exportBackup(teamId) {
-  const snap = await getDocs(collection(db, "cases"));
-  const cases = [];
+  const snap = await getDocs(
+    query(collection(db, "cases"), where("teamId", "==", teamId))
+  );
 
-  snap.forEach(d => {
-    if (d.data().teamId === teamId)
-      cases.push({ id: d.id, ...d.data() });
-  });
+  const cases = snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
 
-  const blob = new Blob([JSON.stringify(cases, null, 2)], { type: "application/json" });
+  const backup = {
+    version: 2,
+    app: "KCI Case Tracker",
+    exportedAt: new Date().toISOString(),
+    teamId,
+    caseCount: cases.length,
+    cases
+  };
+
+  const blob = new Blob(
+    [JSON.stringify(backup, null, 2)],
+    { type: "application/json" }
+  );
+
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   const today = getTeamToday(teamConfig);
 
   a.href = url;
-  a.download = `${teamId}_backup_${today}.json`;
+  a.download = `${teamId}_backup_v2_${today}.json`;
   a.click();
+
   URL.revokeObjectURL(url);
 }
 
@@ -1809,13 +1859,18 @@ function importBackupPrompt(teamId) {
     const file = input.files[0];
     if (!file) return;
 
+    resetExcelUI();               // 🔁 reuse Excel UI
+    excelState.teamId = teamId;
+    excelState.file = file;
+
+    clearProgress();
+    updateProgress("Reading backup file...");
+
     const text = await file.text();
     const data = JSON.parse(text);
 
-    if (!confirm("This will overwrite ALL cases for this team. Continue?"))
-      return;
-
-    await importBackup(teamId, data);
+    await parseBackupFile(data);  // NEW
+    validateReadyState();
   };
 
   input.click();
@@ -2580,6 +2635,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

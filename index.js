@@ -2681,14 +2681,26 @@ let timeState = {
 
 /* ---------- helpers ---------- */
 
-async function incrementClosedCount(teamId) {
-  const today = getTeamToday(trackerState.teamConfig);
+async function incrementClosedCount(teamId, todayISO) {
+  const reportRef = doc(
+    db,
+    "dailyRepairReports",
+    teamId,
+    "reports",
+    todayISO
+  );
 
-  const ref = doc(db, "dailyRepairReports", teamId, "reports", today);
+  const snap = await getDoc(reportRef);
+  const prevCount =
+    snap.exists() && typeof snap.data().closedCount === "number"
+      ? snap.data().closedCount
+      : 0;
 
   await setDoc(
-    ref,
-    { closedCount: increment(1) },
+    reportRef,
+    {
+      closedCount: prevCount + 1
+    },
     { merge: true }
   );
 }
@@ -3334,6 +3346,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -30,6 +30,7 @@ import {
 
 import { isPrimary, isSecondary, toggleTheme } from "./js/userProfile.js";
 import { showPopup } from "./js/utils.js";
+import { cleanupDailyReports } from "./js/utils.js";
 
 // Tooltip edge protection for admin page
 document.addEventListener("mouseover", (e) => {
@@ -808,6 +809,8 @@ async function applyExcelChanges() {
   updateProgress(`Deleted: ${deleted.length}`);
   updateProgress("-----------------------------------");
 
+   await writeDailyRepairReportSnapshot();
+
   showPopup("Excel update complete!");
    processing = false;
 
@@ -815,6 +818,60 @@ async function applyExcelChanges() {
 
 }
 
+async function writeDailyRepairReportSnapshot() {
+  const teamId = excelState.teamId;
+  const todayISO = getTeamToday(teamConfig);
+
+  // ===============================
+  // RFC VALUES (already computed)
+  // ===============================
+  const reportData = {
+    // OPEN CASES
+    open_total: rfcState.open.total,
+    open_onsite: rfcState.open.onsite,
+    open_offsite: rfcState.open.offsite,
+    open_csr: rfcState.open.csr,
+
+    // READY FOR CLOSURE
+    rfc_total: rfcState.rfc.total,
+    rfc_onsite: rfcState.rfc.onsite,
+    rfc_offsite: rfcState.rfc.offsite,
+    rfc_csr: rfcState.rfc.csr,
+
+    // OVERDUE
+    overdue_total: rfcState.overdue.total,
+    overdue_onsite: rfcState.overdue.onsite,
+    overdue_offsite: rfcState.overdue.offsite,
+    overdue_csr: rfcState.overdue.csr
+  };
+
+  const reportRef = doc(
+    db,
+    "dailyRepairReports",
+    teamId,
+    "reports",
+    todayISO
+  );
+
+  // Preserve closedCount
+  const snap = await getDoc(reportRef);
+  const closedCount =
+    snap.exists() && typeof snap.data().closedCount === "number"
+      ? snap.data().closedCount
+      : 0;
+
+  await setDoc(
+    reportRef,
+    {
+      ...reportData,
+      closedCount
+    },
+    { merge: true }
+  );
+
+  // Retention cleanup
+  await cleanupDailyReports(teamId, todayISO);
+}
 
 
 /* ============================================================
@@ -2663,6 +2720,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

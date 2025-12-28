@@ -436,14 +436,17 @@ function setupRealtimeCases(teamId) {
         : null,
       
       predictionComment: c.predictionComment || "",
+
+      otcCode: c.otcCode || "",
+      market: c.market || "",
        
       notes: c.notes || "",
       lastActionedOn: c.lastActionedOn || "",
       lastActionedBy: c.lastActionedBy || "",
 
       // <-- NEW: include the status-change audit fields
-     statusChangedOn: c.statusChangedOn || "",
-     statusChangedBy: c.statusChangedBy || ""
+      statusChangedOn: c.statusChangedOn || "",
+      statusChangedBy: c.statusChangedBy || ""
     }));
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
@@ -3236,6 +3239,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

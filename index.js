@@ -2681,7 +2681,9 @@ let timeState = {
 
 /* ---------- helpers ---------- */
 
-async function incrementClosedCount(teamId, todayISO) {
+async function incrementClosedCount(teamId) {
+  const todayISO = getTeamToday(trackerState.teamConfig);
+
   const reportRef = doc(
     db,
     "dailyRepairReports",
@@ -2691,6 +2693,7 @@ async function incrementClosedCount(teamId, todayISO) {
   );
 
   const snap = await getDoc(reportRef);
+
   const prevCount =
     snap.exists() && typeof snap.data().closedCount === "number"
       ? snap.data().closedCount
@@ -3346,6 +3349,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

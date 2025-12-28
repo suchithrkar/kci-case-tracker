@@ -2214,23 +2214,6 @@ async function handleClosedCaseArchival(caseId) {
   await cleanupDailyReports(teamId, todayISO);
 }
 
-async function archiveClosedCase(caseId) {
-  const ref = doc(db, "cases", caseId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-
-  // Write to archive
-  await setDoc(
-    doc(db, "closedCasesHistory", caseId),
-    {
-      ...data,
-      archivedAt: new Date().toISOString()
-    }
-  );
-}
-
 // =====================================================
 // SUBMIT CASE CLOSURE (MANDATORY SURVEY)
 // =====================================================
@@ -2288,8 +2271,6 @@ submitBtn.textContent = "Submit";
    // ===============================
    await handleClosedCaseArchival(caseId);
    
-   // PHASE 3 — ARCHIVE CLOSED CASE
-   await archiveClosedCase(caseId);
    
   // ✅ Clear closure warning after successful submission
    const warn = document.getElementById("closureWarning");
@@ -3321,6 +3302,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

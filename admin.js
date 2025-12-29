@@ -862,13 +862,12 @@ async function generateDailyRepairReport({
   // ===============================
   // WRITE REPORT
   // ===============================
-  const reportRef = doc(
-    db,
-    "dailyRepairReports",
-    teamId,
-    "reports",
-    todayISO
-  );
+   const reportRef = doc(
+     db,
+     "dailyRepairReports",
+     teamId,
+     todayISO
+   );
 
   await setDoc(
     reportRef,
@@ -2752,6 +2751,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

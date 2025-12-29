@@ -27,7 +27,6 @@ import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
 import { showPopup } from "./js/utils.js";
 import { setDoc } from "./js/firebase.js";
 import { cleanupClosedCases } from "./js/utils.js";
-import { cleanupDailyReports } from "./js/utils.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -2186,29 +2185,6 @@ async function handleClosedCaseArchival(caseId) {
     }
   );
 
-  // 4️⃣ Increment closedCount for team/day
-  const reportRef = doc(
-    db,
-    "dailyRepairReports",
-    teamId,
-    "reports",
-    todayISO
-  );
-
-  const reportSnap = await getDoc(reportRef);
-
-  if (reportSnap.exists()) {
-    await setDoc(
-      reportRef,
-      {
-        closedCount: (reportSnap.data().closedCount || 0) + 1
-      },
-      { merge: true }
-    );
-  } else {
-    await setDoc(reportRef, { closedCount: 1 });
-  }
-
   // 5️⃣ Cleanup (rolling 4 months)
   await cleanupClosedCases(todayISO);
 }
@@ -3301,6 +3277,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

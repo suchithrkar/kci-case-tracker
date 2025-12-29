@@ -866,6 +866,7 @@ async function generateDailyRepairReport({
      db,
      "dailyRepairReports",
      teamId,
+     "reports",
      todayISO
    );
 
@@ -2751,6 +2752,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

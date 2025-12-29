@@ -137,6 +137,7 @@ async function incrementDailyClosedCount(teamId, todayISO) {
     db,
     "dailyRepairReports",
     teamId,
+    "reports",
     todayISO
   );
 
@@ -3305,6 +3306,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

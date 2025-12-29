@@ -91,8 +91,7 @@ export async function cleanupDailyReports(teamId, todayISO) {
   const reportsRef = collection(
     db,
     "dailyRepairReports",
-    teamId,
-    "reports"
+    teamId
   );
 
   const snap = await getDocs(reportsRef);
@@ -104,3 +103,4 @@ export async function cleanupDailyReports(teamId, todayISO) {
     }
   }
 }
+

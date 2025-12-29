@@ -13,7 +13,9 @@ import {
   query,
   where,
   onSnapshot,
-  updateDoc
+  updateDoc,
+  setDoc,
+  increment
 } from "./js/firebase.js";
 
 import {
@@ -129,6 +131,24 @@ function getTeamToday(teamConfig) {
   }
 
   return teamDate;
+}
+
+async function incrementDailyClosedCount(teamId, todayISO) {
+  const reportRef = doc(
+    db,
+    "dailyRepairReports",
+    teamId,
+    "reports",
+    todayISO
+  );
+
+  await setDoc(
+    reportRef,
+    {
+      closedCount: increment(1)
+    },
+    { merge: true }
+  );
 }
 
 function scheduleFollowUpReminder(r) {
@@ -2240,7 +2260,17 @@ submitBtn.textContent = "Submit";
     }
   }
 
-  await firestoreUpdateCase(caseId, update);
+   await firestoreUpdateCase(caseId, update);
+   
+   // ===============================
+   // PHASE C — DAILY CLOSED COUNT
+   // ===============================
+   const todayISO = getTeamToday(trackerState.teamConfig);
+   await incrementDailyClosedCount(
+     trackerState.teamId,
+     todayISO
+   );
+   
    // ===============================
    // PHASE 2 — CLOSED CASE ARCHIVAL
    // ===============================
@@ -3277,6 +3307,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

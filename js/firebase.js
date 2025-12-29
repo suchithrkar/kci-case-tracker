@@ -26,8 +26,10 @@ import {
   deleteDoc,
   query,
   where,
-  onSnapshot
+  onSnapshot,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
 
 /* ============================================================
    Firebase Config — (Your Real Config)
@@ -66,6 +68,7 @@ export {
 };
 
 // FIRESTORE
+// FIRESTORE
 export {
   collection,
   doc,
@@ -76,5 +79,7 @@ export {
   deleteDoc,
   query,
   where,
-  onSnapshot
+  onSnapshot,
+  increment
 };
+

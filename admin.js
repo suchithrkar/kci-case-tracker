@@ -786,40 +786,82 @@ async function applyExcelChanges() {
   updateProgress(`Deleted: ${deleted.length}`);
   updateProgress("-----------------------------------");
 
-   await writeDailyRepairReportSnapshot();
-
-  showPopup("Excel update complete!");
+   const todayISO = getTeamToday(teamConfig);
+   
+   await generateDailyRepairReport({
+     teamId: excelState.teamId,
+     cases: excelState.excelCases,
+     todayISO,
+     generatedBy: adminState.user.uid
+   });
+   
+   showPopup("Excel update complete!");
    processing = false;
-
 }
 
-async function writeDailyRepairReportSnapshot() {
-  const teamId = excelState.teamId;
-  const todayISO = getTeamToday(teamConfig);
+
+async function generateDailyRepairReport({
+  teamId,
+  cases,
+  todayISO,
+  generatedBy
+}) {
+  // ===============================
+  // TOTAL OPEN
+  // ===============================
+  const onsiteAll = cases.filter(
+    c => c.caseResolutionCode === "Onsite Solution"
+  );
+  const offsiteAll = cases.filter(
+    c => c.caseResolutionCode === "Offsite Solution"
+  );
+  const csrAll = cases.filter(
+    c => c.caseResolutionCode === "Parts Shipped"
+  );
 
   // ===============================
-  // RFC VALUES (already computed)
+  // READY FOR CLOSURE
   // ===============================
-  const reportData = {
-    // OPEN CASES
-    open_total: rfcState.open.total,
-    open_onsite: rfcState.open.onsite,
-    open_offsite: rfcState.open.offsite,
-    open_csr: rfcState.open.csr,
+  const onsiteRFC = onsiteAll.filter(c =>
+    ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
+      .includes(c.onsiteRFC)
+  );
 
-    // READY FOR CLOSURE
-    rfc_total: rfcState.rfc.total,
-    rfc_onsite: rfcState.rfc.onsite,
-    rfc_offsite: rfcState.rfc.offsite,
-    rfc_csr: rfcState.rfc.csr,
+  const offsiteRFC = offsiteAll.filter(c =>
+    c.benchRFC === "Possible completed"
+  );
 
-    // OVERDUE
-    overdue_total: rfcState.overdue.total,
-    overdue_onsite: rfcState.overdue.onsite,
-    overdue_offsite: rfcState.overdue.offsite,
-    overdue_csr: rfcState.overdue.csr
-  };
+  const csrRFC = csrAll.filter(c =>
+    ["Cancelled", "Closed", "POD"].includes(c.csrRFC)
+  );
 
+  const rfcIds = new Set(
+    [...onsiteRFC, ...offsiteRFC, ...csrRFC].map(c => c.id)
+  );
+
+  // ===============================
+  // OVERDUE (NEGATIVE LOGIC)
+  // ===============================
+  let overdue = cases.filter(c => !rfcIds.has(c.id));
+
+  overdue = overdue.filter(c => !(
+    c.caseResolutionCode === "Onsite Solution" &&
+    ["0-3 Days", "3-5 Days"].includes(c.caGroup)
+  ));
+
+  overdue = overdue.filter(c => !(
+    c.caseResolutionCode === "Offsite Solution" &&
+    ["0-3 Days", "3-5 Days", "5-10 Days"].includes(c.caGroup)
+  ));
+
+  overdue = overdue.filter(c => !(
+    c.caseResolutionCode === "Parts Shipped" &&
+    c.caGroup === "0-3 Days"
+  ));
+
+  // ===============================
+  // WRITE REPORT
+  // ===============================
   const reportRef = doc(
     db,
     "dailyRepairReports",
@@ -828,26 +870,41 @@ async function writeDailyRepairReportSnapshot() {
     todayISO
   );
 
-  // Preserve closedCount
-  const snap = await getDoc(reportRef);
-  const closedCount =
-    snap.exists() && typeof snap.data().closedCount === "number"
-      ? snap.data().closedCount
-      : 0;
-
   await setDoc(
     reportRef,
     {
-      ...reportData,
-      closedCount
+      // TOTAL OPEN
+      totalOpen: cases.length,
+      totalOpenOnsite: onsiteAll.length,
+      totalOpenOffsite: offsiteAll.length,
+      totalOpenCSR: csrAll.length,
+
+      // READY FOR CLOSURE
+      readyForClosureTotal: rfcIds.size,
+      readyForClosureOnsite: onsiteRFC.length,
+      readyForClosureOffsite: offsiteRFC.length,
+      readyForClosureCSR: csrRFC.length,
+
+      // OVERDUE
+      overdueTotal: overdue.length,
+      overdueOnsite: overdue.filter(c =>
+        c.caseResolutionCode === "Onsite Solution"
+      ).length,
+      overdueOffsite: overdue.filter(c =>
+        c.caseResolutionCode === "Offsite Solution"
+      ).length,
+      overdueCSR: overdue.filter(c =>
+        c.caseResolutionCode === "Parts Shipped"
+      ).length,
+
+      generatedAt: new Date(),
+      generatedBy
     },
-    { merge: true }
+    { merge: true } // 🔑 preserves closedCount
   );
 
-  // Retention cleanup
   await cleanupDailyReports(teamId, todayISO);
 }
-
 
 /* ============================================================
    FIX — Enable Update Data Modal
@@ -2695,6 +2752,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

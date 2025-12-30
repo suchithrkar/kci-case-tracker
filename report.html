@@ -95,13 +95,6 @@
   /* =====================================================
      PANELS & SECTIONS
      ===================================================== */
-  
-  .panel{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:1rem;
-  }
 
   .stats-header{
     display:flex;
@@ -236,13 +229,9 @@
   <button class="hdr-btn" id="btnLogout">Log Out</button>
 </header>
 
-
-<main style="padding: 1rem; display: grid; gap: 1.25rem;">
-
   <!-- =====================================================
        SECTION 1 — TOTAL OPEN REPAIR CASES (TODAY)
        ===================================================== -->
-  <section class="panel">
     <div class="stats-header">
       <div class="stats-title">
         Total Open Repair Cases – Today
@@ -282,13 +271,11 @@
         </tbody>
       </table>
     </div>
-  </section>
 
 
   <!-- =====================================================
        SECTION 2 — REPORT CONTROLS
        ===================================================== -->
-  <section class="panel">
     <div class="report-controls">
 
       <!-- VIEW SELECT -->
@@ -320,13 +307,12 @@
       </div>
 
     </div>
-  </section>
 
 
   <!-- =====================================================
        SECTION 3 — DYNAMIC REPORT CONTENT
        ===================================================== -->
-  <section class="panel" id="reportContent">
+  <div class="panel" id="reportContent">
 
     <!-- TODAY SUMMARY TABLE -->
     <div id="todaySummaryBlock">
@@ -379,19 +365,7 @@
 
     </div>
 
-  </section>
-
-</main>
-
-
-<!-- =========================
-     SIDEBAR + OVERLAY
-     (Reuse existing markup)
-     ========================= -->
-<div class="overlay" id="overlay"></div>
-<aside class="sidebar" id="sidebar">
-  <!-- Sidebar content reused later if needed -->
-</aside>
+  </div>
 
 
 <!-- =========================
@@ -402,4 +376,5 @@
 </body>
 
 </html>
+
 

@@ -470,25 +470,26 @@ function setupControls() {
 function setupReportTabs() {
   const tabs = document.querySelectorAll("#reportTabBar .tab");
 
-      tab.addEventListener("click", () => {
-        // deactivate all
-        tabs.forEach(t => t.classList.remove("active"));
-      
-        // activate clicked
-        tab.classList.add("active");
-      
-        // update state
-        reportState.activeMetric = tab.dataset.metric;
-        reportState.view = "month";
-      
-        // 🔑 SYNC VIEW DROPDOWN LABEL (THIS WAS MISSING)
-        const viewTrigger =
-          el.reportViewSelect.querySelector(".custom-select-trigger");
-        if (viewTrigger) viewTrigger.textContent = "Month";
-      
-        // re-render content
-        updateView();
-      });
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      // deactivate all
+      tabs.forEach(t => t.classList.remove("active"));
+
+      // activate clicked
+      tab.classList.add("active");
+
+      // update state
+      reportState.activeMetric = tab.dataset.metric;
+      reportState.view = "month";
+
+      // 🔑 sync view dropdown label to Month
+      const viewTrigger =
+        el.reportViewSelect.querySelector(".custom-select-trigger");
+      if (viewTrigger) viewTrigger.textContent = "Month";
+
+      // re-render content
+      updateView();
+    });
   });
 }
 
@@ -682,6 +683,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

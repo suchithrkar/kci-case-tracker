@@ -670,6 +670,21 @@ function renderMonthlyChart(rows, days) {
     return { label: r.key, values };
   });
 
+   const legend = document.getElementById("monthlyChartLegend");
+   if (legend) {
+     legend.innerHTML = series
+       .map(s => `
+         <div class="chart-legend-item">
+           <span
+             class="chart-legend-color"
+             style="background:${colors[s.label]}"
+           ></span>
+           ${s.label}
+         </div>
+       `)
+       .join("");
+   }
+
   if (maxVal === 0) maxVal = 1;
 
   /* ---------------------------
@@ -800,6 +815,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

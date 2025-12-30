@@ -7,8 +7,195 @@
 
   <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
 
-  <!-- Reuse existing global styles -->
-  <link rel="stylesheet" href="styles.css" />
+<style>
+  /* =====================================================
+     THEME VARIABLES (MATCH INDEX / ADMIN)
+     ===================================================== */
+  
+  :root{
+    --bg:#0f1115;
+    --panel:#151923;
+    --panel-2:#1A1F2B;
+    --muted:#9aa4b2;
+    --accent:#4F8CF0;
+    --text:#e6ebf3;
+    --danger:#ff6b6b;
+    --ok:#38d9a9;
+    --warn:#ffd166;
+    --border:#2a2f3a;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  
+  [data-theme="light"]{
+    --bg:#f7f9fe;
+    --panel:#ffffff;
+    --panel-2:#f1f4fa;
+    --muted:#4a5568;
+    --text:#10131a;
+    --border:#cfd6e4;
+    --shadow:0 4px 12px rgba(0,0,0,.08);
+  }
+  
+  /* =====================================================
+     BASE
+     ===================================================== */
+  
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto;
+  }
+  
+  .hidden{display:none}
+  
+  /* =====================================================
+     HEADER (IDENTICAL TO INDEX / ADMIN)
+     ===================================================== */
+  
+  .header{
+    position:sticky;top:0;z-index:40;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;
+    gap:.8rem;
+    padding:.75rem 1rem;
+  }
+  
+  .hamburger,
+  .theme-toggle{
+    width:38px;height:38px;
+    border-radius:50%;
+    display:grid;place-items:center;
+    border:1px solid var(--border);
+    background:var(--panel-2);
+    cursor:pointer;
+  }
+  
+  .title{font-weight:700}
+  .grow{flex:1}
+  
+  .user-name{
+    font-weight:600;
+    padding:0 .75rem;
+    white-space:nowrap;
+  }
+  
+  .hdr-btn{
+    padding:.6rem 1rem;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--panel-2);
+    cursor:pointer;
+  }
+  
+  /* =====================================================
+     PANELS & SECTIONS
+     ===================================================== */
+  
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:1rem;
+  }
+  
+  .section-title{
+    margin:0 0 .75rem 0;
+    font-size:15px;
+    font-weight:700;
+  }
+  
+  .section-subtitle{
+    margin:.25rem 0 .75rem 0;
+    font-size:14px;
+    font-weight:600;
+  }
+  
+  /* =====================================================
+     TABLES (REUSED)
+     ===================================================== */
+  
+  .table-wrap{width:100%;overflow:auto}
+  
+  table{
+    width:100%;
+    border-collapse:collapse;
+  }
+  
+  thead th{
+    background:var(--panel-2);
+    border-bottom:1px solid var(--border);
+    text-align:center;
+    font-size:12px;
+    padding:.5rem;
+  }
+  
+  tbody td{
+    border-bottom:1px solid var(--border);
+    text-align:center;
+    padding:.45rem;
+  }
+  
+  tbody tr:hover{
+    background:rgba(255,255,255,.05);
+  }
+  
+  /* =====================================================
+     RFC SEGMENTED (ADMIN STYLE)
+     ===================================================== */
+  
+  .rfc-segmented{
+    display:flex;
+    border:1px solid var(--border);
+    border-radius:6px;
+    overflow:hidden;
+    background:var(--panel-2);
+  }
+  
+  .rfc-segmented .rfcBtn{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:.55rem;
+    cursor:pointer;
+    font-size:13px;
+  }
+  
+  .rfc-segmented .rfcBtn.active{
+    background:rgba(79,140,240,.18);
+  }
+  
+  /* =====================================================
+     REPORT CONTROLS
+     ===================================================== */
+  
+  .report-controls{
+    display:flex;
+    gap:1rem;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  
+  .control-group{
+    display:flex;
+    flex-direction:column;
+    gap:.25rem;
+  }
+  
+  /* =====================================================
+     LINE CHART
+     ===================================================== */
+  
+  .chart-wrap{
+    margin-top:1rem;
+    padding:.75rem;
+    background:var(--panel-2);
+    border-radius:12px;
+  }
+</style>
 </head>
 
 <body>
@@ -187,4 +374,5 @@
 <script type="module" src="report.js"></script>
 
 </body>
+
 </html>

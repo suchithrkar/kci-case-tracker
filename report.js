@@ -51,8 +51,6 @@ const el = {
   btnTheme: document.getElementById("btnTheme"),
   btnAdmin: document.getElementById("btnAdmin"),
   btnLogout: document.getElementById("btnLogout"),
-  teamSelectLabel: document.getElementById("teamSelectLabel"),
-  teamSelectOptions: document.getElementById("teamSelectOptions"),
 
   distributionTable: document
     .getElementById("distributionTable")
@@ -232,7 +230,23 @@ async function loadTodaySummary() {
 }
 
 async function loadTeamsForReport() {
-  el.teamSelectOptions.innerHTML = `
+  // Inject dropdown skeleton (same pattern as Admin)
+  reportTeamControls.innerHTML = `
+    <div class="custom-select" id="reportTeamSelect">
+      <div class="custom-select-trigger">
+        <span id="reportTeamLabel">TOTAL</span>
+      </div>
+      <div class="custom-options" id="reportTeamOptions"></div>
+    </div>
+  `;
+
+  const labelEl =
+    document.getElementById("reportTeamLabel");
+  const optionsEl =
+    document.getElementById("reportTeamOptions");
+
+  // Add TOTAL option
+  let html = `
     <div class="custom-option" data-team="TOTAL">TOTAL</div>
   `;
 
@@ -240,18 +254,21 @@ async function loadTeamsForReport() {
 
   snap.forEach(docSnap => {
     const t = docSnap.data();
-    el.teamSelectOptions.innerHTML += `
+    html += `
       <div class="custom-option" data-team="${docSnap.id}">
         ${t.name || docSnap.id}
       </div>
     `;
   });
 
-  el.teamSelectOptions.onclick = async (e) => {
+  optionsEl.innerHTML = html;
+
+  // Handle selection
+  optionsEl.onclick = async (e) => {
     const opt = e.target.closest(".custom-option");
     if (!opt) return;
 
-    el.teamSelectLabel.textContent = opt.textContent;
+    labelEl.textContent = opt.textContent;
 
     reportState.teamId =
       opt.dataset.team === "TOTAL"
@@ -261,6 +278,8 @@ async function loadTeamsForReport() {
     await loadLiveCases();
     renderDistributionTable();
   };
+   // Re-bind custom select behavior after injection
+   setupControls();
 }
 
 /* =========================================================
@@ -662,6 +681,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

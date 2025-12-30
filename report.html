@@ -318,6 +318,22 @@
   .custom-option:hover {
     background: var(--option-hover);
   }
+
+  .stats-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    gap: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  .stats-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
   
 </style>
 </head>
@@ -351,20 +367,12 @@
        SECTION 1 — TOTAL OPEN REPAIR CASES (TODAY)
        ===================================================== -->
     <div class="stats-header">
-      <div class="stats-title">
-        Total Open Repair Cases – Today
-      </div>
+      <h2>Total Open Repair Cases – Today</h2>
     
       <!-- TEAM SELECT (PRIMARY ADMIN ONLY) -->
-      <div class="stats-team-select hidden" id="reportTeamSelect">
-        <div class="custom-select" id="teamSelect">
-          <div class="custom-select-trigger">
-            <span id="teamSelectLabel">TOTAL</span>
-          </div>
-          <div class="custom-options" id="teamSelectOptions">
-            <!-- JS injects teams -->
-          </div>
-        </div>
+      <div class="stats-header-right">
+        <!-- Team selector injected by JS -->
+        <div id="reportTeamControls"></div>
       </div>
     </div>
 
@@ -494,6 +502,7 @@
 </body>
 
 </html>
+
 
 
 

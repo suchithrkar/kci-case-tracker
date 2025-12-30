@@ -64,7 +64,6 @@ const el = {
   monthlyBlock: document.getElementById("monthlyReportBlock"),
 
   reportViewSelect: document.getElementById("reportViewSelect"),
-  reportViewLabel: document.getElementById("reportViewLabel"),
 };
 
 const reportTeamControls =
@@ -411,8 +410,11 @@ function setupControls() {
    
        reportState.view = opt.dataset.value;
        reportState.activeMetric = null;
-   
-       el.reportViewLabel.textContent = opt.textContent;
+
+        // clear active tab visually
+         document
+           .querySelectorAll("#reportTabBar .tab")
+           .forEach(t => t.classList.remove("active"));
    
        updateView();
      });
@@ -463,10 +465,11 @@ function setupReportTabs() {
       tab.classList.add("active");
 
       // update state
-      reportState.metric = tab.dataset.metric;
+      reportState.activeMetric = tab.dataset.metric;
+      reportState.view = "month";
 
       // re-render content
-      updateReportView();
+      updateView();
     });
   });
 }
@@ -661,6 +664,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

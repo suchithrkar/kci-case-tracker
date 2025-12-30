@@ -595,9 +595,13 @@ function renderMonthlyTable() {
             let field;
             
             if (r.key === "Total") {
-              field = metric; // e.g. "totalOpen"
+              if (metric === "totalOpen") {
+                field = "totalOpen";
+              } else {
+                field = `${metric}Total`;
+              }
             } else {
-              field = `${metric}${r.key}`; // e.g. "totalOpenOnsite"
+              field = `${metric}${r.key}`;
             }
             
             return `<td>${d[field] || 0}</td>`;
@@ -697,6 +701,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

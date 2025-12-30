@@ -157,10 +157,10 @@ onAuthStateChanged(auth, async (user) => {
   initHeader(data);
 
    if (isPrimary(data)) {
-     el.reportTeamSelect.classList.remove("hidden");
+     reportTeamControls.classList.remove("hidden");
      await loadTeamsForReport();
    } else {
-     el.reportTeamSelect.classList.add("hidden");
+     reportTeamControls.classList.add("hidden");
    }
    
   await loadLiveCases();
@@ -662,6 +662,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

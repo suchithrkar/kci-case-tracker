@@ -204,6 +204,95 @@
     background:var(--panel-2);
     border-radius:12px;
   }
+
+  /* ==========================================================
+     CUSTOM DROPDOWN (REPLACES <select>)
+     ========================================================== */
+  
+  .custom-select {
+    position: relative;
+    width: 140px;              /* ✅ fixed max width */
+    max-width: 140px;
+    margin: 0 auto;            /* ✅ center inside table cell */
+    cursor: pointer;
+    font-size: 13px;
+  }
+  
+  .custom-select-trigger {
+    background: var(--select-bg);
+    border: 1px solid var(--select-border);
+    border-radius: 8px;
+    padding: 6px 28px 6px 12px;
+  
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  
+    text-align: left;
+    color: var(--select-text);
+    min-height: 32px;
+  }
+  
+  .custom-select-trigger::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+  
+    width: 6px;
+    height: 6px;
+  
+    border-left: 2px solid var(--select-text);
+    border-bottom: 2px solid var(--select-text);
+    transform: translateY(-50%) rotate(-45deg);
+  
+    opacity: 0.9;
+    pointer-events: none;
+  }
+  
+  /* Dropdown panel */
+  .custom-options {
+    position: absolute;
+    top: calc(100% + 0px);
+    left: 0;
+    right: 0;
+  
+    background: var(--dropdown-bg);
+    border: 1px solid var(--dropdown-border);
+    border-radius: 8px;
+  
+    padding: 4px;
+    z-index: 300;
+  
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  
+    display: none;
+  }
+  
+  .custom-select.open .custom-options {
+    display: block;
+  }
+  
+  /* Each option */
+  .custom-option {
+    padding: 4.8px 6px;
+    border-radius: 4px;
+  
+    color: var(--select-text);
+    font-weight: 500;
+    background: transparent;
+    text-align: left;
+  }
+  
+  .custom-option:last-child {
+    margin-bottom: 0;
+  }
+  
+  .custom-option:hover {
+    background: var(--option-hover);
+  }
+  
 </style>
 </head>
 
@@ -379,6 +468,7 @@
 </body>
 
 </html>
+
 
 
 

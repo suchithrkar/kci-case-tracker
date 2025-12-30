@@ -408,15 +408,29 @@ function setupControls() {
        const opt = e.target.closest(".custom-option");
        if (!opt || opt.classList.contains("disabled")) return;
    
-       reportState.view = opt.dataset.value;
-       reportState.activeMetric = null;
+         reportState.view = opt.dataset.value;
+         
+         // clear all tabs first
+         const tabs = document.querySelectorAll("#reportTabBar .tab");
+         tabs.forEach(t => t.classList.remove("active"));
+         
+         if (reportState.view === "month") {
+           // default to Total Open
+           const firstTab = document.querySelector(
+             '#reportTabBar .tab[data-metric="totalOpen"]'
+           );
+         
+           if (firstTab) {
+             firstTab.classList.add("active");
+             reportState.activeMetric = "totalOpen";
+           }
+         } else {
+           // Today view → no active metric
+           reportState.activeMetric = null;
+         }
+         
+         updateView();
 
-        // clear active tab visually
-         document
-           .querySelectorAll("#reportTabBar .tab")
-           .forEach(t => t.classList.remove("active"));
-   
-       updateView();
      });
 
   /* ================================
@@ -664,6 +678,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

@@ -476,7 +476,25 @@ function setupControls() {
    
 }
 
+function setupReportTabs() {
+  const tabs = document.querySelectorAll("#reportTabBar .tab");
 
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      // deactivate all
+      tabs.forEach(t => t.classList.remove("active"));
+
+      // activate clicked
+      tab.classList.add("active");
+
+      // update state
+      reportState.metric = tab.dataset.metric;
+
+      // re-render content
+      updateReportView();
+    });
+  });
+}
 
 /* =========================================================
    METRIC TAB STATE
@@ -682,6 +700,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

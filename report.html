@@ -73,6 +73,7 @@
     background:var(--bg);
     color:var(--text);
     font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto;
+    overflow-x: hidden;
   }
   
   .hidden{display:none}
@@ -213,6 +214,7 @@
     margin-top:2rem;
     padding:.75rem;
     background:var(--panel-2);
+    overflow-x: hidden;   /* 🔑 prevent horizontal scroll */
   }
 
   /* ==========================================================
@@ -348,9 +350,11 @@
 
   .chart-legend {
     display: flex;
-    gap: 1.2rem;
+    justify-content: center;      /* center horizontally */
+    gap: 2rem;                    /* increase spacing */
     flex-wrap: wrap;
-    margin-top: 0.75rem;
+    margin-top: 0;                /* remove top margin */
+    margin-bottom: 1rem;          /* add bottom spacing */
     font-size: 12px;
   }
   
@@ -522,6 +526,7 @@
 </body>
 
 </html>
+
 
 
 

@@ -346,6 +346,27 @@
     color: var(--text);
     border: 1px solid var(--border);
   }
+
+  .chart-legend {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+    font-size: 12px;
+  }
+  
+  .chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+  }
+  
+  .chart-legend-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
   
 </style>
 </head>
@@ -486,6 +507,7 @@
       <!-- LINE CHART -->
       <div class="chart-wrap">
         <canvas id="monthlyLineChart"></canvas>
+        <div class="chart-legend" id="monthlyChartLegend"></div>
       </div>
 
     </div>
@@ -501,6 +523,7 @@
 </body>
 
 </html>
+
 
 
 

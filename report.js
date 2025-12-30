@@ -621,10 +621,19 @@ function renderMonthlyChart(rows, days) {
   const canvas = document.getElementById("monthlyLineChart");
   const ctx = canvas.getContext("2d");
 
-  canvas.width = canvas.parentElement.offsetWidth;
-  canvas.height = 320;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+   const dpr = window.devicePixelRatio || 1;
+   
+   const cssWidth = canvas.parentElement.offsetWidth;
+   const cssHeight = 320;
+   
+   canvas.width = cssWidth * dpr;
+   canvas.height = cssHeight * dpr;
+   
+   canvas.style.width = cssWidth + "px";
+   canvas.style.height = cssHeight + "px";
+   
+   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const metric = reportState.activeMetric;
   const monthKey = reportState.currentMonth;
@@ -819,6 +828,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

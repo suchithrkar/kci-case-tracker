@@ -196,9 +196,7 @@ async function loadLiveCases() {
   );
 
   const snap = await getDocs(q);
-  reportState.liveCases = snap.docs
-    .map(d => d.data())
-    .filter(c => c.status !== "Closed");
+  reportState.liveCases = snap.docs.map(d => d.data());
 }
 
 async function loadTodaySummary() {
@@ -578,4 +576,5 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 

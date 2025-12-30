@@ -187,48 +187,7 @@
   tbody tr:hover{
     background:rgba(255,255,255,.05);
   }
-  
-  /* =====================================================
-     RFC SEGMENTED (ADMIN STYLE)
-     ===================================================== */
-  
-  .rfc-segmented{
-    display:flex;
-    border:1px solid var(--border);
-    border-radius:6px;
-    overflow:hidden;
-    background:var(--panel-2);
-  }
-  
-  .rfc-segmented .rfcBtn{
-    flex:1;
-    border:none;
-    background:transparent;
-    padding:.55rem;
-    cursor:pointer;
-    font-size:13px;
-  }
-  
-  .rfc-segmented .rfcBtn.active{
-    background:rgba(79,140,240,.18);
-  }
-  
-  /* =====================================================
-     REPORT CONTROLS
-     ===================================================== */
-  
-  .report-controls{
-    display:flex;
-    gap:1rem;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-  
-  .control-group{
-    display:flex;
-    flex-direction:column;
-    gap:.25rem;
-  }
+
   
   /* =====================================================
      LINE CHART
@@ -392,39 +351,37 @@
     </div>
 
 
-  <!-- =====================================================
-       SECTION 2 — REPORT CONTROLS
-       ===================================================== -->
-    <div class="report-controls">
-
-      <!-- VIEW SELECT -->
-      <div class="control-group">
-        <label class="control-label">View</label>
-        <div class="custom-select" id="reportViewSelect">
-          <div class="custom-select-trigger">
-            <span id="reportViewLabel">Today</span>
-          </div>
-          <div class="custom-options">
-            <div class="custom-option" data-value="today">Today</div>
-            <div class="custom-option" data-value="month">Month</div>
-            <div class="custom-option disabled">Quarter (Coming Soon)</div>
-          </div>
+    <!-- =====================================================
+     REPORT TAB BAR (ADMIN-STYLE)
+     ===================================================== -->
+    <div class="tab-bar" id="reportTabBar">
+    
+      <!-- Right side controls -->
+      <div class="grow"></div>
+    
+      <!-- VIEW DROPDOWN -->
+      <div class="custom-select" id="reportViewSelect">
+        <div class="custom-select-trigger">Today</div>
+        <div class="custom-options">
+          <div class="custom-option" data-value="today">Today</div>
+          <div class="custom-option" data-value="month">Month</div>
+          <div class="custom-option disabled">Quarter (Coming Soon)</div>
         </div>
       </div>
-
-      <!-- METRIC TOGGLES -->
-      <div class="rfc-segmented" id="reportMetricTabs">
-        <button class="rfcBtn" data-metric="totalOpen">
-          Total Open Repair Cases
-        </button>
-        <button class="rfcBtn" data-metric="readyForClosure">
-          Ready for Closure
-        </button>
-        <button class="rfcBtn" data-metric="overdue">
-          Overdue Cases
-        </button>
+    
+      <!-- REPORT TABS -->
+      <div class="tab active" data-metric="totalOpen">
+        Total Open Repair Cases
       </div>
-
+    
+      <div class="tab" data-metric="readyForClosure">
+        Ready for Closure
+      </div>
+    
+      <div class="tab" data-metric="overdue">
+        Overdue Cases
+      </div>
+    
     </div>
 
 
@@ -495,6 +452,7 @@
 </body>
 
 </html>
+
 
 
 

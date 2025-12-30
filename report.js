@@ -622,7 +622,7 @@ function renderMonthlyChart(rows, days) {
   const ctx = canvas.getContext("2d");
 
   canvas.width = canvas.parentElement.offsetWidth;
-  canvas.height = 260;
+  canvas.height = 320;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -636,7 +636,10 @@ function renderMonthlyChart(rows, days) {
     Total: "#ff6b6b"
   };
 
-  // Collect max value
+  /* ---------------------------
+     DATA PREP
+     --------------------------- */
+
   let maxVal = 0;
 
   const series = rows.map(r => {
@@ -645,44 +648,131 @@ function renderMonthlyChart(rows, days) {
       const d =
         reportState.dailyReports[`${monthKey}-${day}`] ||
         zeroDay();
-      const v = d[`${metric}${r.key}`] || 0;
+
+      let field;
+      if (r.key === "Total") {
+        field = metric === "totalOpen"
+          ? "totalOpen"
+          : `${metric}Total`;
+      } else {
+        field = `${metric}${r.key}`;
+      }
+
+      const v = d[field] || 0;
       maxVal = Math.max(maxVal, v);
       return v;
     });
+
     return { label: r.key, values };
   });
 
   if (maxVal === 0) maxVal = 1;
 
-  const padding = 40;
+  /* ---------------------------
+     LAYOUT
+     --------------------------- */
+
+  const padding = 60;
   const w = canvas.width - padding * 2;
   const h = canvas.height - padding * 2;
 
-  // Axes
+  /* ---------------------------
+     AXES
+     --------------------------- */
+
   ctx.strokeStyle = "#2a2f3a";
+  ctx.lineWidth = 1;
+
   ctx.beginPath();
   ctx.moveTo(padding, padding);
   ctx.lineTo(padding, canvas.height - padding);
   ctx.lineTo(canvas.width - padding, canvas.height - padding);
   ctx.stroke();
 
-  // Lines
+  /* ---------------------------
+     Y GRID + LABELS
+     --------------------------- */
+
+  ctx.font = "12px system-ui";
+  ctx.fillStyle = "#9aa4b2";
+
+  const steps = 5;
+  for (let i = 0; i <= steps; i++) {
+    const y = padding + (h / steps) * i;
+    const val = Math.round(
+      maxVal - (maxVal / steps) * i
+    );
+
+    ctx.strokeStyle = "#2a2f3a";
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(canvas.width - padding, y);
+    ctx.stroke();
+
+    ctx.fillText(
+      val,
+      padding - 40,
+      y + 4
+    );
+  }
+
+  /* ---------------------------
+     X LABELS (DAYS)
+     --------------------------- */
+
+  const labelStep =
+    days > 20 ? 5 : 1; // reduce clutter
+
+  Array.from({ length: days }, (_, i) => {
+    if ((i + 1) % labelStep !== 0) return;
+
+    const x =
+      padding + (i / (days - 1)) * w;
+
+    ctx.fillText(
+      i + 1,
+      x - 6,
+      canvas.height - padding + 20
+    );
+  });
+
+  /* ---------------------------
+     LINES + POINTS
+     --------------------------- */
+
   series.forEach(s => {
     ctx.strokeStyle = colors[s.label];
     ctx.lineWidth = 2;
     ctx.beginPath();
 
     s.values.forEach((v, i) => {
-      const x = padding + (i / (days - 1)) * w;
+      const x =
+        padding + (i / (days - 1)) * w;
       const y =
         canvas.height -
         padding -
         (v / maxVal) * h;
 
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
     });
 
     ctx.stroke();
+
+    // points
+    s.values.forEach((v, i) => {
+      const x =
+        padding + (i / (days - 1)) * w;
+      const y =
+        canvas.height -
+        padding -
+        (v / maxVal) * h;
+
+      ctx.fillStyle = colors[s.label];
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
   });
 }
 
@@ -701,6 +791,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

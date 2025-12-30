@@ -670,6 +670,10 @@ function renderMonthlyChart(rows, days) {
     return { label: r.key, values };
   });
 
+   /* ---------------------------
+   CHART LEGEND
+   --------------------------- */
+
    const legend = document.getElementById("monthlyChartLegend");
    if (legend) {
      legend.innerHTML = series
@@ -815,6 +819,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

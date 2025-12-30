@@ -286,6 +286,48 @@
   .custom-option:hover {
     background: var(--option-hover);
   }
+
+  /* ============================================================
+     PILL SWITCHER TAB DESIGN (Users / Stats)
+     ============================================================ */
+  .tab-bar {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1.2rem;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;   /* center the icon + text */
+    gap: 6px;
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: var(--muted);
+    transition: background 0.2s ease, border 0.2s ease, color 0.2s ease;
+    width: 100%;               /* makes both tabs equal-width */
+    text-align: center;        /* align text inside */
+  }
+  
+  
+  .tab:hover {
+    color: var(--text);
+    background: var(--panel-2);
+  }
+  
+  .tab.active {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
   
 </style>
 </head>
@@ -452,6 +494,7 @@
 </body>
 
 </html>
+
 
 
 

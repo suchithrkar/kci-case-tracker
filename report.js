@@ -51,6 +51,9 @@ const el = {
   btnTheme: document.getElementById("btnTheme"),
   btnAdmin: document.getElementById("btnAdmin"),
   btnLogout: document.getElementById("btnLogout"),
+  reportTeamSelect: document.getElementById("reportTeamSelect"),
+  teamSelectLabel: document.getElementById("teamSelectLabel"),
+  teamSelectOptions: document.getElementById("teamSelectOptions"),
 
   distributionTable: document
     .getElementById("distributionTable")
@@ -150,6 +153,14 @@ onAuthStateChanged(auth, async (user) => {
   reportState.currentMonth = reportState.todayISO.slice(0, 7);
 
   initHeader(data);
+
+   if (isPrimary(data)) {
+     el.reportTeamSelect.classList.remove("hidden");
+     await loadTeamsForReport();
+   } else {
+     el.reportTeamSelect.classList.add("hidden");
+   }
+   
   await loadLiveCases();
   await loadTodaySummary();
 
@@ -190,10 +201,16 @@ function initHeader(user) {
    ========================================================= */
 
 async function loadLiveCases() {
-  const q = query(
-    collection(db, "cases"),
-    where("teamId", "==", reportState.teamId)
-  );
+  let q;
+
+  if (reportState.teamId === "TOTAL") {
+    q = query(collection(db, "cases"));
+  } else {
+    q = query(
+      collection(db, "cases"),
+      where("teamId", "==", reportState.teamId)
+    );
+  }
 
   const snap = await getDocs(q);
   reportState.liveCases = snap.docs.map(d => d.data());
@@ -210,6 +227,38 @@ async function loadTodaySummary() {
 
   const snap = await getDoc(ref);
   reportState.todayReport = snap.exists() ? snap.data() : {};
+}
+
+async function loadTeamsForReport() {
+  el.teamSelectOptions.innerHTML = `
+    <div class="custom-option" data-team="TOTAL">TOTAL</div>
+  `;
+
+  const snap = await getDocs(collection(db, "teams"));
+
+  snap.forEach(docSnap => {
+    const t = docSnap.data();
+    el.teamSelectOptions.innerHTML += `
+      <div class="custom-option" data-team="${docSnap.id}">
+        ${t.name || docSnap.id}
+      </div>
+    `;
+  });
+
+  el.teamSelectOptions.onclick = async (e) => {
+    const opt = e.target.closest(".custom-option");
+    if (!opt) return;
+
+    el.teamSelectLabel.textContent = opt.textContent;
+
+    reportState.teamId =
+      opt.dataset.team === "TOTAL"
+        ? "TOTAL"
+        : opt.dataset.team;
+
+    await loadLiveCases();
+    renderDistributionTable();
+  };
 }
 
 /* =========================================================
@@ -576,5 +625,6 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 

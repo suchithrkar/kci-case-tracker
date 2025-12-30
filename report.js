@@ -278,8 +278,6 @@ async function loadTeamsForReport() {
     await loadLiveCases();
     renderDistributionTable();
   };
-   // Re-bind custom select behavior after injection
-   setupControls();
 }
 
 /* =========================================================
@@ -403,6 +401,8 @@ function renderTodaySummary() {
    ========================================================= */
 
 function setupControls() {
+  if (setupControls._initialized) return;
+  setupControls._initialized = true;
   // View dropdown — option selection only
    el.reportViewSelect
      .querySelector(".custom-options")
@@ -682,6 +682,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

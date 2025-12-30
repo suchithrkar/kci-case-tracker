@@ -419,7 +419,42 @@ function setupControls() {
     });
 
   updateMetricTabs();
+
+  /* ================================
+     CUSTOM DROPDOWN BEHAVIOR
+     (Copied from index.js logic)
+     ================================ */
+
+  document.querySelectorAll(".custom-select").forEach(select => {
+    const trigger = select.querySelector(".custom-select-trigger");
+
+    if (!trigger) return;
+
+    trigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+
+      // Close other open dropdowns
+      document
+        .querySelectorAll(".custom-select.open")
+        .forEach(s => {
+          if (s !== select) s.classList.remove("open");
+        });
+
+      // Toggle this one
+      select.classList.toggle("open");
+    });
+  });
+
+  // Close all dropdowns on outside click
+  document.addEventListener("click", () => {
+    document
+      .querySelectorAll(".custom-select.open")
+      .forEach(s => s.classList.remove("open"));
+  });
+   
 }
+
+
 
 /* =========================================================
    METRIC TAB STATE
@@ -625,6 +660,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

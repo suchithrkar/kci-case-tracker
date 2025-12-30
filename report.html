@@ -36,6 +36,32 @@
     --border:#cfd6e4;
     --shadow:0 4px 12px rgba(0,0,0,.08);
   }
+
+  /* =====================================================
+   THEME VARIABLES — CUSTOM SELECT (MATCH INDEX PAGE)
+   ===================================================== */
+  
+  :root[data-theme="dark"] {
+    --select-bg: #1A1F2B;
+    --select-border: #2f3546;
+    --select-text: #e6ebf3;
+  
+    --dropdown-bg: #111827;
+    --dropdown-border: #30364a;
+  
+    --option-hover: #2a3042;
+  }
+  
+  :root[data-theme="light"] {
+    --select-bg: #ffffff;
+    --select-border: #c9d1e2;
+    --select-text: #1f2937;
+  
+    --dropdown-bg: #f9fafb;
+    --dropdown-border: #cfd6e4;
+  
+    --option-hover: #e5e7eb;
+  }
   
   /* =====================================================
      BASE
@@ -206,14 +232,14 @@
   }
 
   /* ==========================================================
-     CUSTOM DROPDOWN (REPLACES <select>)
+     CUSTOM DROPDOWN (MATCH INDEX PAGE)
      ========================================================== */
   
   .custom-select {
     position: relative;
-    width: 140px;              /* ✅ fixed max width */
+    width: 140px;
     max-width: 140px;
-    margin: 0 auto;            /* ✅ center inside table cell */
+    margin: 0 auto;
     cursor: pointer;
     font-size: 13px;
   }
@@ -238,14 +264,13 @@
     position: absolute;
     right: 12px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(-50%) rotate(-45deg);
   
     width: 6px;
     height: 6px;
   
     border-left: 2px solid var(--select-text);
     border-bottom: 2px solid var(--select-text);
-    transform: translateY(-50%) rotate(-45deg);
   
     opacity: 0.9;
     pointer-events: none;
@@ -468,6 +493,7 @@
 </body>
 
 </html>
+
 
 
 

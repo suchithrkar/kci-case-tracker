@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Open Repair Cases Report</title>
+
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
+
+  <!-- Reuse existing global styles -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+<!-- =========================
+     HEADER (IDENTICAL STYLE)
+     ========================= -->
+<header class="header">
+  <button class="hamburger" id="btnHamburger">☰</button>
+
+  <div class="title">Open Repair Cases Report</div>
+  <div class="grow"></div>
+
+  <!-- USER FULL NAME -->
+  <div class="user-name" id="userFullName">Loading...</div>
+
+  <!-- THEME TOGGLE -->
+  <button class="theme-toggle" id="btnTheme">🌙</button>
+
+  <!-- ADMIN DASHBOARD -->
+  <button class="hdr-btn" id="btnAdmin" style="display:none;">
+    Admin Dashboard
+  </button>
+
+  <!-- LOG OUT -->
+  <button class="hdr-btn" id="btnLogout">Log Out</button>
+</header>
+
+
+<main style="padding: 1rem; display: grid; gap: 1.25rem;">
+
+  <!-- =====================================================
+       SECTION 1 — TOTAL OPEN REPAIR CASES (TODAY)
+       ===================================================== -->
+  <section class="panel">
+    <h2 class="section-title">
+      Total Open Repair Cases – Today
+    </h2>
+
+    <div class="table-wrap">
+      <table id="distributionTable">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>0–3 Days</th>
+            <th>3–5 Days</th>
+            <th>5–10 Days</th>
+            <th>10–14 Days</th>
+            <th>15–30 Days</th>
+            <th>30–60 Days</th>
+            <th>60–90 Days</th>
+            <th>&gt; 90 Days</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JS will inject rows -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       SECTION 2 — REPORT CONTROLS
+       ===================================================== -->
+  <section class="panel">
+    <div class="report-controls">
+
+      <!-- VIEW SELECT -->
+      <div class="control-group">
+        <label class="control-label">View</label>
+        <div class="custom-select" id="reportViewSelect">
+          <div class="custom-select-trigger">
+            <span id="reportViewLabel">Today</span>
+          </div>
+          <div class="custom-options">
+            <div class="custom-option" data-value="today">Today</div>
+            <div class="custom-option" data-value="month">Month</div>
+            <div class="custom-option disabled">Quarter (Coming Soon)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- METRIC TOGGLES -->
+      <div class="rfc-segmented" id="reportMetricTabs">
+        <button class="rfcBtn" data-metric="totalOpen">
+          Total Open Repair Cases
+        </button>
+        <button class="rfcBtn" data-metric="readyForClosure">
+          Ready for Closure
+        </button>
+        <button class="rfcBtn" data-metric="overdue">
+          Overdue Cases
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- =====================================================
+       SECTION 3 — DYNAMIC REPORT CONTENT
+       ===================================================== -->
+  <section class="panel" id="reportContent">
+
+    <!-- TODAY SUMMARY TABLE -->
+    <div id="todaySummaryBlock">
+
+      <h3 class="section-subtitle">
+        Today Summary
+      </h3>
+
+      <div class="table-wrap">
+        <table id="todaySummaryTable">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Total Open</th>
+              <th>Ready for Closure</th>
+              <th>Overdue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JS injects rows -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+
+    <!-- MONTHLY TABLE -->
+    <div id="monthlyReportBlock" class="hidden">
+
+      <h3 class="section-subtitle" id="monthlyTitle">
+        Monthly Report
+      </h3>
+
+      <div class="table-wrap">
+        <table id="monthlyReportTable">
+          <thead>
+            <!-- JS generates day columns -->
+          </thead>
+          <tbody>
+            <!-- JS generates rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LINE CHART -->
+      <div class="chart-wrap">
+        <canvas id="monthlyLineChart"></canvas>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<!-- =========================
+     SIDEBAR + OVERLAY
+     (Reuse existing markup)
+     ========================= -->
+<div class="overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <!-- Sidebar content reused later if needed -->
+</aside>
+
+
+<!-- =========================
+     SCRIPT
+     ========================= -->
+<script type="module" src="report.js"></script>
+
+</body>
+</html>

@@ -238,27 +238,50 @@ const CRS_TYPES = [
 function renderDistributionTable() {
   el.distributionTable.innerHTML = "";
 
-  const rows = [...CRS_TYPES, "Total"];
-
-  rows.forEach(type => {
+  // ---------- Individual CRS rows ----------
+  CRS_TYPES.forEach(type => {
     const tr = document.createElement("tr");
     let rowTotal = 0;
 
-    tr.innerHTML =
-      `<td><strong>${type}</strong></td>` +
-      CA_BUCKETS.map(bucket => {
-        const count = reportState.liveCases.filter(c =>
-          (type === "Total" || c.caseResolutionCode === type) &&
-          c.caGroup === bucket
-        ).length;
+    const cells = CA_BUCKETS.map(bucket => {
+      const count = reportState.liveCases.filter(c =>
+        String(c.caseResolutionCode).trim() === type &&
+        String(c.caGroup).trim() === bucket
+      ).length;
 
-        rowTotal += count;
-        return `<td>${count}</td>`;
-      }).join("") +
-      `<td><strong>${rowTotal}</strong></td>`;
+      rowTotal += count;
+      return `<td>${count}</td>`;
+    }).join("");
+
+    tr.innerHTML = `
+      <td><strong>${type}</strong></td>
+      ${cells}
+      <td><strong>${rowTotal}</strong></td>
+    `;
 
     el.distributionTable.appendChild(tr);
   });
+
+  // ---------- GRAND TOTAL ROW ----------
+  const totalRow = document.createElement("tr");
+  let grandTotal = 0;
+
+  const totalCells = CA_BUCKETS.map(bucket => {
+    const count = reportState.liveCases.filter(c =>
+      String(c.caGroup).trim() === bucket
+    ).length;
+
+    grandTotal += count;
+    return `<td><strong>${count}</strong></td>`;
+  }).join("");
+
+  totalRow.innerHTML = `
+    <td><strong>Total</strong></td>
+    ${totalCells}
+    <td><strong>${grandTotal}</strong></td>
+  `;
+
+  el.distributionTable.appendChild(totalRow);
 }
 
 /* =========================================================
@@ -555,3 +578,4 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+

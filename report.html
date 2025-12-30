@@ -163,6 +163,28 @@
     width:100%;
     border-collapse:collapse;
   }
+
+  /* =====================================================
+     DISTRIBUTION TABLE COLUMN WIDTHS
+     ===================================================== */
+  
+  .distribution-table {
+    table-layout: fixed; /* required for equal columns */
+  }
+  
+  /* First column (Type) — auto width */
+  .distribution-table th:first-child,
+  .distribution-table td:first-child {
+    width: 160px;           /* stable, readable */
+    text-align: left;
+    padding-left: 0.75rem;
+  }
+  
+  /* All remaining columns — equal width */
+  .distribution-table th:not(:first-child),
+  .distribution-table td:not(:first-child) {
+    width: calc((100% - 160px) / 9);
+  }
   
   thead th{
     background:var(--panel-2);
@@ -367,7 +389,7 @@
     </div>
 
     <div class="table-wrap">
-      <table id="distributionTable">
+      <table id="distributionTable" class="distribution-table">
         <thead>
           <tr>
             <th>Type</th>
@@ -479,6 +501,7 @@
 </body>
 
 </html>
+
 
 
 

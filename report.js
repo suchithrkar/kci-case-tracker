@@ -646,8 +646,7 @@ function renderMonthlyChart(rows, days) {
     const values = Array.from({ length: days }, (_, i) => {
       const day = String(i + 1).padStart(2, "0");
       const d =
-        reportState.dailyReports[`${monthKey}-${day}`] ||
-        zeroDay();
+        reportState.dailyReports[`${monthKey}-${day}`] || null;
 
       let field;
       if (r.key === "Total") {
@@ -658,8 +657,13 @@ function renderMonthlyChart(rows, days) {
         field = `${metric}${r.key}`;
       }
 
-      const v = d[field] || 0;
-      maxVal = Math.max(maxVal, v);
+      const v =
+        d && typeof d[field] === "number"
+          ? d[field]
+          : null;
+      if (v !== null) {
+        maxVal = Math.max(maxVal, v);
+      }
       return v;
     });
 
@@ -720,21 +724,16 @@ function renderMonthlyChart(rows, days) {
      X LABELS (DAYS)
      --------------------------- */
 
-  const labelStep =
-    days > 20 ? 5 : 1; // reduce clutter
-
-  Array.from({ length: days }, (_, i) => {
-    if ((i + 1) % labelStep !== 0) return;
-
-    const x =
-      padding + (i / (days - 1)) * w;
-
-    ctx.fillText(
-      i + 1,
-      x - 6,
-      canvas.height - padding + 20
-    );
-  });
+   Array.from({ length: days }, (_, i) => {
+     const x =
+       padding + (i / (days - 1)) * w;
+   
+     ctx.fillText(
+       i + 1,
+       x - 6,
+       canvas.height - padding + 20
+     );
+   });
 
   /* ---------------------------
      LINES + POINTS
@@ -753,8 +752,16 @@ function renderMonthlyChart(rows, days) {
         padding -
         (v / maxVal) * h;
 
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+      if (v === null) {
+        ctx.moveTo(x, y);
+        return;
+      }
+      
+      if (i === 0 || s.values[i - 1] === null) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
     });
 
     ctx.stroke();
@@ -769,6 +776,8 @@ function renderMonthlyChart(rows, days) {
         (v / maxVal) * h;
 
       ctx.fillStyle = colors[s.label];
+      if (v === null) return;
+      
       ctx.beginPath();
       ctx.arc(x, y, 3.5, 0, Math.PI * 2);
       ctx.fill();
@@ -791,6 +800,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

@@ -352,24 +352,6 @@ function setupControls() {
 }
 
 /* =========================================================
-   VIEW SWITCHER
-   ========================================================= */
-
-function updateView() {
-  if (reportState.view === "today" &&
-      !reportState.activeMetric) {
-    el.todaySummaryBlock.classList.remove("hidden");
-    el.monthlyBlock.classList.add("hidden");
-    return;
-  }
-
-  el.todaySummaryBlock.classList.add("hidden");
-  el.monthlyBlock.classList.remove("hidden");
-
-  // Monthly data render comes next step
-}
-
-/* =========================================================
    METRIC TAB STATE
    ========================================================= */
 
@@ -571,4 +553,5 @@ async function updateView() {
 
   await loadMonthlyReports(reportState.currentMonth);
   renderMonthlyTable();
+
 }

@@ -403,19 +403,20 @@ function renderTodaySummary() {
    ========================================================= */
 
 function setupControls() {
-  // View dropdown
-  el.reportViewSelect.onclick = (e) => {
-    const opt = e.target.closest(".custom-option");
-    if (!opt || opt.classList.contains("disabled")) return;
-
-    reportState.view = opt.dataset.value;
-    reportState.activeMetric = null;
-
-    el.reportViewLabel.textContent =
-      opt.textContent;
-
-    updateView();
-  };
+  // View dropdown — option selection only
+   el.reportViewSelect
+     .querySelector(".custom-options")
+     .addEventListener("click", (e) => {
+       const opt = e.target.closest(".custom-option");
+       if (!opt || opt.classList.contains("disabled")) return;
+   
+       reportState.view = opt.dataset.value;
+       reportState.activeMetric = null;
+   
+       el.reportViewLabel.textContent = opt.textContent;
+   
+       updateView();
+     });
 
   // Metric toggles
   el.metricTabs.querySelectorAll(".rfcBtn")
@@ -681,6 +682,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

@@ -65,8 +65,6 @@ const el = {
 
   reportViewSelect: document.getElementById("reportViewSelect"),
   reportViewLabel: document.getElementById("reportViewLabel"),
-
-  metricTabs: document.getElementById("reportMetricTabs")
 };
 
 const reportTeamControls =
@@ -167,6 +165,7 @@ onAuthStateChanged(auth, async (user) => {
   renderDistributionTable();
   renderTodaySummary();
   setupControls();
+  setupReportTabs();
 });
 
 /* =========================================================
@@ -418,30 +417,6 @@ function setupControls() {
        updateView();
      });
 
-  // Metric toggles
-  el.metricTabs.querySelectorAll(".rfcBtn")
-    .forEach(btn => {
-      btn.onclick = () => {
-        const metric = btn.dataset.metric;
-
-        // toggle off
-        if (reportState.activeMetric === metric) {
-          reportState.activeMetric = null;
-          reportState.view = "today";
-          el.reportViewLabel.textContent = "Today";
-        } else {
-          reportState.activeMetric = metric;
-          reportState.view = "month";
-          el.reportViewLabel.textContent = "Month";
-        }
-
-        updateMetricTabs();
-        updateView();
-      };
-    });
-
-  updateMetricTabs();
-
   /* ================================
      CUSTOM DROPDOWN BEHAVIOR
      (Copied from index.js logic)
@@ -494,20 +469,6 @@ function setupReportTabs() {
       updateReportView();
     });
   });
-}
-
-/* =========================================================
-   METRIC TAB STATE
-   ========================================================= */
-
-function updateMetricTabs() {
-  el.metricTabs.querySelectorAll(".rfcBtn")
-    .forEach(b => {
-      b.classList.toggle(
-        "active",
-        b.dataset.metric === reportState.activeMetric
-      );
-    });
 }
 
 /* =========================================================
@@ -700,6 +661,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

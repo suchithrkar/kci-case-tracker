@@ -64,7 +64,6 @@
     padding:.75rem 1rem;
   }
   
-  .hamburger,
   .theme-toggle{
     width:38px;height:38px;
     border-radius:50%;
@@ -72,6 +71,7 @@
     border:1px solid var(--border);
     background:var(--panel-2);
     cursor:pointer;
+    color: var(--text);
   }
   
   .title{font-weight:700}
@@ -89,6 +89,7 @@
     border:1px solid var(--border);
     background:var(--panel-2);
     cursor:pointer;
+    color: var(--text);
   }
   
   /* =====================================================
@@ -100,6 +101,18 @@
     border:1px solid var(--border);
     border-radius:var(--radius);
     padding:1rem;
+  }
+
+  .stats-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:.75rem;
+  }
+  
+  .stats-title{
+    font-size:15px;
+    font-weight:700;
   }
   
   .section-title{
@@ -204,7 +217,6 @@
      HEADER (IDENTICAL STYLE)
      ========================= -->
 <header class="header">
-  <button class="hamburger" id="btnHamburger">☰</button>
 
   <div class="title">Open Repair Cases Report</div>
   <div class="grow"></div>
@@ -231,9 +243,23 @@
        SECTION 1 — TOTAL OPEN REPAIR CASES (TODAY)
        ===================================================== -->
   <section class="panel">
-    <h2 class="section-title">
-      Total Open Repair Cases – Today
-    </h2>
+    <div class="stats-header">
+      <div class="stats-title">
+        Total Open Repair Cases – Today
+      </div>
+    
+      <!-- TEAM SELECT (PRIMARY ADMIN ONLY) -->
+      <div class="stats-team-select hidden" id="reportTeamSelect">
+        <div class="custom-select" id="teamSelect">
+          <div class="custom-select-trigger">
+            <span id="teamSelectLabel">TOTAL</span>
+          </div>
+          <div class="custom-options" id="teamSelectOptions">
+            <!-- JS injects teams -->
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="table-wrap">
       <table id="distributionTable">
@@ -376,3 +402,4 @@
 </body>
 
 </html>
+

@@ -1874,6 +1874,13 @@ function resetExcelUI() {
    $("previewSection").style.display = "none";
    $("previewCounts").innerHTML = "";
    excelState.isBackupImport = false;
+
+   // Hide overwrite option by default (Excel upload)
+   const overwriteWrap = document.getElementById("overwriteWrap");
+   if (overwriteWrap) {
+     overwriteWrap.style.display = "none";
+   }
+   
 }
 
 
@@ -1997,6 +2004,16 @@ function importBackupPrompt(teamId) {
     $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> ${teamId}`;
     excelState.file = file;
 
+   // ✅ Import backup mode
+   excelState.isBackupImport = true;
+   
+   // Show overwrite checkbox ONLY for import
+   const overwriteWrap = document.getElementById("overwriteWrap");
+   if (overwriteWrap) {
+     overwriteWrap.style.display = "block";
+     $("overwriteUserActions").checked = true; // sensible default for restore
+   }
+
     clearProgress();
     updateProgress("Reading backup file...");
 
@@ -2004,6 +2021,9 @@ function importBackupPrompt(teamId) {
     const data = JSON.parse(text);
 
     await parseBackupFile(data);  // NEW
+
+    updateProgress("Import mode: Backup restore");
+     
     validateReadyState();
   };
 
@@ -2752,6 +2772,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

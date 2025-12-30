@@ -592,8 +592,15 @@ function renderMonthlyTable() {
           const d =
             reportState.dailyReports[dateKey] || zeroDay();
 
-          const field = `${metric}${r.key}`;
-          return `<td>${d[field] || 0}</td>`;
+            let field;
+            
+            if (r.key === "Total") {
+              field = metric; // e.g. "totalOpen"
+            } else {
+              field = `${metric}${r.key}`; // e.g. "totalOpenOnsite"
+            }
+            
+            return `<td>${d[field] || 0}</td>`;
         }).join("")}
       </tr>
     `;
@@ -690,6 +697,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

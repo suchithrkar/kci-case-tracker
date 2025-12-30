@@ -410,6 +410,13 @@ function setupControls() {
    
          reportState.view = opt.dataset.value;
          
+         // 🔑 UPDATE DROPDOWN LABEL VISUALLY (MISSING)
+         const viewTrigger =
+           el.reportViewSelect.querySelector(".custom-select-trigger");
+         if (viewTrigger) {
+           viewTrigger.textContent = opt.textContent;
+         }
+         
          // clear all tabs first
          const tabs = document.querySelectorAll("#reportTabBar .tab");
          tabs.forEach(t => t.classList.remove("active"));
@@ -683,6 +690,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

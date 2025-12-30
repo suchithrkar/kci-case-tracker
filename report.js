@@ -51,7 +51,6 @@ const el = {
   btnTheme: document.getElementById("btnTheme"),
   btnAdmin: document.getElementById("btnAdmin"),
   btnLogout: document.getElementById("btnLogout"),
-  reportTeamSelect: document.getElementById("reportTeamSelect"),
   teamSelectLabel: document.getElementById("teamSelectLabel"),
   teamSelectOptions: document.getElementById("teamSelectOptions"),
 
@@ -71,6 +70,9 @@ const el = {
 
   metricTabs: document.getElementById("reportMetricTabs")
 };
+
+const reportTeamControls =
+  document.getElementById("reportTeamControls");
 
 /* =========================================================
    TEAM-AWARE TODAY CALCULATION (REUSED)
@@ -660,6 +662,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

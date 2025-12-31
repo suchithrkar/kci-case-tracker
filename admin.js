@@ -2656,7 +2656,7 @@ function buildStatsControls() {
   statsControls.innerHTML = `
     <!-- Cases Report button -->
     <button
-      class="action-btn btn-boxed btn-cases-report"
+      class="btn-cases-report"
       id="btnCasesReport"
       title="Open Cases Report"
     >
@@ -2798,6 +2798,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

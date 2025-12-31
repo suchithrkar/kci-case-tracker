@@ -158,7 +158,12 @@
      TABLES (REUSED)
      ===================================================== */
   
-  .table-wrap{width:100%;overflow:auto}
+  .table-wrap{
+    width:100%;
+    overflow:auto;
+    display: flex;
+    justify-content: center;
+  }
   
   table{
     width:100%;
@@ -171,6 +176,8 @@
   
   .distribution-table {
     table-layout: fixed; /* required for equal columns */
+    width: 80%;
+    border: 1px solid var(--border);
   }
   
   /* First column (Type) — auto width */
@@ -498,7 +505,7 @@
     <div id="todaySummaryBlock">
 
       <div class="table-wrap">
-        <table id="todaySummaryTable">
+        <table id="todaySummaryTable" style="width:60%;border:1px solid var(--border);">
           <thead>
             <tr>
               <th>Type</th>
@@ -549,6 +556,7 @@
 </body>
 
 </html>
+
 
 
 

@@ -704,9 +704,9 @@ function renderMonthlyChart(rows, days) {
      LAYOUT
      --------------------------- */
 
-  const padding = 60;
-  const w = canvas.width - padding * 2;
-  const h = canvas.height - padding * 2;
+   const padding = 60;
+   const w = cssWidth - padding * 2;
+   const h = cssHeight - padding * 2;
 
   /* ---------------------------
      AXES
@@ -772,25 +772,26 @@ function renderMonthlyChart(rows, days) {
     ctx.lineWidth = 2;
     ctx.beginPath();
 
-    s.values.forEach((v, i) => {
-      const x =
-        padding + (i / (days - 1)) * w;
-      const y =
-        canvas.height -
-        padding -
-        (v / maxVal) * h;
-
-      if (v === null) {
-        ctx.moveTo(x, y);
-        return;
-      }
+      s.values.forEach((v, i) => {
+        const x =
+          padding + (i / (days - 1)) * w;
       
-      if (i === 0 || s.values[i - 1] === null) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    });
+        if (v === null) {
+          // break the line — do NOT draw
+          return;
+        }
+      
+        const y =
+          cssHeight -
+          padding -
+          (v / maxVal) * h;
+      
+        if (i === 0 || s.values[i - 1] === null) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
 
     ctx.stroke();
 
@@ -798,13 +799,14 @@ function renderMonthlyChart(rows, days) {
     s.values.forEach((v, i) => {
       const x =
         padding + (i / (days - 1)) * w;
-      const y =
-        canvas.height -
-        padding -
-        (v / maxVal) * h;
-
-      ctx.fillStyle = colors[s.label];
-      if (v === null) return;
+         if (v === null) return;
+         
+         const y =
+           cssHeight -
+           padding -
+           (v / maxVal) * h;
+         
+         ctx.fillStyle = colors[s.label];
       
       ctx.beginPath();
       ctx.arc(x, y, 3.5, 0, Math.PI * 2);
@@ -828,6 +830,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

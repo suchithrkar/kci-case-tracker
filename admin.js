@@ -2761,7 +2761,13 @@ function buildTeamSelector() {
     </div>
   `;
 
-  statsControls.prepend(wrapper);
+   const refreshBtn = document.getElementById("btnStatsRefresh");
+   
+   if (refreshBtn) {
+     statsControls.insertBefore(wrapper, refreshBtn);
+   } else {
+     statsControls.appendChild(wrapper);
+   }
 
   initCustomSelect(wrapper);
 
@@ -2792,6 +2798,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

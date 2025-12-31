@@ -195,6 +195,21 @@
   }
 
   /* =====================================================
+     TODAY SUMMARY TABLE — EQUAL COLUMN WIDTHS
+     ===================================================== */
+  
+  .today-summary-table {
+    table-layout: fixed;
+    width:60%;
+    border:1px solid var(--border);
+  }
+  
+  .today-summary-table th,
+  .today-summary-table td {
+    width: 25%;
+  }
+
+  /* =====================================================
      MONTHLY REPORT TABLE COLUMN WIDTHS
      ===================================================== */
   
@@ -505,7 +520,7 @@
     <div id="todaySummaryBlock">
 
       <div class="table-wrap">
-        <table id="todaySummaryTable" style="width:60%;border:1px solid var(--border);">
+        <table id="todaySummaryTable" class="today-summary-table">
           <thead>
             <tr>
               <th>Type</th>
@@ -556,6 +571,7 @@
 </body>
 
 </html>
+
 
 
 

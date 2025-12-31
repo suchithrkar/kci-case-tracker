@@ -186,6 +186,28 @@
   .distribution-table td:not(:first-child) {
     width: calc((100% - 160px) / 9);
   }
+
+  /* =====================================================
+     MONTHLY REPORT TABLE COLUMN WIDTHS
+     ===================================================== */
+  
+  .monthly-table {
+    table-layout: fixed;
+  }
+  
+  /* First column (Type) */
+  .monthly-table th:first-child,
+  .monthly-table td:first-child {
+    width: 100px;
+    text-align: left;
+    padding-left: 0.75rem;
+  }
+  
+  /* All day columns — equal width */
+  .monthly-table th:not(:first-child),
+  .monthly-table td:not(:first-child) {
+    width: calc((100% - 120px) / 31);
+  }
   
   thead th{
     background:var(--panel-2);
@@ -497,7 +519,7 @@
     <div id="monthlyReportBlock" class="hidden">
 
       <div class="table-wrap">
-        <table id="monthlyReportTable">
+        <table id="monthlyReportTable" class="monthly-table">
           <thead>
             <!-- JS generates day columns -->
           </thead>
@@ -526,6 +548,7 @@
 </body>
 
 </html>
+
 
 
 

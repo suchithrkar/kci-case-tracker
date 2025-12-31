@@ -369,7 +369,7 @@ function renderTodaySummary() {
       overdue: d.overdueOffsite || 0
     },
     {
-      label: "Parts",
+      label: "CSR",
       total: d.totalOpenCSR || 0,
       rfc: d.readyForClosureCSR || 0,
       overdue: d.overdueCSR || 0
@@ -578,7 +578,7 @@ function renderMonthlyTable() {
   const rows = [
     { label: "Onsite", key: "Onsite" },
     { label: "Offsite", key: "Offsite" },
-    { label: "Parts", key: "CSR" },
+    { label: "CSR", key: "CSR" },
     { label: "Total", key: "Total" }
   ];
 
@@ -830,6 +830,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

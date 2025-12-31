@@ -715,11 +715,11 @@ function renderMonthlyChart(rows, days) {
   ctx.strokeStyle = "#2a2f3a";
   ctx.lineWidth = 1;
 
-  ctx.beginPath();
-  ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, canvas.height - padding);
-  ctx.lineTo(canvas.width - padding, canvas.height - padding);
-  ctx.stroke();
+   ctx.beginPath();
+   ctx.moveTo(padding, padding);
+   ctx.lineTo(padding, cssHeight - padding);
+   ctx.lineTo(cssWidth - padding, cssHeight - padding);
+   ctx.stroke();
 
   /* ---------------------------
      Y GRID + LABELS
@@ -738,7 +738,7 @@ function renderMonthlyChart(rows, days) {
     ctx.strokeStyle = "#2a2f3a";
     ctx.beginPath();
     ctx.moveTo(padding, y);
-    ctx.lineTo(canvas.width - padding, y);
+    ctx.lineTo(cssWidth - padding, y);
     ctx.stroke();
 
     ctx.fillText(
@@ -756,11 +756,11 @@ function renderMonthlyChart(rows, days) {
      const x =
        padding + (i / (days - 1)) * w;
    
-     ctx.fillText(
-       i + 1,
-       x - 6,
-       canvas.height - padding + 20
-     );
+      ctx.fillText(
+        i + 1,
+        x - 6,
+        cssHeight - padding + 20
+      );
    });
 
   /* ---------------------------
@@ -830,6 +830,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

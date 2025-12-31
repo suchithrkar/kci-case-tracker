@@ -2674,18 +2674,17 @@ function buildStatsControls() {
     </button>
   `;
 
-  // Navigate to report page
-  document.getElementById("btnCasesReport").onclick = () => {
-    location.href = "report.html";
-  };
-}
-
-
+  // Refresh stats
   document.getElementById("btnStatsRefresh").onclick = async () => {
     showPopup("Refreshing stats...");
     await loadStatsCasesOnce();
     await loadAllUsersForStats();
     renderStatsTableNew();
+  };
+
+  // Navigate to report page
+  document.getElementById("btnCasesReport").onclick = () => {
+    location.href = "report.html";
   };
 }
 
@@ -2793,6 +2792,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

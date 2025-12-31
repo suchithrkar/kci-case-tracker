@@ -2654,10 +2654,39 @@ async function loadStatsCasesOnce() {
 ------------------------------------------------------------ */
 function buildStatsControls() {
   statsControls.innerHTML = `
-    <button class="action-btn btn-boxed" style="padding:0.55rem 0.65rem;font-size:18px;" id="btnStatsRefresh" title="Refresh">
+    <!-- Cases Report button -->
+    <button
+      class="action-btn btn-boxed btn-cases-report"
+      id="btnCasesReport"
+      title="Open Cases Report"
+    >
+      Cases Report
+    </button>
+
+    <!-- Refresh button -->
+    <button
+      class="action-btn btn-boxed"
+      style="padding:0.55rem 0.65rem;font-size:18px;"
+      id="btnStatsRefresh"
+      title="Refresh"
+    >
       🔄
     </button>
-`;
+  `;
+
+  // Refresh stats
+  document.getElementById("btnStatsRefresh").onclick = async () => {
+    showPopup("Refreshing stats...");
+    await loadStatsCasesOnce();
+    await loadAllUsersForStats();
+    renderStatsTableNew();
+  };
+
+  // Navigate to report page
+  document.getElementById("btnCasesReport").onclick = () => {
+    location.href = "report.html";
+  };
+}
 
 
   document.getElementById("btnStatsRefresh").onclick = async () => {
@@ -2772,6 +2801,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

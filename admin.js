@@ -862,6 +862,33 @@ async function generateDailyRepairReport({
   // ===============================
   // WRITE REPORT
   // ===============================
+
+   // ===============================
+   // CA GROUP DISTRIBUTION (ALL CASES)
+   // ===============================
+   const caGroups = {
+     "0-3 Days": 0,
+     "3-5 Days": 0,
+     "5-10 Days": 0,
+     "10-14 Days": 0,
+     "15-30 Days": 0,
+     "30-60 Days": 0,
+     "60-90 Days": 0,
+     "> 90 Days": 0
+   };
+   
+   cases.forEach(c => {
+     if (caGroups[c.caGroup] !== undefined) {
+       caGroups[c.caGroup]++;
+     }
+   });
+   
+   // Total cases > 30 days
+   const caAbove30Total =
+     caGroups["30-60 Days"] +
+     caGroups["60-90 Days"] +
+     caGroups["> 90 Days"];
+   
    const reportRef = doc(
      db,
      "dailyRepairReports",
@@ -896,6 +923,19 @@ async function generateDailyRepairReport({
       overdueCSR: overdue.filter(c =>
         c.caseResolutionCode === "Parts Shipped"
       ).length,
+
+      // CA GROUP COUNTS
+      ca_0_3: caGroups["0-3 Days"],
+      ca_3_5: caGroups["3-5 Days"],
+      ca_5_10: caGroups["5-10 Days"],
+      ca_10_14: caGroups["10-14 Days"],
+      ca_15_30: caGroups["15-30 Days"],
+      ca_30_60: caGroups["30-60 Days"],
+      ca_60_90: caGroups["60-90 Days"],
+      ca_gt_90: caGroups["> 90 Days"],
+      
+      // TOTAL > 30 DAYS
+      ca_gt_30_total: caAbove30Total,
 
       generatedAt: new Date(),
       generatedBy
@@ -2798,6 +2838,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

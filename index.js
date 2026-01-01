@@ -3171,7 +3171,7 @@ document.getElementById("btnInfoCopy").onclick = () => {
       const toast = document.getElementById("toast");
       toast.textContent = "Copied!";
       toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 900);
+      setTimeout(() => toast.classList.remove("show"), 3000);
     })
     .catch(() => {
       alert("Copy failed. Your browser may block clipboard access.");
@@ -3306,6 +3306,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

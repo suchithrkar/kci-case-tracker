@@ -31,7 +31,7 @@ export function showPopup(msg) {
   });
 
   document.body.appendChild(div);
-  setTimeout(() => div.remove(), 10000);
+  setTimeout(() => div.remove(), 5000);
 }
 
 /* ============================================================
@@ -104,6 +104,7 @@ export async function cleanupDailyReports(teamId, todayISO) {
     }
   }
 }
+
 
 
 

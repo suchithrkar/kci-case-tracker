@@ -786,7 +786,16 @@ async function applyExcelChanges() {
   updateProgress(`Deleted: ${deleted.length}`);
   updateProgress("-----------------------------------");
 
-   const todayISO = getTeamToday(teamConfig);
+   // 🔒 Always fetch correct team config for Excel upload
+   const teamSnap = await getDoc(doc(db, "teams", excelState.teamId));
+   const teamCfg = teamSnap.exists()
+     ? {
+         resetTimezone: teamSnap.data().resetTimezone,
+         resetHour: teamSnap.data().resetHour
+       }
+     : { resetTimezone: "UTC", resetHour: 0 };
+   
+   const todayISO = getTeamToday(teamCfg);
    
    await generateDailyRepairReport({
      teamId: excelState.teamId,
@@ -2838,6 +2847,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

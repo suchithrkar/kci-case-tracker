@@ -904,7 +904,8 @@ function renderMonthlyChart(rows, businessDays) {
    
      const x =
        padding +
-       (mid / (businessDays.length - 1)) * w;
+       xInset +
+       (mid / (businessDays.length - 1)) * plotW;
    
      ctx.fillText(
        `Week ${wk.week}`,
@@ -924,10 +925,11 @@ function renderMonthlyChart(rows, businessDays) {
      // midpoint between last day of previous week and first day of next week
      const midIndex =
        (prev.endIndex + curr.startIndex) / 2;
-   
+
      const x =
        padding +
-       (midIndex / (businessDays.length - 1)) * w;
+       xInset +
+       (midIndex / (businessDays.length - 1)) * plotW;
    
      ctx.beginPath();
      ctx.moveTo(x, cssHeight - padding + 8);
@@ -1006,6 +1008,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

@@ -822,6 +822,12 @@ function renderMonthlyChart(rows, businessDays) {
 
   if (maxVal === 0) maxVal = 1;
 
+   // Add headroom above highest value (Y-axis breathing space)
+   const yHeadroomRatio = 0.1; // 10% extra space
+   const scaledMaxVal = Math.ceil(
+     maxVal * (1 + yHeadroomRatio)
+   );
+
   /* ---------------------------
      LAYOUT
      --------------------------- */
@@ -895,7 +901,7 @@ function renderMonthlyChart(rows, businessDays) {
   for (let i = 0; i <= steps; i++) {
     const y = padding + (h / steps) * i;
     const val = Math.round(
-      maxVal - (maxVal / steps) * i
+      scaledMaxVal - (scaledMaxVal / steps) * i
     );
 
     ctx.strokeStyle = "#2a2f3a";
@@ -1020,7 +1026,7 @@ function renderMonthlyChart(rows, businessDays) {
         const y =
           cssHeight -
           padding -
-          (v / maxVal) * h;
+          (v / scaledMaxVal) * h;
       
         if (i === 0 || s.values[i - 1] === null) {
           ctx.moveTo(x, y);
@@ -1042,7 +1048,7 @@ function renderMonthlyChart(rows, businessDays) {
          const y =
            cssHeight -
            padding -
-           (v / maxVal) * h;
+           (v / scaledMaxVal) * h;
          
          ctx.fillStyle = colors[s.label];
       
@@ -1068,6 +1074,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

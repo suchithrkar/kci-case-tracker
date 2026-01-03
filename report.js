@@ -863,6 +863,10 @@ function renderMonthlyChart(rows, businessDays) {
      X LABELS (DAYS)
      --------------------------- */
 
+   // ---- DAY LABELS ----
+   ctx.font = "12px system-ui";
+   ctx.fillStyle = "#9aa4b2";
+   
    businessDays.forEach((d, i) => {
      const x =
        padding +
@@ -873,24 +877,22 @@ function renderMonthlyChart(rows, businessDays) {
        x - 6,
        cssHeight - padding + 20
      );
-
-      ctx.font = "12px system-ui";
-      ctx.fillStyle = "#9aa4b2";
-      
-      chartWeeks.forEach(wk => {
-        const mid =
-          (wk.startIndex + wk.endIndex) / 2;
-      
-        const x =
-          padding +
-          (mid / (businessDays.length - 1)) * w;
-      
-        ctx.fillText(
-          `Week ${wk.week}`,
-          x - 18,
-          cssHeight - padding + 38
-        );
-      });
+   });
+   
+   // ---- WEEK LABELS ----
+   chartWeeks.forEach(wk => {
+     const mid =
+       (wk.startIndex + wk.endIndex) / 2;
+   
+     const x =
+       padding +
+       (mid / (businessDays.length - 1)) * w;
+   
+     ctx.fillText(
+       `Week ${wk.week}`,
+       x - 18,
+       cssHeight - padding + 38
+     );
    });
 
   /* ---------------------------
@@ -960,6 +962,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

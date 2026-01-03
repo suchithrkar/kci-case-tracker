@@ -201,6 +201,15 @@ export const trackerState = {
 /* Map UID → Full Name for Excel export */
 const userNameMap = {};
 
+/* =========================================================
+   USER NAME CACHE (PHASE 1)
+   ========================================================= */
+
+const USER_CACHE_VERSION = 1;
+
+function getUserCacheKey(teamId) {
+  return `kci_user_map_v${USER_CACHE_VERSION}_${teamId}`;
+}
 
 /* =======================================================================
    UI STATE (CLEAN REBUILD)
@@ -359,18 +368,38 @@ if (trackerState.teamId) {
 
 
 /* Load UID → Full Name map (SAFE per team) */
-const qUsers = query(
-  collection(db, "users"),
-  where("teamId", "==", trackerState.teamId)
-);
+/* ------------------------------------------------------------------
+   LOAD USER NAME MAP (CACHED — PHASE 1)
+   ------------------------------------------------------------------ */
 
-const usersSnap = await getDocs(qUsers);
-usersSnap.forEach(d => {
-  const u = d.data();
-  userNameMap[d.id] = `${u.firstName} ${u.lastName}`;
-});
+const cacheKey = getUserCacheKey(trackerState.teamId);
+const cached = localStorage.getItem(cacheKey);
 
-/* Always add current user's own name (allowed by rules) */
+if (cached) {
+  try {
+    Object.assign(userNameMap, JSON.parse(cached));
+  } catch {
+    localStorage.removeItem(cacheKey);
+  }
+}
+
+if (Object.keys(userNameMap).length === 0) {
+  const qUsers = query(
+    collection(db, "users"),
+    where("teamId", "==", trackerState.teamId)
+  );
+
+  const usersSnap = await getDocs(qUsers);
+
+  usersSnap.forEach(d => {
+    const u = d.data();
+    userNameMap[d.id] = `${u.firstName} ${u.lastName}`;
+  });
+
+  localStorage.setItem(cacheKey, JSON.stringify(userNameMap));
+}
+
+/* Always ensure current user is present */
 userNameMap[trackerState.user.uid] =
   `${trackerState.user.firstName} ${trackerState.user.lastName}`;
 
@@ -2531,20 +2560,14 @@ if (btnClosureClose) {
    LAST ACTIONED BY NAME LOOKUP
    ======================================================================= */
 
-async function loadLastActionedByName(uid) {
+function loadLastActionedByName(uid) {
   if (!uid) {
     optLastActionedByName.textContent = "—";
-    optLastActionedByName.style.opacity = 1;
     return;
   }
 
-  const snap = await getDoc(doc(db, "users", uid));
-  if (snap.exists()) {
-    const u = snap.data();
-    optLastActionedByName.textContent = `${u.firstName} ${u.lastName}`;
-  } else {
-    optLastActionedByName.textContent = "Unknown";
-  }
+  optLastActionedByName.textContent =
+    userNameMap[uid] || "Unknown";
 }
 
 /* =======================================================================
@@ -3334,6 +3357,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -63,6 +63,7 @@ const el = {
     .querySelector("tbody"),
 
   monthlyBlock: document.getElementById("monthlyReportBlock"),
+  monthlyChartWrap: document.querySelector("#monthlyReportBlock .chart-wrap"),
 
   reportViewSelect: document.getElementById("reportViewSelect"),
 };
@@ -499,6 +500,14 @@ function setupReportTabs() {
 
       // re-render content
       updateView();
+      
+      // ⬇️ Auto-scroll to chart (after DOM updates)
+      setTimeout(() => {
+        el.monthlyChartWrap?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }, 100);
     });
   });
 }
@@ -986,5 +995,6 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 

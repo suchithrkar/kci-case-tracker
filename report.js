@@ -714,6 +714,19 @@ function renderMonthlyTable() {
   renderMonthlyChart(rows, businessDays);
 }
 
+function getNiceStep(maxValue, steps) {
+  const roughStep = maxValue / steps;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+  const residual = roughStep / magnitude;
+
+  let niceResidual;
+  if (residual >= 5) niceResidual = 5;
+  else if (residual >= 2) niceResidual = 2;
+  else niceResidual = 1;
+
+  return niceResidual * magnitude;
+}
+
 /* =========================================================
    LINE CHART (CANVAS)
    ========================================================= */
@@ -824,9 +837,15 @@ function renderMonthlyChart(rows, businessDays) {
 
    // Add headroom above highest value (Y-axis breathing space)
    const yHeadroomRatio = 0.1; // 10% extra space
-   const scaledMaxVal = Math.ceil(
-     maxVal * (1 + yHeadroomRatio)
-   );
+   const rawMaxVal = maxVal * (1 + yHeadroomRatio);
+   
+   // Calculate nice Y-axis step
+   const steps = 5;
+   const niceStep = getNiceStep(rawMaxVal, steps);
+   
+   // Round top value to clean multiple
+   const scaledMaxVal =
+     Math.ceil(rawMaxVal / niceStep) * niceStep;
 
   /* ---------------------------
      LAYOUT
@@ -897,12 +916,9 @@ function renderMonthlyChart(rows, businessDays) {
   ctx.font = "12px system-ui";
   ctx.fillStyle = "#9aa4b2";
 
-  const steps = 5;
-  for (let i = 0; i <= steps; i++) {
-    const y = padding + (h / steps) * i;
-    const val = Math.round(
-      scaledMaxVal - (scaledMaxVal / steps) * i
-    );
+   for (let i = 0; i <= steps; i++) {
+     const y = padding + (h / steps) * i;
+     const val = scaledMaxVal - niceStep * i;
 
     ctx.strokeStyle = "#2a2f3a";
     ctx.beginPath();
@@ -1074,6 +1090,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

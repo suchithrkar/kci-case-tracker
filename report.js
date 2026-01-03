@@ -693,32 +693,34 @@ function renderMonthlyChart(rows, businessDays) {
   let maxVal = 0;
 
   const series = rows.map(r => {
-    const values = Array.from({ length: days }, (_, i) => {
-      const day = String(i + 1).padStart(2, "0");
-      const d =
-        reportState.dailyReports[`${monthKey}-${day}`] || null;
-
-      let field;
-      if (r.key === "Total") {
-        field = metric === "totalOpen"
-          ? "totalOpen"
-          : `${metric}Total`;
-      } else {
-        field = `${metric}${r.key}`;
-      }
-
-      const v =
-        d && typeof d[field] === "number"
-          ? d[field]
-          : null;
-      if (v !== null) {
-        maxVal = Math.max(maxVal, v);
-      }
-      return v;
-    });
-
-    return { label: r.key, values };
-  });
+     const values = businessDays.map(d => {
+       const dayData =
+         reportState.dailyReports[d.iso] || null;
+   
+       let field;
+       if (r.key === "Total") {
+         field =
+           metric === "totalOpen"
+             ? "totalOpen"
+             : `${metric}Total`;
+       } else {
+         field = `${metric}${r.key}`;
+       }
+   
+       const v =
+         dayData && typeof dayData[field] === "number"
+           ? dayData[field]
+           : null;
+   
+       if (v !== null) {
+         maxVal = Math.max(maxVal, v);
+       }
+   
+       return v;
+     });
+   
+     return { label: r.key, values };
+   });
 
    /* ---------------------------
    CHART LEGEND
@@ -793,15 +795,16 @@ function renderMonthlyChart(rows, businessDays) {
      X LABELS (DAYS)
      --------------------------- */
 
-   Array.from({ length: days }, (_, i) => {
+   businessDays.forEach((d, i) => {
      const x =
-       padding + (i / (days - 1)) * w;
+       padding +
+       (i / (businessDays.length - 1)) * w;
    
-      ctx.fillText(
-        i + 1,
-        x - 6,
-        cssHeight - padding + 20
-      );
+     ctx.fillText(
+       String(d.day),
+       x - 6,
+       cssHeight - padding + 20
+     );
    });
 
   /* ---------------------------
@@ -815,7 +818,7 @@ function renderMonthlyChart(rows, businessDays) {
 
       s.values.forEach((v, i) => {
         const x =
-          padding + (i / (days - 1)) * w;
+          padding + (i / (businessDays.length - 1)) * w;
       
         if (v === null) {
           // break the line — do NOT draw
@@ -839,7 +842,7 @@ function renderMonthlyChart(rows, businessDays) {
     // points
     s.values.forEach((v, i) => {
       const x =
-        padding + (i / (days - 1)) * w;
+        padding + (i / (businessDays.length - 1)) * w;
          if (v === null) return;
          
          const y =
@@ -871,6 +874,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

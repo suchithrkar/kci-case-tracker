@@ -801,6 +801,32 @@ function renderMonthlyChart(rows, businessDays) {
      }
    });
 
+   // ---- COMPUTE WEEK DIVIDER X POSITIONS ----
+   const weekDividerXs = [];
+   
+   // Leftmost divider (full edge)
+   weekDividerXs.push(padding);
+   
+   // Mid dividers
+   for (let i = 1; i < chartWeeks.length; i++) {
+     const prev = chartWeeks[i - 1];
+     const curr = chartWeeks[i];
+   
+     const midIndex =
+       (prev.endIndex + curr.startIndex) / 2;
+   
+     const x =
+       padding +
+       xInset +
+       (midIndex / (businessDays.length - 1)) *
+         plotW;
+   
+     weekDividerXs.push(x);
+   }
+   
+   // Rightmost divider (full edge)
+   weekDividerXs.push(cssWidth - padding);
+   
    /* ---------------------------
    CHART LEGEND
    --------------------------- */
@@ -962,32 +988,6 @@ function renderMonthlyChart(rows, businessDays) {
      ctx.stroke();
    }
 
-   // ---- COMPUTE WEEK DIVIDER X POSITIONS ----
-   const weekDividerXs = [];
-   
-   // Leftmost divider (full edge)
-   weekDividerXs.push(padding);
-   
-   // Mid dividers
-   for (let i = 1; i < chartWeeks.length; i++) {
-     const prev = chartWeeks[i - 1];
-     const curr = chartWeeks[i];
-   
-     const midIndex =
-       (prev.endIndex + curr.startIndex) / 2;
-   
-     const x =
-       padding +
-       xInset +
-       (midIndex / (businessDays.length - 1)) *
-         plotW;
-   
-     weekDividerXs.push(x);
-   }
-   
-   // Rightmost divider (full edge)
-   weekDividerXs.push(cssWidth - padding);
-
   /* ---------------------------
      LINES + POINTS
      --------------------------- */
@@ -1059,6 +1059,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

@@ -830,11 +830,20 @@ function renderMonthlyChart(rows, businessDays) {
    const w = cssWidth - padding * 2;
    const h = cssHeight - padding * 2;
 
-   // Horizontal inset so chart does not touch edges
-   const xInset = 20;
+   // Effective drawable width (full width initially)
+   let plotW = w;
    
-   // Effective drawable width after inset
-   const plotW = w - xInset * 2;
+   // Distance between adjacent dates
+   const step =
+     businessDays.length > 1
+       ? plotW / (businessDays.length - 1)
+       : plotW;
+   
+   // Dynamic inset = half step
+   const xInset = step / 2;
+   
+   // Final drawable width after inset
+   plotW = w - xInset * 2;
 
    // ---- COMPUTE WEEK DIVIDER X POSITIONS ----
    const weekDividerXs = [];
@@ -1059,6 +1068,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

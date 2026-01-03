@@ -840,14 +840,10 @@ function renderMonthlyChart(rows, businessDays) {
    const rawMaxVal = maxVal * (1 + yHeadroomRatio);
    
    // Calculate nice Y-axis step
-   const niceStep = getNiceStep(rawMaxVal, 5);
-   
-   // Round top value to clean multiple
+   const steps = 5;
+   const niceStep = getNiceStep(rawMaxVal, steps);
    const scaledMaxVal =
      Math.ceil(rawMaxVal / niceStep) * niceStep;
-   
-   // Number of grid steps derived from rounded range
-   const steps = Math.round(scaledMaxVal / niceStep);
 
   /* ---------------------------
      LAYOUT
@@ -1092,6 +1088,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

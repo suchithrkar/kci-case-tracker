@@ -830,6 +830,12 @@ function renderMonthlyChart(rows, businessDays) {
    const w = cssWidth - padding * 2;
    const h = cssHeight - padding * 2;
 
+   // Horizontal inset so chart does not touch edges
+   const xInset = 20;
+   
+   // Effective drawable width after inset
+   const plotW = w - xInset * 2;
+
   /* ---------------------------
      AXES
      --------------------------- */
@@ -840,7 +846,7 @@ function renderMonthlyChart(rows, businessDays) {
    ctx.beginPath();
    ctx.moveTo(padding, padding);
    ctx.lineTo(padding, cssHeight - padding);
-   ctx.lineTo(cssWidth - padding, cssHeight - padding);
+   ctx.lineTo(padding + xInset + plotW, cssHeight - padding);
    ctx.stroke();
 
   /* ---------------------------
@@ -860,7 +866,7 @@ function renderMonthlyChart(rows, businessDays) {
     ctx.strokeStyle = "#2a2f3a";
     ctx.beginPath();
     ctx.moveTo(padding, y);
-    ctx.lineTo(cssWidth - padding, y);
+    ctx.lineTo(padding + xInset + plotW, y);
     ctx.stroke();
 
     ctx.fillText(
@@ -879,9 +885,10 @@ function renderMonthlyChart(rows, businessDays) {
    ctx.fillStyle = "#9aa4b2";
    
    businessDays.forEach((d, i) => {
-     const x =
-       padding +
-       (i / (businessDays.length - 1)) * w;
+   const x =
+     padding +
+     xInset +
+     (i / (businessDays.length - 1)) * plotW;
    
      ctx.fillText(
        String(d.day),
@@ -938,8 +945,10 @@ function renderMonthlyChart(rows, businessDays) {
     ctx.beginPath();
 
       s.values.forEach((v, i) => {
-        const x =
-          padding + (i / (businessDays.length - 1)) * w;
+      const x =
+        padding +
+        xInset +
+        (i / (businessDays.length - 1)) * plotW;
       
         if (v === null) {
           // break the line — do NOT draw
@@ -963,7 +972,9 @@ function renderMonthlyChart(rows, businessDays) {
     // points
     s.values.forEach((v, i) => {
       const x =
-        padding + (i / (businessDays.length - 1)) * w;
+        padding +
+        xInset +
+        (i / (businessDays.length - 1)) * plotW;
          if (v === null) return;
          
          const y =
@@ -995,6 +1006,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

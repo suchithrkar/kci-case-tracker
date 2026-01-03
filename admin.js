@@ -920,18 +920,13 @@ async function generateDailyRepairReport({
      todayISO
    );
 
-   let reportWritten = false;
-
-   await runTransaction(db, async (tx) => {
+   const reportWritten = await runTransaction(db, async (tx) => {
      const snap = await tx.get(reportRef);
    
-     // 🔒 Guard: prevent duplicate report for same day
-     if (snap.exists()) {
-       const data = snap.data();
-       if (data.generatedBy === generatedBy) {
-         console.warn("Daily report already written for today:", todayISO);
-         return;
-       }
+     // Guard: already generated
+     if (snap.exists() && snap.data().generatedBy === generatedBy) {
+       console.warn("Daily report already written for today:", todayISO);
+       return false;
      }
    
      tx.set(
@@ -979,8 +974,7 @@ async function generateDailyRepairReport({
        { merge: true }
      );
    
-     // ✅ Mark success ONLY if tx.set ran
-     reportWritten = true;
+     return true; // ✅ commit intent
    });
    
    if (reportWritten) {
@@ -2881,6 +2875,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

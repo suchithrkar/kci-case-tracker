@@ -218,23 +218,19 @@
   }
   
   /* First column (Type) */
-  .monthly-table th:first-child,
+  /* Monthly table — Type column ONLY */
+  .monthly-table th.type-col,
   .monthly-table td:first-child {
     width: 100px;
     text-align: left;
     padding-left: 0.75rem;
+    border-right: 2px solid var(--border);
   }
   
   /* All day columns — equal width */
   .monthly-table th:not(:first-child),
   .monthly-table td:not(:first-child) {
     width: calc((100% - 120px) / 31);
-  }
-
-  /* Monthly table — Type column right divider */
-  .monthly-table th:first-child,
-  .monthly-table td:first-child {
-    border-right: 2px solid var(--border);
   }
   
   thead th{
@@ -592,6 +588,7 @@
 </body>
 
 </html>
+
 
 
 

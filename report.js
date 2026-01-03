@@ -535,6 +535,35 @@ function getDaysInMonth(monthKey) {
   return new Date(y, m, 0).getDate();
 }
 
+function getBusinessDaysOfMonth(monthKey, timezone) {
+  const [y, m] = monthKey.split("-").map(Number);
+  const daysInMonth = new Date(y, m, 0).getDate();
+
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone,
+    weekday: "short"
+  });
+
+  const result = [];
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${monthKey}-${String(d).padStart(2, "0")}`;
+    const dateObj = new Date(`${iso}T00:00:00Z`);
+    const weekday = formatter.format(dateObj);
+
+    if (weekday === "Sat" || weekday === "Sun") continue;
+
+    result.push({
+      day: d,
+      iso,
+      weekday,
+      isWeekStart: weekday === "Mon"
+    });
+  }
+
+  return result;
+}
+
 function zeroDay() {
   return {
     totalOpenOnsite: 0,
@@ -565,17 +594,25 @@ function renderMonthlyTable() {
 
   const metric = reportState.activeMetric;
   const monthKey = reportState.currentMonth;
-  const days = getDaysInMonth(monthKey);
+   const timezone =
+     reportState.teamId === "TOTAL"
+       ? "UTC"
+       : reportState.teamConfig?.resetTimezone || "UTC";
+   
+   const businessDays =
+     getBusinessDaysOfMonth(monthKey, timezone);
 
   // ---------- HEADER ----------
-  thead.innerHTML = `
-    <tr>
-      <th>Type</th>
-      ${Array.from({ length: days }, (_, i) =>
-        `<th>${String(i + 1).padStart(2, "0")}</th>`
-      ).join("")}
-    </tr>
-  `;
+   thead.innerHTML = `
+     <tr>
+       <th>Type</th>
+       ${businessDays.map(d => `
+         <th class="${d.isWeekStart ? "week-start" : ""}">
+           ${String(d.day).padStart(2, "0")}
+         </th>
+       `).join("")}
+     </tr>
+   `;
 
   // ---------- DATA MAPPING ----------
   const rows = [
@@ -589,38 +626,39 @@ function renderMonthlyTable() {
     return `
       <tr>
         <td><strong>${r.label}</strong></td>
-        ${Array.from({ length: days }, (_, i) => {
-          const day = String(i + 1).padStart(2, "0");
-          const dateKey = `${monthKey}-${day}`;
-          const d =
-            reportState.dailyReports[dateKey] || zeroDay();
-
-            let field;
-            
-            if (r.key === "Total") {
-              if (metric === "totalOpen") {
-                field = "totalOpen";
-              } else {
-                field = `${metric}Total`;
-              }
-            } else {
-              field = `${metric}${r.key}`;
-            }
-            
-            return `<td>${d[field] || 0}</td>`;
-        }).join("")}
+        ${businessDays.map(d => {
+           const dateKey = d.iso;
+           const data =
+             reportState.dailyReports[dateKey] || zeroDay();
+         
+           let field;
+           if (r.key === "Total") {
+             field =
+               metric === "totalOpen"
+                 ? "totalOpen"
+                 : `${metric}Total`;
+           } else {
+             field = `${metric}${r.key}`;
+           }
+         
+           return `
+             <td class="${d.isWeekStart ? "week-start" : ""}">
+               ${data[field] || 0}
+             </td>
+           `;
+         }).join("")}
       </tr>
     `;
   }).join("");
 
-  renderMonthlyChart(rows, days);
+  renderMonthlyChart(rows, businessDays);
 }
 
 /* =========================================================
    LINE CHART (CANVAS)
    ========================================================= */
 
-function renderMonthlyChart(rows, days) {
+function renderMonthlyChart(rows, businessDays) {
   const canvas = document.getElementById("monthlyLineChart");
   const ctx = canvas.getContext("2d");
 
@@ -833,6 +871,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

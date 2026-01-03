@@ -866,7 +866,7 @@ function renderMonthlyChart(rows, businessDays) {
     ctx.strokeStyle = "#2a2f3a";
     ctx.beginPath();
     ctx.moveTo(padding, y);
-    ctx.lineTo(padding + xInset + plotW, y);
+    ctx.lineTo(cssWidth - padding, y);
     ctx.stroke();
 
     ctx.fillText(
@@ -918,21 +918,59 @@ function renderMonthlyChart(rows, businessDays) {
    ctx.strokeStyle = "#2a2f3a";
    ctx.lineWidth = 1;
    
+   // ---- WEEK LABEL DIVIDERS (X-AXIS ONLY, FULL SET) ----
+   ctx.strokeStyle = "#2a2f3a";
+   ctx.lineWidth = 1;
+   
+   // Divider BEFORE first week
+   {
+     const x =
+       padding +
+       xInset +
+       (chartWeeks[0].startIndex /
+         (businessDays.length - 1)) *
+         plotW;
+   
+     ctx.beginPath();
+     ctx.moveTo(x, cssHeight - padding);
+     ctx.lineTo(x, cssHeight - padding + 48);
+     ctx.stroke();
+   }
+   
+   // Dividers BETWEEN weeks
    for (let i = 1; i < chartWeeks.length; i++) {
      const prev = chartWeeks[i - 1];
      const curr = chartWeeks[i];
    
-     // midpoint between last day of previous week and first day of next week
      const midIndex =
        (prev.endIndex + curr.startIndex) / 2;
-
+   
      const x =
        padding +
        xInset +
-       (midIndex / (businessDays.length - 1)) * plotW;
+       (midIndex / (businessDays.length - 1)) *
+         plotW;
    
      ctx.beginPath();
-     ctx.moveTo(x, cssHeight - padding + 8);
+     ctx.moveTo(x, cssHeight - padding);
+     ctx.lineTo(x, cssHeight - padding + 48);
+     ctx.stroke();
+   }
+   
+   // Divider AFTER last week
+   {
+     const last =
+       chartWeeks[chartWeeks.length - 1];
+   
+     const x =
+       padding +
+       xInset +
+       (last.endIndex /
+         (businessDays.length - 1)) *
+         plotW;
+   
+     ctx.beginPath();
+     ctx.moveTo(x, cssHeight - padding);
      ctx.lineTo(x, cssHeight - padding + 48);
      ctx.stroke();
    }
@@ -1008,6 +1046,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

@@ -897,6 +897,24 @@ function renderMonthlyChart(rows, businessDays) {
      );
    });
 
+   // ---- WEEK DIVIDERS ----
+   ctx.strokeStyle = "#2a2f3a";
+   ctx.lineWidth = 1;
+   
+   chartWeeks.forEach(wk => {
+     // draw divider only if not the very first week
+     if (wk.startIndex === 0) return;
+   
+     const x =
+       padding +
+       (wk.startIndex / (businessDays.length - 1)) * w;
+   
+     ctx.beginPath();
+     ctx.moveTo(x, padding);
+     ctx.lineTo(x, cssHeight - padding);
+     ctx.stroke();
+   });
+
   /* ---------------------------
      LINES + POINTS
      --------------------------- */
@@ -964,36 +982,3 @@ async function updateView() {
   renderMonthlyTable();
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

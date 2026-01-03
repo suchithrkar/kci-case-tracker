@@ -51,6 +51,7 @@ const el = {
   btnTheme: document.getElementById("btnTheme"),
   btnAdmin: document.getElementById("btnAdmin"),
   btnLogout: document.getElementById("btnLogout"),
+  btnTracker: document.getElementById("btnTracker"),
 
   distributionTable: document
     .getElementById("distributionTable")
@@ -187,11 +188,13 @@ function initHeader(user) {
       user.theme === "dark" ? "☀️" : "🌙";
   };
 
-  el.btnAdmin.style.display = "inline-block";
-  el.btnAdmin.onclick = () => (location.href = "admin.html");
-
-  el.btnLogout.onclick = () =>
-    auth.signOut().then(() => (location.href = "login.html"));
+   el.btnAdmin.style.display = "inline-block";
+   el.btnAdmin.onclick = () => (location.href = "admin.html");
+   
+   el.btnTracker.onclick = () => (location.href = "index.html");
+   
+   el.btnLogout.onclick = () =>
+     auth.signOut().then(() => (location.href = "login.html"));
 }
 
 /* =========================================================
@@ -830,6 +833,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

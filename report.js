@@ -976,10 +976,6 @@ function renderMonthlyChart(rows, businessDays) {
        cssHeight - padding + 38
      );
    });
-
-   // ---- WEEK LABEL DIVIDERS (X-AXIS ONLY, MIDPOINT) ----
-   ctx.strokeStyle = "#2a2f3a";
-   ctx.lineWidth = 1;
    
    // ---- WEEK LABEL DIVIDERS (X-AXIS ONLY, FULL SET) ----
    ctx.strokeStyle = "#2a2f3a";
@@ -1096,6 +1092,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

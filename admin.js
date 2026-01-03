@@ -619,6 +619,13 @@ $("btnPreviewCancel").onclick = () => {
 
 
 $("btnConfirmImport").onclick = async () => {
+  if (processing) {
+    showPopup("Update already in progress. Please wait.");
+    return;
+  }
+
+  processing = true;
+
   const d = excelState.diff;
 
   // Safety: deletions require checkbox
@@ -906,6 +913,14 @@ async function generateDailyRepairReport({
      todayISO
    );
 
+   const existingSnap = await getDoc(reportRef);
+   
+   // 🔒 Guard: prevent duplicate generation in same session
+   if (existingSnap.exists() && existingSnap.data().generatedBy === generatedBy) {
+     console.warn("Daily report already written for today:", todayISO);
+     return;
+   }
+
   await setDoc(
     reportRef,
     {
@@ -953,6 +968,7 @@ async function generateDailyRepairReport({
   );
 
   await cleanupDailyReports(teamId, todayISO);
+  showPopup(`Daily repair report generated for ${todayISO}`);
 }
 
 /* ============================================================
@@ -2847,6 +2863,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

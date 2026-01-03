@@ -634,7 +634,7 @@ function renderMonthlyTable() {
    thead.innerHTML = `
      <!-- WEEK NUMBER ROW -->
      <tr>
-       <th rowspan="3">Type</th>
+       <th rowspan="3" class="type-col">Type</th>
          ${weeks.map(w =>
            `<th colspan="${w.days.length}" class="week-group">
               Week ${w.week}
@@ -964,6 +964,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

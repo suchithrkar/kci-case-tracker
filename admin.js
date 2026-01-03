@@ -687,101 +687,108 @@ async function applyExcelChanges() {
     updateProgress(`${label}: ✔ completed (${processed})`);
   }
 
-  // ======================================================
-  // NEW CASES → setDoc
-  // ======================================================
-  updateProgress("\nCreating NEW cases...");
-  await runBatches(
-  newCases.map(ex =>
-    setDoc(doc(db, "cases", ex.id), {
-      id: ex.id,
-      teamId: excelState.teamId,
-
-      excelOrder: ex.excelOrder, 
-
-      customerName: ex.customerName,
-      createdOn: ex.createdOn,
-      createdBy: ex.createdBy,
-      country: ex.country,
-      caseResolutionCode: ex.caseResolutionCode,
-      caseOwner: ex.caseOwner,
-      otcCode: ex.otcCode,
-      caGroup: ex.caGroup,
-      tl: ex.tl,
-      sbd: ex.sbd,
-      onsiteRFC: ex.onsiteRFC,
-      csrRFC: ex.csrRFC,
-      benchRFC: ex.benchRFC,
-      market: ex.market,
-
-      // default fields
-      status: "",
-      followDate: "",
-      followTime: "",                 // ✅ NEW
-      flagged: false,
-      pns: false,                     // ✅ NEW
-      surveyPrediction: "",           // ✅ NEW
-      predictionComment: "",          // ✅ NEW
-      notes: "",
-      lastActionedOn: "",
-      lastActionedBy: "",
-      statusChangedOn: "",
-      statusChangedBy: ""
-    })
-  ),
-  "New"
-);
-
-
-  // ======================================================
-  // UPDATED CASES → updateDoc (only changed fields)
-  // ======================================================
-  updateProgress("\nUpdating existing cases...");
-
-  await runBatches(
-  updated.map(ex => {
-     const existing = excelState.firestoreCases.find(c => c.id === ex.id);
-     const overwrite = $("overwriteUserActions")?.checked;
+  try {
+     // ======================================================
+     // NEW CASES → setDoc
+     // ======================================================
+     updateProgress("\nCreating NEW cases...");
+     await runBatches(
+     newCases.map(ex =>
+       setDoc(doc(db, "cases", ex.id), {
+         id: ex.id,
+         teamId: excelState.teamId,
    
-     let data = { ...ex, teamId: excelState.teamId };
+         excelOrder: ex.excelOrder, 
    
-     if (!overwrite && existing) {
-       const preserve = [
-         "status",
-         "followDate",
-         "followTime",
-         "flagged",
-         "notes",
-         "pns",
-         "surveyPrediction",
-         "predictionComment",
-         "lastActionedOn",
-         "lastActionedBy",
-         "statusChangedOn",
-         "statusChangedBy"
-       ];
+         customerName: ex.customerName,
+         createdOn: ex.createdOn,
+         createdBy: ex.createdBy,
+         country: ex.country,
+         caseResolutionCode: ex.caseResolutionCode,
+         caseOwner: ex.caseOwner,
+         otcCode: ex.otcCode,
+         caGroup: ex.caGroup,
+         tl: ex.tl,
+         sbd: ex.sbd,
+         onsiteRFC: ex.onsiteRFC,
+         csrRFC: ex.csrRFC,
+         benchRFC: ex.benchRFC,
+         market: ex.market,
    
-       preserve.forEach(f => {
-         if (existing[f] !== undefined) data[f] = existing[f];
-       });
+         // default fields
+         status: "",
+         followDate: "",
+         followTime: "",                 // ✅ NEW
+         flagged: false,
+         pns: false,                     // ✅ NEW
+         surveyPrediction: "",           // ✅ NEW
+         predictionComment: "",          // ✅ NEW
+         notes: "",
+         lastActionedOn: "",
+         lastActionedBy: "",
+         statusChangedOn: "",
+         statusChangedBy: ""
+       })
+     ),
+     "New"
+   );
+   
+   
+     // ======================================================
+     // UPDATED CASES → updateDoc (only changed fields)
+     // ======================================================
+     updateProgress("\nUpdating existing cases...");
+   
+     await runBatches(
+     updated.map(ex => {
+        const existing = excelState.firestoreCases.find(c => c.id === ex.id);
+        const overwrite = $("overwriteUserActions")?.checked;
+      
+        let data = { ...ex, teamId: excelState.teamId };
+      
+        if (!overwrite && existing) {
+          const preserve = [
+            "status",
+            "followDate",
+            "followTime",
+            "flagged",
+            "notes",
+            "pns",
+            "surveyPrediction",
+            "predictionComment",
+            "lastActionedOn",
+            "lastActionedBy",
+            "statusChangedOn",
+            "statusChangedBy"
+          ];
+      
+          preserve.forEach(f => {
+            if (existing[f] !== undefined) data[f] = existing[f];
+          });
+        }
+      
+        return setDoc(doc(db, "cases", ex.id), data);
+      }),
+     "Updated"
+   );
+   
+   
+     // ======================================================
+     // DELETED CASES → deleteDoc
+     // ======================================================
+     if (deleted.length > 0) {
+       updateProgress("\nDeleting missing cases...");
+       await runBatches(
+         deleted.map(c => deleteDoc(doc(db, "cases", c.id))),
+         "Deleted"
+       );
      }
-   
-     return setDoc(doc(db, "cases", ex.id), data);
-   }),
-  "Updated"
-);
-
-
-  // ======================================================
-  // DELETED CASES → deleteDoc
-  // ======================================================
-  if (deleted.length > 0) {
-    updateProgress("\nDeleting missing cases...");
-    await runBatches(
-      deleted.map(c => deleteDoc(doc(db, "cases", c.id))),
-      "Deleted"
-    );
-  }
+   } catch (err) {
+     console.error("Case update failed:", err);
+     showPopup("❌ Case update failed. Report was NOT generated.");
+     processing = false;
+     return; // ⛔ STOP HERE
+   }
 
   // ======================================================
   // SUMMARY
@@ -2863,6 +2870,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

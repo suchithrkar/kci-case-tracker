@@ -919,21 +919,25 @@ function renderMonthlyChart(rows, businessDays) {
   ctx.fillStyle = "#9aa4b2";
 
    for (let i = 0; i <= steps; i++) {
+   
+     // ❌ Skip every alternate grid line (remove 2nd, 4th, etc.)
+     if (i % 2 !== 0) continue;
+   
      const y = padding + (h / steps) * i;
      const val = scaledMaxVal - niceStep * i;
-
-    ctx.strokeStyle = "#2a2f3a";
-    ctx.beginPath();
-    ctx.moveTo(padding, y);
-    ctx.lineTo(cssWidth - padding, y);
-    ctx.stroke();
-
-    ctx.fillText(
-      val,
-      padding - 40,
-      y + 4
-    );
-  }
+   
+     ctx.strokeStyle = "#2a2f3a";
+     ctx.beginPath();
+     ctx.moveTo(padding, y);
+     ctx.lineTo(cssWidth - padding, y);
+     ctx.stroke();
+   
+     ctx.fillText(
+       val,
+       padding - 40,
+       y + 4
+     );
+   }
 
   /* ---------------------------
      X LABELS (DAYS)
@@ -1092,6 +1096,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

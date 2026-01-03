@@ -897,15 +897,15 @@ function renderMonthlyChart(rows, businessDays) {
      );
    });
    
-   // ---- WEEK LABELS ----
-   chartWeeks.forEach(wk => {
-     const mid =
-       (wk.startIndex + wk.endIndex) / 2;
+   // ---- WEEK LABELS (CENTERED BETWEEN DIVIDERS) ----
+   ctx.font = "12px system-ui";
+   ctx.fillStyle = "#9aa4b2";
    
-     const x =
-       padding +
-       xInset +
-       (mid / (businessDays.length - 1)) * plotW;
+   chartWeeks.forEach((wk, i) => {
+     const leftX = weekDividerXs[i];
+     const rightX = weekDividerXs[i + 1];
+   
+     const x = (leftX + rightX) / 2;
    
      ctx.fillText(
        `Week ${wk.week}`,
@@ -961,6 +961,32 @@ function renderMonthlyChart(rows, businessDays) {
      ctx.lineTo(x, cssHeight - padding + 48);
      ctx.stroke();
    }
+
+   // ---- COMPUTE WEEK DIVIDER X POSITIONS ----
+   const weekDividerXs = [];
+   
+   // Leftmost divider (full edge)
+   weekDividerXs.push(padding);
+   
+   // Mid dividers
+   for (let i = 1; i < chartWeeks.length; i++) {
+     const prev = chartWeeks[i - 1];
+     const curr = chartWeeks[i];
+   
+     const midIndex =
+       (prev.endIndex + curr.startIndex) / 2;
+   
+     const x =
+       padding +
+       xInset +
+       (midIndex / (businessDays.length - 1)) *
+         plotW;
+   
+     weekDividerXs.push(x);
+   }
+   
+   // Rightmost divider (full edge)
+   weekDividerXs.push(cssWidth - padding);
 
   /* ---------------------------
      LINES + POINTS
@@ -1033,6 +1059,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

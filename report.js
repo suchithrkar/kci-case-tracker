@@ -897,21 +897,22 @@ function renderMonthlyChart(rows, businessDays) {
      );
    });
 
-   // ---- WEEK DIVIDERS ----
+   // ---- WEEK LABEL DIVIDERS (X-AXIS ONLY) ----
    ctx.strokeStyle = "#2a2f3a";
    ctx.lineWidth = 1;
    
    chartWeeks.forEach(wk => {
-     // draw divider only if not the very first week
+     // skip first week
      if (wk.startIndex === 0) return;
    
      const x =
        padding +
        (wk.startIndex / (businessDays.length - 1)) * w;
    
+     // draw only in label area (below axis)
      ctx.beginPath();
-     ctx.moveTo(x, padding);
-     ctx.lineTo(x, cssHeight - padding);
+     ctx.moveTo(x, cssHeight - padding + 8);
+     ctx.lineTo(x, cssHeight - padding + 48);
      ctx.stroke();
    });
 
@@ -982,3 +983,4 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+

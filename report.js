@@ -922,14 +922,9 @@ function renderMonthlyChart(rows, businessDays) {
    ctx.strokeStyle = "#2a2f3a";
    ctx.lineWidth = 1;
    
-   // Divider BEFORE first week
+   // Divider BEFORE first week — FULL EDGE
    {
-     const x =
-       padding +
-       xInset +
-       (chartWeeks[0].startIndex /
-         (businessDays.length - 1)) *
-         plotW;
+     const x = padding; // full left edge
    
      ctx.beginPath();
      ctx.moveTo(x, cssHeight - padding);
@@ -957,17 +952,9 @@ function renderMonthlyChart(rows, businessDays) {
      ctx.stroke();
    }
    
-   // Divider AFTER last week
+   // Divider AFTER last week — FULL EDGE
    {
-     const last =
-       chartWeeks[chartWeeks.length - 1];
-   
-     const x =
-       padding +
-       xInset +
-       (last.endIndex /
-         (businessDays.length - 1)) *
-         plotW;
+     const x = cssWidth - padding; // full right edge
    
      ctx.beginPath();
      ctx.moveTo(x, cssHeight - padding);
@@ -1046,6 +1033,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

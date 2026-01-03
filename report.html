@@ -230,6 +230,12 @@
   .monthly-table td:not(:first-child) {
     width: calc((100% - 120px) / 31);
   }
+
+  /* Monthly table — Type column right divider */
+  .monthly-table th:first-child,
+  .monthly-table td:first-child {
+    border-right: 2px solid var(--border);
+  }
   
   thead th{
     background:var(--panel-2);
@@ -581,6 +587,7 @@
 </body>
 
 </html>
+
 
 
 

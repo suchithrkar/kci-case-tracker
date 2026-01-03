@@ -401,6 +401,34 @@ el.btnTheme.onclick = () => {
     el.btnAdmin.style.display = "none";
   }
 
+   /* =====================================================
+      RFC REPORT → VIEW DETAILED REPORT BUTTON (ADMINS ONLY)
+      ===================================================== */
+   
+   const btnViewDetailedReport =
+     document.getElementById("btnViewDetailedReport");
+   
+   if (btnViewDetailedReport) {
+     if (isPrimary(data) || isSecondary(data)) {
+       // Show for Primary & Secondary Admins
+       btnViewDetailedReport.style.display = "inline-block";
+   
+       btnViewDetailedReport.onclick = () => {
+         // Close the RFC modal first (clean UX)
+         document
+           .getElementById("rfcReportOverlay")
+           ?.classList.remove("show");
+   
+         // Redirect to full report page
+         window.location.href = "report.html";
+       };
+     } else {
+       // General users → completely hidden
+       btnViewDetailedReport.style.display = "none";
+       btnViewDetailedReport.disabled = true;
+     }
+   }
+
    // HIDE INFO BUTTON FOR SECONDARY USERS
 if (isSecondary(data)) {
   const infoBtn = document.getElementById("btnInfo");
@@ -3306,6 +3334,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

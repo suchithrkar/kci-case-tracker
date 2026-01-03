@@ -564,6 +564,18 @@ function getBusinessDaysOfMonth(monthKey, timezone) {
   return result;
 }
 
+function getWeekNumber(dateISO) {
+  const d = new Date(dateISO + "T00:00:00Z");
+  const jan4 = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+  const weekStart =
+    jan4.getTime() -
+    (jan4.getUTCDay() || 7) * 86400000;
+
+  return Math.ceil(
+    ((d.getTime() - weekStart) / 86400000 + 1) / 7
+  );
+}
+
 function zeroDay() {
   return {
     totalOpenOnsite: 0,
@@ -602,15 +614,52 @@ function renderMonthlyTable() {
    const businessDays =
      getBusinessDaysOfMonth(monthKey, timezone);
 
-  // ---------- HEADER ----------
+   // ---------- HEADER ----------
+   // ---- GROUP DAYS BY WEEK ----
+   const weeks = [];
+   let currentWeek = null;
+   
+   businessDays.forEach(d => {
+     const weekNo = getWeekNumber(d.iso);
+   
+     if (!currentWeek || currentWeek.week !== weekNo) {
+       currentWeek = { week: weekNo, days: [] };
+       weeks.push(currentWeek);
+     }
+   
+     currentWeek.days.push(d);
+   });
+   
+   // ---- HEADER HTML ----
    thead.innerHTML = `
+     <!-- WEEK NUMBER ROW -->
      <tr>
-       <th>Type</th>
-       ${businessDays.map(d => `
-         <th class="${d.isWeekStart ? "week-start" : ""}">
-           ${String(d.day).padStart(2, "0")}
-         </th>
-       `).join("")}
+       <th rowspan="3">Type</th>
+       ${weeks.map(w =>
+         `<th colspan="${w.days.length}">Week ${w.week}</th>`
+       ).join("")}
+     </tr>
+   
+     <!-- WEEKDAY ROW -->
+     <tr>
+       ${weeks.flatMap(w =>
+         w.days.map(d =>
+           `<th class="${d.isWeekStart ? "week-start" : ""}">
+             ${d.weekday}
+           </th>`
+         )
+       ).join("")}
+     </tr>
+   
+     <!-- DATE ROW -->
+     <tr>
+       ${weeks.flatMap(w =>
+         w.days.map(d =>
+           `<th class="${d.isWeekStart ? "week-start" : ""}">
+             ${String(d.day).padStart(2, "0")}
+           </th>`
+         )
+       ).join("")}
      </tr>
    `;
 
@@ -722,6 +771,25 @@ function renderMonthlyChart(rows, businessDays) {
      return { label: r.key, values };
    });
 
+   // ---- GROUP DAYS BY WEEK FOR X LABELS ----
+   const chartWeeks = [];
+   let currentWeek = null;
+   
+   businessDays.forEach((d, i) => {
+     const weekNo = getWeekNumber(d.iso);
+   
+     if (!currentWeek || currentWeek.week !== weekNo) {
+       currentWeek = {
+         week: weekNo,
+         startIndex: i,
+         endIndex: i
+       };
+       chartWeeks.push(currentWeek);
+     } else {
+       currentWeek.endIndex = i;
+     }
+   });
+
    /* ---------------------------
    CHART LEGEND
    --------------------------- */
@@ -805,6 +873,24 @@ function renderMonthlyChart(rows, businessDays) {
        x - 6,
        cssHeight - padding + 20
      );
+
+      ctx.font = "12px system-ui";
+      ctx.fillStyle = "#9aa4b2";
+      
+      chartWeeks.forEach(wk => {
+        const mid =
+          (wk.startIndex + wk.endIndex) / 2;
+      
+        const x =
+          padding +
+          (mid / (businessDays.length - 1)) * w;
+      
+        ctx.fillText(
+          `Week ${wk.week}`,
+          x - 18,
+          cssHeight - padding + 38
+        );
+      });
    });
 
   /* ---------------------------
@@ -874,6 +960,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

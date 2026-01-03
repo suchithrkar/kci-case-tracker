@@ -920,6 +920,8 @@ async function generateDailyRepairReport({
      todayISO
    );
 
+   let reportWritten = false;
+
    await runTransaction(db, async (tx) => {
      const snap = await tx.get(reportRef);
    
@@ -928,7 +930,7 @@ async function generateDailyRepairReport({
        const data = snap.data();
        if (data.generatedBy === generatedBy) {
          console.warn("Daily report already written for today:", todayISO);
-         return; // transaction exits cleanly
+         return;
        }
      }
    
@@ -971,16 +973,20 @@ async function generateDailyRepairReport({
    
          // TOTAL > 30 DAYS
          ca_gt_30_total: caAbove30Total,
-   
          generatedAt: new Date(),
          generatedBy
        },
-       { merge: true } // 🔑 preserves closedCount
+       { merge: true }
      );
+   
+     // ✅ Mark success ONLY if tx.set ran
+     reportWritten = true;
    });
-
-  await cleanupDailyReports(teamId, todayISO);
-  showPopup(`Daily repair report generated for ${todayISO}`);
+   
+   if (reportWritten) {
+     await cleanupDailyReports(teamId, todayISO);
+     showPopup(`Daily repair report generated for ${todayISO}`);
+   }
 }
 
 /* ============================================================
@@ -2875,6 +2881,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

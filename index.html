@@ -808,6 +808,12 @@ tr.active-row {
   border-bottom: 1px solid var(--border);
 }
 
+.rfc-report-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* spacing between buttons */
+}
+
 .rfc-report-title {
   font-weight: 700;
 }
@@ -1550,14 +1556,18 @@ tr.active-row {
 
     <div class="rfc-report-head">
       <div class="rfc-report-title">Repair Cases Report</div>
-        <!-- NEW: View Detailed Report (Admins only) -->
+    
+      <!-- RIGHT ACTIONS -->
+      <div class="rfc-report-actions">
         <button
           id="btnViewDetailedReport"
           class="hdr-btn"
-          style="display:none;margin-right:0.5rem;">
+          style="display:none;">
           View Detailed Report
         </button>
-      <button class="btn" id="btnRfcReportClose">Close</button>
+    
+        <button class="btn" id="btnRfcReportClose">Close</button>
+      </div>
     </div>
 
     <div class="rfc-report-body" id="rfcReportBody">
@@ -1684,6 +1694,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

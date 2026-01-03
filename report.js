@@ -635,9 +635,11 @@ function renderMonthlyTable() {
      <!-- WEEK NUMBER ROW -->
      <tr>
        <th rowspan="3">Type</th>
-       ${weeks.map(w =>
-         `<th colspan="${w.days.length}">Week ${w.week}</th>`
-       ).join("")}
+         ${weeks.map(w =>
+           `<th colspan="${w.days.length}" class="week-group">
+              Week ${w.week}
+            </th>`
+         ).join("")}
      </tr>
    
      <!-- WEEKDAY ROW -->
@@ -962,6 +964,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

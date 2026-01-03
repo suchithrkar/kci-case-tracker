@@ -653,7 +653,6 @@ $("btnConfirmImport").onclick = async () => {
 // MAIN ENGINE — APPLY EXCEL CHANGES (batch write + progress)
 // ======================================================
 async function applyExcelChanges() {
-   processing = true;
   const { new: newCases, updated, deleted } = excelState.diff;
 
   updateProgress(`Preparing to write data...`);
@@ -2870,6 +2869,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -551,6 +551,8 @@ let unsubscribe = null;
 
 function setupRealtimeCases(teamId) {
   if (unsubscribe) unsubscribe();
+      trackerState.allCases = [];     // 🔥 RESET MEMORY STATE
+      trackerState.filteredCases = [];
 
    /* =========================================================
       PHASE 3B — HYDRATE FROM INDEXEDDB (FAST LOAD)
@@ -646,10 +648,12 @@ function applySnapshotDiff(snapshot, teamId) {
 
     const idx = trackerState.allCases.findIndex(r => r.id === data.id);
 
-    if (change.type === "added") {
-      trackerState.allCases.push(data);
-      changed = true;
-    }
+   if (change.type === "added") {
+     if (idx === -1) {               // ✅ CRITICAL DEDUPE GUARD
+       trackerState.allCases.push(data);
+       changed = true;
+     }
+   }
 
     if (change.type === "modified" && idx !== -1) {
       trackerState.allCases[idx] = data;
@@ -3225,6 +3229,9 @@ async function saveModalData() {
   r.lastActionedOn = today;
   r.lastActionedBy = trackerState.user.uid;
 
+   // ✅ FORCE TABLE RE-RENDER WITH UPDATED DATA
+   applyFilters();
+
    // ✅ INSTANT MODAL UI UPDATE (OPTIMISTIC)
    optLastActioned.textContent = formatDMY(today);
    loadLastActionedByName(trackerState.user.uid);
@@ -3491,6 +3498,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

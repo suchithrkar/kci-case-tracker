@@ -2121,7 +2121,7 @@ if (uiState.unupdatedActive) {
   const previousStatus = row.status;
 
   // Update local state
-  //row.status = newStatus;
+  row.status = newStatus;
 
    if (needsFollow) {
      prevStatusBeforeModal = previousStatus;
@@ -2141,28 +2141,24 @@ if (uiState.unupdatedActive) {
    }
 
 
-
   // Normal statuses → update Firestore directly
-  // Normal statuses → update Firestore directly
-// Update Firestore, then remove pending lock for this case and refresh if needed
-firestoreUpdateCase(caseId, {
-  status: newStatus,
-  lastActionedOn: today,
-  lastActionedBy: trackerState.user.uid,
-  statusChangedOn: today,
-  statusChangedBy: trackerState.user.uid
-}).then(() => {
-  pendingUnupdated.delete(caseId);
-
-  applyFilters();
-}).catch(err => {
-  // On failure, remove pending and show popup (prevents permanent stuck case)
-  pendingUnupdated.delete(caseId);
-  showPopup("Failed to update case. Please try again.");
-  console.error(err);
-});
-
-
+   // Update Firestore, then remove pending lock for this case and refresh if needed
+   firestoreUpdateCase(caseId, {
+     status: newStatus,
+     lastActionedOn: today,
+     lastActionedBy: trackerState.user.uid,
+     statusChangedOn: today,
+     statusChangedBy: trackerState.user.uid
+   }).then(() => {
+     pendingUnupdated.delete(caseId);
+   
+     applyFilters();
+   }).catch(err => {
+     // On failure, remove pending and show popup (prevents permanent stuck case)
+     pendingUnupdated.delete(caseId);
+     showPopup("Failed to update case. Please try again.");
+     console.error(err);
+   });
 }
 
 // Status selector inside Case Options modal (reminder flow)
@@ -3353,6 +3349,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

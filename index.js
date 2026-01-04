@@ -10,6 +10,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  addDoc,
   query,
   where,
   onSnapshot,
@@ -2225,14 +2226,16 @@ async function handleClosedCaseArchival(caseId) {
   const teamId = caseData.teamId;
 
   // 3️⃣ Store full snapshot in history
-  await setDoc(
-    doc(db, "closedCasesHistory", caseId),
-    {
-      ...caseData,
-      teamId: caseData.teamId,
-      closedDate: todayISO
-    }
-  );
+   await addDoc(
+     collection(db, "closedCasesHistory"),
+     {
+       ...caseData,
+       teamId: caseData.teamId,
+       closedDate: todayISO,
+       archivedAt: new Date().toISOString(),
+       archivedBy: trackerState.user.uid
+     }
+   );
 
    // 5️⃣ Cleanup (admins only - rolling 4 months)
    if (trackerState.user.role === "primary") {
@@ -2301,7 +2304,14 @@ submitBtn.textContent = "Submit";
        todayISO
      );
    
-     await handleClosedCaseArchival(caseId);
+     try {
+        await handleClosedCaseArchival(caseId);
+      } catch (err) {
+        console.warn(
+          "Closed case archival failed, closure still succeeded:",
+          err
+        );
+      }
    
      // ✅ Clear closure warning after successful submission
      const warn = document.getElementById("closureWarning");
@@ -3346,6 +3356,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

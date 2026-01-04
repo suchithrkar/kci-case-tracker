@@ -1841,6 +1841,12 @@ tbody.addEventListener("click", (e) => {
   const caseId = select.dataset.id;
   const value = option.dataset.value;
 
+  // ✅ IMMEDIATE VISUAL UPDATE (CRITICAL)
+  const label = select.querySelector(".custom-select-trigger span");
+  if (label) {
+    label.innerHTML = value || "&nbsp;";
+  }
+
   handleStatusChange(caseId, value);
 
   select.classList.remove("open");
@@ -3349,6 +3355,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

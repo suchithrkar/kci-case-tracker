@@ -26,11 +26,8 @@ import {
 } from "./js/userProfile.js";
 
 import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
-import { 
-   cleanupClosedCases,
-   showPopup,
-   trackerCache
-} from "./js/utils.js";
+import { showPopup } from "./js/utils.js";
+import { cleanupClosedCases } from "./js/utils.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -61,20 +58,8 @@ const el = {
 
   badgeDue: document.getElementById("badgeDue"),
   badgeFlag: document.getElementById("badgeFlag"),
-  badgePNS: document.getElementById("badgePNS"),
+   badgePNS: document.getElementById("badgePNS"),
 };
-
-/* =========================================================
-   PHASE 3B — TRACKER CACHE KEYS
-   ========================================================= */
-
-function getCasesCacheKey(teamId) {
-  return `tracker_cases_${teamId}`;
-}
-
-function getDerivedCacheKey(teamId) {
-  return `tracker_derived_${teamId}`;
-}
 
 /* ============================================================
    TOOLTIP EDGE-PROTECTION — AUTO REALIGN ON SCREEN EDGES
@@ -106,8 +91,6 @@ document.addEventListener("mouseover", (e) => {
     tooltip.classList.add("align-left");
   }
 });
-
-const optimisticStatus = new Map(); // caseId → status
 
 /* ============================================================
    TEAM-AWARE "TODAY" CALCULATION
@@ -218,54 +201,6 @@ export const trackerState = {
 /* Map UID → Full Name for Excel export */
 const userNameMap = {};
 
-/* =========================================================
-   PHASE 3C — CACHE WRITE THROTTLING
-   ========================================================= */
-
-let cacheWriteTimer = null;
-const CACHE_WRITE_DELAY = 1500; // ms
-
-function scheduleCacheWrite(teamId) {
-  if (cacheWriteTimer) {
-    clearTimeout(cacheWriteTimer);
-  }
-
-  cacheWriteTimer = setTimeout(() => {
-    trackerCache.set(
-      getCasesCacheKey(teamId),
-      trackerState.allCases
-    );
-
-    trackerCache.set(
-      getDerivedCacheKey(teamId),
-      trackerDerived
-    );
-
-    cacheWriteTimer = null;
-  }, CACHE_WRITE_DELAY);
-}
-
-/* =========================================================
-   USER NAME CACHE (PHASE 1)
-   ========================================================= */
-
-const USER_CACHE_VERSION = 1;
-
-function getUserCacheKey(teamId) {
-  return `kci_user_map_v${USER_CACHE_VERSION}_${teamId}`;
-}
-
-/* =========================================================
-   PHASE 2 — DERIVED DATA CACHE
-   ========================================================= */
-
-const trackerDerived = {
-  dueToday: [],
-  flagged: [],
-  pns: [],
-  rfcTotal: [],
-  rfcNegative: []
-};
 
 /* =======================================================================
    UI STATE (CLEAN REBUILD)
@@ -424,38 +359,18 @@ if (trackerState.teamId) {
 
 
 /* Load UID → Full Name map (SAFE per team) */
-/* ------------------------------------------------------------------
-   LOAD USER NAME MAP (CACHED — PHASE 1)
-   ------------------------------------------------------------------ */
+const qUsers = query(
+  collection(db, "users"),
+  where("teamId", "==", trackerState.teamId)
+);
 
-const cacheKey = getUserCacheKey(trackerState.teamId);
-const cached = localStorage.getItem(cacheKey);
+const usersSnap = await getDocs(qUsers);
+usersSnap.forEach(d => {
+  const u = d.data();
+  userNameMap[d.id] = `${u.firstName} ${u.lastName}`;
+});
 
-if (cached) {
-  try {
-    Object.assign(userNameMap, JSON.parse(cached));
-  } catch {
-    localStorage.removeItem(cacheKey);
-  }
-}
-
-if (Object.keys(userNameMap).length === 0) {
-  const qUsers = query(
-    collection(db, "users"),
-    where("teamId", "==", trackerState.teamId)
-  );
-
-  const usersSnap = await getDocs(qUsers);
-
-  usersSnap.forEach(d => {
-    const u = d.data();
-    userNameMap[d.id] = `${u.firstName} ${u.lastName}`;
-  });
-
-  localStorage.setItem(cacheKey, JSON.stringify(userNameMap));
-}
-
-/* Always ensure current user is present */
+/* Always add current user's own name (allowed by rules) */
 userNameMap[trackerState.user.uid] =
   `${trackerState.user.firstName} ${trackerState.user.lastName}`;
 
@@ -522,18 +437,7 @@ if (isSecondary(data)) {
 }
 
 
-  el.btnLogout.onclick = async () => {
-     try {
-       // 🧹 Clear IndexedDB tracker cache
-       await trackerCache.clearAll();
-   
-       await auth.signOut();
-       location.href = "login.html";
-     } catch (err) {
-       console.error("Logout failed:", err);
-       showPopup("❌ Logout failed. Please try again.");
-     }
-   };
+  el.btnLogout.onclick = () => auth.signOut().then(() => (location.href = "login.html"));
 
   setupSidebarControls();
   setupFilterControls();
@@ -551,134 +455,59 @@ let unsubscribe = null;
 
 function setupRealtimeCases(teamId) {
   if (unsubscribe) unsubscribe();
-      trackerState.allCases = [];     // 🔥 RESET MEMORY STATE
-      trackerState.filteredCases = [];
 
-   /* =========================================================
-      PHASE 3B — HYDRATE FROM INDEXEDDB (FAST LOAD)
-      ========================================================= */
-   
-   (async () => {
-     const cachedCases = await trackerCache.get(
-       getCasesCacheKey(teamId)
-     );
-     const cachedDerived = await trackerCache.get(
-       getDerivedCacheKey(teamId)
-     );
-   
-     if (Array.isArray(cachedCases) && cachedCases.length > 0) {
-       trackerState.allCases = cachedCases;
-   
-       if (cachedDerived) {
-         Object.assign(trackerDerived, cachedDerived);
-       } else {
-         rebuildDerivedData();
-       }
-   
-       applyFilters(); // instant render
-     }
-   })();
+  unsubscribe = listenToTeamCases(teamId, (cases) => {
+    trackerState.allCases = cases.map(c => ({
+      id: c.id,
+      customerName: c.customerName || "",
+      createdOn: c.createdOn || "",
+      createdBy: c.createdBy || "",
 
-  unsubscribe = listenToTeamCases(teamId, (snapshot) => {
-     // Ignore cache-only snapshots
-     if (snapshot.metadata.fromCache) return;
-   
-     // Ignore local write echoes
-     if (snapshot.metadata.hasPendingWrites) return;
-   
-     applySnapshotDiff(snapshot, teamId);
-   });
-}
+      excelOrder: typeof c.excelOrder === "number" ? c.excelOrder : 999999,
+       
+      country: c.country || "",
+      caseResolutionCode: c.caseResolutionCode || "",
+      caseOwner: c.caseOwner || "",
+      caGroup: c.caGroup || "",
+      tl: c.tl || "",
+      sbd: c.sbd || "",
+      onsiteRFC: c.onsiteRFC || "",
+      csrRFC: c.csrRFC || "",
+      benchRFC: c.benchRFC || "",
+      status: c.status || "",
+      followDate: c.followDate || "",
+      followTime: c.followTime || "",
+      flagged: !!c.flagged,
+      PNS: !!c.PNS,
 
-function normalizeCase(c) {
-  return {
-    id: c.id,
-    customerName: c.customerName || "",
-    createdOn: c.createdOn || "",
-    createdBy: c.createdBy || "",
-
-    excelOrder: typeof c.excelOrder === "number" ? c.excelOrder : 999999,
-
-    country: c.country || "",
-    caseResolutionCode: c.caseResolutionCode || "",
-    caseOwner: c.caseOwner || "",
-    caGroup: c.caGroup || "",
-    tl: c.tl || "",
-    sbd: c.sbd || "",
-
-    onsiteRFC: c.onsiteRFC || "",
-    csrRFC: c.csrRFC || "",
-    benchRFC: c.benchRFC || "",
-
-    status: c.status || "",
-    followDate: c.followDate || "",
-    followTime: c.followTime || "",
-    flagged: !!c.flagged,
-    PNS: !!c.PNS,
-
-    surveyPrediction:
-      typeof c.surveyPrediction === "number"
+      surveyPrediction: typeof c.surveyPrediction === "number"
         ? c.surveyPrediction
         : null,
+      
+      predictionComment: c.predictionComment || "",
 
-    predictionComment: c.predictionComment || "",
+      otcCode: c.otcCode || "",
+      market: c.market || "",
+       
+      notes: c.notes || "",
+      lastActionedOn: c.lastActionedOn || "",
+      lastActionedBy: c.lastActionedBy || "",
 
-    otcCode: c.otcCode || "",
-    market: c.market || "",
+      // <-- NEW: include the status-change audit fields
+      statusChangedOn: c.statusChangedOn || "",
+      statusChangedBy: c.statusChangedBy || ""
+    }));
 
-    notes: c.notes || "",
-    lastActionedOn: c.lastActionedOn || "",
-    lastActionedBy: c.lastActionedBy || "",
-
-    statusChangedOn: c.statusChangedOn || "",
-    statusChangedBy: c.statusChangedBy || ""
-  };
+    // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
+if (uiState.unupdatedActive && unupdatedProtect) {
+  return;
 }
 
-function applySnapshotDiff(snapshot, teamId) {
+// Normal realtime refresh
+applyFilters();
 
-  // 🔒 HARD GUARD: ignore late snapshots from old team
-  if (teamId !== trackerState.teamId) return;
-   
-  let changed = false;
 
-  snapshot.docChanges().forEach(change => {
-    const raw = { id: change.doc.id, ...change.doc.data() };
-    const data = normalizeCase(raw);
-
-    const idx = trackerState.allCases.findIndex(r => r.id === data.id);
-
-   if (change.type === "added") {
-     if (idx === -1) {               // ✅ CRITICAL DEDUPE GUARD
-       trackerState.allCases.push(data);
-       changed = true;
-     }
-   }
-
-    if (change.type === "modified" && idx !== -1) {
-      trackerState.allCases[idx] = data;
-      // ✅ clear optimistic shadow once Firestore confirms
-      optimisticStatus.delete(data.id);
-      changed = true;
-    }
-
-    if (change.type === "removed" && idx !== -1) {
-      trackerState.allCases.splice(idx, 1);
-      changed = true;
-    }
   });
-
-  if (!changed) return;
-
-  rebuildDerivedData();
-  scheduleCacheWrite(teamId);
-
-  // 🚫 Preserve your existing unupdated protection logic
-  if (uiState.unupdatedActive && unupdatedProtect) {
-    return;
-  }
-
-  applyFilters();
 }
 
 /* =======================================================================
@@ -1448,88 +1277,7 @@ function restrictNcmCasesForUser(rows, user) {
   });
 }
 
-function rebuildDerivedData() {
-  const today = getTeamToday(trackerState.teamConfig);
-  const uid = trackerState.user.uid;
-  const all = trackerState.allCases;
 
-  /* =========================
-     USER-CENTRIC DERIVED SETS
-     ========================= */
-
-  trackerDerived.dueToday = all.filter(r =>
-    r.lastActionedBy === uid &&
-    r.followDate &&
-    r.followDate <= today &&
-    r.status !== "Closed"
-  );
-
-  trackerDerived.flagged = all.filter(r =>
-    r.lastActionedBy === uid && r.flagged
-  );
-
-  trackerDerived.pns = all.filter(r =>
-    r.lastActionedBy === uid && r.PNS === true
-  );
-
-  /* =====================================================
-     RFC TOTAL — STATUS BASED (UNCHANGED ORIGINAL LOGIC)
-     ===================================================== */
-
-  const onsiteStatusRFC = all.filter(r =>
-    r.caseResolutionCode === "Onsite Solution" &&
-    ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
-      .includes(r.onsiteRFC)
-  );
-
-  const offsiteStatusRFC = all.filter(r =>
-    r.caseResolutionCode === "Offsite Solution" &&
-    r.benchRFC === "Possible completed"
-  );
-
-  const csrStatusRFC = all.filter(r =>
-    r.caseResolutionCode === "Parts Shipped" &&
-    ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
-  );
-
-  trackerDerived.rfcTotal = [
-    ...onsiteStatusRFC,
-    ...offsiteStatusRFC,
-    ...csrStatusRFC
-  ];
-
-  /* =====================================================
-     RFC NEGATIVE (OVERDUE) — CA GROUP BASED (EXACT ORIGINAL)
-     ===================================================== */
-
-  trackerDerived.rfcNegative = all.filter(r => {
-    // Onsite exclusion
-    if (
-      r.caseResolutionCode === "Onsite Solution" &&
-      ["0-3 Days", "3-5 Days"].includes(r.caGroup)
-    ) {
-      return false;
-    }
-
-    // Offsite exclusion
-    if (
-      r.caseResolutionCode === "Offsite Solution" &&
-      ["0-3 Days", "3-5 Days", "5-10 Days"].includes(r.caGroup)
-    ) {
-      return false;
-    }
-
-    // Parts Shipped exclusion
-    if (
-      r.caseResolutionCode === "Parts Shipped" &&
-      r.caGroup === "0-3 Days"
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-}
 
 export function applyFilters() {
   // 🚫 Global protection: do NOT auto-refresh if modal process is happening in Unupdated mode
@@ -1545,32 +1293,107 @@ if (uiState.unupdatedActive && unupdatedProtect) {
   /* ===============================================================
      MODE OVERRIDES (Option A)
      =============================================================== */
-   if (uiState.mode === "due") {
-     rows = [...trackerDerived.dueToday];
-   }
+  if (uiState.mode === "due") {
+  rows = rows.filter(r =>
+    r.lastActionedBy === trackerState.user.uid &&
+    r.followDate &&
+    r.followDate <= today &&
+    r.status !== "Closed"
+  );
+}
 
 
   if (uiState.mode === "flagged") {
-    rows = [...trackerDerived.flagged];
+    rows = rows.filter(r =>
+      r.flagged &&
+      r.lastActionedBy === trackerState.user.uid
+    );
   }
 
    if (uiState.mode === "pns") {
-     rows = [...trackerDerived.pns];
+     rows = rows.filter(r =>
+       r.PNS === true &&
+       r.lastActionedBy === trackerState.user.uid
+     );
    }
 
   /* ===============================================================
    RFC MODE: TOTAL  (NEW — does NOT return early)
    =============================================================== */
-   if (uiState.mode === "total") {
-       rows = [...trackerDerived.rfcTotal];
-   }
+if (uiState.mode === "total") {
 
-   /* ===============================================================
-      RFC MODE: NEGATIVE (NEW — does NOT return early)
-      =============================================================== */
-   if (uiState.mode === "negative") {
-       rows = [...trackerDerived.rfcNegative];
-   }
+    const onsiteList = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Onsite Solution" &&
+        ["Closed - Canceled","Closed - Posted","Open - Completed"].includes(r.onsiteRFC)
+    );
+
+    const offsiteList = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Offsite Solution" &&
+        r.benchRFC === "Possible completed"
+    );
+
+    const csrList = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Parts Shipped" &&
+        ["Cancelled","Closed","POD"].includes(r.csrRFC)
+    );
+
+    rows = [
+        ...onsiteList,
+        ...offsiteList,
+        ...csrList
+    ];
+}
+
+/* ===============================================================
+   RFC MODE: NEGATIVE (NEW — does NOT return early)
+   =============================================================== */
+if (uiState.mode === "negative") {
+
+    let base = [...trackerState.allCases];
+
+    // TOTAL building (same as total mode)
+    const onsiteTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Onsite Solution" &&
+        ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
+        .includes(r.onsiteRFC)
+    );
+
+    const offsiteTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Offsite Solution" &&
+        r.benchRFC === "Possible completed"
+    );
+
+    const csrTotal = trackerState.allCases.filter(r =>
+        r.caseResolutionCode === "Parts Shipped" &&
+        ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
+    );
+
+    const totalCases = [...onsiteTotal, ...offsiteTotal, ...csrTotal]
+        .map(c => c.id);
+
+    // Remove TOTAL cases
+    base = base.filter(r => !totalCases.includes(r.id));
+
+    // Remove Onsite + CA Group 0-3 / 3-5
+    base = base.filter(r => !(
+        r.caseResolutionCode === "Onsite Solution" &&
+        ["0-3 Days", "3-5 Days"].includes(r.caGroup)
+    ));
+
+    // Remove Parts Shipped + CA Group 0-3
+    base = base.filter(r => !(
+        r.caseResolutionCode === "Parts Shipped" &&
+        r.caGroup === "0-3 Days"
+    ));
+
+    // Remove Offsite + CA Group 0-3 / 3-5 / 5-10
+    base = base.filter(r => !(
+        r.caseResolutionCode === "Offsite Solution" &&
+        ["0-3 Days","3-5 Days","5-10 Days"].includes(r.caGroup)
+    ));
+
+    rows = base;
+}
 
   /* ===============================================================
      NORMAL MODE — APPLY FULL FILTER PIPELINE
@@ -1692,14 +1515,32 @@ renderTable();
    BADGE COUNTS (GLOBAL)
    ======================================================================= */
 function updateBadges() {
-  el.badgeDue.textContent = trackerDerived.dueToday.length;
-  el.badgeFlag.textContent = trackerDerived.flagged.length;
-  el.badgePNS.textContent = trackerDerived.pns.length;
+  const today = getTeamToday(trackerState.teamConfig);
 
+  el.badgeDue.textContent = trackerState.allCases.filter(r =>
+    r.lastActionedBy === trackerState.user.uid &&
+    r.followDate &&
+    r.followDate <= today &&
+    r.status !== "Closed"
+  ).length;
+
+  el.badgeFlag.textContent = trackerState.allCases.filter(r =>
+    r.lastActionedBy === trackerState.user.uid &&
+    r.flagged
+  ).length;
+
+   el.badgePNS.textContent = trackerState.allCases.filter(r =>
+     r.PNS === true &&
+     r.lastActionedBy === trackerState.user.uid
+   ).length;
+
+
+  // RFC — Total Open Repair Cases (team-wide)
   const rfcTotalEl = document.getElementById("rfcTotalCount");
   if (rfcTotalEl) {
     rfcTotalEl.textContent = trackerState.allCases.length;
   }
+
 }
 
 /* =========================================================
@@ -1959,7 +1800,7 @@ function renderStatusSelect(row) {
   return `
     <div class="custom-select" data-id="${row.id}">
       <div class="custom-select-trigger">
-        <span>${optimisticStatus.get(row.id) ?? row.status ?? "&nbsp;"}</span>
+        <span>${row.status || "&nbsp;"}</span>
       </div>
       <div class="custom-options">
         ${statuses.map(s => `
@@ -1999,13 +1840,6 @@ tbody.addEventListener("click", (e) => {
 
   const caseId = select.dataset.id;
   const value = option.dataset.value;
-
-   // ✅ store optimistic value
-   optimisticStatus.set(caseId, value);
-
-  // ✅ IMMEDIATE VISUAL UPDATE (THIS WAS MISSING)
-  const label = select.querySelector(".custom-select-trigger span");
-  label.innerHTML = value || "&nbsp;";
 
   handleStatusChange(caseId, value);
 
@@ -2259,6 +2093,7 @@ if (uiState.unupdatedActive) {
        statusChangedBy: trackerState.user.uid
      }).then(() => {
        pendingUnupdated.delete(caseId);
+       applyFilters();
      }).catch(err => {
        pendingUnupdated.delete(caseId);
        showPopup("Failed to update case.");
@@ -2308,33 +2143,26 @@ if (uiState.unupdatedActive) {
 
 
   // Normal statuses → update Firestore directly
-   // Update Firestore, then remove pending lock for this case and refresh if needed
-   // ✅ OPTIMISTIC LOCAL UPDATE (CRITICAL)
-   row.status = newStatus;
-   row.lastActionedOn = today;
-   row.lastActionedBy = trackerState.user.uid;
-   row.statusChangedOn = today;
-   row.statusChangedBy = trackerState.user.uid;
-   
-   // 🔄 Immediate UI refresh
-   applyFilters();
-   
-   // 🔥 Persist to Firestore
-   firestoreUpdateCase(caseId, {
-     status: newStatus,
-     lastActionedOn: today,
-     lastActionedBy: trackerState.user.uid,
-     statusChangedOn: today,
-     statusChangedBy: trackerState.user.uid
-   })
-   .then(() => {
-     pendingUnupdated.delete(caseId);
-   })
-   .catch(err => {
-     pendingUnupdated.delete(caseId);
-     showPopup("Failed to update case. Please try again.");
-     console.error(err);
-   });
+  // Normal statuses → update Firestore directly
+// Update Firestore, then remove pending lock for this case and refresh if needed
+firestoreUpdateCase(caseId, {
+  status: newStatus,
+  lastActionedOn: today,
+  lastActionedBy: trackerState.user.uid,
+  statusChangedOn: today,
+  statusChangedBy: trackerState.user.uid
+}).then(() => {
+  pendingUnupdated.delete(caseId);
+
+  applyFilters();
+}).catch(err => {
+  // On failure, remove pending and show popup (prevents permanent stuck case)
+  pendingUnupdated.delete(caseId);
+  showPopup("Failed to update case. Please try again.");
+  console.error(err);
+});
+
+
 }
 
 // Status selector inside Case Options modal (reminder flow)
@@ -2378,7 +2206,7 @@ async function firestoreUpdateCase(caseId, fields) {
      if (err.code === "permission-denied") {
        showPopup("Permission restricted: Read-only access on tracker page.");
      } else {
-       showPopup("Unable to save changes.");
+       showPopup("Unable to save changes. Read-only access allowed.");
      }
    }
 }
@@ -2703,14 +2531,20 @@ if (btnClosureClose) {
    LAST ACTIONED BY NAME LOOKUP
    ======================================================================= */
 
-function loadLastActionedByName(uid) {
+async function loadLastActionedByName(uid) {
   if (!uid) {
     optLastActionedByName.textContent = "—";
+    optLastActionedByName.style.opacity = 1;
     return;
   }
 
-  optLastActionedByName.textContent =
-    userNameMap[uid] || "Unknown";
+  const snap = await getDoc(doc(db, "users", uid));
+  if (snap.exists()) {
+    const u = snap.data();
+    optLastActionedByName.textContent = `${u.firstName} ${u.lastName}`;
+  } else {
+    optLastActionedByName.textContent = "Unknown";
+  }
 }
 
 /* =======================================================================
@@ -3238,13 +3072,6 @@ async function saveModalData() {
   r.lastActionedOn = today;
   r.lastActionedBy = trackerState.user.uid;
 
-   // ✅ FORCE TABLE RE-RENDER WITH UPDATED DATA
-   applyFilters();
-
-   // ✅ INSTANT MODAL UI UPDATE (OPTIMISTIC)
-   optLastActioned.textContent = formatDMY(today);
-   loadLastActionedByName(trackerState.user.uid);
-
    r.PNS = optPNS.classList.contains("on");
    
    const updateObj = {
@@ -3507,18 +3334,6 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

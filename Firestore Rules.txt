@@ -1,0 +1,197 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* =====================================
+       USERS COLLECTION
+       ===================================== */
+    match /users/{userId} {
+
+      // Anyone can create their own document after signup
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // READ:
+      // Primary admin → read everything
+      // Secondary/general users → read users in their own team
+      allow read: if
+        isPrimaryAdmin()
+        ||
+        (
+          isApprovedUser() &&
+          getUserTeam() == resource.data.teamId
+        );
+
+      // UPDATE:
+      // Primary admin → can update any user
+      // Others → can update ONLY their own "theme"
+      allow update: if
+        isPrimaryAdmin()
+        ||
+        (
+          request.auth != null &&
+          request.auth.uid == userId &&
+          request.resource.data.diff(resource.data).changedKeys().hasOnly(["theme"])
+        );
+
+      // DELETE:
+      allow delete: if isPrimaryAdmin();
+    }
+
+
+    /* =====================================
+       TEAMS COLLECTION
+       ===================================== */
+    match /teams/{teamId} {
+
+      // Any approved user may read team info
+      allow read: if isApprovedUser();
+
+      // Only primary admin may create/modify/delete teams
+      allow write: if isPrimaryAdmin();
+    }
+
+
+    /* =====================================
+       CASES COLLECTION
+       ===================================== */
+    match /cases/{caseId} {
+
+      // Approved users can read ONLY cases from their own team
+      allow read: if
+        isPrimaryAdmin()
+        ||
+        (
+          isApprovedUser() &&
+          resource.data.teamId == getUserTeam()
+        );
+
+      // Primary admin may fully write
+      allow write: if isPrimaryAdmin();
+
+      // GENERAL USERS may update only allowed fields
+      allow update: if
+        isGeneral() &&
+        resource.data.teamId == getUserTeam() &&
+        isAllowedCaseUpdate();
+    }
+    
+    /* =====================================
+       CLOSED CASES HISTORY (ARCHIVE)
+       ===================================== */
+    match /closedCasesHistory/{caseId} {
+
+      allow read: if isPrimaryAdmin();
+
+      allow create: if
+        isGeneral() &&
+        request.resource.data.teamId == getUserTeam();
+
+      allow update, delete: if isPrimaryAdmin();
+    }
+    
+    /* =====================================
+       DAILY REPAIR REPORTS (TEAM-WISE HISTORY)
+       ===================================== */
+    match /dailyRepairReports/{teamId}/reports/{reportDate} {
+
+      // READ
+      allow read: if
+        isPrimaryAdmin()
+        ||
+        (isSecondaryAdmin() && getUserTeam() == teamId);
+
+      // WRITE
+      allow write: if
+        isPrimaryAdmin()
+        ||
+        (
+          isGeneral() &&
+          getUserTeam() == teamId &&
+          isOnlyClosedCountIncrement()
+        );
+    }
+
+
+    /* =====================================
+       HELPER FUNCTIONS
+       ===================================== */
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function getUserTeam() {
+      return getUserDoc().teamId;
+    }
+
+    function getUserRole() {
+      return getUserDoc().role;
+    }
+
+    function getUserStatus() {
+      return getUserDoc().status;
+    }
+
+    function isApprovedUser() {
+      return request.auth != null &&
+             getUserStatus() == "approved";
+    }
+
+    function isPrimaryAdmin() {
+      return isApprovedUser() &&
+             getUserRole() == "primary";
+    }
+
+    function isSecondaryAdmin() {
+      return isApprovedUser() &&
+             getUserRole() == "secondary";
+    }
+
+    function isGeneral() {
+      return isApprovedUser() &&
+             getUserRole() == "general";
+    }
+    
+    function isOnlyClosedCountIncrement() {
+      return
+        // Only closedCount can change
+        request.resource.data
+          .diff(resource.data)
+          .changedKeys()
+          .hasOnly(["closedCount"])
+
+        &&
+
+        // Ensure increment by exactly +1
+        (
+          !resource.data.closedCount ||
+          request.resource.data.closedCount ==
+            resource.data.closedCount + 1
+        );
+    }
+
+    /* =====================================
+       ALLOWED CASE UPDATE FIELDS
+       ===================================== */
+    function isAllowedCaseUpdate() {
+      let allowed = [
+        "status",
+        "statusChangedOn",
+        "statusChangedBy",
+        "followDate",
+        "flagged",
+        "notes",
+        "lastActionedOn",
+        "lastActionedBy",
+        "teamId",
+        "id",
+        "followTime",
+				"pns",
+				"surveyPrediction",
+				"predictionComment"
+      ];
+
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(allowed);
+    }
+
+  }
+}

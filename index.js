@@ -520,7 +520,18 @@ if (isSecondary(data)) {
 }
 
 
-  el.btnLogout.onclick = () => auth.signOut().then(() => (location.href = "login.html"));
+  el.btnLogout.onclick = async () => {
+     try {
+       // 🧹 Clear IndexedDB tracker cache
+       await trackerCache.clearAll();
+   
+       await auth.signOut();
+       location.href = "login.html";
+     } catch (err) {
+       console.error("Logout failed:", err);
+       showPopup("❌ Logout failed. Please try again.");
+     }
+   };
 
   setupSidebarControls();
   setupFilterControls();
@@ -621,6 +632,10 @@ function normalizeCase(c) {
 }
 
 function applySnapshotDiff(snapshot, teamId) {
+
+  // 🔒 HARD GUARD: ignore late snapshots from old team
+  if (teamId !== trackerState.teamId) return;
+   
   let changed = false;
 
   snapshot.docChanges().forEach(change => {
@@ -2342,7 +2357,7 @@ async function firestoreUpdateCase(caseId, fields) {
      if (err.code === "permission-denied") {
        showPopup("Permission restricted: Read-only access on tracker page.");
      } else {
-       showPopup("Unable to save changes. Read-only access allowed.");
+       showPopup("Unable to save changes.");
      }
    }
 }
@@ -3464,6 +3479,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

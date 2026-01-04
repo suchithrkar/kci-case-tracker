@@ -3225,6 +3225,10 @@ async function saveModalData() {
   r.lastActionedOn = today;
   r.lastActionedBy = trackerState.user.uid;
 
+   // ✅ INSTANT MODAL UI UPDATE (OPTIMISTIC)
+   optLastActioned.textContent = formatDMY(today);
+   loadLastActionedByName(trackerState.user.uid);
+
    r.PNS = optPNS.classList.contains("on");
    
    const updateObj = {
@@ -3487,6 +3491,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

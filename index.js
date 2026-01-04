@@ -2127,7 +2127,7 @@ if (uiState.unupdatedActive) {
   const previousStatus = row.status;
 
   // Update local state
-  row.status = newStatus;
+  //row.status = newStatus;
 
    if (needsFollow) {
      prevStatusBeforeModal = previousStatus;
@@ -3355,6 +3355,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

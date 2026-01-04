@@ -2234,8 +2234,10 @@ async function handleClosedCaseArchival(caseId) {
     }
   );
 
-  // 5️⃣ Cleanup (rolling 4 months)
-  await cleanupClosedCases(todayISO);
+   // 5️⃣ Cleanup (admins only - rolling 4 months)
+   if (trackerState.user.role === "primary") {
+     await cleanupClosedCases(todayISO);
+   }
 }
 
 // =====================================================
@@ -3344,6 +3346,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

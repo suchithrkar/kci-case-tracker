@@ -1044,7 +1044,7 @@ function setupFilterControls() {
   el.btnClear.onclick = () => {
 
     const rfcModes = ["onsite","offsite","csr","total","negative"];
-    const set2Modes = ["due","flagged","repeat","unupdated"];
+    const set2Modes = ["due","flagged","pns","repeat","unupdated"];
     const isRfcMode = rfcModes.includes(uiState.mode);
     const isSet2 = set2Modes.includes(uiState.mode);
 
@@ -1129,7 +1129,6 @@ function setupFilterControls() {
      uiState.unupdatedActive = !uiState.unupdatedActive;
      applyFilters();
    };
-
 
   /* SORT BY DATE BUTTON */
   el.btnSortDate.onclick = () => {
@@ -3354,6 +3353,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

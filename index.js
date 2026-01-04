@@ -564,60 +564,98 @@ function setupRealtimeCases(teamId) {
      }
    })();
 
-  unsubscribe = listenToTeamCases(teamId, (cases) => {
-    trackerState.allCases = cases.map(c => ({
-      id: c.id,
-      customerName: c.customerName || "",
-      createdOn: c.createdOn || "",
-      createdBy: c.createdBy || "",
+  unsubscribe = listenToTeamCases(teamId, (snapshot) => {
+     // Ignore cache-only snapshots
+     if (snapshot.metadata.fromCache) return;
+   
+     // Ignore local write echoes
+     if (snapshot.metadata.hasPendingWrites) return;
+   
+     applySnapshotDiff(snapshot, teamId);
+   });
+}
 
-      excelOrder: typeof c.excelOrder === "number" ? c.excelOrder : 999999,
-       
-      country: c.country || "",
-      caseResolutionCode: c.caseResolutionCode || "",
-      caseOwner: c.caseOwner || "",
-      caGroup: c.caGroup || "",
-      tl: c.tl || "",
-      sbd: c.sbd || "",
-      onsiteRFC: c.onsiteRFC || "",
-      csrRFC: c.csrRFC || "",
-      benchRFC: c.benchRFC || "",
-      status: c.status || "",
-      followDate: c.followDate || "",
-      followTime: c.followTime || "",
-      flagged: !!c.flagged,
-      PNS: !!c.PNS,
+function normalizeCase(c) {
+  return {
+    id: c.id,
+    customerName: c.customerName || "",
+    createdOn: c.createdOn || "",
+    createdBy: c.createdBy || "",
 
-      surveyPrediction: typeof c.surveyPrediction === "number"
+    excelOrder: typeof c.excelOrder === "number" ? c.excelOrder : 999999,
+
+    country: c.country || "",
+    caseResolutionCode: c.caseResolutionCode || "",
+    caseOwner: c.caseOwner || "",
+    caGroup: c.caGroup || "",
+    tl: c.tl || "",
+    sbd: c.sbd || "",
+
+    onsiteRFC: c.onsiteRFC || "",
+    csrRFC: c.csrRFC || "",
+    benchRFC: c.benchRFC || "",
+
+    status: c.status || "",
+    followDate: c.followDate || "",
+    followTime: c.followTime || "",
+    flagged: !!c.flagged,
+    PNS: !!c.PNS,
+
+    surveyPrediction:
+      typeof c.surveyPrediction === "number"
         ? c.surveyPrediction
         : null,
-      
-      predictionComment: c.predictionComment || "",
 
-      otcCode: c.otcCode || "",
-      market: c.market || "",
-       
-      notes: c.notes || "",
-      lastActionedOn: c.lastActionedOn || "",
-      lastActionedBy: c.lastActionedBy || "",
+    predictionComment: c.predictionComment || "",
 
-      // <-- NEW: include the status-change audit fields
-      statusChangedOn: c.statusChangedOn || "",
-      statusChangedBy: c.statusChangedBy || ""
-    }));
+    otcCode: c.otcCode || "",
+    market: c.market || "",
 
-   rebuildDerivedData();
+    notes: c.notes || "",
+    lastActionedOn: c.lastActionedOn || "",
+    lastActionedBy: c.lastActionedBy || "",
 
-   scheduleCacheWrite(teamId);
+    statusChangedOn: c.statusChangedOn || "",
+    statusChangedBy: c.statusChangedBy || ""
+  };
+}
 
-    // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
-   if (uiState.unupdatedActive && unupdatedProtect) {
-     return;
-   }
-   
-   // Normal realtime refresh
-   applyFilters();
+function applySnapshotDiff(snapshot, teamId) {
+  let changed = false;
+
+  snapshot.docChanges().forEach(change => {
+    const raw = { id: change.doc.id, ...change.doc.data() };
+    const data = normalizeCase(raw);
+
+    const idx = trackerState.allCases.findIndex(r => r.id === data.id);
+
+    if (change.type === "added") {
+      trackerState.allCases.push(data);
+      changed = true;
+    }
+
+    if (change.type === "modified" && idx !== -1) {
+      trackerState.allCases[idx] = data;
+      changed = true;
+    }
+
+    if (change.type === "removed" && idx !== -1) {
+      trackerState.allCases.splice(idx, 1);
+      changed = true;
+    }
   });
+
+  if (!changed) return;
+
+  rebuildDerivedData();
+  scheduleCacheWrite(teamId);
+
+  // 🚫 Preserve your existing unupdated protection logic
+  if (uiState.unupdatedActive && unupdatedProtect) {
+    return;
+  }
+
+  applyFilters();
 }
 
 /* =======================================================================
@@ -3426,6 +3464,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

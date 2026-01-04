@@ -2228,6 +2228,7 @@ async function handleClosedCaseArchival(caseId) {
     doc(db, "closedCasesHistory", caseId),
     {
       ...caseData,
+      teamId: caseData.teamId,
       closedDate: todayISO
     }
   );
@@ -3334,6 +3335,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

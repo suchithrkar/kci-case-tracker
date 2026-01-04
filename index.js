@@ -2226,16 +2226,19 @@ async function handleClosedCaseArchival(caseId) {
   const teamId = caseData.teamId;
 
   // 3️⃣ Store full snapshot in history
-   await addDoc(
-     collection(db, "closedCasesHistory"),
-     {
-       ...caseData,
-       teamId: caseData.teamId,
-       closedDate: todayISO,
-       archivedAt: new Date().toISOString(),
-       archivedBy: trackerState.user.uid
-     }
-   );
+   const historyRef = doc(db, "closedCasesHistory", caseId);
+   
+   // ❗ Prevent overwrite if somehow called twice
+   const existing = await getDoc(historyRef);
+   if (existing.exists()) return;
+   
+   await setDoc(historyRef, {
+     ...caseData,
+     teamId: caseData.teamId,
+     closedDate: todayISO,
+     archivedAt: new Date().toISOString(),
+     archivedBy: trackerState.user.uid
+   });
 
    // 5️⃣ Cleanup (admins only - rolling 4 months)
    if (trackerState.user.role === "primary") {
@@ -3356,6 +3359,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

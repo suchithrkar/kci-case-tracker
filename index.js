@@ -2203,12 +2203,13 @@ async function firestoreUpdateCase(caseId, fields) {
   try {
     await updateCase(caseId, fields);
   } catch (err) {
-     if (err.code === "permission-denied") {
-       showPopup("Permission restricted: Read-only access on tracker page.");
-     } else {
-       showPopup("Unable to save changes. Read-only access allowed.");
-     }
-   }
+    if (err.code === "permission-denied") {
+      showPopup("Permission restricted: Read-only access on tracker page.");
+    } else {
+      showPopup("Unable to save changes. Read-only access allowed.");
+    }
+    throw err; // 🔴 CRITICAL — propagate failure
+  }
 }
 
 async function handleClosedCaseArchival(caseId) {
@@ -2288,32 +2289,40 @@ submitBtn.textContent = "Submit";
     }
   }
 
-   await firestoreUpdateCase(caseId, update);
+   try {
+     await firestoreUpdateCase(caseId, update);
    
-   // ===============================
-   // PHASE C — DAILY CLOSED COUNT
-   // ===============================
-   const todayISO = getTeamToday(trackerState.teamConfig);
-   await incrementDailyClosedCount(
-     trackerState.teamId,
-     todayISO
-   );
+     const todayISO = getTeamToday(trackerState.teamConfig);
    
-   // ===============================
-   // PHASE 2 — CLOSED CASE ARCHIVAL
-   // ===============================
-   await handleClosedCaseArchival(caseId);
+     await incrementDailyClosedCount(
+       trackerState.teamId,
+       todayISO
+     );
    
+     await handleClosedCaseArchival(caseId);
    
-  // ✅ Clear closure warning after successful submission
-   const warn = document.getElementById("closureWarning");
-   if (warn) warn.remove();
-
-  closureSurveyCompleted = true;
-  pendingStatusForModal = null; // prevent double handling
-
-   submitBtn.disabled = false;
-   submitBtn.textContent = "Submit";
+     // ✅ Clear closure warning after successful submission
+     const warn = document.getElementById("closureWarning");
+     if (warn) warn.remove();
+   
+     closureSurveyCompleted = true;
+     pendingStatusForModal = null;
+   
+     document
+       .getElementById("closureModal")
+       .classList.remove("show");
+   
+     applyFilters();
+   
+   } catch (err) {
+     console.error("Case closure failed:", err);
+     showPopup("Case closure failed. Please try again.");
+   
+   } finally {
+     // 🔐 ALWAYS reset button
+     submitBtn.disabled = false;
+     submitBtn.textContent = "Submit";
+   }
 
 
   document
@@ -3335,6 +3344,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

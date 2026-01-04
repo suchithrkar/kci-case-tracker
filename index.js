@@ -2079,6 +2079,14 @@ if (uiState.unupdatedActive) {
   const row = trackerState.allCases.find(r => r.id === caseId);
   if (!row) return;
 
+   /* =====================================================
+      🔧 FIX: Immediate local state update (CRITICAL)
+      This prevents blank status in Unupdated mode
+      ===================================================== */
+   row.status = newStatus;
+   row.lastActionedOn = getTeamToday(trackerState.teamConfig);
+   row.lastActionedBy = trackerState.user.uid;
+
   const needsFollow = (newStatus === "Service Pending" || newStatus === "Monitoring");
 
    // ✅ AUTO-PNS: If status is set to PNS, auto-enable PNS flag
@@ -3353,6 +3361,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

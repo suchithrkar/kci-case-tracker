@@ -2248,7 +2248,6 @@ if (uiState.unupdatedActive) {
        statusChangedBy: trackerState.user.uid
      }).then(() => {
        pendingUnupdated.delete(caseId);
-       applyFilters();
      }).catch(err => {
        pendingUnupdated.delete(caseId);
        showPopup("Failed to update case.");
@@ -3483,6 +3482,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

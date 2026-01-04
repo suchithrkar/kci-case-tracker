@@ -107,6 +107,8 @@ document.addEventListener("mouseover", (e) => {
   }
 });
 
+const optimisticStatus = new Map(); // caseId → status
+
 /* ============================================================
    TEAM-AWARE "TODAY" CALCULATION
    ============================================================ */
@@ -651,6 +653,8 @@ function applySnapshotDiff(snapshot, teamId) {
 
     if (change.type === "modified" && idx !== -1) {
       trackerState.allCases[idx] = data;
+      // ✅ clear optimistic shadow once Firestore confirms
+      optimisticStatus.delete(data.id);
       changed = true;
     }
 
@@ -1951,7 +1955,7 @@ function renderStatusSelect(row) {
   return `
     <div class="custom-select" data-id="${row.id}">
       <div class="custom-select-trigger">
-        <span>${row.status || "&nbsp;"}</span>
+        <span>${optimisticStatus.get(row.id) ?? row.status ?? "&nbsp;"}</span>
       </div>
       <div class="custom-options">
         ${statuses.map(s => `
@@ -1991,6 +1995,9 @@ tbody.addEventListener("click", (e) => {
 
   const caseId = select.dataset.id;
   const value = option.dataset.value;
+
+   // ✅ store optimistic value
+   optimisticStatus.set(caseId, value);
 
   // ✅ IMMEDIATE VISUAL UPDATE (THIS WAS MISSING)
   const label = select.querySelector(".custom-select-trigger span");
@@ -2307,8 +2314,6 @@ firestoreUpdateCase(caseId, {
   statusChangedBy: trackerState.user.uid
 }).then(() => {
   pendingUnupdated.delete(caseId);
-
-  applyFilters();
 }).catch(err => {
   // On failure, remove pending and show popup (prevents permanent stuck case)
   pendingUnupdated.delete(caseId);
@@ -3482,6 +3487,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

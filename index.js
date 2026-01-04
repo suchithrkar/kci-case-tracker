@@ -217,6 +217,33 @@ export const trackerState = {
 const userNameMap = {};
 
 /* =========================================================
+   PHASE 3C — CACHE WRITE THROTTLING
+   ========================================================= */
+
+let cacheWriteTimer = null;
+const CACHE_WRITE_DELAY = 1500; // ms
+
+function scheduleCacheWrite(teamId) {
+  if (cacheWriteTimer) {
+    clearTimeout(cacheWriteTimer);
+  }
+
+  cacheWriteTimer = setTimeout(() => {
+    trackerCache.set(
+      getCasesCacheKey(teamId),
+      trackerState.allCases
+    );
+
+    trackerCache.set(
+      getDerivedCacheKey(teamId),
+      trackerDerived
+    );
+
+    cacheWriteTimer = null;
+  }, CACHE_WRITE_DELAY);
+}
+
+/* =========================================================
    USER NAME CACHE (PHASE 1)
    ========================================================= */
 
@@ -581,15 +608,7 @@ function setupRealtimeCases(teamId) {
 
    rebuildDerivedData();
 
-   trackerCache.set(
-     getCasesCacheKey(teamId),
-     trackerState.allCases
-   );
-   
-   trackerCache.set(
-     getDerivedCacheKey(teamId),
-     trackerDerived
-   );
+   scheduleCacheWrite(teamId);
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
    if (uiState.unupdatedActive && unupdatedProtect) {
@@ -3407,6 +3426,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

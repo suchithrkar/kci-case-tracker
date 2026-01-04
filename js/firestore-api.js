@@ -11,11 +11,13 @@ import {
 export function listenToTeamCases(teamId, callback) {
   const q = query(collection(db, "cases"), where("teamId", "==", teamId));
 
-  return onSnapshot(q, (snap) => {
-    const rows = [];
-    snap.forEach((d) => rows.push({ id: d.id, ...d.data() }));
-    callback(rows);
-  });
+  return onSnapshot(
+    q,
+    { includeMetadataChanges: true },
+    (snap) => {
+      callback(snap);
+    }
+  );
 }
 
 // ======================================
@@ -54,4 +56,5 @@ export function getUser(uid) {
 // ======================================
 export function getCase(caseId) {
   return getDoc(doc(db, "cases", caseId));
+
 }

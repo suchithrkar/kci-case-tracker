@@ -105,6 +105,99 @@ export async function cleanupDailyReports(teamId, todayISO) {
   }
 }
 
+/* ============================================================
+   PHASE 3A — INDEXEDDB READ-THROUGH CACHE (TRACKER)
+   ============================================================ */
 
+const TRACKER_DB_NAME = "kci-tracker-cache";
+const TRACKER_DB_VERSION = 1;
+const TRACKER_STORE = "tracker";
 
+/**
+ * Open (or create) IndexedDB
+ */
+function openTrackerDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(TRACKER_DB_NAME, TRACKER_DB_VERSION);
 
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(TRACKER_STORE)) {
+        db.createObjectStore(TRACKER_STORE);
+      }
+    };
+
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/**
+ * Read value from cache
+ */
+async function idbGet(key) {
+  const db = await openTrackerDB();
+
+  return new Promise((resolve) => {
+    const tx = db.transaction(TRACKER_STORE, "readonly");
+    const store = tx.objectStore(TRACKER_STORE);
+    const req = store.get(key);
+
+    req.onsuccess = () => resolve(req.result ?? null);
+    req.onerror = () => resolve(null);
+  });
+}
+
+/**
+ * Write value to cache
+ */
+async function idbSet(key, value) {
+  const db = await openTrackerDB();
+
+  return new Promise((resolve) => {
+    const tx = db.transaction(TRACKER_STORE, "readwrite");
+    const store = tx.objectStore(TRACKER_STORE);
+    store.put(value, key);
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+}
+
+/**
+ * Delete single cache entry
+ */
+async function idbDelete(key) {
+  const db = await openTrackerDB();
+
+  return new Promise((resolve) => {
+    const tx = db.transaction(TRACKER_STORE, "readwrite");
+    tx.objectStore(TRACKER_STORE).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+}
+
+/**
+ * Clear entire tracker cache
+ */
+async function idbClearAll() {
+  const db = await openTrackerDB();
+
+  return new Promise((resolve) => {
+    const tx = db.transaction(TRACKER_STORE, "readwrite");
+    tx.objectStore(TRACKER_STORE).clear();
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+}
+
+/**
+ * Public cache API (team-aware keys)
+ */
+export const trackerCache = {
+  get: idbGet,
+  set: idbSet,
+  delete: idbDelete,
+  clearAll: idbClearAll
+};

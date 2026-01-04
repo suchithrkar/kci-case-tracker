@@ -26,8 +26,11 @@ import {
 } from "./js/userProfile.js";
 
 import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
-import { showPopup } from "./js/utils.js";
-import { cleanupClosedCases } from "./js/utils.js";
+import { 
+   cleanupClosedCases,
+   showPopup,
+   trackerCache
+} from "./js/utils.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -58,8 +61,20 @@ const el = {
 
   badgeDue: document.getElementById("badgeDue"),
   badgeFlag: document.getElementById("badgeFlag"),
-   badgePNS: document.getElementById("badgePNS"),
+  badgePNS: document.getElementById("badgePNS"),
 };
+
+/* =========================================================
+   PHASE 3B — TRACKER CACHE KEYS
+   ========================================================= */
+
+function getCasesCacheKey(teamId) {
+  return `tracker_cases_${teamId}`;
+}
+
+function getDerivedCacheKey(teamId) {
+  return `tracker_derived_${teamId}`;
+}
 
 /* ============================================================
    TOOLTIP EDGE-PROTECTION — AUTO REALIGN ON SCREEN EDGES
@@ -497,6 +512,31 @@ let unsubscribe = null;
 function setupRealtimeCases(teamId) {
   if (unsubscribe) unsubscribe();
 
+   /* =========================================================
+      PHASE 3B — HYDRATE FROM INDEXEDDB (FAST LOAD)
+      ========================================================= */
+   
+   (async () => {
+     const cachedCases = await trackerCache.get(
+       getCasesCacheKey(teamId)
+     );
+     const cachedDerived = await trackerCache.get(
+       getDerivedCacheKey(teamId)
+     );
+   
+     if (Array.isArray(cachedCases) && cachedCases.length > 0) {
+       trackerState.allCases = cachedCases;
+   
+       if (cachedDerived) {
+         Object.assign(trackerDerived, cachedDerived);
+       } else {
+         rebuildDerivedData();
+       }
+   
+       applyFilters(); // instant render
+     }
+   })();
+
   unsubscribe = listenToTeamCases(teamId, (cases) => {
     trackerState.allCases = cases.map(c => ({
       id: c.id,
@@ -539,7 +579,17 @@ function setupRealtimeCases(teamId) {
       statusChangedBy: c.statusChangedBy || ""
     }));
 
-     rebuildDerivedData();
+   rebuildDerivedData();
+
+   trackerCache.set(
+     getCasesCacheKey(teamId),
+     trackerState.allCases
+   );
+   
+   trackerCache.set(
+     getDerivedCacheKey(teamId),
+     trackerDerived
+   );
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
    if (uiState.unupdatedActive && unupdatedProtect) {
@@ -3357,6 +3407,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

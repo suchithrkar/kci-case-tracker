@@ -1992,6 +1992,10 @@ tbody.addEventListener("click", (e) => {
   const caseId = select.dataset.id;
   const value = option.dataset.value;
 
+  // ✅ IMMEDIATE VISUAL UPDATE (THIS WAS MISSING)
+  const label = select.querySelector(".custom-select-trigger span");
+  label.innerHTML = value || "&nbsp;";
+
   handleStatusChange(caseId, value);
 
   select.classList.remove("open");
@@ -3479,6 +3483,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

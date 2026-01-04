@@ -2214,7 +2214,7 @@ async function firestoreUpdateCase(caseId, fields) {
 }
 
 async function handleClosedCaseArchival(caseId) {
-  // 1️⃣ Read final case state
+  // 1️⃣ Read final case state (ALLOWED — cases read is permitted)
   const caseRef = doc(db, "cases", caseId);
   const snap = await getDoc(caseRef);
   if (!snap.exists()) return;
@@ -2223,27 +2223,22 @@ async function handleClosedCaseArchival(caseId) {
 
   // 2️⃣ Team-aware closed date
   const todayISO = getTeamToday(trackerState.teamConfig);
-  const teamId = caseData.teamId;
 
-  // 3️⃣ Store full snapshot in history
-   const historyRef = doc(db, "closedCasesHistory", caseId);
-   
-   // ❗ Prevent overwrite if somehow called twice
-   const existing = await getDoc(historyRef);
-   if (existing.exists()) return;
-   
-   await setDoc(historyRef, {
-     ...caseData,
-     teamId: caseData.teamId,
-     closedDate: todayISO,
-     archivedAt: new Date().toISOString(),
-     archivedBy: trackerState.user.uid
-   });
+  // 3️⃣ Archive snapshot (WRITE-ONLY for general users)
+  const historyRef = doc(db, "closedCasesHistory", caseId);
 
-   // 5️⃣ Cleanup (admins only - rolling 4 months)
-   if (trackerState.user.role === "primary") {
-     await cleanupClosedCases(todayISO);
-   }
+  await setDoc(historyRef, {
+    ...caseData,
+    teamId: caseData.teamId,
+    closedDate: todayISO,
+    archivedAt: new Date().toISOString(),
+    archivedBy: trackerState.user.uid
+  });
+
+  // 4️⃣ Cleanup (primary admin only)
+  if (trackerState.user.role === "primary") {
+    await cleanupClosedCases(todayISO);
+  }
 }
 
 // =====================================================
@@ -3359,6 +3354,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -21,6 +21,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  addDoc,
   setDoc,
   updateDoc,
   deleteDoc,
@@ -76,6 +77,7 @@ export {
   getDoc,
   getDocs,
   setDoc,
+  addDoc,
   updateDoc,
   deleteDoc,
   query,
@@ -84,5 +86,6 @@ export {
   increment,
   runTransaction
 };
+
 
 

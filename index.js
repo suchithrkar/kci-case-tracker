@@ -211,6 +211,18 @@ function getUserCacheKey(teamId) {
   return `kci_user_map_v${USER_CACHE_VERSION}_${teamId}`;
 }
 
+/* =========================================================
+   PHASE 2 — DERIVED DATA CACHE
+   ========================================================= */
+
+const trackerDerived = {
+  dueToday: [],
+  flagged: [],
+  pns: [],
+  rfcTotal: [],
+  rfcNegative: []
+};
+
 /* =======================================================================
    UI STATE (CLEAN REBUILD)
    ======================================================================= */
@@ -527,15 +539,15 @@ function setupRealtimeCases(teamId) {
       statusChangedBy: c.statusChangedBy || ""
     }));
 
+     rebuildDerivedData();
+
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
-if (uiState.unupdatedActive && unupdatedProtect) {
-  return;
-}
-
-// Normal realtime refresh
-applyFilters();
-
-
+   if (uiState.unupdatedActive && unupdatedProtect) {
+     return;
+   }
+   
+   // Normal realtime refresh
+   applyFilters();
   });
 }
 
@@ -1306,7 +1318,88 @@ function restrictNcmCasesForUser(rows, user) {
   });
 }
 
+function rebuildDerivedData() {
+  const today = getTeamToday(trackerState.teamConfig);
+  const uid = trackerState.user.uid;
+  const all = trackerState.allCases;
 
+  /* =========================
+     USER-CENTRIC DERIVED SETS
+     ========================= */
+
+  trackerDerived.dueToday = all.filter(r =>
+    r.lastActionedBy === uid &&
+    r.followDate &&
+    r.followDate <= today &&
+    r.status !== "Closed"
+  );
+
+  trackerDerived.flagged = all.filter(r =>
+    r.lastActionedBy === uid && r.flagged
+  );
+
+  trackerDerived.pns = all.filter(r =>
+    r.lastActionedBy === uid && r.PNS === true
+  );
+
+  /* =====================================================
+     RFC TOTAL — STATUS BASED (UNCHANGED ORIGINAL LOGIC)
+     ===================================================== */
+
+  const onsiteStatusRFC = all.filter(r =>
+    r.caseResolutionCode === "Onsite Solution" &&
+    ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
+      .includes(r.onsiteRFC)
+  );
+
+  const offsiteStatusRFC = all.filter(r =>
+    r.caseResolutionCode === "Offsite Solution" &&
+    r.benchRFC === "Possible completed"
+  );
+
+  const csrStatusRFC = all.filter(r =>
+    r.caseResolutionCode === "Parts Shipped" &&
+    ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
+  );
+
+  trackerDerived.rfcTotal = [
+    ...onsiteStatusRFC,
+    ...offsiteStatusRFC,
+    ...csrStatusRFC
+  ];
+
+  /* =====================================================
+     RFC NEGATIVE (OVERDUE) — CA GROUP BASED (EXACT ORIGINAL)
+     ===================================================== */
+
+  trackerDerived.rfcNegative = all.filter(r => {
+    // Onsite exclusion
+    if (
+      r.caseResolutionCode === "Onsite Solution" &&
+      ["0-3 Days", "3-5 Days"].includes(r.caGroup)
+    ) {
+      return false;
+    }
+
+    // Offsite exclusion
+    if (
+      r.caseResolutionCode === "Offsite Solution" &&
+      ["0-3 Days", "3-5 Days", "5-10 Days"].includes(r.caGroup)
+    ) {
+      return false;
+    }
+
+    // Parts Shipped exclusion
+    if (
+      r.caseResolutionCode === "Parts Shipped" &&
+      r.caGroup === "0-3 Days"
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+}
 
 export function applyFilters() {
   // 🚫 Global protection: do NOT auto-refresh if modal process is happening in Unupdated mode
@@ -1322,107 +1415,32 @@ if (uiState.unupdatedActive && unupdatedProtect) {
   /* ===============================================================
      MODE OVERRIDES (Option A)
      =============================================================== */
-  if (uiState.mode === "due") {
-  rows = rows.filter(r =>
-    r.lastActionedBy === trackerState.user.uid &&
-    r.followDate &&
-    r.followDate <= today &&
-    r.status !== "Closed"
-  );
-}
+   if (uiState.mode === "due") {
+     rows = [...trackerDerived.dueToday];
+   }
 
 
   if (uiState.mode === "flagged") {
-    rows = rows.filter(r =>
-      r.flagged &&
-      r.lastActionedBy === trackerState.user.uid
-    );
+    rows = [...trackerDerived.flagged];
   }
 
    if (uiState.mode === "pns") {
-     rows = rows.filter(r =>
-       r.PNS === true &&
-       r.lastActionedBy === trackerState.user.uid
-     );
+     rows = [...trackerDerived.pns];
    }
 
   /* ===============================================================
    RFC MODE: TOTAL  (NEW — does NOT return early)
    =============================================================== */
-if (uiState.mode === "total") {
+   if (uiState.mode === "total") {
+       rows = [...trackerDerived.rfcTotal];
+   }
 
-    const onsiteList = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Onsite Solution" &&
-        ["Closed - Canceled","Closed - Posted","Open - Completed"].includes(r.onsiteRFC)
-    );
-
-    const offsiteList = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Offsite Solution" &&
-        r.benchRFC === "Possible completed"
-    );
-
-    const csrList = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Parts Shipped" &&
-        ["Cancelled","Closed","POD"].includes(r.csrRFC)
-    );
-
-    rows = [
-        ...onsiteList,
-        ...offsiteList,
-        ...csrList
-    ];
-}
-
-/* ===============================================================
-   RFC MODE: NEGATIVE (NEW — does NOT return early)
-   =============================================================== */
-if (uiState.mode === "negative") {
-
-    let base = [...trackerState.allCases];
-
-    // TOTAL building (same as total mode)
-    const onsiteTotal = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Onsite Solution" &&
-        ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
-        .includes(r.onsiteRFC)
-    );
-
-    const offsiteTotal = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Offsite Solution" &&
-        r.benchRFC === "Possible completed"
-    );
-
-    const csrTotal = trackerState.allCases.filter(r =>
-        r.caseResolutionCode === "Parts Shipped" &&
-        ["Cancelled", "Closed", "POD"].includes(r.csrRFC)
-    );
-
-    const totalCases = [...onsiteTotal, ...offsiteTotal, ...csrTotal]
-        .map(c => c.id);
-
-    // Remove TOTAL cases
-    base = base.filter(r => !totalCases.includes(r.id));
-
-    // Remove Onsite + CA Group 0-3 / 3-5
-    base = base.filter(r => !(
-        r.caseResolutionCode === "Onsite Solution" &&
-        ["0-3 Days", "3-5 Days"].includes(r.caGroup)
-    ));
-
-    // Remove Parts Shipped + CA Group 0-3
-    base = base.filter(r => !(
-        r.caseResolutionCode === "Parts Shipped" &&
-        r.caGroup === "0-3 Days"
-    ));
-
-    // Remove Offsite + CA Group 0-3 / 3-5 / 5-10
-    base = base.filter(r => !(
-        r.caseResolutionCode === "Offsite Solution" &&
-        ["0-3 Days","3-5 Days","5-10 Days"].includes(r.caGroup)
-    ));
-
-    rows = base;
-}
+   /* ===============================================================
+      RFC MODE: NEGATIVE (NEW — does NOT return early)
+      =============================================================== */
+   if (uiState.mode === "negative") {
+       rows = [...trackerDerived.rfcNegative];
+   }
 
   /* ===============================================================
      NORMAL MODE — APPLY FULL FILTER PIPELINE
@@ -1544,32 +1562,14 @@ renderTable();
    BADGE COUNTS (GLOBAL)
    ======================================================================= */
 function updateBadges() {
-  const today = getTeamToday(trackerState.teamConfig);
+  el.badgeDue.textContent = trackerDerived.dueToday.length;
+  el.badgeFlag.textContent = trackerDerived.flagged.length;
+  el.badgePNS.textContent = trackerDerived.pns.length;
 
-  el.badgeDue.textContent = trackerState.allCases.filter(r =>
-    r.lastActionedBy === trackerState.user.uid &&
-    r.followDate &&
-    r.followDate <= today &&
-    r.status !== "Closed"
-  ).length;
-
-  el.badgeFlag.textContent = trackerState.allCases.filter(r =>
-    r.lastActionedBy === trackerState.user.uid &&
-    r.flagged
-  ).length;
-
-   el.badgePNS.textContent = trackerState.allCases.filter(r =>
-     r.PNS === true &&
-     r.lastActionedBy === trackerState.user.uid
-   ).length;
-
-
-  // RFC — Total Open Repair Cases (team-wide)
   const rfcTotalEl = document.getElementById("rfcTotalCount");
   if (rfcTotalEl) {
     rfcTotalEl.textContent = trackerState.allCases.length;
   }
-
 }
 
 /* =========================================================
@@ -3357,6 +3357,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

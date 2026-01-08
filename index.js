@@ -1,6 +1,6 @@
-/* =========================================================
+/* =======================================================
    PHASE 1 — CORE ENGINE REBUILD
-   ========================================================= */
+   ======================================================= */
 
 import {
   auth,
@@ -3355,6 +3355,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

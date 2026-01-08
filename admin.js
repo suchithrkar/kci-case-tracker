@@ -17,6 +17,7 @@ import {
   onAuthStateChanged,
   db,
   collection,
+  addDoc,
   doc,
   getDoc,
   getDocs,
@@ -1338,6 +1339,7 @@ async function createTeamHandler() {
   } catch (err) {
     console.error(err);
     alert("Failed to create team.");
+    showPopup(`Failed to create team.\n${err.message}`);
   }
 }
 
@@ -2875,6 +2877,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

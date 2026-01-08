@@ -851,7 +851,7 @@ async function generateDailyRepairReport({
   );
 
   const offsiteRFC = offsiteAll.filter(c =>
-    c.benchRFC === "Possible completed"
+    c.benchRFC === "Delivered"
   );
 
   const csrRFC = csrAll.filter(c =>
@@ -2875,6 +2875,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

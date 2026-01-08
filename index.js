@@ -632,7 +632,7 @@ function buildPrimaryFilters() {
         </div>
       </div>
       <div class="filter-body" id="filter-body-${key}">
-        <div class="chips" id="chips-${key}">
+        <div class="chips ${key === "benchRFC" ? "single-column" : ""}" id="chips-${key}">
           ${PRIMARY_OPTIONS[key].map(opt => `
             <label style="display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem;">
               <input type="checkbox" data-key="${key}" data-value="${escapeHtml(opt)}"/>
@@ -2476,13 +2476,16 @@ export function openCaseModal(caseId, enforce = false) {
 
    /* Restore saved notes box height */
    const savedH = localStorage.getItem("notesBoxHeight");
-if (savedH) {
-  notesHeightLocked = true;       // ← prevent auto-resize overwrite
-  optNotes.style.height = savedH;
-} else {
-  notesHeightLocked = false;      // ← normal auto-resize mode
-  resizeNotes();
-}
+   if (savedH) {
+     notesHeightLocked = true;
+   
+     // ⛔ Clamp saved height to max 400px
+     const clampedH = Math.min(parseInt(savedH, 10), 350);
+     optNotes.style.height = clampedH + "px";
+   } else {
+     notesHeightLocked = false;
+     resizeNotes();
+   }
 
 
 
@@ -2878,30 +2881,38 @@ setInterval(refreshFlagUI, 300); */
    ======================================================================= */
 
 optNotes.addEventListener("input", () => {
-  // If height was manually resized → do NOT auto-resize
   if (notesHeightLocked) return;
 
   optNotes.style.height = "auto";
-  optNotes.style.height = (optNotes.scrollHeight + 6) + "px";
+
+  // ⛔ Clamp auto-grow to max 400px
+  const newH = Math.min(optNotes.scrollHeight + 6, 350);
+  optNotes.style.height = newH + "px";
 });
 
 
 /* SAVE resized height to localStorage */
 optNotes.addEventListener("mouseup", () => {
-  const h = optNotes.style.height;
-  if (h) {
-    localStorage.setItem("notesBoxHeight", h);
-    notesHeightLocked = true;   // ← lock the height once resized
-  }
+  let h = parseInt(optNotes.style.height, 10);
+  if (!h) return;
+
+  // ⛔ Clamp to max 400px
+  h = Math.min(h, 350);
+
+  optNotes.style.height = h + "px";
+  localStorage.setItem("notesBoxHeight", h + "px");
+  notesHeightLocked = true;
 });
 
 
 
 /* Initial resize when modal opens */
 function resizeNotes() {
-  if (notesHeightLocked) return;   // ← prevent overwriting saved height
+  if (notesHeightLocked) return;
+
   optNotes.style.height = "auto";
-  optNotes.style.height = (optNotes.scrollHeight + 6) + "px";
+  const newH = Math.min(optNotes.scrollHeight + 6, 350);
+  optNotes.style.height = newH + "px";
 }
 
 /* FINAL unified openCaseModal override (animation + notes resize) */
@@ -3355,6 +3366,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

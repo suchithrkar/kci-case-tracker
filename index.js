@@ -608,7 +608,7 @@ const PRIMARY_OPTIONS = {
   caGroup: ["0-3 Days","3-5 Days","5-10 Days","10-14 Days","15-30 Days","30-60 Days","60-90 Days","> 90 Days"],
   onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
   csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
-  benchRFC: ["Possible completed","Repair Pending"],
+  benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
   country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"]
 };
 
@@ -877,7 +877,7 @@ return;
        
        uiState.mode = "offsite";
         uiState.primaries.caseResolutionCode = ["Offsite Solution"];
-        uiState.primaries.benchRFC = ["Possible completed"];
+        uiState.primaries.benchRFC = ["Delivered"];
         buildPrimaryFilters();
 previouslyOpenFilters.forEach(key => {
     const body = document.getElementById(`filter-body-${key}`);
@@ -1329,7 +1329,7 @@ if (uiState.mode === "total") {
 
     const offsiteList = trackerState.allCases.filter(r =>
         r.caseResolutionCode === "Offsite Solution" &&
-        r.benchRFC === "Possible completed"
+        r.benchRFC === "Delivered"
     );
 
     const csrList = trackerState.allCases.filter(r =>
@@ -1360,7 +1360,7 @@ if (uiState.mode === "negative") {
 
     const offsiteTotal = trackerState.allCases.filter(r =>
         r.caseResolutionCode === "Offsite Solution" &&
-        r.benchRFC === "Possible completed"
+        r.benchRFC === "Delivered"
     );
 
     const csrTotal = trackerState.allCases.filter(r =>
@@ -1577,7 +1577,7 @@ function buildRfcReport() {
   );
 
   const offsiteRFC = offsiteAll.filter(r =>
-    r.benchRFC === "Possible completed"
+    r.benchRFC === "Delivered"
   );
 
   const csrRFC = csrAll.filter(r =>
@@ -3355,6 +3355,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

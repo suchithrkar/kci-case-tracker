@@ -1318,15 +1318,27 @@ btnTeamCancel.onclick = () => {
 // ============================================================
 async function createTeamHandler() {
   const name = newTeamName.value.trim();
-   const timezone = newTeamTimezone.dataset.value;
-   const resetHour = newTeamResetHour.dataset.value;
+  const timezone = newTeamTimezone.dataset.value;
+  const resetHour = newTeamResetHour.dataset.value;
 
   if (!name) return alert("Please enter a team name.");
   if (!timezone) return alert("Please select a team timezone.");
   if (resetHour === "") return alert("Please select a daily reset time.");
 
+  const teamId = name
+    .toUpperCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^A-Z0-9_]/g, "");
+
   try {
-    await addDoc(collection(db, "teams"), {
+    const teamRef = doc(db, "teams", teamId);
+
+    const existing = await getDoc(teamRef);
+    if (existing.exists()) {
+      return showPopup("A team with this name already exists.");
+    }
+
+    await setDoc(teamRef, {
       name,
       resetTimezone: timezone,
       resetHour: Number(resetHour),
@@ -1338,7 +1350,6 @@ async function createTeamHandler() {
     showPopup("Team created successfully.");
   } catch (err) {
     console.error(err);
-    alert("Failed to create team.");
     showPopup(`Failed to create team.\n${err.message}`);
   }
 }
@@ -2877,6 +2888,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

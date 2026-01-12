@@ -608,7 +608,7 @@ const PRIMARY_OPTIONS = {
   caGroup: ["0-3 Days","3-5 Days","5-10 Days","10-14 Days","15-30 Days","30-60 Days","60-90 Days","> 90 Days"],
   onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
   csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
-  benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
+  benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Order processing hold","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
   country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"]
 };
 
@@ -3366,6 +3366,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

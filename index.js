@@ -877,7 +877,7 @@ return;
        
        uiState.mode = "offsite";
         uiState.primaries.caseResolutionCode = ["Offsite Solution"];
-        uiState.primaries.benchRFC = ["Delivered"];
+        uiState.primaries.benchRFC = ["Delivered","Order cancelled, not to be reopened"];
         buildPrimaryFilters();
 previouslyOpenFilters.forEach(key => {
     const body = document.getElementById(`filter-body-${key}`);
@@ -1329,7 +1329,7 @@ if (uiState.mode === "total") {
 
     const offsiteList = trackerState.allCases.filter(r =>
         r.caseResolutionCode === "Offsite Solution" &&
-        r.benchRFC === "Delivered"
+        ["Delivered","Order cancelled, not to be reopened"].includes(r.benchRFC)
     );
 
     const csrList = trackerState.allCases.filter(r =>
@@ -1360,7 +1360,7 @@ if (uiState.mode === "negative") {
 
     const offsiteTotal = trackerState.allCases.filter(r =>
         r.caseResolutionCode === "Offsite Solution" &&
-        r.benchRFC === "Delivered"
+        ["Delivered", "Order cancelled, not to be reopened"].includes(r.benchRFC)
     );
 
     const csrTotal = trackerState.allCases.filter(r =>
@@ -1577,7 +1577,7 @@ function buildRfcReport() {
   );
 
   const offsiteRFC = offsiteAll.filter(r =>
-    r.benchRFC === "Delivered"
+    ["Delivered","Order cancelled, not to be reopened"].includes(r.benchRFC)
   );
 
   const csrRFC = csrAll.filter(r =>
@@ -3366,6 +3366,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -852,7 +852,7 @@ async function generateDailyRepairReport({
   );
 
   const offsiteRFC = offsiteAll.filter(c =>
-    c.benchRFC === "Delivered"
+    ["Delivered", "Order cancelled, not to be reopened"].includes(c.benchRFC)
   );
 
   const csrRFC = csrAll.filter(c =>
@@ -2888,6 +2888,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

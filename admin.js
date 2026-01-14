@@ -2466,8 +2466,8 @@ function renderStatsTableNew() {
   <table class="admin-stats-table">
     <thead>
       <tr style="text-align:left;border-bottom:1px solid var(--border);">
-        <th>User</th>
-        <th>Total Followed Up</th>
+        <th>Agent</th>
+        <th>Total Followed Up Today</th>
         <th>Closed Today</th>
         <th>Met</th>
         <th>Not Met</th>
@@ -2481,7 +2481,7 @@ function renderStatsTableNew() {
         </th>
 
         <th style="position:relative;">
-          Follow-ups
+          Scheduled Follow-ups
           <span class="tooltip">
             Cases Due to be followed up today.<br>
             X - Total Due Today Cases.<br>
@@ -2888,6 +2888,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -2203,7 +2203,7 @@ document.addEventListener("click", (e) => {
 
 async function firestoreUpdateCase(caseId, fields) {
   try {
-    await updateCase(caseId, fields);
+    await updateCase(currentUser.teamId, caseId, fields);
   } catch (err) {
     if (err.code === "permission-denied") {
       showPopup("Permission restricted: Read-only access on tracker page.");
@@ -3366,6 +3366,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

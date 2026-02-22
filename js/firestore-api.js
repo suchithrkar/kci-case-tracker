@@ -43,10 +43,11 @@ export async function adminUpsertCase(teamId, caseId, data) {
 // ======================================
 // ADMIN: DELETE CASE
 // ======================================
-export function adminDeleteCase(caseId) {
-  return updateDoc(doc(db, "cases", caseId), {
-    _deleted: true
-  });
+export function adminDeleteCase(teamId, caseId) {
+  return updateDoc(
+    doc(db, "cases", teamId, "casesList", caseId),
+    { _deleted: true }
+  );
 }
 
 // ======================================
@@ -64,3 +65,4 @@ export function getCase(teamId, caseId) {
     doc(db, "cases", teamId, "casesList", caseId)
   );
 }
+

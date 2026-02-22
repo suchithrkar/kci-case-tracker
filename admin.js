@@ -1910,19 +1910,17 @@ function bindUserActions() {
    CASCADE DELETE — DELETE ALL CASES FOR A TEAM
    ======================================================================= */
 async function deleteAllCasesForTeam(teamId) {
-  const casesSnap = await getDocs(
-    query(collection(db, "cases"), where("teamId", "==", teamId))
-  );
+  const colRef = collection(db, "cases", teamId, "casesList");
+  const snap = await getDocs(colRef);
 
-  const batchLimit = 450;  // Firestore batch limit safe-zone
+  const batchLimit = 450;
   let batch = [];
   let counter = 0;
 
-  for (const docSnap of casesSnap.docs) {
-    batch.push(deleteDoc(doc(db, "cases", docSnap.id)));
+  for (const docSnap of snap.docs) {
+    batch.push(deleteDoc(docSnap.ref));
     counter++;
 
-    // Execute in chunks to avoid failures
     if (counter >= batchLimit) {
       await Promise.all(batch);
       batch = [];
@@ -1934,8 +1932,6 @@ async function deleteAllCasesForTeam(teamId) {
     await Promise.all(batch);
   }
 }
-
-
 
 
 /* ============================================================
@@ -2720,24 +2716,51 @@ async function loadAllUsersForStats() {
    Load cases ONCE for stats tab (NO realtime)
 ------------------------------------------------------------ */
 async function loadStatsCasesOnce() {
-  // Load cases using a team-scoped query for non-primary users
   try {
-    let snap;
+    let allCases = [];
 
+    // SECONDARY → only their team
     if (!isPrimary(adminState.user)) {
-      // Secondary → only read cases for their team
-      const q = query(collection(db, "cases"), where("teamId", "==", adminState.user.teamId));
-      snap = await getDocs(q);
-    } else {
-      // Primary → can read all cases (TOTAL mode or specific team selected elsewhere)
-      snap = await getDocs(collection(db, "cases"));
+      const colRef = collection(
+        db,
+        "cases",
+        adminState.user.teamId,
+        "casesList"
+      );
+
+      const snap = await getDocs(colRef);
+      allCases = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     }
 
-    statsCases = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // PRIMARY
+    else {
+      const selectedTeam = adminState.selectedStatsTeam;
+
+      // TOTAL mode → loop all teams
+      if (selectedTeam === "TOTAL") {
+        for (const t of adminState.allTeams) {
+          const colRef = collection(db, "cases", t.id, "casesList");
+          const snap = await getDocs(colRef);
+          snap.forEach(d => {
+            allCases.push({ id: d.id, ...d.data() });
+          });
+        }
+      }
+
+      // Specific team
+      else {
+        const colRef = collection(db, "cases", selectedTeam, "casesList");
+        const snap = await getDocs(colRef);
+        allCases = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+    }
+
+    statsCases = allCases;
+
   } catch (err) {
     console.error("Failed to load stats cases:", err);
-    showPopup("Unable to load cases for stats (permission or network issue).");
-    statsCases = []; // safe fallback
+    showPopup("Unable to load cases for stats.");
+    statsCases = [];
   }
 }
 
@@ -2883,6 +2906,8 @@ function buildTeamSelector() {
   });
 }
 
+adminState.selectedStatsTeam = "TOTAL";
+
 /* ------------------------------------------------------------
    Disable the old real-time stats subscription
 ------------------------------------------------------------ */
@@ -2891,56 +2916,4 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

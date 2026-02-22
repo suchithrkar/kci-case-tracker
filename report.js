@@ -209,8 +209,14 @@ async function loadLiveCases() {
     q = query(collection(db, "cases"));
   } else {
     q = query(
-      collection(db, "cases"),
-      where("teamId", "==", reportState.teamId)
+      const colRef = collection(
+        db,
+        "cases",
+        reportState.teamId,
+        "casesList"
+      );
+      
+      const snap = await getDocs(colRef);
     );
   }
 
@@ -1092,6 +1098,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

@@ -555,20 +555,20 @@ function computeDiff() {
 async function loadFirestoreCasesForTeam(teamId) {
   updateProgress("Loading existing Firestore cases...");
 
-  const q = query(
-   const colRef = collection(db, "cases", teamId, "casesList");
-   snap = await getDocs(colRef);
-  );
-
-  let snap;
-try {
-  snap = await getDocs(q);
-} catch (err) {
-  console.error("Firestore read failed:", err);
-  showPopup("Could not load Firestore cases. Try again in 1–2 seconds.");
-  return;
-}
-
+     try {
+       const colRef = collection(db, "cases", teamId, "casesList");
+       const snap = await getDocs(colRef);
+   
+       excelState.firestoreCases = snap.docs.map(d => ({
+         id: d.id,
+         ...d.data()
+       }));
+   
+     } catch (err) {
+       console.error("Firestore read failed:", err);
+       showPopup("Could not load Firestore cases. Try again in 1–2 seconds.");
+     }
+   }
 
   excelState.firestoreCases = snap.docs.map(d => ({
     id: d.id,
@@ -2891,6 +2891,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

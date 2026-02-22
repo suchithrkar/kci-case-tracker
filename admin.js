@@ -568,12 +568,6 @@ async function loadFirestoreCasesForTeam(teamId) {
        console.error("Firestore read failed:", err);
        showPopup("Could not load Firestore cases. Try again in 1–2 seconds.");
      }
-   }
-
-  excelState.firestoreCases = snap.docs.map(d => ({
-    id: d.id,
-    ...d.data()
-  }));
 }
 
 
@@ -2916,4 +2910,5 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 

@@ -556,8 +556,8 @@ async function loadFirestoreCasesForTeam(teamId) {
   updateProgress("Loading existing Firestore cases...");
 
   const q = query(
-    collection(db, "cases"),
-    where("teamId", "==", teamId)
+   const colRef = collection(db, "cases", teamId, "casesList");
+   snap = await getDocs(colRef);
   );
 
   let snap;
@@ -695,7 +695,7 @@ async function applyExcelChanges() {
      updateProgress("\nCreating NEW cases...");
      await runBatches(
      newCases.map(ex =>
-       setDoc(doc(db, "cases", ex.id), {
+       setDoc(doc(db, "cases", excelState.teamId, "casesList", ex.id),{
          id: ex.id,
          teamId: excelState.teamId,
    
@@ -768,7 +768,10 @@ async function applyExcelChanges() {
           });
         }
       
-        return setDoc(doc(db, "cases", ex.id), data);
+         return setDoc(
+           doc(db, "cases", excelState.teamId, "casesList", ex.id),
+           data
+         );
       }),
      "Updated"
    );
@@ -780,7 +783,7 @@ async function applyExcelChanges() {
      if (deleted.length > 0) {
        updateProgress("\nDeleting missing cases...");
        await runBatches(
-         deleted.map(c => deleteDoc(doc(db, "cases", c.id))),
+         deleted.map(c => deleteDoc(doc(db, "cases", excelState.teamId, "casesList", c.id))),
          "Deleted"
        );
      }
@@ -2888,6 +2891,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

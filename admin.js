@@ -2032,16 +2032,12 @@ if (fileLabel && excelInputEl) {
 
 
 
-
-
-
 /* ============================================================
    BACKUP EXPORT / IMPORT
    ============================================================ */
 async function exportBackup(teamId) {
-  const snap = await getDocs(
-    query(collection(db, "cases"), where("teamId", "==", teamId))
-  );
+  const colRef = collection(db, "cases", teamId, "casesList");
+  const snap = await getDocs(colRef);
 
   const cases = snap.docs.map(d => ({
     id: d.id,
@@ -2910,5 +2906,6 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 

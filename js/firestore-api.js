@@ -9,9 +9,9 @@ import {
 // REAL-TIME CASE LISTENER
 // ======================================
 export function listenToTeamCases(teamId, callback) {
-  const q = query(collection(db, "cases"), where("teamId", "==", teamId));
+  const colRef = collection(db, "cases", teamId, "casesList");
 
-  return onSnapshot(q, (snap) => {
+  return onSnapshot(colRef, (snap) => {
     const rows = [];
     snap.forEach((d) => rows.push({ id: d.id, ...d.data() }));
     callback(rows);
@@ -22,15 +22,22 @@ export function listenToTeamCases(teamId, callback) {
 // UPDATE CASE MANUAL FIELDS
 // (rules restrict what general users can update)
 // ======================================
-export async function updateCase(caseId, fields) {
-  return updateDoc(doc(db, "cases", caseId), fields);
+export async function updateCase(teamId, caseId, fields) {
+  return updateDoc(
+    doc(db, "cases", teamId, "casesList", caseId),
+    fields
+  );
 }
 
 // ======================================
 // ADMIN: CREATE/UPDATE CASE FROM EXCEL
 // ======================================
-export async function adminUpsertCase(caseId, data) {
-  await setDoc(doc(db, "cases", caseId), data, { merge: true });
+export async function adminUpsertCase(teamId, caseId, data) {
+  await setDoc(
+    doc(db, "cases", teamId, "casesList", caseId),
+    data,
+    { merge: true }
+  );
 }
 
 // ======================================
@@ -52,6 +59,8 @@ export function getUser(uid) {
 // ======================================
 // GET SINGLE CASE DOC
 // ======================================
-export function getCase(caseId) {
-  return getDoc(doc(db, "cases", caseId));
+export function getCase(teamId, caseId) {
+  return getDoc(
+    doc(db, "cases", teamId, "casesList", caseId)
+  );
 }

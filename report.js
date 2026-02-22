@@ -203,25 +203,47 @@ function initHeader(user) {
    ========================================================= */
 
 async function loadLiveCases() {
-  let q;
 
   if (reportState.teamId === "TOTAL") {
-    q = query(collection(db, "cases"));
-  } else {
-    q = query(
+
+    // Load all teams separately
+    const teamsSnap = await getDocs(collection(db, "teams"));
+
+    let allCases = [];
+
+    for (const teamDoc of teamsSnap.docs) {
+
+      const teamId = teamDoc.id;
+
       const colRef = collection(
         db,
         "cases",
-        reportState.teamId,
+        teamId,
         "casesList"
       );
-      
-      const snap = await getDocs(colRef);
-    );
-  }
 
-  const snap = await getDocs(q);
-  reportState.liveCases = snap.docs.map(d => d.data());
+      const snap = await getDocs(colRef);
+
+      snap.forEach(d => {
+        allCases.push(d.data());
+      });
+    }
+
+    reportState.liveCases = allCases;
+
+  } else {
+
+    const colRef = collection(
+      db,
+      "cases",
+      reportState.teamId,
+      "casesList"
+    );
+
+    const snap = await getDocs(colRef);
+
+    reportState.liveCases = snap.docs.map(d => d.data());
+  }
 }
 
 async function loadTodaySummary() {
@@ -1098,6 +1120,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

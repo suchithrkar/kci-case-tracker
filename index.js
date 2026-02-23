@@ -2203,14 +2203,23 @@ document.addEventListener("click", (e) => {
 
 async function firestoreUpdateCase(caseId, fields) {
   try {
-    await updateCase(currentUser.teamId, caseId, fields);
+    if (!trackerState.teamId) {
+      throw new Error("Team ID not available");
+    }
+
+    await updateCase(trackerState.teamId, caseId, fields);
+
   } catch (err) {
+
+    console.error("Firestore update failed:", err);
+
     if (err.code === "permission-denied") {
       showPopup("Permission restricted: Read-only access on tracker page.");
     } else {
-      showPopup("Unable to save changes. Read-only access allowed.");
+      showPopup("Failed to update case. Please try again.");
     }
-    throw err; // 🔴 CRITICAL — propagate failure
+
+    throw err;
   }
 }
 
@@ -3366,6 +3375,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

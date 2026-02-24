@@ -667,13 +667,13 @@ async function openPreviewModal() {
    
      const todayISO = getTeamToday(teamCfg);
    
-     const reportRef = doc(
-       db,
-       "dailyRepairReports",
-       excelState.teamId,
-       "reports",
-       todayISO
-     );
+      const reportRef = doc(
+        db,
+        "cases",
+        excelState.teamId,
+        "reports",
+        todayISO
+      );
    
      const reportSnap = await getDoc(reportRef);
    
@@ -1137,7 +1137,7 @@ async function generateDailyRepairReport({
    
    const reportRef = doc(
      db,
-     "dailyRepairReports",
+     "cases",
      teamId,
      "reports",
      todayISO
@@ -3138,6 +3138,44 @@ function buildTeamSelector() {
   });
 }
 
+// ======================================================
+// ONE-TIME MIGRATION: Move reports to cases/{teamId}/reports
+// ======================================================
+async function migrateDailyReportsToCases() {
+  showPopup("Starting report migration...");
+
+  const teamsSnap = await getDocs(collection(db, "dailyRepairReports"));
+
+  for (const teamDoc of teamsSnap.docs) {
+    const teamId = teamDoc.id;
+
+    const oldReportsRef = collection(
+      db,
+      "dailyRepairReports",
+      teamId,
+      "reports"
+    );
+
+    const oldSnap = await getDocs(oldReportsRef);
+
+    for (const reportDoc of oldSnap.docs) {
+      const newRef = doc(
+        db,
+        "cases",
+        teamId,
+        "reports",
+        reportDoc.id
+      );
+
+      await setDoc(newRef, reportDoc.data());
+    }
+
+    console.log(`Migrated reports for team: ${teamId}`);
+  }
+
+  showPopup("Migration complete. Verify Firestore before deleting old collection.");
+}
+
 adminState.selectedStatsTeam = "TOTAL";
 
 /* ------------------------------------------------------------
@@ -3148,6 +3186,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

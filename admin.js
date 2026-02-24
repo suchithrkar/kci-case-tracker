@@ -354,20 +354,28 @@ async function parseExcelFile(file) {
       // We only check for KEY PHRASES, not full header text
       const expectedHeaders = {
         0: "case id",
-        1: "full name",                 // matches "Full Name (Primary Contact)"
-        2: "created",                   // matches "Created On"
+        1: "customer name",
+        2: "created on",
         3: "created by",
-        6: "country",
-        8: "resolution",                // matches "Case Resolution Code"
-        9: "owning user",               // ✅ matches "Full Name (Owning User) (User)"
-        15: "otc",                      // OTC Code
-        18: "ca group",
-        21: "tl",
-        30: "sbd",
-        34: "onsite",
-        35: "csr",
-        36: "bench",
-        37: "market"
+        4: "country",
+        5: "resolution",
+        6: "owner",
+        7: "otc",
+        8: "ca group",
+        9: "tl",
+        10: "sbd",
+        11: "onsite",
+        12: "csr",
+        13: "bench",
+        14: "market",
+        15: "closure",
+        16: "tracking",
+        17: "part number",
+        18: "part name",
+        19: "serial",
+        20: "product",
+        21: "email",
+        22: "dnap"
       };
 
       const headerRow = rows[0] || [];
@@ -2994,6 +3002,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

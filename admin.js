@@ -641,7 +641,7 @@ async function loadFirestoreCasesForTeam(teamId) {
 // ======================================================
 // PREVIEW CHANGES MODAL
 // ======================================================
-function openPreviewModal() {
+async function openPreviewModal() {
   const d = excelState.diff;
 
   $("previewCounts").innerHTML = `
@@ -652,6 +652,43 @@ function openPreviewModal() {
 
   // show preview section
   $("previewSection").style.display = "block";
+
+   // ==========================================
+   // Auto-toggle Daily Report checkbox
+   // ==========================================
+   try {
+     const teamSnap = await getDoc(doc(db, "teams", excelState.teamId));
+     const teamCfg = teamSnap.exists()
+       ? {
+           resetTimezone: teamSnap.data().resetTimezone,
+           resetHour: teamSnap.data().resetHour
+         }
+       : { resetTimezone: "UTC", resetHour: 0 };
+   
+     const todayISO = getTeamToday(teamCfg);
+   
+     const reportRef = doc(
+       db,
+       "dailyRepairReports",
+       excelState.teamId,
+       "reports",
+       todayISO
+     );
+   
+     const reportSnap = await getDoc(reportRef);
+   
+     // First upload of the day → checked
+     if (!reportSnap.exists()) {
+       $("updateDailyReport").checked = true;
+     } else {
+       // Already generated today → unchecked
+       $("updateDailyReport").checked = false;
+     }
+   
+   } catch (err) {
+     console.warn("Could not determine daily report state:", err);
+     $("updateDailyReport").checked = false;
+   }
 
   // show checkbox only when needed
   $("deleteCheckboxWrap").style.display = d.deleted.length > 0 ? "block" : "none";
@@ -1270,7 +1307,7 @@ $("btnPreviewChanges").onclick = async () => {
   updateProgress("Comparing Excel → Firestore...");
   computeDiff();
 
-  openPreviewModal();
+  await openPreviewModal();
 };
 
 function openNoFollowModal(userId) {
@@ -3117,6 +3154,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

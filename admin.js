@@ -3175,6 +3175,7 @@ async function migrateDailyReportsToCases() {
 
   showPopup("Migration complete. Verify Firestore before deleting old collection.");
 }
+window.migrateDailyReportsToCases = migrateDailyReportsToCases;
 
 adminState.selectedStatsTeam = "TOTAL";
 
@@ -3186,6 +3187,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

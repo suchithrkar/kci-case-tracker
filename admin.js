@@ -3144,7 +3144,7 @@ function buildTeamSelector() {
 async function migrateDailyReportsToCases() {
   showPopup("Starting report migration...");
 
-  const teamsSnap = await getDocs(collection(db, "dailyRepairReports"));
+  const teamsSnap = await getDocs(collection(db, "teams"));
 
   for (const teamDoc of teamsSnap.docs) {
     const teamId = teamDoc.id;
@@ -3158,6 +3158,11 @@ async function migrateDailyReportsToCases() {
 
     const oldSnap = await getDocs(oldReportsRef);
 
+    if (oldSnap.empty) {
+      console.log(`No reports found for team: ${teamId}`);
+      continue;
+    }
+
     for (const reportDoc of oldSnap.docs) {
       const newRef = doc(
         db,
@@ -3167,14 +3172,15 @@ async function migrateDailyReportsToCases() {
         reportDoc.id
       );
 
-      await setDoc(newRef, reportDoc.data());
+      await setDoc(newRef, reportDoc.data(), { merge: true });
     }
 
-    console.log(`Migrated reports for team: ${teamId}`);
+    console.log(`Migrated ${oldSnap.size} reports for team: ${teamId}`);
   }
 
   showPopup("Migration complete. Verify Firestore before deleting old collection.");
 }
+
 window.migrateDailyReportsToCases = migrateDailyReportsToCases;
 
 adminState.selectedStatsTeam = "TOTAL";
@@ -3187,6 +3193,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

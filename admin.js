@@ -883,12 +883,22 @@ async function applyExcelChanges() {
    
    const todayISO = getTeamToday(teamCfg);
    
-   await generateDailyRepairReport({
-     teamId: excelState.teamId,
-     cases: excelState.excelCases,
-     todayISO,
-     generatedBy: adminState.user.uid
-   });
+   if ($("updateDailyReport")?.checked) {
+   
+     updateProgress("\nGenerating Daily Repair Report...");
+   
+     await generateDailyRepairReport({
+       teamId: excelState.teamId,
+       cases: excelState.excelCases,
+       todayISO,
+       generatedBy: adminState.user.uid
+     });
+   
+     updateProgress("Daily report updated.");
+   
+   } else {
+     updateProgress("\nDaily report update skipped.");
+   }
 
    // ==========================================
    // Sync Closed Cases (Batched + Cleanup)
@@ -2125,6 +2135,7 @@ function resetExcelUI() {
   $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> -`;
   $("btnPreviewChanges").disabled = true;
   $("allowDeletion").checked = false;
+  $("updateDailyReport").checked = false;
 
   clearProgress();
 
@@ -3106,6 +3117,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

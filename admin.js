@@ -937,8 +937,6 @@ async function applyExcelChanges() {
    updateProgress(`New Closed Cases: ${toCreate.length}`);
    updateProgress(`Removed Closed Cases: ${toDelete.length}`);
    
-   const batchLimit = 400;
-   
    // Utility batch runner
    async function runClosedBatches(tasks, label) {
      let batch = [];
@@ -3108,6 +3106,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

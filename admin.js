@@ -2062,17 +2062,39 @@ function resetExcelUI() {
    
 }
 
+function excelToDate(value) {
+  if (!value) return "";
 
+  try {
+    // If already a Date object
+    if (value instanceof Date && !isNaN(value)) {
+      return value.toISOString().split("T")[0];
+    }
 
+    // If numeric Excel serial date
+    if (typeof value === "number") {
+      const epoch = new Date(Date.UTC(1899, 11, 30));
+      const d = new Date(epoch.getTime() + value * 86400000);
+      if (!isNaN(d)) {
+        return d.toISOString().split("T")[0];
+      }
+    }
 
-function excelToDate(num) {
-  if (!num) return "";
-  const epoch = new Date(1899, 11, 30);
-  const d = new Date(epoch.getTime() + num * 86400000);
-  return d.toISOString().split("T")[0];
+    // If string date
+    if (typeof value === "string") {
+      const parsed = new Date(value);
+      if (!isNaN(parsed)) {
+        return parsed.toISOString().split("T")[0];
+      }
+    }
+
+    // If none of the above
+    return "";
+  } catch (err) {
+    console.warn("Invalid date encountered in Excel:", value);
+    return "";
+  }
 }
-
-
 
 updateTeamList.addEventListener("click", async (e) => {
   const btn = e.target.closest("button");
@@ -3002,6 +3024,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

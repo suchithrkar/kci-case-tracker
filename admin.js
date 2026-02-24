@@ -891,26 +891,110 @@ async function applyExcelChanges() {
    });
 
    // ==========================================
-   // Sync Closed Cases (Archival Only)
+   // Sync Closed Cases (Batched + Cleanup)
    // ==========================================
-   if (excelState.closedCases?.length) {
-     updateProgress("\nSyncing Closed Cases archive...");
+   updateProgress("\n-----------------------------------");
+   updateProgress("SYNCING CLOSED CASES ARCHIVE");
+   updateProgress("-----------------------------------");
    
-     for (const c of excelState.closedCases) {
-       const ref = doc(db, "cases", excelState.teamId, "closedCases", c.id);
-       const snap = await getDoc(ref);
+   const closedColRef = collection(
+     db,
+     "cases",
+     excelState.teamId,
+     "closedCases"
+   );
    
-       if (!snap.exists()) {
-         await setDoc(ref, {
-           ...c,
-           teamId: excelState.teamId,
-           archivedAt: new Date()
-         });
+   // 1️⃣ Load existing closed cases from Firestore
+   updateProgress("Loading existing closed cases from Firestore...");
+   const closedSnap = await getDocs(closedColRef);
+   
+   const existingClosedMap = new Map();
+   closedSnap.forEach(d => {
+     existingClosedMap.set(d.id, d.data());
+   });
+   
+   const excelClosedMap = new Map();
+   excelState.closedCases.forEach(c => {
+     excelClosedMap.set(c.id, c);
+   });
+   
+   // 2️⃣ Detect NEW + DELETE
+   const toCreate = [];
+   const toDelete = [];
+   
+   for (const c of excelState.closedCases) {
+     if (!existingClosedMap.has(c.id)) {
+       toCreate.push(c);
+     }
+   }
+   
+   for (const d of closedSnap.docs) {
+     if (!excelClosedMap.has(d.id)) {
+       toDelete.push(d.id);
+     }
+   }
+   
+   updateProgress(`New Closed Cases: ${toCreate.length}`);
+   updateProgress(`Removed Closed Cases: ${toDelete.length}`);
+   
+   const batchLimit = 400;
+   
+   // Utility batch runner
+   async function runClosedBatches(tasks, label) {
+     let batch = [];
+     let processed = 0;
+   
+     for (const t of tasks) {
+       batch.push(t);
+       processed++;
+   
+       if (batch.length >= batchLimit) {
+         updateProgress(`${label}: writing batch (${processed - batch.length} to ${processed})...`);
+         await Promise.all(batch);
+         batch = [];
        }
      }
    
-     updateProgress(`Closed Cases synced: ${excelState.closedCases.length}`);
+     if (batch.length > 0) {
+       updateProgress(`${label}: writing final batch...`);
+       await Promise.all(batch);
+     }
+   
+     updateProgress(`${label}: ✔ completed (${processed})`);
    }
+   
+   // 3️⃣ CREATE NEW
+   if (toCreate.length > 0) {
+     updateProgress("\nCreating new closed cases...");
+     await runClosedBatches(
+       toCreate.map(c =>
+         setDoc(
+           doc(db, "cases", excelState.teamId, "closedCases", c.id),
+           {
+             ...c,
+             teamId: excelState.teamId,
+             archivedAt: new Date()
+           }
+         )
+       ),
+       "Closed Create"
+     );
+   }
+   
+   // 4️⃣ DELETE MISSING
+   if (toDelete.length > 0) {
+     updateProgress("\nRemoving missing closed cases...");
+     await runClosedBatches(
+       toDelete.map(id =>
+         deleteDoc(
+           doc(db, "cases", excelState.teamId, "closedCases", id)
+         )
+       ),
+       "Closed Delete"
+     );
+   }
+   
+   updateProgress("\nClosed Cases Sync Complete.");
    
    showPopup("Excel update complete!");
    processing = false;
@@ -3024,6 +3108,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -52,26 +52,26 @@ service cloud.firestore {
 
 
     /* =====================================
-       CASES COLLECTION
+       CASES COLLECTION (TEAM-SCOPED)
        ===================================== */
-    match /cases/{caseId} {
+    match /cases/{teamId}/casesList/{caseId} {
 
-      // Approved users can read ONLY cases from their own team
+      // READ
       allow read: if
         isPrimaryAdmin()
         ||
         (
           isApprovedUser() &&
-          resource.data.teamId == getUserTeam()
+          teamId == getUserTeam()
         );
 
-      // Primary admin may fully write
+      // PRIMARY ADMIN FULL WRITE
       allow write: if isPrimaryAdmin();
 
-      // GENERAL USERS may update only allowed fields
+      // GENERAL USERS LIMITED UPDATE
       allow update: if
         isGeneral() &&
-        resource.data.teamId == getUserTeam() &&
+        teamId == getUserTeam() &&
         isAllowedCaseUpdate();
     }
     
@@ -80,10 +80,14 @@ service cloud.firestore {
        ===================================== */
     match /closedCasesHistory/{caseId} {
 
-      allow read: if isPrimaryAdmin();
+      // Primary admin can read all history
+      allow read: if
+        isPrimaryAdmin() ||
+        isSecondaryAdmin();
 
+      // One-time archival write (create only)
       allow create: if
-        isGeneral() &&
+        isApprovedUser() &&
         request.resource.data.teamId == getUserTeam();
 
       allow update, delete: if isPrimaryAdmin();
@@ -95,10 +99,12 @@ service cloud.firestore {
     match /dailyRepairReports/{teamId}/reports/{reportDate} {
 
       // READ
-      allow read: if
-        isPrimaryAdmin()
-        ||
-        (isSecondaryAdmin() && getUserTeam() == teamId);
+    allow read: if
+      isPrimaryAdmin()
+      ||
+      isSecondaryAdmin()
+      ||
+      (isGeneral() && getUserTeam() == teamId);
 
       // WRITE
       allow write: if
@@ -152,21 +158,26 @@ service cloud.firestore {
     }
     
     function isOnlyClosedCountIncrement() {
-      return
-        // Only closedCount can change
+
+      // CASE 1: document does NOT exist yet → allow create with closedCount = 1
+      return (
+        resource == null &&
+        request.resource.data.keys().hasOnly(["closedCount"]) &&
+        request.resource.data.closedCount == 1
+      )
+
+      ||
+
+      // CASE 2: document exists → allow increment by +1 only
+      (
+        resource != null &&
         request.resource.data
           .diff(resource.data)
           .changedKeys()
-          .hasOnly(["closedCount"])
-
-        &&
-
-        // Ensure increment by exactly +1
-        (
-          !resource.data.closedCount ||
-          request.resource.data.closedCount ==
-            resource.data.closedCount + 1
-        );
+          .hasOnly(["closedCount"]) &&
+        request.resource.data.closedCount ==
+          resource.data.closedCount + 1
+      );
     }
 
     /* =====================================

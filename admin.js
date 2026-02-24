@@ -64,6 +64,7 @@ const excelState = {
   rawRows: [],
   excelCases: [],
   firestoreCases: [],
+  closedCases: [],
   diff: { new: [], updated: [], deleted: [] }
 };
 
@@ -330,8 +331,20 @@ async function parseExcelFile(file) {
     reader.onload = (evt) => {
       const data = evt.target.result;
       const wb = XLSX.read(data, { type: "binary" });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+      // ==========================================
+      // Read required sheets by NAME
+      // ==========================================
+      const repairSheet = wb.Sheets["Repair Cases"];
+      const closedSheet = wb.Sheets["Closed Cases Data"];
+      
+      if (!repairSheet) {
+        alert("Repair Cases sheet not found.");
+        resolve();
+        return;
+      }
+      
+      const rows = XLSX.utils.sheet_to_json(repairSheet, { header: 1 });
 
       // ======================================================
       // OPTIONAL SAFETY GUARD — EXCEL HEADER VALIDATION
@@ -400,28 +413,33 @@ async function parseExcelFile(file) {
         if (!id) continue;
 
         parsed.push({
-           id,                                                   // Col A
-           customerName: String(r[1] || "").trim(),              // Col B
-           createdOn: excelToDate(r[2]),                         // Col C
-           createdBy: String(r[3] || "").trim(),                 // Col D
-           country: String(r[6] || "").trim(),                   // Col G
-           caseResolutionCode: String(r[8] || "").trim(),        // Col I
-           caseOwner: String(r[9] || "").trim(),                 // Col J
-
-           // ✅ NEW COLUMN — OTC Code
-           otcCode: String(r[15] || "").trim(),                  // Col P
-
-           // ⬇️ ALL BELOW SHIFTED BY +1
-           caGroup: String(r[18] || "").trim(),                  // Col S
-           tl: String(r[21] || "").trim(),                       // Col V
-           sbd: String(r[30] || "").trim(),                      // Col AE
+           id: String(r[0] || "").trim(),              // A
+           customerName: String(r[1] || "").trim(),   // B
+           createdOn: excelToDate(r[2]),              // C
+           createdBy: String(r[3] || "").trim(),      // D
+           country: String(r[4] || "").trim(),        // E
+           caseResolutionCode: String(r[5] || "").trim(), // F
+           caseOwner: String(r[6] || "").trim(),      // G
+           otcCode: String(r[7] || "").trim(),        // H
+           caGroup: String(r[8] || "").trim(),        // I
+           tl: String(r[9] || "").trim(),             // J
+           sbd: String(r[10] || "").trim(),           // K
+           onsiteRFC: String(r[11] || "").trim(),     // L
+           csrRFC: String(r[12] || "").trim(),        // M
+           benchRFC: String(r[13] || "").trim(),      // N
+           market: String(r[14] || "").trim(),        // O
          
-           onsiteRFC: String(r[34] || "").trim(),                // Col AI
-           csrRFC:    String(r[35] || "").trim(),                // Col AJ
-           benchRFC:  String(r[36] || "").trim(),                // Col AK
-
-           // ✅ NEW LAST COLUMN — Market
-           market: String(r[37] || "").trim(),                   // Col AL
+           // ==========================
+           // NEW FIELDS
+           // ==========================
+           woClosureNotes: String(r[15] || "").trim(), // P
+           trackingStatus: String(r[16] || "").trim(), // Q
+           partNumber: String(r[17] || "").trim(),     // R
+           partName: String(r[18] || "").trim(),       // S
+           serialNumber: String(r[19] || "").trim(),   // T
+           productName: String(r[20] || "").trim(),    // U
+           emailStatus: String(r[21] || "").trim(),    // V
+           dnap: String(r[22] || "").trim(),           // W
          
            excelOrder: i
          });
@@ -429,9 +447,41 @@ async function parseExcelFile(file) {
 
       excelState.excelCases = parsed;
 
+       // ==========================================
+      // Parse Closed Cases Data sheet (archival)
+      // ==========================================
+      excelState.closedCases = [];
+      
+      if (closedSheet) {
+        const closedRows = XLSX.utils.sheet_to_json(closedSheet, { header: 1 });
+      
+        for (let i = 1; i < closedRows.length; i++) {
+          const r = closedRows[i];
+          if (!r || !r[0]) continue;
+      
+          excelState.closedCases.push({
+            id: String(r[0] || "").trim(),
+            customerName: String(r[1] || "").trim(),
+            createdOn: excelToDate(r[2]),
+            createdBy: String(r[3] || "").trim(),
+            modifiedBy: String(r[4] || "").trim(),
+            modifiedOn: excelToDate(r[5]),
+            caseClosedDate: excelToDate(r[6]),
+            closedBy: String(r[7] || "").trim(),
+            country: String(r[8] || "").trim(),
+            caseResolutionCode: String(r[9] || "").trim(),
+            caseOwner: String(r[10] || "").trim(),
+            otcCode: String(r[11] || "").trim(),
+            tl: String(r[12] || "").trim(),
+            sbd: String(r[13] || "").trim(),
+            market: String(r[14] || "").trim()
+          });
+        }
+      }
+
       updateProgress(`Excel loaded.\nTotal valid rows: ${parsed.length}`);
-// Do NOT call validateReadyState() here.
-// It is called AFTER parseExcelFile() in the onchange handler.
+      // Do NOT call validateReadyState() here.
+      // It is called AFTER parseExcelFile() in the onchange handler.
 
 
       resolve();
@@ -539,7 +589,15 @@ function computeDiff() {
        ex.csrRFC !== fs.csrRFC ||
        ex.benchRFC !== fs.benchRFC ||
        ex.market !== fs.market ||
-       ex.excelOrder !== fs.excelOrder;
+       ex.excelOrder !== fs.excelOrder ||
+       ex.woClosureNotes !== fs.woClosureNotes ||
+       ex.trackingStatus !== fs.trackingStatus ||
+       ex.partNumber !== fs.partNumber ||
+       ex.partName !== fs.partName ||
+       ex.serialNumber !== fs.serialNumber ||
+       ex.productName !== fs.productName ||
+       ex.emailStatus !== fs.emailStatus ||
+       ex.dnap !== fs.dnap;
    
      if (changed) diff.updated.push(ex);
    }
@@ -709,6 +767,14 @@ async function applyExcelChanges() {
          csrRFC: ex.csrRFC,
          benchRFC: ex.benchRFC,
          market: ex.market,
+         woClosureNotes: ex.woClosureNotes,
+         trackingStatus: ex.trackingStatus,
+         partNumber: ex.partNumber,
+         partName: ex.partName,
+         serialNumber: ex.serialNumber,
+         productName: ex.productName,
+         emailStatus: ex.emailStatus,
+         dnap: ex.dnap,
    
          // default fields
          status: "",
@@ -815,6 +881,28 @@ async function applyExcelChanges() {
      todayISO,
      generatedBy: adminState.user.uid
    });
+
+   // ==========================================
+   // Sync Closed Cases (Archival Only)
+   // ==========================================
+   if (excelState.closedCases?.length) {
+     updateProgress("\nSyncing Closed Cases archive...");
+   
+     for (const c of excelState.closedCases) {
+       const ref = doc(db, "cases", excelState.teamId, "closedCases", c.id);
+       const snap = await getDoc(ref);
+   
+       if (!snap.exists()) {
+         await setDoc(ref, {
+           ...c,
+           teamId: excelState.teamId,
+           archivedAt: new Date()
+         });
+       }
+     }
+   
+     updateProgress(`Closed Cases synced: ${excelState.closedCases.length}`);
+   }
    
    showPopup("Excel update complete!");
    processing = false;
@@ -2906,6 +2994,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

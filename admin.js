@@ -1146,12 +1146,6 @@ async function generateDailyRepairReport({
    const reportWritten = await runTransaction(db, async (tx) => {
      const snap = await tx.get(reportRef);
    
-     // Guard: already generated
-     if (snap.exists() && snap.data().generatedBy === generatedBy) {
-       console.warn("Daily report already written for today:", todayISO);
-       return false;
-     }
-   
      tx.set(
        reportRef,
        {
@@ -3154,6 +3148,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

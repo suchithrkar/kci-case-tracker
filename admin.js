@@ -1222,7 +1222,7 @@ async function generateDailyRepairReport({
      "0-3 Days": 0,
      "3-5 Days": 0,
      "5-10 Days": 0,
-     "10-14 Days": 0,
+     "10-15 Days": 0,
      "15-30 Days": 0,
      "30-60 Days": 0,
      "60-90 Days": 0,
@@ -1280,7 +1280,7 @@ async function generateDailyRepairReport({
        ca_0_3: caGroups["0-3 Days"],
        ca_3_5: caGroups["3-5 Days"],
        ca_5_10: caGroups["5-10 Days"],
-       ca_10_14: caGroups["10-14 Days"],
+       ca_10_15: caGroups["10-15 Days"],
        ca_15_30: caGroups["15-30 Days"],
        ca_30_60: caGroups["30-60 Days"],
        ca_60_90: caGroups["60-90 Days"],
@@ -3345,6 +3345,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

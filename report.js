@@ -318,7 +318,7 @@ const CA_BUCKETS = [
   "0-3 Days",
   "3-5 Days",
   "5-10 Days",
-  "10-14 Days",
+  "10-15 Days",
   "15-30 Days",
   "30-60 Days",
   "60-90 Days",
@@ -1120,6 +1120,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

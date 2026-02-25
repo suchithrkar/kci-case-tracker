@@ -547,12 +547,12 @@ function setupReportTabs() {
 async function loadMonthlyReports(monthKey) {
   reportState.dailyReports = {};
 
-  const reportsRef = collection(
-    db,
-    "dailyRepairReports",
-    reportState.teamId,
-    "reports"
-  );
+   const reportsRef = collection(
+     db,
+     "cases",
+     reportState.teamId,
+     "reports"
+   );
 
   const q = query(
     reportsRef,
@@ -1120,6 +1120,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

@@ -130,7 +130,7 @@ export async function cleanupDailyReports(teamId, todayISO) {
 
   const reportsRef = collection(
     db,
-    "dailyRepairReports",
+    "cases",
     teamId,
     "reports"
   );

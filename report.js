@@ -247,13 +247,13 @@ async function loadLiveCases() {
 }
 
 async function loadTodaySummary() {
-  const ref = doc(
-    db,
-    "dailyRepairReports",
-    reportState.teamId,
-    "reports",
-    reportState.todayISO
-  );
+   const ref = doc(
+     db,
+     "cases",
+     reportState.teamId,
+     "reports",
+     reportState.todayISO
+   );
 
   const snap = await getDoc(ref);
   reportState.todayReport = snap.exists() ? snap.data() : {};
@@ -1120,6 +1120,7 @@ async function updateView() {
   renderMonthlyTable();
 
 }
+
 
 
 

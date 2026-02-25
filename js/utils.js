@@ -105,7 +105,7 @@ export function getValidMonthKeys(todayISO, monthsToKeep = 13) {
 }
 
 /**
- * Cleanup closedCasesHistory older than 3 months
+ * Cleanup closedCasesHistory older than 13 months
  */
 export async function cleanupClosedCases(todayISO) {
   const validMonths = getValidMonthKeys(todayISO, 13);
@@ -144,6 +144,7 @@ export async function cleanupDailyReports(teamId, todayISO) {
     }
   }
 }
+
 
 
 

@@ -26,8 +26,7 @@ import {
   deleteDoc,
   query,
   where,
-  onSnapshot,
-  runTransaction
+  onSnapshot
 } from "./js/firebase.js";
 
 import { isPrimary, isSecondary, toggleTheme } from "./js/userProfile.js";
@@ -1250,61 +1249,53 @@ async function generateDailyRepairReport({
      todayISO
    );
 
-   const reportWritten = await runTransaction(db, async (tx) => {
-     const snap = await tx.get(reportRef);
+   await setDoc(
+     reportRef,
+     {
+       // TOTAL OPEN
+       totalOpen: cases.length,
+       totalOpenOnsite: onsiteAll.length,
+       totalOpenOffsite: offsiteAll.length,
+       totalOpenCSR: csrAll.length,
    
-     tx.set(
-       reportRef,
-       {
-         // TOTAL OPEN
-         totalOpen: cases.length,
-         totalOpenOnsite: onsiteAll.length,
-         totalOpenOffsite: offsiteAll.length,
-         totalOpenCSR: csrAll.length,
+       // READY FOR CLOSURE
+       readyForClosureTotal: rfcIds.size,
+       readyForClosureOnsite: onsiteRFC.length,
+       readyForClosureOffsite: offsiteRFC.length,
+       readyForClosureCSR: csrRFC.length,
    
-         // READY FOR CLOSURE
-         readyForClosureTotal: rfcIds.size,
-         readyForClosureOnsite: onsiteRFC.length,
-         readyForClosureOffsite: offsiteRFC.length,
-         readyForClosureCSR: csrRFC.length,
+       // OVERDUE
+       overdueTotal: overdue.length,
+       overdueOnsite: overdue.filter(c =>
+         c.caseResolutionCode === "Onsite Solution"
+       ).length,
+       overdueOffsite: overdue.filter(c =>
+         c.caseResolutionCode === "Offsite Solution"
+       ).length,
+       overdueCSR: overdue.filter(c =>
+         c.caseResolutionCode === "Parts Shipped"
+       ).length,
    
-         // OVERDUE
-         overdueTotal: overdue.length,
-         overdueOnsite: overdue.filter(c =>
-           c.caseResolutionCode === "Onsite Solution"
-         ).length,
-         overdueOffsite: overdue.filter(c =>
-           c.caseResolutionCode === "Offsite Solution"
-         ).length,
-         overdueCSR: overdue.filter(c =>
-           c.caseResolutionCode === "Parts Shipped"
-         ).length,
+       // CA GROUP
+       ca_0_3: caGroups["0-3 Days"],
+       ca_3_5: caGroups["3-5 Days"],
+       ca_5_10: caGroups["5-10 Days"],
+       ca_10_14: caGroups["10-14 Days"],
+       ca_15_30: caGroups["15-30 Days"],
+       ca_30_60: caGroups["30-60 Days"],
+       ca_60_90: caGroups["60-90 Days"],
+       ca_gt_90: caGroups["> 90 Days"],
    
-         // CA GROUP COUNTS
-         ca_0_3: caGroups["0-3 Days"],
-         ca_3_5: caGroups["3-5 Days"],
-         ca_5_10: caGroups["5-10 Days"],
-         ca_10_14: caGroups["10-14 Days"],
-         ca_15_30: caGroups["15-30 Days"],
-         ca_30_60: caGroups["30-60 Days"],
-         ca_60_90: caGroups["60-90 Days"],
-         ca_gt_90: caGroups["> 90 Days"],
+       ca_gt_30_total: caAbove30Total,
+       generatedAt: new Date(),
+       generatedBy
+     },
+     { merge: true }
+   );
    
-         // TOTAL > 30 DAYS
-         ca_gt_30_total: caAbove30Total,
-         generatedAt: new Date(),
-         generatedBy
-       },
-       { merge: true }
-     );
+   await cleanupDailyReports(teamId, todayISO);
    
-     return true; // ✅ commit intent
-   });
-   
-   if (reportWritten) {
-     await cleanupDailyReports(teamId, todayISO);
-     showPopup(`Daily repair report generated for ${todayISO}`);
-   }
+   showPopup(`Daily repair report generated for ${todayISO}`);
 }
 
 /* ============================================================
@@ -3354,6 +3345,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

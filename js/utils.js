@@ -88,13 +88,13 @@ import {
 
 /**
  * Returns allowed YYYY-MM month keys
- * (current month + last 3 months)
+ * (current month + last 12 months)
  */
-export function getValidMonthKeys(todayISO) {
+export function getValidMonthKeys(todayISO, monthsToKeep = 13) {
   const [y, m] = todayISO.split("-").map(Number);
   const months = [];
 
-  for (let i = 0; i < 13; i++) {
+  for (let i = 0; i < monthsToKeep; i++) {
     const d = new Date(y, m - 1 - i, 1);
     months.push(
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
@@ -108,7 +108,7 @@ export function getValidMonthKeys(todayISO) {
  * Cleanup closedCasesHistory older than 3 months
  */
 export async function cleanupClosedCases(todayISO) {
-  const validMonths = getValidMonthKeys(todayISO);
+  const validMonths = getValidMonthKeys(todayISO, 13);
   const snap = await getDocs(collection(db, "closedCasesHistory"));
 
   for (const d of snap.docs) {
@@ -144,6 +144,7 @@ export async function cleanupDailyReports(teamId, todayISO) {
     }
   }
 }
+
 
 
 

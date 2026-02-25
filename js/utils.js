@@ -13,25 +13,65 @@ export function excelDateToYMD(v) {
   return "";
 }
 
-// Simple popup modal creator (replaces alert)
-export function showPopup(msg) {
-  const div = document.createElement("div");
-  div.className = "popup-message";
-  div.innerHTML = msg;
+// ============================================================
+// STACKED TOAST SYSTEM (replaces alert-style popup)
+// ============================================================
 
-  Object.assign(div.style, {
-    position: "fixed",
-    bottom: "20px",
-    right: "20px",
+let toastContainer = null;
+
+export function showPopup(message, duration = 5000) {
+
+  // Create container once
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toastContainer";
+
+    Object.assign(toastContainer.style, {
+      position: "fixed",
+      bottom: "20px",
+      right: "20px",
+      display: "flex",
+      flexDirection: "column-reverse", // newest at bottom
+      gap: "10px",
+      zIndex: 9999,
+      pointerEvents: "none"
+    });
+
+    document.body.appendChild(toastContainer);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "popup-message";
+  toast.innerHTML = message;
+
+  Object.assign(toast.style, {
     background: "var(--panel)",
     border: "1px solid var(--border)",
     padding: "12px 16px",
     borderRadius: "12px",
-    zIndex: 999
+    minWidth: "220px",
+    maxWidth: "320px",
+    boxShadow: "var(--shadow)",
+    opacity: "0",
+    transform: "translateY(10px)",
+    transition: "all 0.25s ease",
+    pointerEvents: "auto"
   });
 
-  document.body.appendChild(div);
-  setTimeout(() => div.remove(), 5000);
+  toastContainer.appendChild(toast);
+
+  // Animate in
+  requestAnimationFrame(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  });
+
+  // Auto remove
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(10px)";
+    setTimeout(() => toast.remove(), 250);
+  }, duration);
 }
 
 /* ============================================================
@@ -104,6 +144,7 @@ export async function cleanupDailyReports(teamId, todayISO) {
     }
   }
 }
+
 
 
 

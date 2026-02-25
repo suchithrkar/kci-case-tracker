@@ -2753,15 +2753,22 @@ function updateSaveButtonState() {
     effectiveStatus === "Service Pending" ||
     effectiveStatus === "Monitoring";
 
-  if (needsFollow && !follow) {
-    btnModalSave.disabled = true;
-    btnModalSave.style.opacity = "0.6";
-    btnModalSave.style.cursor = "not-allowed";
-  } else {
-    btnModalSave.disabled = false;
-    btnModalSave.style.opacity = "";
-    btnModalSave.style.cursor = "";
-  }
+   if (needsFollow && !follow) {
+     btnModalSave.disabled = true;
+     btnModalSave.style.opacity = "0.6";
+     btnModalSave.style.cursor = "not-allowed";
+   
+     // ✅ UX enhancement — hover explanation
+     btnModalSave.title = "Follow-up date required for this status";
+   
+   } else {
+     btnModalSave.disabled = false;
+     btnModalSave.style.opacity = "";
+     btnModalSave.style.cursor = "";
+   
+     // ✅ Remove tooltip when enabled
+     btnModalSave.title = "";
+   }
 }
 
 function showClosureWarning(msg) {
@@ -3461,6 +3468,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

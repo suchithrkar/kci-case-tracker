@@ -528,7 +528,9 @@ async function parseBackupFile(data) {
   }
 
   updateProgress(`Backup loaded (v${backup.version}).`);
-  updateProgress(`Cases in backup: ${backup.cases.length}`);
+   updateProgress(`Open Cases: ${backup.casesList?.length || 0}`);
+   updateProgress(`Closed Cases: ${backup.closedCases?.length || 0}`);
+   updateProgress(`Reports: ${backup.reports?.length || 0}`);
 
   // Normalize to Excel engine
    excelState.fullBackupData = backup;
@@ -542,10 +544,20 @@ async function parseBackupFile(data) {
 // ENABLE/DISABLE PREVIEW BUTTON BASED ON STATE
 // ======================================================
 function validateReadyState() {
-  const ready =
-    excelState.teamId &&
-    excelState.file &&
-    excelState.excelCases.length > 0;
+  let ready = false;
+
+  // Backup restore mode
+  if (excelState.isFullRestore && excelState.fullBackupData) {
+    ready = true;
+  }
+
+  // Excel upload mode
+  else {
+    ready =
+      excelState.teamId &&
+      excelState.file &&
+      excelState.excelCases.length > 0;
+  }
 
   $("btnPreviewChanges").disabled = !ready;
 }
@@ -2346,7 +2358,8 @@ function resetExcelUI() {
    if (overwriteWrap) {
      overwriteWrap.style.display = "none";
    }
-   
+   excelState.fullBackupData = null;
+   excelState.isFullRestore = false;
 }
 
 function excelToDate(value) {
@@ -2492,7 +2505,7 @@ async function exportBackup(teamId) {
     const a = document.createElement("a");
 
     a.href = url;
-    a.download = `${teamId}_backup_v2_${today}.json`;
+    a.download = `${teamId}_backup_v3_${today}.json`;
     a.click();
 
     URL.revokeObjectURL(url);
@@ -3341,6 +3354,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

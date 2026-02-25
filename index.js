@@ -134,13 +134,13 @@ function getTeamToday(teamConfig) {
 }
 
 async function incrementDailyClosedCount(teamId, todayISO) {
-  const reportRef = doc(
-    db,
-    "dailyRepairReports",
-    teamId,
-    "reports",
-    todayISO
-  );
+   const reportRef = doc(
+     db,
+     "cases",
+     teamId,
+     "reports",
+     todayISO
+   );
 
   await setDoc(
     reportRef,
@@ -3375,6 +3375,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

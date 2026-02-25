@@ -605,7 +605,7 @@ const PRIMARY_OPTIONS = {
   caseResolutionCode: ["Onsite Solution", "Offsite Solution", "Parts Shipped"],
   tl: ["Aarthi", "Sandeep", "Ratan"],
   sbd: ["Met", "Not Met", "NA"],
-  caGroup: ["0-3 Days","3-5 Days","5-10 Days","10-14 Days","15-30 Days","30-60 Days","60-90 Days","> 90 Days"],
+  caGroup: ["0-3 Days","3-5 Days","5-10 Days","10-15 Days","15-30 Days","30-60 Days","60-90 Days","> 90 Days"],
   onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
   csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
   benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Order processing hold","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
@@ -3375,6 +3375,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

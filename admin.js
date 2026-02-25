@@ -861,7 +861,9 @@ async function applyExcelChanges() {
      await runBatches(
      updated.map(ex => {
         const existing = excelState.firestoreCases.find(c => c.id === ex.id);
-        const overwrite = $("overwriteUserActions")?.checked;
+        const overwrite =
+          excelState.isBackupImport &&
+          $("overwriteUserActions")?.checked;
       
         let data = { ...ex, teamId: excelState.teamId };
       
@@ -888,7 +890,8 @@ async function applyExcelChanges() {
       
          return setDoc(
            doc(db, "cases", excelState.teamId, "casesList", ex.id),
-           data
+           data,
+           { merge: true }
          );
       }),
      "Updated"
@@ -3345,6 +3348,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

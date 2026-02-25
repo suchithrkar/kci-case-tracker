@@ -511,9 +511,9 @@ async function parseBackupFile(data) {
     };
   }
   // v2 backup (object)
-  else if (data.version === 2 && Array.isArray(data.cases)) {
-    backup = data;
-  }
+   else if (data.version === 3 && data.casesList) {
+     backup = data;
+   }
   else {
     showPopup("Invalid backup format.");
     return;
@@ -531,7 +531,8 @@ async function parseBackupFile(data) {
   updateProgress(`Cases in backup: ${backup.cases.length}`);
 
   // Normalize to Excel engine
-  excelState.excelCases = backup.cases;
+   excelState.fullBackupData = backup;
+   excelState.isFullRestore = true;
   // 🔧 Backup import needs full overwrite capability.
   // Mark backup imports so we can force-update cases later.
   excelState.isBackupImport = true;
@@ -736,13 +737,14 @@ $("btnConfirmImport").onclick = async () => {
   $("btnConfirmImport").disabled = true;
   $("allowDeletion").disabled = true;
 
-   
-
-
   clearProgress();
   updateProgress("Starting update…");
 
-  await applyExcelChanges();  // main engine
+   if (excelState.isFullRestore) {
+     await applyFullRestore();
+   } else {
+     await applyExcelChanges();
+   }  // main engine
 
   updateProgress("\nDONE.\nYou may close this window.");
 
@@ -1045,6 +1047,99 @@ async function applyExcelChanges() {
    processing = false;
 }
 
+async function applyFullRestore() {
+  const teamId = excelState.teamId;
+  const data = excelState.fullBackupData;
+
+  updateProgress("Starting FULL RESTORE...");
+
+  const batchLimit = 400;
+
+  async function wipeCollection(colRef, label) {
+    const snap = await getDocs(colRef);
+
+    let batch = [];
+    let count = 0;
+
+    for (const d of snap.docs) {
+      batch.push(deleteDoc(d.ref));
+      count++;
+
+      if (batch.length >= batchLimit) {
+        await Promise.all(batch);
+        batch = [];
+      }
+    }
+
+    if (batch.length) await Promise.all(batch);
+
+    updateProgress(`${label} wiped (${count})`);
+  }
+
+  async function writeCollection(colPath, docs, label) {
+    let batch = [];
+    let count = 0;
+
+    for (const d of docs) {
+      const ref = doc(db, ...colPath, d.id);
+      batch.push(setDoc(ref, d));
+      count++;
+
+      if (batch.length >= batchLimit) {
+        await Promise.all(batch);
+        batch = [];
+      }
+    }
+
+    if (batch.length) await Promise.all(batch);
+
+    updateProgress(`${label} restored (${count})`);
+  }
+
+  try {
+    // WIPE EXISTING DATA
+    await wipeCollection(
+      collection(db, "cases", teamId, "casesList"),
+      "casesList"
+    );
+
+    await wipeCollection(
+      collection(db, "cases", teamId, "closedCases"),
+      "closedCases"
+    );
+
+    await wipeCollection(
+      collection(db, "cases", teamId, "reports"),
+      "reports"
+    );
+
+    // RESTORE
+    await writeCollection(
+      ["cases", teamId, "casesList"],
+      data.casesList || [],
+      "casesList"
+    );
+
+    await writeCollection(
+      ["cases", teamId, "closedCases"],
+      data.closedCases || [],
+      "closedCases"
+    );
+
+    await writeCollection(
+      ["cases", teamId, "reports"],
+      data.reports || [],
+      "reports"
+    );
+
+    showPopup("Full backup restore completed.");
+  } catch (err) {
+    console.error("Full restore failed:", err);
+    showPopup("Full restore failed.");
+  }
+
+  processing = false;
+}
 
 async function generateDailyRepairReport({
   teamId,
@@ -2346,37 +2441,67 @@ if (fileLabel && excelInputEl) {
    BACKUP EXPORT / IMPORT
    ============================================================ */
 async function exportBackup(teamId) {
-  const colRef = collection(db, "cases", teamId, "casesList");
-  const snap = await getDocs(colRef);
+  try {
+    showPopup("Preparing full backup...");
 
-  const cases = snap.docs.map(d => ({
-    id: d.id,
-    ...d.data()
-  }));
+    // Load casesList
+    const casesSnap = await getDocs(
+      collection(db, "cases", teamId, "casesList")
+    );
+    const casesList = casesSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
 
-  const backup = {
-    version: 2,
-    app: "KCI Case Tracker",
-    exportedAt: new Date().toISOString(),
-    teamId,
-    caseCount: cases.length,
-    cases
-  };
+    // Load closedCases
+    const closedSnap = await getDocs(
+      collection(db, "cases", teamId, "closedCases")
+    );
+    const closedCases = closedSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
 
-  const blob = new Blob(
-    [JSON.stringify(backup, null, 2)],
-    { type: "application/json" }
-  );
+    // Load reports
+    const reportsSnap = await getDocs(
+      collection(db, "cases", teamId, "reports")
+    );
+    const reports = reportsSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
 
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  const today = getTeamToday(teamConfig);
+    const today = getTeamToday(teamConfig);
 
-  a.href = url;
-  a.download = `${teamId}_backup_v2_${today}.json`;
-  a.click();
+    const backup = {
+      version: 3,
+      app: "KCI Case Tracker",
+      exportedAt: new Date().toISOString(),
+      teamId,
+      casesList,
+      closedCases,
+      reports
+    };
 
-  URL.revokeObjectURL(url);
+    const blob = new Blob(
+      [JSON.stringify(backup, null, 2)],
+      { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = `${teamId}_backup_v2_${today}.json`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    showPopup("Full backup exported.");
+  } catch (err) {
+    console.error("Backup export failed:", err);
+    showPopup("Backup export failed.");
+  }
 }
 
 function importBackupPrompt(teamId) {
@@ -3216,6 +3341,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

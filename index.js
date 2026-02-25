@@ -2061,6 +2061,7 @@ function renderCalendar() {
      optDate.dataset.iso = iso;       // store internally
      optDate.value = formatDMY(iso);  // show DD-MM-YYYY
      closeCalendar();
+     updateSaveButtonState();
    };
   });
    
@@ -2084,6 +2085,8 @@ function renderCalendar() {
        timeAMPM.textContent = "AM";
    
        document.getElementById("optTime").dataset.value = "";
+       document.getElementById("optTime").dataset.display = "";
+       updateSaveButtonState();
    
        closeCalendar();
      };
@@ -2242,6 +2245,7 @@ document.addEventListener("click", (e) => {
    
    // Then process logic
    handleStatusChange(caseId, value);
+   setTimeout(updateSaveButtonState, 0);
    
    select.classList.remove("open");
 });
@@ -2556,6 +2560,7 @@ export function openCaseModal(caseId, enforce = false) {
   modal.classList.add("show");
    animateModalOpen();
    setTimeout(resizeNotes, 60);
+   updateSaveButtonState();
 
 }
 
@@ -2725,6 +2730,38 @@ function showModalWarning(msg) {
 }
 function hideModalWarning() {
   modalWarning.style.display = "none";
+}
+
+// =====================================================
+// SAVE BUTTON AUTO-DISABLE LOGIC
+// =====================================================
+
+function updateSaveButtonState() {
+  if (!btnModalSave) return;
+
+  const follow = optDate.dataset.iso || "";
+  const effectiveStatus =
+    pendingStatusForModal !== null
+      ? pendingStatusForModal
+      : (
+          trackerState.allCases.find(
+            c => c.id === currentModalCaseId
+          )?.status || ""
+        );
+
+  const needsFollow =
+    effectiveStatus === "Service Pending" ||
+    effectiveStatus === "Monitoring";
+
+  if (needsFollow && !follow) {
+    btnModalSave.disabled = true;
+    btnModalSave.style.opacity = "0.6";
+    btnModalSave.style.cursor = "not-allowed";
+  } else {
+    btnModalSave.disabled = false;
+    btnModalSave.style.opacity = "";
+    btnModalSave.style.cursor = "";
+  }
 }
 
 function showClosureWarning(msg) {
@@ -3424,6 +3461,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

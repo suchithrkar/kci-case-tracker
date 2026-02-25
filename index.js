@@ -152,7 +152,15 @@ async function incrementDailyClosedCount(teamId, todayISO) {
 }
 
 function scheduleFollowUpReminder(r) {
+
+  // ⛔ 1️⃣ Only schedule if current user is the lastActionedBy
+  if (r.lastActionedBy !== trackerState.user?.uid) return;
+
+  // ⛔ 2️⃣ Must have both follow date and time
   if (!r.followDate || !r.followTime) return;
+
+  // ⛔ 3️⃣ If case is already Closed → do not schedule
+  if (r.status === "Closed") return;
 
   // Build exact timestamp
   const reminderTs = new Date(
@@ -160,13 +168,13 @@ function scheduleFollowUpReminder(r) {
   ).getTime();
 
   const now = Date.now();
-  if (reminderTs <= now) return; // past → ignore
+  if (reminderTs <= now) return;
 
   const delay = reminderTs - now;
 
-   const timerId = setTimeout(() => {
-     openFollowUpReminderModal(r);
-   }, delay);
+  const timerId = setTimeout(() => {
+    openFollowUpReminderModal(r);
+  }, delay);
 
   followUpTimers.set(r.id, timerId);
 }
@@ -3375,6 +3383,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

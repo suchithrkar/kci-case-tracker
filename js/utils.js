@@ -94,7 +94,7 @@ export function getValidMonthKeys(todayISO) {
   const [y, m] = todayISO.split("-").map(Number);
   const months = [];
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 13; i++) {
     const d = new Date(y, m - 1 - i, 1);
     months.push(
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
@@ -144,6 +144,7 @@ export async function cleanupDailyReports(teamId, todayISO) {
     }
   }
 }
+
 
 
 

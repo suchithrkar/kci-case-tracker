@@ -2007,26 +2007,42 @@ function renderCalendar() {
           const day = i + 1;
           const iso =
             `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-
+      
           const isToday =
             day === today.getDate() &&
             month === today.getMonth() &&
             year === today.getFullYear();
-
-         const weekday = new Date(iso).getDay(); // 0 = Sun, 6 = Sat
-         const isWeekend = weekday === 0 || weekday === 6;
-         
-         return `
-           <div class="calendar-day
-             ${isToday ? "today" : ""}
-             ${iso === selected ? "selected" : ""}
-             ${isWeekend ? "weekend" : ""}"
-             data-date="${iso}">
-             ${day}
-           </div>`;
+      
+          const weekday = new Date(iso).getDay();
+          const isWeekend = weekday === 0 || weekday === 6;
+      
+          return `
+            <div class="calendar-day
+              ${isToday ? "today" : ""}
+              ${iso === selected ? "selected" : ""}
+              ${isWeekend ? "weekend" : ""}"
+              data-date="${iso}">
+              ${day}
+            </div>`;
         }).join("")}
       </div>
-    </div>
+      
+      <!-- ✅ NEW CLEAR OPTION -->
+      <div class="calendar-clear"
+           style="margin-top:8px;text-align:center;">
+        <button id="calendarClearBtn"
+                style="
+                  border:1px solid var(--border);
+                  background:var(--panel-2);
+                  padding:6px 14px;
+                  border-radius:8px;
+                  cursor:pointer;
+                  font-size:12px;">
+          Clear
+        </button>
+      </div>
+      
+   </div>
   `;
 
   container.querySelector("#prevMonth").onclick = () => {
@@ -2047,6 +2063,31 @@ function renderCalendar() {
      closeCalendar();
    };
   });
+   
+   // ✅ CLEAR DATE + TIME
+   const clearBtn = container.querySelector("#calendarClearBtn");
+   if (clearBtn) {
+     clearBtn.onclick = (e) => {
+       e.stopPropagation();
+   
+       // Clear date
+       optDate.dataset.iso = "";
+       optDate.value = "";
+   
+       // Reset time picker
+       timeState.hh = null;
+       timeState.mm = null;
+       timeState.ampm = "AM";
+   
+       timeHH.textContent = "HH";
+       timeMM.textContent = "MM";
+       timeAMPM.textContent = "AM";
+   
+       document.getElementById("optTime").dataset.value = "";
+   
+       closeCalendar();
+     };
+   }
 }
 
 
@@ -3383,6 +3424,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

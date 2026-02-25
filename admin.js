@@ -2118,31 +2118,99 @@ function bindUserActions() {
 });
 }
 
-
 /* =======================================================================
-   CASCADE DELETE — DELETE ALL CASES FOR A TEAM
+   CASCADE DELETE — FULL TEAM DATA CLEANUP
+   Deletes:
+   - casesList
+   - closedCases
+   - reports
+   - closedCasesHistory (by teamId match)
    ======================================================================= */
 async function deleteAllCasesForTeam(teamId) {
-  const colRef = collection(db, "cases", teamId, "casesList");
-  const snap = await getDocs(colRef);
 
-  const batchLimit = 450;
-  let batch = [];
-  let counter = 0;
+  const batchLimit = 400;
 
-  for (const docSnap of snap.docs) {
-    batch.push(deleteDoc(docSnap.ref));
-    counter++;
+  async function deleteCollection(colRef, label) {
+    const snap = await getDocs(colRef);
 
-    if (counter >= batchLimit) {
-      await Promise.all(batch);
-      batch = [];
-      counter = 0;
+    let batch = [];
+    let count = 0;
+
+    for (const d of snap.docs) {
+      batch.push(deleteDoc(d.ref));
+      count++;
+
+      if (batch.length >= batchLimit) {
+        await Promise.all(batch);
+        batch = [];
+      }
     }
+
+    if (batch.length > 0) {
+      await Promise.all(batch);
+    }
+
+    console.log(`${label} deleted: ${count}`);
   }
 
-  if (batch.length > 0) {
-    await Promise.all(batch);
+  try {
+
+    // ======================================================
+    // 1️⃣ Delete OPEN CASES
+    // ======================================================
+    await deleteCollection(
+      collection(db, "cases", teamId, "casesList"),
+      "casesList"
+    );
+
+    // ======================================================
+    // 2️⃣ Delete CLOSED CASES
+    // ======================================================
+    await deleteCollection(
+      collection(db, "cases", teamId, "closedCases"),
+      "closedCases"
+    );
+
+    // ======================================================
+    // 3️⃣ Delete REPORTS
+    // ======================================================
+    await deleteCollection(
+      collection(db, "cases", teamId, "reports"),
+      "reports"
+    );
+
+    // ======================================================
+    // 4️⃣ Delete CLOSED CASES HISTORY (GLOBAL COLLECTION)
+    // ======================================================
+    const historyQuery = query(
+      collection(db, "closedCasesHistory"),
+      where("teamId", "==", teamId)
+    );
+
+    const historySnap = await getDocs(historyQuery);
+
+    let historyBatch = [];
+    let historyCount = 0;
+
+    for (const d of historySnap.docs) {
+      historyBatch.push(deleteDoc(d.ref));
+      historyCount++;
+
+      if (historyBatch.length >= batchLimit) {
+        await Promise.all(historyBatch);
+        historyBatch = [];
+      }
+    }
+
+    if (historyBatch.length > 0) {
+      await Promise.all(historyBatch);
+    }
+
+    console.log(`closedCasesHistory deleted: ${historyCount}`);
+
+  } catch (err) {
+    console.error("Full cascade delete failed:", err);
+    throw err;
   }
 }
 
@@ -3148,6 +3216,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

@@ -3138,51 +3138,6 @@ function buildTeamSelector() {
   });
 }
 
-// ======================================================
-// ONE-TIME MIGRATION: Move reports to cases/{teamId}/reports
-// ======================================================
-async function migrateDailyReportsToCases() {
-  showPopup("Starting report migration...");
-
-  const teamsSnap = await getDocs(collection(db, "teams"));
-
-  for (const teamDoc of teamsSnap.docs) {
-    const teamId = teamDoc.id;
-
-    const oldReportsRef = collection(
-      db,
-      "dailyRepairReports",
-      teamId,
-      "reports"
-    );
-
-    const oldSnap = await getDocs(oldReportsRef);
-
-    if (oldSnap.empty) {
-      console.log(`No reports found for team: ${teamId}`);
-      continue;
-    }
-
-    for (const reportDoc of oldSnap.docs) {
-      const newRef = doc(
-        db,
-        "cases",
-        teamId,
-        "reports",
-        reportDoc.id
-      );
-
-      await setDoc(newRef, reportDoc.data(), { merge: true });
-    }
-
-    console.log(`Migrated ${oldSnap.size} reports for team: ${teamId}`);
-  }
-
-  showPopup("Migration complete. Verify Firestore before deleting old collection.");
-}
-
-window.migrateDailyReportsToCases = migrateDailyReportsToCases;
-
 adminState.selectedStatsTeam = "TOTAL";
 
 /* ------------------------------------------------------------
@@ -3193,6 +3148,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

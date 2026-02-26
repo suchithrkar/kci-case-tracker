@@ -1841,7 +1841,28 @@ tbody.addEventListener("click", (e) => {
   const select = e.target.closest(".custom-select");
   if (!select) return;
 
+  // Close other dropdowns first
+  document.querySelectorAll(".custom-select").forEach(s => {
+    if (s !== select) {
+      s.classList.remove("open", "open-up");
+    }
+  });
+
   select.classList.toggle("open");
+
+  if (select.classList.contains("open")) {
+    const dropdown = select.querySelector(".custom-options");
+    const rect = select.getBoundingClientRect();
+    const dropdownHeight = dropdown.offsetHeight;
+    const spaceBelow = window.innerHeight - rect.bottom;
+
+    // If not enough space below → open upward
+    if (spaceBelow < dropdownHeight + 10) {
+      select.classList.add("open-up");
+    } else {
+      select.classList.remove("open-up");
+    }
+  }
 
   const option = e.target.closest(".custom-option");
   if (!option) return;
@@ -1849,7 +1870,6 @@ tbody.addEventListener("click", (e) => {
   const caseId = select.dataset.id;
   const value = option.dataset.value;
 
-  // ✅ IMMEDIATE VISUAL UPDATE (CRITICAL)
   const label = select.querySelector(".custom-select-trigger span");
   if (label) {
     label.innerHTML = value || "&nbsp;";
@@ -1857,7 +1877,7 @@ tbody.addEventListener("click", (e) => {
 
   handleStatusChange(caseId, value);
 
-  select.classList.remove("open");
+  select.classList.remove("open", "open-up");
 });
 
 /* Close on outside click */
@@ -3468,6 +3488,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -487,9 +487,9 @@ function setupRealtimeCases(teamId) {
         csrRFC: c.csrRFC || "",
         benchRFC: c.benchRFC || "",
         dnap:
-          c.dnap === true ||
-          c.dnap === "Yes" ||
-          c.dnap === "yes"
+          c.dnap !== undefined &&
+          c.dnap !== null &&
+          String(c.dnap).trim() !== ""
             ? "Yes"
             : "",
         status: c.status || "",
@@ -3598,6 +3598,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

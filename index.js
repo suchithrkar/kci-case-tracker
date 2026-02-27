@@ -661,7 +661,7 @@ function buildPrimaryFilters() {
               <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
                 <input type="checkbox"
                        id="benchDnapCheckbox"
-                       ${uiState.primaries.dnap?.includes("Yes") ? "checked" : ""}/>
+                       ${uiState.primaries.dnap?.includes("__HAS_VALUE__") ? "checked" : ""}/>
                 DNAP
               </label>
               <span style="opacity:.7;">▾</span>
@@ -3618,6 +3618,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

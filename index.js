@@ -701,7 +701,7 @@ function buildPrimaryFilters() {
            });
    
            // 2️⃣ Activate DNAP
-           uiState.primaries.dnap = ["Yes"];
+           uiState.primaries.dnap = ["__HAS_VALUE__"];
    
             // 3️⃣ Disable ALL sidebar filters
             Object.keys(uiState.primaryLocks).forEach(k => {
@@ -1063,7 +1063,7 @@ function syncPrimaryFiltersFromUI() {
 
   // 🔥 Sync DNAP separately
   const dnapCb = document.getElementById("benchDnapCheckbox");
-  uiState.primaries.dnap = dnapCb?.checked ? ["Yes"] : [];
+  uiState.primaries.dnap = dnapCb?.checked ? ["__HAS_VALUE__"] : [];
 }
 
 /* Utility: convert key to human label */
@@ -1521,17 +1521,22 @@ if (uiState.rfcMode === "negative") {
    }
 
      /* PRIMARY TABLE FILTERS (AND across filters; OR within each filter's options) */
-  // For each primary filter, if selection exists, keep rows matching any of its options.
-  Object.keys(uiState.primaries).forEach(key => {
-    const sel = uiState.primaries[key] || [];
-    if (!sel || sel.length === 0) return; // ignore unselected filters
-
-    rows = rows.filter(r => {
-      const val = (r[key] || "").toString();
-      // For CA Group and similar columns, exact match is used; adjust if needed
-      return sel.includes(val);
-    });
-  });
+   // For each primary filter, if selection exists, keep rows matching any of its options.
+   Object.keys(uiState.primaries).forEach(key => {
+     const sel = uiState.primaries[key] || [];
+     if (!sel || sel.length === 0) return;
+   
+     rows = rows.filter(r => {
+       const val = (r[key] || "").toString().trim();
+   
+       // 🔥 Special logic for DNAP
+       if (key === "dnap" && sel.includes("__HAS_VALUE__")) {
+         return val !== "";
+       }
+   
+       return sel.includes(val);
+     });
+   });
 
 /* ===============================================================
    REPEAT CUSTOMERS — OVERLAY FILTER
@@ -3613,6 +3618,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

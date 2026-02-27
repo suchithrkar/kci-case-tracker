@@ -1184,13 +1184,11 @@ function resetAllFilters({
 
   // 4️⃣ Set 2 (Mode buttons)
   if (clearSet2) {
-    if (clearRFC) {
-       uiState.mode = "normal";
-       uiState.repeatActive = false;
-       uiState.unupdatedActive = false;
-       uiState.sortByDateAsc = null;
-       updateSortIcon();
-    }
+    uiState.mode = "normal";
+    uiState.repeatActive = false;
+    uiState.unupdatedActive = false;
+    uiState.sortByDateAsc = null;
+    updateSortIcon();
   }
 
   // 5️⃣ Safety clears
@@ -3533,6 +3531,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -2194,8 +2194,6 @@ function handleStatusChange(caseId, newStatus) {
        statusChangedBy: trackerState.user.uid
      }).then(() => {
        pendingUnupdated.delete(caseId);
-       // ✅ Remove status override protection
-       pendingStatusOverride.delete(caseId);
        applyFilters();
      }).catch(err => {
        pendingUnupdated.delete(caseId);
@@ -2253,7 +2251,8 @@ function handleStatusChange(caseId, newStatus) {
      statusChangedBy: trackerState.user.uid
    }).then(() => {
      pendingUnupdated.delete(caseId);
-   
+     // ✅ Remove status override protection
+     pendingStatusOverride.delete(caseId);
      applyFilters();
    }).catch(err => {
      // On failure, remove pending and show popup (prevents permanent stuck case)
@@ -2770,6 +2769,7 @@ function closeModal() {
   // ✅ Clean protection BEFORE resetting case ID
   if (currentModalCaseId) {
     pendingUnupdated.delete(currentModalCaseId);
+    pendingStatusOverride.delete(currentModalCaseId);
   }
 
   unupdatedProtect = false;
@@ -3537,6 +3537,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

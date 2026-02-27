@@ -1184,7 +1184,12 @@ function resetAllFilters({
 
   // 4️⃣ Set 2 (Mode buttons)
   if (clearSet2) {
-    uiState.mode = "normal";
+
+    // Only reset mode if RFC is also being cleared
+    if (clearRFC) {
+      uiState.mode = "normal";
+    }
+
     uiState.repeatActive = false;
     uiState.unupdatedActive = false;
     uiState.sortByDateAsc = null;
@@ -3531,6 +3536,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

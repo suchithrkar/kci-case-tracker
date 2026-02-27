@@ -469,46 +469,45 @@ function setupRealtimeCases(teamId) {
   if (unsubscribe) unsubscribe();
 
   unsubscribe = listenToTeamCases(teamId, (cases) => {
-    trackerState.allCases = cases.map(c => ({
-      id: c.id,
-      customerName: c.customerName || "",
-      createdOn: c.createdOn || "",
-      createdBy: c.createdBy || "",
-
-      excelOrder: typeof c.excelOrder === "number" ? c.excelOrder : 999999,
-       
-      country: c.country || "",
-      caseResolutionCode: c.caseResolutionCode || "",
-      caseOwner: c.caseOwner || "",
-      caGroup: c.caGroup || "",
-      tl: c.tl || "",
-      sbd: c.sbd || "",
-      onsiteRFC: c.onsiteRFC || "",
-      csrRFC: c.csrRFC || "",
-      benchRFC: c.benchRFC || "",
-      status: c.status || "",
-      followDate: c.followDate || "",
-      followTime: c.followTime || "",
-      flagged: !!c.flagged,
-      PNS: !!c.PNS,
-
-      surveyPrediction: typeof c.surveyPrediction === "number"
-        ? c.surveyPrediction
-        : null,
+    const incoming = cases.map(c => ({
+        id: c.id,
+        customerName: c.customerName || "",
+        createdOn: c.createdOn || "",
+        createdBy: c.createdBy || "",
+        excelOrder: typeof c.excelOrder === "number" ? c.excelOrder : 999999,
+        country: c.country || "",
+        caseResolutionCode: c.caseResolutionCode || "",
+        caseOwner: c.caseOwner || "",
+        caGroup: c.caGroup || "",
+        tl: c.tl || "",
+        sbd: c.sbd || "",
+        onsiteRFC: c.onsiteRFC || "",
+        csrRFC: c.csrRFC || "",
+        benchRFC: c.benchRFC || "",
+        status: c.status || "",
+        followDate: c.followDate || "",
+        followTime: c.followTime || "",
+        flagged: !!c.flagged,
+        PNS: !!c.PNS,
+        surveyPrediction: typeof c.surveyPrediction === "number" ? c.surveyPrediction : null,
+        predictionComment: c.predictionComment || "",
+        otcCode: c.otcCode || "",
+        market: c.market || "",
+        notes: c.notes || "",
+        lastActionedOn: c.lastActionedOn || "",
+        lastActionedBy: c.lastActionedBy || "",
+        statusChangedOn: c.statusChangedOn || "",
+        statusChangedBy: c.statusChangedBy || ""
+      }));
       
-      predictionComment: c.predictionComment || "",
-
-      otcCode: c.otcCode || "",
-      market: c.market || "",
-       
-      notes: c.notes || "",
-      lastActionedOn: c.lastActionedOn || "",
-      lastActionedBy: c.lastActionedBy || "",
-
-      // <-- NEW: include the status-change audit fields
-      statusChangedOn: c.statusChangedOn || "",
-      statusChangedBy: c.statusChangedBy || ""
-    }));
+      // 🔥 Preserve protected rows during status override
+      trackerState.allCases = incoming.map(newRow => {
+        if (pendingStatusOverride.has(newRow.id)) {
+          const existing = trackerState.allCases.find(r => r.id === newRow.id);
+          return existing || newRow;
+        }
+        return newRow;
+      });
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
 if (uiState.unupdatedActive && unupdatedProtect) {
@@ -3539,6 +3538,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

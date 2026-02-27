@@ -874,7 +874,7 @@ return;
       uiState.primaryLocks.benchRFC = false;
 
        
-       uiState.mode = "offsite";
+       uiState.rfcMode = "offsite";
         uiState.primaries.caseResolutionCode = ["Offsite Solution"];
         uiState.primaries.benchRFC = ["Delivered","Order cancelled, not to be reopened"];
         buildPrimaryFilters();
@@ -895,7 +895,7 @@ return;
       uiState.primaryLocks.benchRFC = false;
 
        
-       uiState.mode = "csr";
+       uiState.rfcMode = "csr";
         uiState.primaries.caseResolutionCode = ["Parts Shipped"];
         uiState.primaries.csrRFC = ["Cancelled","Closed","POD"];
         buildPrimaryFilters();
@@ -909,7 +909,7 @@ return;
     }
 
     if (type === "total") {
-    uiState.mode = "total";
+    uiState.rfcMode = "total";
 
     // Disable the 3 RFC filters only
     uiState.primaryLocks.onsiteRFC = true;
@@ -931,7 +931,7 @@ return;
 
 
       if (type === "negative") {
-    uiState.mode = "negative";
+    uiState.rfcMode = "negative";
 
     // Disable the 3 RFC filters only
     uiState.primaryLocks.onsiteRFC = true;
@@ -1332,7 +1332,7 @@ if (uiState.unupdatedActive && unupdatedProtect) {
   /* ===============================================================
    RFC MODE: TOTAL  (NEW — does NOT return early)
    =============================================================== */
-if (uiState.mode === "total") {
+if (uiState.rfcMode === "total") {
 
     const onsiteList = trackerState.allCases.filter(r =>
         r.caseResolutionCode === "Onsite Solution" &&
@@ -1359,7 +1359,7 @@ if (uiState.mode === "total") {
 /* ===============================================================
    RFC MODE: NEGATIVE (NEW — does NOT return early)
    =============================================================== */
-if (uiState.mode === "negative") {
+if (uiState.rfcMode === "negative") {
 
     let base = [...trackerState.allCases];
 
@@ -3529,6 +3529,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

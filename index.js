@@ -238,6 +238,9 @@ let unupdatedProtect = false;
 // track specific caseIds that are being updated while in Unupdated mode
 const pendingUnupdated = new Set();
 
+// ✅ Holds rows temporarily when Status filter is active
+const pendingStatusOverride = new Set();
+
 /* =========================================================
    FOLLOW-UP REMINDER ENGINE (PHASE 2)
    ========================================================= */
@@ -1429,8 +1432,15 @@ if (uiState.mode === "negative") {
   }
 
   /* STATUS MULTI-SELECT */
-  if (uiState.statusList.length > 0)
-    rows = rows.filter(r => uiState.statusList.includes(r.status));
+   if (uiState.statusList.length > 0) {
+     rows = rows.filter(r => {
+   
+       // ✅ Keep rows currently being edited
+       if (pendingStatusOverride.has(r.id)) return true;
+   
+       return uiState.statusList.includes(r.status);
+     });
+   }
 
      /* PRIMARY TABLE FILTERS (AND across filters; OR within each filter's options) */
   // For each primary filter, if selection exists, keep rows matching any of its options.
@@ -2155,11 +2165,15 @@ if (starContainer) {
 function handleStatusChange(caseId, newStatus) {
 
    // FINAL FIX: protect instantly before UI auto-refresh
-if (uiState.unupdatedActive) {
-  unupdatedProtect = true;
-  pendingUnupdated.add(caseId);
-}
-
+   if (uiState.unupdatedActive) {
+     unupdatedProtect = true;
+     pendingUnupdated.add(caseId);
+   }
+   
+   // ✅ Protect row if Status filter is active
+   if (uiState.statusList && uiState.statusList.length > 0) {
+     pendingStatusOverride.add(caseId);
+   }
 
    
   const today = getTeamToday(trackerState.teamConfig);
@@ -2180,6 +2194,8 @@ if (uiState.unupdatedActive) {
        statusChangedBy: trackerState.user.uid
      }).then(() => {
        pendingUnupdated.delete(caseId);
+       // ✅ Remove status override protection
+       pendingStatusOverride.delete(caseId);
        applyFilters();
      }).catch(err => {
        pendingUnupdated.delete(caseId);
@@ -3298,12 +3314,13 @@ async function saveModalData() {
   try {
     await firestoreUpdateCase(caseId, updateObj);
      // NEW: Remove pending lock for this case after modal save
-pendingUnupdated.delete(caseId);
+    pendingUnupdated.delete(caseId);
+    pendingStatusOverride.delete(caseId);
 
-// You allowed unupdated list to refresh after modal save
-if (uiState.unupdatedActive) {
-  applyFilters();
-}
+   // You allowed unupdated list to refresh after modal save
+   if (uiState.unupdatedActive) {
+     applyFilters();
+   }
 
   } catch (err) {
     console.error(err);
@@ -3317,13 +3334,13 @@ if (uiState.unupdatedActive) {
 
 
   // 🚫 Prevent auto-refresh while in Unupdated mode
-if (!uiState.unupdatedActive) {
-  applyFilters();
-}
+   if (!uiState.unupdatedActive) {
+     applyFilters();
+   }
 
   requireFollowUp = false;
   currentModalCaseId = null;
-unupdatedProtect = false;
+  unupdatedProtect = false;
 
   return true;
 }
@@ -3520,6 +3537,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

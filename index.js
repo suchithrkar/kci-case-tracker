@@ -2191,13 +2191,12 @@ if (uiState.unupdatedActive) {
    }
 
    if (newStatus === "Closed") {
-   
+     // 🔹 Track current case for revert logic
+     currentModalCaseId = caseId;
      // store previous status so UI can revert if modal is cancelled
      prevStatusBeforeModal = row.status || "";
-   
      // mark pending "Closed" (same concept as SP / Monitoring)
      pendingStatusForModal = "Closed";
-
      closureSurveyCompleted = false; // 🔒 reset until survey submits
    
      openClosureModal(row);
@@ -3521,6 +3520,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

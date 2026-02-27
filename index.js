@@ -1963,7 +1963,7 @@ const dateSegment = optDate.closest(".segmented-input");
 
 dateSegment.addEventListener("click", (e) => {
   e.stopPropagation();
-
+  closeTimeDropdowns();
   // Focus input for accessibility
   optDate.focus();
 
@@ -2833,6 +2833,21 @@ const timeAMPM = document.getElementById("timeAMPM");
 const hhDropdown = document.getElementById("hhDropdown");
 const mmDropdown = document.getElementById("mmDropdown");
 
+// ======================================================
+// CALENDAR & TIME DROPDOWN COORDINATION HELPERS
+// ======================================================
+
+function closeCalendar() {
+  if (calendarContainer) {
+    calendarContainer.innerHTML = "";
+  }
+}
+
+function closeTimeDropdowns() {
+  if (hhDropdown) hhDropdown.style.display = "none";
+  if (mmDropdown) mmDropdown.style.display = "none";
+}
+
 let timeState = {
   hh: null,
   mm: null,
@@ -2869,6 +2884,7 @@ function syncTimeValue() {
 
 timeHH.onclick = (e) => {
   e.stopPropagation();
+  closeCalendar();
   closeTimeDropdowns();
 
   hhDropdown.innerHTML = `
@@ -2897,6 +2913,7 @@ hhDropdown.onclick = (e) => {
 
 timeMM.onclick = (e) => {
   e.stopPropagation();
+  closeCalendar();
   closeTimeDropdowns();
 
    mmDropdown.innerHTML = `
@@ -2924,6 +2941,7 @@ mmDropdown.onclick = (e) => {
 /* ---------- AM / PM toggle ---------- */
 
 timeAMPM.onclick = () => {
+  closeCalendar();
   timeState.ampm = timeState.ampm === "AM" ? "PM" : "AM";
   timeAMPM.textContent = timeState.ampm;
   syncTimeValue();
@@ -3490,6 +3508,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

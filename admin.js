@@ -446,7 +446,11 @@ async function parseExcelFile(file) {
            serialNumber: String(r[19] || "").trim(),   // T
            productName: String(r[20] || "").trim(),    // U
            emailStatus: String(r[21] || "").trim(),    // V
-           dnap: String(r[22] || "").trim(),           // W
+         
+           dnap: (() => {
+             const raw = String(r[22] || "").trim().toLowerCase();
+             return raw === "yes" || raw === "y" || raw === "true" ? "Yes" : "";
+           })(),                                        // W
          
            excelOrder: i
          });
@@ -3348,6 +3352,7 @@ function subscribeStatsCases() {
   // (We only load on demand using loadStatsCasesOnce)
   return;
 }
+
 
 
 

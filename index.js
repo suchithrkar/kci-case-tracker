@@ -2833,21 +2833,6 @@ const timeAMPM = document.getElementById("timeAMPM");
 const hhDropdown = document.getElementById("hhDropdown");
 const mmDropdown = document.getElementById("mmDropdown");
 
-// ======================================================
-// CALENDAR & TIME DROPDOWN COORDINATION HELPERS
-// ======================================================
-
-function closeCalendar() {
-  if (calendarContainer) {
-    calendarContainer.innerHTML = "";
-  }
-}
-
-function closeTimeDropdowns() {
-  if (hhDropdown) hhDropdown.style.display = "none";
-  if (mmDropdown) mmDropdown.style.display = "none";
-}
-
 let timeState = {
   hh: null,
   mm: null,
@@ -3508,6 +3493,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -804,30 +804,49 @@ document.addEventListener("click", (e) => {
     if (!btn) return;   // Prevents accidental unlocks on ANY other click
     if (rfcLocked) return;
 
-    // Unlock the three RFC filters ONLY when RFC Clear is clicked
-    uiState.primaryLocks.onsiteRFC = false;
-    uiState.primaryLocks.csrRFC = false;
-    uiState.primaryLocks.benchRFC = false;
+    // ================================
+    // FULL CLEAR (Unlocked Scenario)
+    // ================================
 
+    // 1️⃣ Reset RFC mode + highlights
+    lastRfcMode = null;
     uiState.mode = "normal";
+    document.querySelectorAll(".rfcBtn").forEach(b =>
+        b.classList.remove("active")
+    );
 
-    if (!preventRfcHighlightReset) {
-    document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
-}
-
-    Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
-
-    const openFilters = Array.from(
-        document.querySelectorAll(".filter-body.open")
-    ).map(el => el.id.replace("filter-body-", ""));
-
-    buildPrimaryFilters();
-
-    openFilters.forEach(key => {
-        const body = document.getElementById(`filter-body-${key}`);
-        if (body) body.classList.add("open");
+    // 2️⃣ Clear ALL primary filters
+    Object.keys(uiState.primaries).forEach(k => {
+        uiState.primaries[k] = [];
+        uiState.primaryLocks[k] = false;
     });
 
+    // 3️⃣ Clear Set 1 (Search + Status)
+    uiState.search = "";
+    uiState.statusList = [];
+    el.txtSearch.value = "";
+
+    buildStatusPanel();
+
+    // 4️⃣ Clear Set 2 buttons
+    uiState.repeatActive = false;
+    uiState.unupdatedActive = false;
+    uiState.sortByDateAsc = null;
+
+    // Clear due / flagged / pns modes
+    uiState.mode = "normal";
+
+    updateSortIcon();
+
+    // 5️⃣ Reset internal protections
+    pendingUnupdated.clear();
+    pendingStatusOverride.clear();
+    unupdatedProtect = false;
+
+    // 6️⃣ Rebuild sidebar UI
+    buildPrimaryFilters();
+
+    // 7️⃣ Apply filters → show full table
     applyFilters();
 });
 
@@ -3536,6 +3555,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

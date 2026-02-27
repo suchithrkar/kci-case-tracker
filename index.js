@@ -694,45 +694,25 @@ function buildPrimaryFilters() {
      if (dnapCb) {
        dnapCb.onchange = () => {
          if (dnapCb.checked) {
-   
-           // 1️⃣ Clear ALL other filters
-           Object.keys(uiState.primaries).forEach(k => {
-             uiState.primaries[k] = [];
+         
+           // 🔥 FULL CLEAN RESET
+           resetAllFilters({
+             clearPrimaries: true,
+             clearRFC: true,
+             clearSet1: false,
+             clearSet2: false
            });
-   
-           // 2️⃣ Activate DNAP
+         
+           // 🔥 Apply DNAP only
            uiState.primaries.dnap = ["__HAS_VALUE__"];
-   
-            // 3️⃣ Disable ALL sidebar filters
-            Object.keys(uiState.primaryLocks).forEach(k => {
-              uiState.primaryLocks[k] = true;
-            });
-            
-            // 4️⃣ Disable RFC mode completely
-            uiState.rfcMode = "normal";
-            lastRfcMode = null;
-            
-            // Remove RFC highlights
-            document.querySelectorAll(".rfcBtn")
-              .forEach(b => b.classList.remove("active"));
-            
-            rfcLocked = true;
-   
+         
          } else {
-   
-           // Uncheck DNAP
+         
+           // Uncheck DNAP → just clear DNAP
            uiState.primaries.dnap = [];
-   
-           // Re-enable filters
-           Object.keys(uiState.primaryLocks).forEach(k => {
-             uiState.primaryLocks[k] = false;
-           });
-   
-            rfcLocked = false;
-            uiState.rfcMode = "normal";
-            lastRfcMode = null;
+         
          }
-   
+         
          buildPrimaryFilters();
        };
      }
@@ -3618,6 +3598,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

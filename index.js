@@ -2194,9 +2194,11 @@ function handleStatusChange(caseId, newStatus) {
        statusChangedBy: trackerState.user.uid
      }).then(() => {
        pendingUnupdated.delete(caseId);
+       pendingStatusOverride.delete(caseId);
        applyFilters();
      }).catch(err => {
        pendingUnupdated.delete(caseId);
+       pendingStatusOverride.delete(caseId);
        showPopup("Failed to update case.");
        console.error(err);
      });
@@ -3537,6 +3539,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

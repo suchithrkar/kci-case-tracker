@@ -2736,38 +2736,38 @@ btnModalClear.onclick = () => {
   resizeNotes();
 };
 
-
 function closeModal() {
-  // If modal was enforcing follow-up and user cancels → revert status
-   if (pendingStatusForModal && currentModalCaseId) {
-     const r = trackerState.allCases.find(x => x.id === currentModalCaseId);
-     if (r) {
-       r.status = prevStatusBeforeModal || "";
-     }
-     pendingStatusForModal = null;
-     prevStatusBeforeModal = null;
-   
-     // refresh UI so dropdown reverts visually
-     applyFilters();
-   }
+
+  if (pendingStatusForModal && currentModalCaseId) {
+    const r = trackerState.allCases.find(x => x.id === currentModalCaseId);
+    if (r) {
+      r.status = prevStatusBeforeModal || "";
+    }
+    pendingStatusForModal = null;
+    prevStatusBeforeModal = null;
+
+    applyFilters();
+  }
 
   requireFollowUp = false;
+
+  // ✅ Clean protection BEFORE resetting case ID
+  if (currentModalCaseId) {
+    pendingUnupdated.delete(currentModalCaseId);
+  }
+
+  unupdatedProtect = false;
   currentModalCaseId = null;
 
-  hideModalWarning();   // ✅ FIX: clear stale warning
+  hideModalWarning();
 
-  // Animate close, THEN hide modal
   animateModalClose(() => {
     modal.classList.remove("show");
   });
-   pendingUnupdated.delete(currentModalCaseId);
-   unupdatedProtect = false;
 
-   window.__fromReminder = false;
-   closureSurveyCompleted = false;
+  window.__fromReminder = false;
+  closureSurveyCompleted = false;
 }
-
-
 
 /* =======================================================================
    MODAL WARNINGS
@@ -3520,6 +3520,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

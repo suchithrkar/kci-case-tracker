@@ -804,50 +804,12 @@ document.addEventListener("click", (e) => {
     if (!btn) return;   // Prevents accidental unlocks on ANY other click
     if (rfcLocked) return;
 
-    // ================================
-    // FULL CLEAR (Unlocked Scenario)
-    // ================================
-
-    // 1️⃣ Reset RFC mode + highlights
-    lastRfcMode = null;
-    uiState.mode = "normal";
-    document.querySelectorAll(".rfcBtn").forEach(b =>
-        b.classList.remove("active")
-    );
-
-    // 2️⃣ Clear ALL primary filters
-    Object.keys(uiState.primaries).forEach(k => {
-        uiState.primaries[k] = [];
-        uiState.primaryLocks[k] = false;
-    });
-
-    // 3️⃣ Clear Set 1 (Search + Status)
-    uiState.search = "";
-    uiState.statusList = [];
-    el.txtSearch.value = "";
-
-    buildStatusPanel();
-
-    // 4️⃣ Clear Set 2 buttons
-    uiState.repeatActive = false;
-    uiState.unupdatedActive = false;
-    uiState.sortByDateAsc = null;
-
-    // Clear due / flagged / pns modes
-    uiState.mode = "normal";
-
-    updateSortIcon();
-
-    // 5️⃣ Reset internal protections
-    pendingUnupdated.clear();
-    pendingStatusOverride.clear();
-    unupdatedProtect = false;
-
-    // 6️⃣ Rebuild sidebar UI
-    buildPrimaryFilters();
-
-    // 7️⃣ Apply filters → show full table
-    applyFilters();
+    resetAllFilters({
+     clearPrimaries: true,
+     clearRFC: true,
+     clearSet1: true,
+     clearSet2: true
+   });
 });
 
 
@@ -1078,79 +1040,42 @@ function setupFilterControls() {
 
     /* CLEAR */
   el.btnClear.onclick = () => {
-    // 🔥 Clear working-set overrides
-    pendingStatusOverride.clear();
-
-    const rfcModes = ["onsite","offsite","csr","total","negative"];
-    const set2Modes = ["due","flagged","pns","repeat","unupdated"];
-    const isRfcMode = rfcModes.includes(uiState.mode);
-    const isSet2 = set2Modes.includes(uiState.mode);
-
-    // ========== CASE 1: RFC ACTIVE + SIDEBAR LOCKED ==========
-    if (rfcLocked && (isRfcMode || isSet2)) {
-
-        // restore last known RFC mode
-        if (lastRfcMode) {
-            uiState.mode = lastRfcMode;
-        }
-
-        // clear ONLY main filters
-        uiState.search = "";
-        uiState.statusList = [];
-        uiState.sortByDateAsc = null;
-        updateSortIcon();
-
-        uiState.repeatActive = false;
-        uiState.unupdatedActive = false;
-
-        el.txtSearch.value = "";
-
-        buildStatusPanel();
-        applyFilters();
-
-        // restore highlight AFTER DOM updates
-        setTimeout(() => {
-            document.querySelectorAll(".rfcBtn").forEach(b => {
-                b.classList.toggle("active", b.dataset.type === uiState.mode);
-            });
-        }, 0);
-
-        return;
-    }
-
-    // ========== CASE 2: NOT LOCKED — NORMAL CLEAR ==========
-    // normal reset
-    lastRfcMode = null;
-    uiState.mode = "normal";
-    uiState.repeatActive = false;
-    uiState.unupdatedActive = false;
-
-    document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
-
-    uiState.search = "";
-    uiState.statusList = [];
-    uiState.sortByDateAsc = null;
-    updateSortIcon();
-
-    el.txtSearch.value = "";
-
-    // clear primaries only if not locked
-    Object.keys(uiState.primaries).forEach(key => {
-        if (!uiState.primaryLocks[key]) {
-            uiState.primaries[key] = [];
-        }
-    });
-
-    pendingUnupdated.clear();
-    unupdatedProtect = false;
-
-    buildStatusPanel();
-    buildPrimaryFilters();
-    applyFilters();
-};
-
-
-
+   
+     // Clear working-set overrides
+     pendingStatusOverride.clear();
+   
+     // 🔒 If locked → preserve sidebar filters
+     if (rfcLocked) {
+   
+       resetAllFilters({
+         clearPrimaries: false,  // preserve sidebar
+         clearRFC: false,        // preserve RFC selection
+         clearSet1: true,
+         clearSet2: true         // 🔥 fixes your bug
+       });
+   
+       // Restore RFC highlight
+       setTimeout(() => {
+         document.querySelectorAll(".rfcBtn").forEach(b => {
+           b.classList.toggle(
+             "active",
+             b.dataset.type === uiState.mode
+           );
+         });
+       }, 0);
+   
+       return;
+     }
+   
+     // 🔓 Not locked → full reset
+     resetAllFilters({
+       clearPrimaries: true,
+       clearRFC: true,
+       clearSet1: true,
+       clearSet2: true
+     });
+   
+   };
 
   /* MODE BUTTONS — Direct override (Option A behavior) */
   el.btnDueToday.onclick = () => { uiState.mode = "due"; applyFilters(); };
@@ -1222,7 +1147,58 @@ function updateSet2Highlights() {
   );
 }
 
+/* =========================================================
+   GLOBAL FILTER RESET ENGINE
+   ========================================================= */
 
+function resetAllFilters({
+  clearPrimaries = true,
+  clearRFC = true,
+  clearSet1 = true,
+  clearSet2 = true
+} = {}) {
+
+  // 1️⃣ RFC
+  if (clearRFC) {
+    lastRfcMode = null;
+    uiState.mode = "normal";
+    document.querySelectorAll(".rfcBtn")
+      .forEach(b => b.classList.remove("active"));
+  }
+
+  // 2️⃣ Primary filters
+  if (clearPrimaries) {
+    Object.keys(uiState.primaries).forEach(k => {
+      uiState.primaries[k] = [];
+      uiState.primaryLocks[k] = false;
+    });
+  }
+
+  // 3️⃣ Set 1 (Search + Status)
+  if (clearSet1) {
+    uiState.search = "";
+    uiState.statusList = [];
+    el.txtSearch.value = "";
+    buildStatusPanel();
+  }
+
+  // 4️⃣ Set 2 (Mode buttons)
+  if (clearSet2) {
+    uiState.mode = "normal";
+    uiState.repeatActive = false;
+    uiState.unupdatedActive = false;
+    uiState.sortByDateAsc = null;
+    updateSortIcon();
+  }
+
+  // 5️⃣ Safety clears
+  pendingUnupdated.clear();
+  pendingStatusOverride.clear();
+  unupdatedProtect = false;
+
+  buildPrimaryFilters();
+  applyFilters();
+}
 
 /* =======================================================================
    STATUS PANEL (MULTI-SELECT) — APPLY ONLY AFTER CLICK
@@ -3555,6 +3531,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

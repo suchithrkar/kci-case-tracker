@@ -231,6 +231,7 @@ const uiState = {
     onsiteRFC: [],
     csrRFC: [],
     benchRFC: [],
+    dnap: [],
     country: []
   }
 };
@@ -485,6 +486,7 @@ function setupRealtimeCases(teamId) {
         onsiteRFC: c.onsiteRFC || "",
         csrRFC: c.csrRFC || "",
         benchRFC: c.benchRFC || "",
+        dnap: c.dnap || "",
         status: c.status || "",
         followDate: c.followDate || "",
         followTime: c.followTime || "",
@@ -614,6 +616,7 @@ if (!uiState.primaryLocks) {
     onsiteRFC: false,
     csrRFC: false,
     benchRFC: false,
+    dnap: false,
     country: false
   };
 }
@@ -645,9 +648,26 @@ function buildPrimaryFilters() {
     block.innerHTML = `
       <div class="filter-head" data-key="${key}">
         <div class="filter-title">${title}</div>
-        <div>
-          <span style="margin-left:8px">▾</span>
-        </div>
+   
+        ${
+          key === "benchRFC"
+            ? `
+            <div style="display:flex;align-items:center;gap:12px;">
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+                <input type="checkbox"
+                       id="benchDnapCheckbox"
+                       ${uiState.primaries.dnap?.includes("Yes") ? "checked" : ""}/>
+                DNAP
+              </label>
+              <span style="opacity:.7;">▾</span>
+            </div>
+            `
+            : `
+            <div>
+              <span style="margin-left:8px;">▾</span>
+            </div>
+            `
+        }
       </div>
       <div class="filter-body" id="filter-body-${key}">
         <div class="chips ${key === "benchRFC" ? "single-column" : ""}" id="chips-${key}">
@@ -662,6 +682,46 @@ function buildPrimaryFilters() {
     `;
 
     container.appendChild(block);
+
+   if (key === "benchRFC") {
+     const dnapCb = block.querySelector("#benchDnapCheckbox");
+   
+     if (dnapCb) {
+       dnapCb.onchange = () => {
+         if (dnapCb.checked) {
+   
+           // 1️⃣ Clear ALL other filters
+           Object.keys(uiState.primaries).forEach(k => {
+             uiState.primaries[k] = [];
+           });
+   
+           // 2️⃣ Activate DNAP
+           uiState.primaries.dnap = ["Yes"];
+   
+           // 3️⃣ Disable ALL sidebar filters + RFC buttons
+           Object.keys(uiState.primaryLocks).forEach(k => {
+             uiState.primaryLocks[k] = true;
+           });
+   
+           rfcLocked = true;
+   
+         } else {
+   
+           // Uncheck DNAP
+           uiState.primaries.dnap = [];
+   
+           // Re-enable filters
+           Object.keys(uiState.primaryLocks).forEach(k => {
+             uiState.primaryLocks[k] = false;
+           });
+   
+           rfcLocked = false;
+         }
+   
+         buildPrimaryFilters();
+       };
+     }
+   }
 
     // expand/collapse
     const head = block.querySelector(".filter-head");
@@ -976,10 +1036,19 @@ function updateFilterLockedUI(key) {
 
 /* Synchronize UI checkboxes → uiState.primaries (called on sidebar apply) */
 function syncPrimaryFiltersFromUI() {
+
   Object.keys(PRIMARY_OPTIONS).forEach(key => {
-    const checks = Array.from(document.querySelectorAll(`#filter-body-${key} input[type="checkbox"]`));
-    uiState.primaries[key] = checks.filter(c => c.checked).map(c => c.dataset.value);
+    const checks = Array.from(
+      document.querySelectorAll(`#filter-body-${key} input[type="checkbox"]`)
+    );
+
+    uiState.primaries[key] =
+      checks.filter(c => c.checked).map(c => c.dataset.value);
   });
+
+  // 🔥 Sync DNAP separately
+  const dnapCb = document.getElementById("benchDnapCheckbox");
+  uiState.primaries.dnap = dnapCb?.checked ? ["Yes"] : [];
 }
 
 /* Utility: convert key to human label */
@@ -3529,6 +3598,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

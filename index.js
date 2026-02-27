@@ -2600,6 +2600,10 @@ function openClosureModal(row) {
   const modal = document.getElementById("closureModal");
   modal.classList.add("show");
 
+  // 🔹 Update modal title with Case ID
+  document.getElementById("closureModalTitle").textContent =
+    `Case Closure Survey — ${row.id}`;
+
   // reset state
   selectedStars = 0;
 
@@ -3500,6 +3504,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

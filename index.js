@@ -2185,6 +2185,7 @@ function handleStatusChange(caseId, newStatus) {
 
    // ✅ AUTO-PNS: If status is set to PNS, auto-enable PNS flag
    if (newStatus === "PNS") {
+     row.status = "PNS";   // 🔥 CRITICAL FIX
      row.PNS = true;   // ✅ immediate local update 
      firestoreUpdateCase(caseId, {
        status: "PNS",
@@ -2206,10 +2207,11 @@ function handleStatusChange(caseId, newStatus) {
    }
 
    if (newStatus === "Closed") {
-     // 🔹 Track current case for revert logic
-     currentModalCaseId = caseId;
      // store previous status so UI can revert if modal is cancelled
      prevStatusBeforeModal = row.status || "";
+     row.status = "Closed";  // 🔥 ensure dropdown reflects change
+     // 🔹 Track current case for revert logic
+     currentModalCaseId = caseId;
      // mark pending "Closed" (same concept as SP / Monitoring)
      pendingStatusForModal = "Closed";
      closureSurveyCompleted = false; // 🔒 reset until survey submits
@@ -3534,6 +3536,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

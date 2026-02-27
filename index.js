@@ -2635,14 +2635,31 @@ const btnClosureClose = document.getElementById("btnClosureClose");
 
 if (btnClosureClose) {
   btnClosureClose.onclick = () => {
+
+    const modalEl = document.getElementById("closureModal");
+
     // 🧹 Clear closure warning if present
     const warn = document.getElementById("closureWarning");
     if (warn) warn.remove();
 
-    // Close survey modal
-    document
-      .getElementById("closureModal")
-      .classList.remove("show");
+    // 🔒 REVERT LOGIC (only if survey NOT completed)
+    if (!closureSurveyCompleted && pendingStatusForModal === "Closed") {
+
+      const row = trackerState.allCases.find(
+        r => r.id === currentModalCaseId
+      );
+
+      if (row) {
+        row.status = prevStatusBeforeModal || "";
+      }
+
+      pendingStatusForModal = null;
+      prevStatusBeforeModal = null;
+
+      applyFilters(); // refresh dropdown UI
+    }
+
+    modalEl.classList.remove("show");
   };
 }
 
@@ -3504,6 +3521,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

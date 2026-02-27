@@ -698,12 +698,20 @@ function buildPrimaryFilters() {
            // 2️⃣ Activate DNAP
            uiState.primaries.dnap = ["Yes"];
    
-           // 3️⃣ Disable ALL sidebar filters + RFC buttons
-           Object.keys(uiState.primaryLocks).forEach(k => {
-             uiState.primaryLocks[k] = true;
-           });
-   
-           rfcLocked = true;
+            // 3️⃣ Disable ALL sidebar filters
+            Object.keys(uiState.primaryLocks).forEach(k => {
+              uiState.primaryLocks[k] = true;
+            });
+            
+            // 4️⃣ Disable RFC mode completely
+            uiState.rfcMode = "normal";
+            lastRfcMode = null;
+            
+            // Remove RFC highlights
+            document.querySelectorAll(".rfcBtn")
+              .forEach(b => b.classList.remove("active"));
+            
+            rfcLocked = true;
    
          } else {
    
@@ -715,7 +723,9 @@ function buildPrimaryFilters() {
              uiState.primaryLocks[k] = false;
            });
    
-           rfcLocked = false;
+            rfcLocked = false;
+            uiState.rfcMode = "normal";
+            lastRfcMode = null;
          }
    
          buildPrimaryFilters();
@@ -3598,6 +3608,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

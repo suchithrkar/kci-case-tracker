@@ -1059,6 +1059,8 @@ function setupFilterControls() {
 
     /* CLEAR */
   el.btnClear.onclick = () => {
+    // 🔥 Clear working-set overrides
+    pendingStatusOverride.clear();
 
     const rfcModes = ["onsite","offsite","csr","total","negative"];
     const set2Modes = ["due","flagged","pns","repeat","unupdated"];
@@ -2193,11 +2195,9 @@ function handleStatusChange(caseId, newStatus) {
        statusChangedBy: trackerState.user.uid
      }).then(() => {
        pendingUnupdated.delete(caseId);
-       pendingStatusOverride.delete(caseId);
        applyFilters();
      }).catch(err => {
        pendingUnupdated.delete(caseId);
-       pendingStatusOverride.delete(caseId);
        showPopup("Failed to update case.");
        console.error(err);
      });
@@ -2252,8 +2252,6 @@ function handleStatusChange(caseId, newStatus) {
      statusChangedBy: trackerState.user.uid
    }).then(() => {
      pendingUnupdated.delete(caseId);
-     // ✅ Remove status override protection
-     pendingStatusOverride.delete(caseId);
      applyFilters();
    }).catch(err => {
      // On failure, remove pending and show popup (prevents permanent stuck case)
@@ -2770,7 +2768,6 @@ function closeModal() {
   // ✅ Clean protection BEFORE resetting case ID
   if (currentModalCaseId) {
     pendingUnupdated.delete(currentModalCaseId);
-    pendingStatusOverride.delete(currentModalCaseId);
   }
 
   unupdatedProtect = false;
@@ -3316,7 +3313,6 @@ async function saveModalData() {
     await firestoreUpdateCase(caseId, updateObj);
      // NEW: Remove pending lock for this case after modal save
     pendingUnupdated.delete(caseId);
-    pendingStatusOverride.delete(caseId);
 
    // You allowed unupdated list to refresh after modal save
    if (uiState.unupdatedActive) {
@@ -3538,6 +3534,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

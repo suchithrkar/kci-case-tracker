@@ -217,10 +217,11 @@ const userNameMap = {};
 const uiState = {
   search: "",
   statusList: [],
-  mode: "normal",   // normal | due | flagged | total | negative
+  rfcMode: "normal",     // RFC buttons only
+  set2Mode: "normal",    // Due / Flagged / PNS only
   unupdatedActive: false,
   repeatActive: false,
-  sortByDateAsc: null,     // null = off, true = asc, false = desc
+  sortByDateAsc: null,
 
   primaries: {
     caseResolutionCode: [],
@@ -847,7 +848,7 @@ btn.classList.add("active");
       uiState.primaryLocks.benchRFC = false;
 
        
-       uiState.mode = "onsite";
+       uiState.rfcMode = "onsite";
         uiState.primaries.caseResolutionCode = ["Onsite Solution"];
         uiState.primaries.onsiteRFC = [
             "Closed - Canceled",
@@ -1059,7 +1060,7 @@ function setupFilterControls() {
          document.querySelectorAll(".rfcBtn").forEach(b => {
            b.classList.toggle(
              "active",
-             b.dataset.type === uiState.mode
+             b.dataset.type === uiState.rfcMode
            );
          });
        }, 0);
@@ -1078,12 +1079,9 @@ function setupFilterControls() {
    };
 
   /* MODE BUTTONS — Direct override (Option A behavior) */
-  el.btnDueToday.onclick = () => { uiState.mode = "due"; applyFilters(); };
-  el.btnFlagged.onclick = () => { uiState.mode = "flagged"; applyFilters(); };
-  el.btnPNS.onclick = () => {
-     uiState.mode = "pns";
-     applyFilters();
-   };
+  el.btnDueToday.onclick = () => { uiState.set2Mode = "due"; applyFilters(); };
+  el.btnFlagged.onclick = () => { uiState.set2Mode = "flagged"; applyFilters(); };
+  el.btnPNS.onclick = () => { uiState.set2Mode = "pns"; applyFilters(); };
   el.btnRepeating.onclick = () => {
      uiState.repeatActive = !uiState.repeatActive;
      applyFilters();
@@ -1136,9 +1134,9 @@ function updateSortIcon() {
 
 
 function updateSet2Highlights() {
-  el.btnDueToday.classList.toggle("active", uiState.mode === "due");
-  el.btnFlagged.classList.toggle("active", uiState.mode === "flagged");
-  el.btnPNS.classList.toggle("active", uiState.mode === "pns");
+  el.btnDueToday.classList.toggle("active", uiState.set2Mode === "due");
+  el.btnFlagged.classList.toggle("active", uiState.set2Mode === "flagged");
+  el.btnPNS.classList.toggle("active", uiState.set2Mode === "pns");
   el.btnRepeating.classList.toggle("active", uiState.repeatActive);
   el.btnUnupdated.classList.toggle("active", uiState.unupdatedActive);
   el.btnSortDate.classList.toggle(
@@ -1161,7 +1159,7 @@ function resetAllFilters({
   // 1️⃣ RFC
   if (clearRFC) {
     lastRfcMode = null;
-    uiState.mode = "normal";
+    uiState.rfcMode = "normal";
     document.querySelectorAll(".rfcBtn")
       .forEach(b => b.classList.remove("active"));
   }
@@ -1184,12 +1182,7 @@ function resetAllFilters({
 
   // 4️⃣ Set 2 (Mode buttons)
   if (clearSet2) {
-
-    // Only reset mode if RFC is also being cleared
-    if (clearRFC) {
-      uiState.mode = "normal";
-    }
-
+    uiState.set2Mode = "normal";
     uiState.repeatActive = false;
     uiState.unupdatedActive = false;
     uiState.sortByDateAsc = null;
@@ -1312,7 +1305,7 @@ if (uiState.unupdatedActive && unupdatedProtect) {
   /* ===============================================================
      MODE OVERRIDES (Option A)
      =============================================================== */
-  if (uiState.mode === "due") {
+  if (uiState.set2Mode === "due") {
   rows = rows.filter(r =>
     r.lastActionedBy === trackerState.user.uid &&
     r.followDate &&
@@ -1322,14 +1315,14 @@ if (uiState.unupdatedActive && unupdatedProtect) {
 }
 
 
-  if (uiState.mode === "flagged") {
+  if (uiState.set2Mode === "flagged") {
     rows = rows.filter(r =>
       r.flagged &&
       r.lastActionedBy === trackerState.user.uid
     );
   }
 
-   if (uiState.mode === "pns") {
+   if (uiState.set2Mode === "pns") {
      rows = rows.filter(r =>
        r.PNS === true &&
        r.lastActionedBy === trackerState.user.uid
@@ -3536,6 +3529,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

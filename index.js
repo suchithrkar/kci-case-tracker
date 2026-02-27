@@ -527,10 +527,17 @@ applyFilters();
    ======================================================================= */
 function setupSidebarControls() {
   // Open / close
-  el.hamburger.onclick = () => {
-    el.sidebar.classList.add("open");
-    el.overlay.classList.add("show");
-  };
+   el.hamburger.onclick = () => {
+   
+     // 🔒 If Case Options modal is open → close it first
+     if (modal.classList.contains("show")) {
+       closeModal();
+     }
+   
+     // Then open sidebar
+     el.sidebar.classList.add("open");
+     el.overlay.classList.add("show");
+   };
 
   el.overlay.onclick = closeSidebar;
   document.getElementById("btnSideClose").onclick = closeSidebar;
@@ -3493,6 +3500,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

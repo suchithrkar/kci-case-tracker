@@ -1883,7 +1883,9 @@ tbody.addEventListener("click", (e) => {
 /* Close on outside click */
 document.addEventListener("click", (e) => {
   document.querySelectorAll(".custom-select.open").forEach(sel => {
-    if (!sel.contains(e.target)) sel.classList.remove("open");
+    if (!sel.contains(e.target)) {
+      sel.classList.remove("open", "open-up");
+    }
   });
 });
 
@@ -3488,6 +3490,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

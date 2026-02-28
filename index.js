@@ -689,25 +689,6 @@ function buildPrimaryFilters() {
 
     container.appendChild(block);
 
-      // 🔗 Link Bench DNAP checkbox to hidden DNAP filter
-      // 🔗 Bench header DNAP should simply toggle the real DNAP checkbox
-      if (key === "benchRFC") {
-        const benchDnap = block.querySelector("#benchDnapCheckbox");
-      
-        if (benchDnap) {
-          benchDnap.onchange = () => {
-      
-            const realDnapCheckbox = document.querySelector(
-              '#filter-body-dnap input[data-key="dnap"][data-value="Yes"]'
-            );
-      
-            if (realDnapCheckbox) {
-              realDnapCheckbox.checked = benchDnap.checked;
-            }
-          };
-        }
-      }
-
      // 🔒 Hide DNAP filter block visually (but keep it functional)
       if (key === "dnap") {
         block.style.display = "none";
@@ -1022,6 +1003,22 @@ function updateFilterLockedUI(key) {
     body.style.pointerEvents = "";
   }
 }
+
+// 🔗 GLOBAL Delegated Listener — Bench DNAP proxy
+document.addEventListener("change", (e) => {
+
+  if (e.target.id !== "benchDnapCheckbox") return;
+
+  const checked = e.target.checked;
+
+  const realDnapCheckbox = document.querySelector(
+    '#filter-body-dnap input[data-key="dnap"][data-value="Yes"]'
+  );
+
+  if (realDnapCheckbox) {
+    realDnapCheckbox.checked = checked;
+  }
+});
 
 
 /* Synchronize UI checkboxes → uiState.primaries (called on sidebar apply) */
@@ -3583,6 +3580,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

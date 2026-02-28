@@ -635,7 +635,8 @@ const PRIMARY_OPTIONS = {
   onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
   csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
   benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Order processing hold","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
-  country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"]
+  country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"],
+  dnap: ["Yes"]
 };
 
 /* Build sidebar markup for all primary filters and attach handlers */
@@ -659,9 +660,9 @@ function buildPrimaryFilters() {
             ? `
             <div style="display:flex;align-items:center;gap:12px;">
               <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-                <input type="checkbox"
-                       id="benchDnapCheckbox"
-                       ${uiState.primaries.dnap?.includes("__HAS_VALUE__") ? "checked" : ""}/>
+                  <input type="checkbox"
+                         id="benchDnapCheckbox"
+                         ${uiState.primaries.dnap?.includes("Yes") ? "checked" : ""}/>
                 DNAP
               </label>
               <span style="opacity:.7;">▾</span>
@@ -693,28 +694,12 @@ function buildPrimaryFilters() {
    
      if (dnapCb) {
        dnapCb.onchange = () => {
-         if (dnapCb.checked) {
-         
-           // 🔥 FULL CLEAN RESET
-           resetAllFilters({
-             clearPrimaries: true,
-             clearRFC: true,
-             clearSet1: false,
-             clearSet2: false
-           });
-         
-           // 🔥 Apply DNAP only
-           uiState.primaries.dnap = ["__HAS_VALUE__"];
-         
-         } else {
-         
-           // Uncheck DNAP → just clear DNAP
-           uiState.primaries.dnap = [];
-         
-         }
-         
-         buildPrimaryFilters();
-       };
+           if (dnapCb.checked) {
+             uiState.primaries.dnap = ["Yes"];
+           } else {
+             uiState.primaries.dnap = [];
+           }
+         };
      }
    }
 
@@ -1040,10 +1025,6 @@ function syncPrimaryFiltersFromUI() {
     uiState.primaries[key] =
       checks.filter(c => c.checked).map(c => c.dataset.value);
   });
-
-  // 🔥 Sync DNAP separately
-  const dnapCb = document.getElementById("benchDnapCheckbox");
-  uiState.primaries.dnap = dnapCb?.checked ? ["__HAS_VALUE__"] : [];
 }
 
 /* Utility: convert key to human label */
@@ -1508,12 +1489,6 @@ if (uiState.rfcMode === "negative") {
    
      rows = rows.filter(r => {
        const val = (r[key] || "").toString().trim();
-   
-       // 🔥 Special logic for DNAP
-       if (key === "dnap" && sel.includes("__HAS_VALUE__")) {
-         return val !== "";
-       }
-   
        return sel.includes(val);
      });
    });
@@ -3598,6 +3573,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -881,11 +881,7 @@ const previouslyOpenFilters = Array.from(
 
 
     // Clear all filters first
-    Object.keys(uiState.primaries).forEach(k => {
-      if (k !== "dnap") {
-        uiState.primaries[k] = [];
-      }
-    });
+    Object.keys(uiState.primaries).forEach(k => uiState.primaries[k] = []);
 
     if (type === "onsite") {
 
@@ -3580,6 +3576,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

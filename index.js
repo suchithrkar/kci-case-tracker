@@ -689,19 +689,32 @@ function buildPrimaryFilters() {
 
     container.appendChild(block);
 
-   if (key === "benchRFC") {
-     const dnapCb = block.querySelector("#benchDnapCheckbox");
-   
-     if (dnapCb) {
-       dnapCb.onchange = () => {
-           if (dnapCb.checked) {
-             uiState.primaries.dnap = ["Yes"];
-           } else {
-             uiState.primaries.dnap = [];
-           }
-         };
-     }
-   }
+      // 🔗 Link Bench DNAP checkbox to hidden DNAP filter
+      if (key === "benchRFC") {
+        const benchDnap = block.querySelector("#benchDnapCheckbox");
+      
+        if (benchDnap) {
+          benchDnap.onchange = () => {
+      
+            // Find hidden DNAP checkbox
+            const hiddenDnapCheckbox = document.querySelector(
+              '#filter-body-dnap input[data-key="dnap"][data-value="Yes"]'
+            );
+      
+            if (hiddenDnapCheckbox) {
+              hiddenDnapCheckbox.checked = benchDnap.checked;
+      
+              // 🔥 Trigger normal checkbox logic
+              hiddenDnapCheckbox.dispatchEvent(new Event("change"));
+            }
+          };
+        }
+      }
+
+     // 🔒 Hide DNAP filter block visually (but keep it functional)
+      if (key === "dnap") {
+        block.style.display = "none";
+      }
 
     // expand/collapse
     const head = block.querySelector(".filter-head");
@@ -3573,6 +3586,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

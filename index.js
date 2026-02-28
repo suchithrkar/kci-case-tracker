@@ -231,7 +231,6 @@ const uiState = {
     onsiteRFC: [],
     csrRFC: [],
     benchRFC: [],
-    dnap: [],
     country: []
   }
 };
@@ -486,12 +485,6 @@ function setupRealtimeCases(teamId) {
         onsiteRFC: c.onsiteRFC || "",
         csrRFC: c.csrRFC || "",
         benchRFC: c.benchRFC || "",
-        dnap:
-          c.dnap !== undefined &&
-          c.dnap !== null &&
-          String(c.dnap).trim() !== ""
-            ? "Yes"
-            : "",
         status: c.status || "",
         followDate: c.followDate || "",
         followTime: c.followTime || "",
@@ -621,7 +614,6 @@ if (!uiState.primaryLocks) {
     onsiteRFC: false,
     csrRFC: false,
     benchRFC: false,
-    dnap: false,
     country: false
   };
 }
@@ -635,8 +627,7 @@ const PRIMARY_OPTIONS = {
   onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
   csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
   benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Order processing hold","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
-  country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"],
-  dnap: ["Yes"]
+  country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"]
 };
 
 /* Build sidebar markup for all primary filters and attach handlers */
@@ -654,26 +645,9 @@ function buildPrimaryFilters() {
     block.innerHTML = `
       <div class="filter-head" data-key="${key}">
         <div class="filter-title">${title}</div>
-   
-        ${
-          key === "benchRFC"
-            ? `
-            <div style="display:flex;align-items:center;gap:12px;">
-              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-                  <input type="checkbox"
-                         id="benchDnapCheckbox"
-                         ${uiState.primaries.dnap?.includes("Yes") ? "checked" : ""}/>
-                DNAP
-              </label>
-              <span style="opacity:.7;">▾</span>
-            </div>
-            `
-            : `
-            <div>
-              <span style="margin-left:8px;">▾</span>
-            </div>
-            `
-        }
+        <div>
+          <span style="margin-left:8px;">▾</span>
+        </div>
       </div>
       <div class="filter-body" id="filter-body-${key}">
         <div class="chips ${key === "benchRFC" ? "single-column" : ""}" id="chips-${key}">
@@ -688,11 +662,6 @@ function buildPrimaryFilters() {
     `;
 
     container.appendChild(block);
-
-     // 🔒 Hide DNAP filter block visually (but keep it functional)
-      if (key === "dnap") {
-        block.style.display = "none";
-      }
 
     // expand/collapse
     const head = block.querySelector(".filter-head");
@@ -1016,12 +985,6 @@ function syncPrimaryFiltersFromUI() {
     uiState.primaries[key] =
       checks.filter(c => c.checked).map(c => c.dataset.value);
   });
-
-  // 🔥 Inject Bench DNAP manually (because it's outside filter-body-dnap)
-  const benchDnap = document.getElementById("benchDnapCheckbox");
-  if (benchDnap) {
-    uiState.primaries.dnap = benchDnap.checked ? ["Yes"] : [];
-  }
 }
 
 /* Utility: convert key to human label */
@@ -3570,6 +3533,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

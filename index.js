@@ -1308,33 +1308,6 @@ if (uiState.unupdatedActive && unupdatedProtect) {
   let rows = [...trackerState.allCases];
 
   /* ===============================================================
-     MODE OVERRIDES (Option A)
-     =============================================================== */
-  if (uiState.set2Mode === "due") {
-  rows = rows.filter(r =>
-    r.lastActionedBy === trackerState.user.uid &&
-    r.followDate &&
-    r.followDate <= today &&
-    r.status !== "Closed"
-  );
-}
-
-
-  if (uiState.set2Mode === "flagged") {
-    rows = rows.filter(r =>
-      r.flagged &&
-      r.lastActionedBy === trackerState.user.uid
-    );
-  }
-
-   if (uiState.set2Mode === "pns") {
-     rows = rows.filter(r =>
-       r.PNS === true &&
-       r.lastActionedBy === trackerState.user.uid
-     );
-   }
-
-  /* ===============================================================
    RFC MODE: TOTAL  (NEW — does NOT return early)
    =============================================================== */
 if (uiState.rfcMode === "total") {
@@ -1411,6 +1384,34 @@ if (uiState.rfcMode === "negative") {
 
     rows = base;
 }
+
+
+  /* ===============================================================
+     MODE OVERRIDES (Option A)
+     =============================================================== */
+  if (uiState.set2Mode === "due") {
+  rows = rows.filter(r =>
+    r.lastActionedBy === trackerState.user.uid &&
+    r.followDate &&
+    r.followDate <= today &&
+    r.status !== "Closed"
+  );
+}
+
+
+  if (uiState.set2Mode === "flagged") {
+    rows = rows.filter(r =>
+      r.flagged &&
+      r.lastActionedBy === trackerState.user.uid
+    );
+  }
+
+   if (uiState.set2Mode === "pns") {
+     rows = rows.filter(r =>
+       r.PNS === true &&
+       r.lastActionedBy === trackerState.user.uid
+     );
+   }
 
   /* ===============================================================
      NORMAL MODE — APPLY FULL FILTER PIPELINE
@@ -3533,6 +3534,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -635,7 +635,8 @@ const PRIMARY_OPTIONS = {
   onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
   csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
   benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Order processing hold","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
-  country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"]
+  country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"],
+  dnap: ["Yes"]
 };
 
 /* Build sidebar markup for all primary filters and attach handlers */
@@ -693,16 +694,12 @@ function buildPrimaryFilters() {
    
      if (dnapCb) {
        dnapCb.onchange = () => {
-       
-         if (dnapCb.checked) {
-           uiState.primaries.dnap = ["Yes"];
-         } else {
-           uiState.primaries.dnap = [];
-         }
-      
-         // Immediately apply filters
-         applyFilters();
-      };
+           if (dnapCb.checked) {
+             uiState.primaries.dnap = ["Yes"];
+           } else {
+             uiState.primaries.dnap = [];
+           }
+         };
      }
    }
 
@@ -873,11 +870,11 @@ const previouslyOpenFilters = Array.from(
 
 
    // Highlight active RFC button
-   if (!preventRfcHighlightReset) {
-       document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
-   }
-   
-   btn.classList.add("active");
+if (!preventRfcHighlightReset) {
+    document.querySelectorAll(".rfcBtn").forEach(b => b.classList.remove("active"));
+}
+
+btn.classList.add("active");
 
 
     // Clear all filters first
@@ -3576,8 +3573,6 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
-
-
 
 
 

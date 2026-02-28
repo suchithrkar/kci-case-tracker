@@ -1004,22 +1004,6 @@ function updateFilterLockedUI(key) {
   }
 }
 
-// 🔗 GLOBAL Delegated Listener — Bench DNAP proxy
-document.addEventListener("change", (e) => {
-
-  if (e.target.id !== "benchDnapCheckbox") return;
-
-  const checked = e.target.checked;
-
-  const realDnapCheckbox = document.querySelector(
-    '#filter-body-dnap input[data-key="dnap"][data-value="Yes"]'
-  );
-
-  if (realDnapCheckbox) {
-    realDnapCheckbox.checked = checked;
-  }
-});
-
 
 /* Synchronize UI checkboxes → uiState.primaries (called on sidebar apply) */
 function syncPrimaryFiltersFromUI() {
@@ -1032,6 +1016,12 @@ function syncPrimaryFiltersFromUI() {
     uiState.primaries[key] =
       checks.filter(c => c.checked).map(c => c.dataset.value);
   });
+
+  // 🔥 Inject Bench DNAP manually (because it's outside filter-body-dnap)
+  const benchDnap = document.getElementById("benchDnapCheckbox");
+  if (benchDnap) {
+    uiState.primaries.dnap = benchDnap.checked ? ["Yes"] : [];
+  }
 }
 
 /* Utility: convert key to human label */
@@ -3580,6 +3570,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -694,20 +694,23 @@ function buildPrimaryFilters() {
         const benchDnap = block.querySelector("#benchDnapCheckbox");
       
         if (benchDnap) {
-          benchDnap.onchange = () => {
-      
-            // Find hidden DNAP checkbox
-            const hiddenDnapCheckbox = document.querySelector(
-              '#filter-body-dnap input[data-key="dnap"][data-value="Yes"]'
-            );
-      
-            if (hiddenDnapCheckbox) {
-              hiddenDnapCheckbox.checked = benchDnap.checked;
-      
-              // 🔥 Trigger normal checkbox logic
-              hiddenDnapCheckbox.dispatchEvent(new Event("change"));
-            }
-          };
+         benchDnap.onchange = () => {
+         
+           if (benchDnap.checked) {
+             uiState.primaries.dnap = ["Yes"];
+           } else {
+             uiState.primaries.dnap = [];
+           }
+         
+           // Sync hidden DNAP checkbox visually
+           const hiddenDnapCheckbox = document.querySelector(
+             '#filter-body-dnap input[data-key="dnap"][data-value="Yes"]'
+           );
+         
+           if (hiddenDnapCheckbox) {
+             hiddenDnapCheckbox.checked = benchDnap.checked;
+           }
+         };
         }
       }
 
@@ -3586,6 +3589,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

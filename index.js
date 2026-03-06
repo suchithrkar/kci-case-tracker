@@ -78,11 +78,29 @@ function updateHeaderHeight() {
   );
 }
 
+function updateSidebarWidth() {
+  const sidebar = document.getElementById("sidebar");
+  if (!sidebar) return;
+
+  const width = sidebar.offsetWidth;
+
+  document.documentElement.style.setProperty(
+    "--sidebar-width",
+    width + "px"
+  );
+}
+
 // Run once when page loads
-window.addEventListener("load", updateHeaderHeight);
+window.addEventListener("load", () => {
+  updateHeaderHeight();
+  updateSidebarWidth();
+});
 
 // Update if window resizes
-window.addEventListener("resize", updateHeaderHeight);
+window.addEventListener("resize", () => {
+  updateHeaderHeight();
+  updateSidebarWidth();
+});
 
 /* ============================================================
    TOOLTIP EDGE-PROTECTION — AUTO REALIGN ON SCREEN EDGES
@@ -562,6 +580,9 @@ function setupSidebarControls() {
      // Then open sidebar
      el.sidebar.classList.add("open");
      el.overlay.classList.add("show");
+
+     // 🔥 ensure width variable updates
+     updateSidebarWidth();
    };
 
   el.overlay.onclick = closeSidebar;
@@ -582,6 +603,7 @@ function setupSidebarControls() {
         if (reportOverlay) {
           reportOverlay.classList.remove("show");
         }   
+     updateSidebarWidth();
    }
 
 
@@ -3556,6 +3578,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

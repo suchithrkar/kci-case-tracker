@@ -3537,20 +3537,25 @@ function showSummaryInfo() {
      4️⃣ RENDER SUMMARY
      --------------------------------------------- */
   infoModalBody.textContent =
-`Total Cases Closed: ${closedCount}
-Met: ${met} (${pct(met)}%)
-Not Met: ${notMet} (${pct(notMet)}%)
-
-Service Pending: ${statusBreakdown["Service Pending"]}
-Monitoring: ${statusBreakdown["Monitoring"]}
-NCM 1: ${statusBreakdown["NCM 1"]}
-NCM 2: ${statusBreakdown["NCM 2"]}
-PNS: ${statusBreakdown["PNS"]}
-
-Total Followed Up Cases: ${totalFollowedUp}
-Total Updated Cases: ${totalUpdated}
-
-Total Actioned Cases: ${totalActioned}`;
+   `Total Cases Closed: ${closedCount}
+   Met: ${met} (${pct(met)}%)
+   Not Met: ${notMet} (${pct(notMet)}%)
+   
+   Service Pending: ${statusBreakdown["Service Pending"]}
+   Monitoring: ${statusBreakdown["Monitoring"]}
+   NCM 1: ${statusBreakdown["NCM 1"]}
+   NCM 2: ${statusBreakdown["NCM 2"]}
+   PNS: ${statusBreakdown["PNS"]}
+   
+   Total Followed Up Cases: ${totalFollowedUp}
+   Total Updated Cases: ${totalUpdated}
+   
+   Total Actioned Cases: ${totalActioned}`;
+   
+   // If sidebar is open → close it first
+   if (el.sidebar.classList.contains("open")) {
+     closeSidebar();
+   }
 
   infoModal.classList.add("show");
 }
@@ -3598,6 +3603,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

@@ -3551,11 +3551,6 @@ function showSummaryInfo() {
    Total Updated Cases: ${totalUpdated}
    
    Total Actioned Cases: ${totalActioned}`;
-   
-   // If sidebar is open → close it first
-   if (el.sidebar.classList.contains("open")) {
-     closeSidebar();
-   }
 
   infoModal.classList.add("show");
 }
@@ -3603,6 +3598,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

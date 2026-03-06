@@ -62,6 +62,28 @@ const el = {
    badgePNS: document.getElementById("badgePNS"),
 };
 
+/* =========================================================
+   HEADER HEIGHT → MODAL OFFSET
+   ========================================================= */
+
+function updateHeaderHeight() {
+  const header = document.querySelector(".header");
+  if (!header) return;
+
+  const height = header.offsetHeight;
+
+  document.documentElement.style.setProperty(
+    "--header-height",
+    height + "px"
+  );
+}
+
+// Run once when page loads
+window.addEventListener("load", updateHeaderHeight);
+
+// Update if window resizes
+window.addEventListener("resize", updateHeaderHeight);
+
 /* ============================================================
    TOOLTIP EDGE-PROTECTION — AUTO REALIGN ON SCREEN EDGES
    ============================================================ */
@@ -3534,6 +3556,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

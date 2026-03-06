@@ -3552,7 +3552,22 @@ function showSummaryInfo() {
    
    Total Actioned Cases: ${totalActioned}`;
 
-  infoModal.classList.add("show");
+   // If sidebar is open → close it first
+   if (el.sidebar.classList.contains("open")) {
+     el.sidebar.classList.remove("open");
+     el.overlay.classList.remove("show");
+   
+     // Collapse filter bodies
+     document.querySelectorAll(".filter-body.open").forEach(body => {
+       body.classList.remove("open");
+     });
+   
+     // Update sidebar width variable
+     updateSidebarWidth();
+   }
+   
+   // Then open Tracker Summary modal
+   infoModal.classList.add("show");
 }
 
 
@@ -3598,6 +3613,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

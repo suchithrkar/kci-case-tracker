@@ -481,10 +481,19 @@ tr.active-row {
 
 /* Modal */
 .modal{
-  position:fixed;inset:0;
-  display:none;align-items:center;
+  position:fixed;
+
+  top:var(--header-height,0px);
+  left:0;
+  right:0;
+  bottom:0;
+
+  display:none;
+  align-items:center;
   justify-content:center;
-  background:rgba(0,0,0,.55);z-index:60;
+
+  background:rgba(0,0,0,.55);
+  z-index:60;
 }
 .modal.show{display:flex}
 .modal-card{
@@ -1710,6 +1719,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

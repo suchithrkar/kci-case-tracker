@@ -3529,16 +3529,26 @@ function showSummaryInfo() {
 
   const totalFollowedUp = followedUpCases.length;
 
-  /* ---------------------------------------------
-     2️⃣ TOTAL ACTIONED CASES (ANY ACTION TODAY)
-     --------------------------------------------- */
+   /* ---------------------------------------------
+      2️⃣ TOTAL ACTIONED CASES (ANY ACTION TODAY)
+      --------------------------------------------- */
    const actionedToday = trackerState.allCases.filter(r =>
      r.lastActionedBy === uid &&
      r.lastActionedOn === today &&
      r.status && r.status.trim() !== ""   // ❌ ignore status changed to blank
    );
-
-  const totalActioned = actionedToday.length;
+   
+   // Prevent double counting when the same case
+   // is updated multiple times in the same day
+   const uniqueActionedCases = new Map();
+   
+   actionedToday.forEach(r => {
+     uniqueActionedCases.set(r.id, r);
+   });
+   
+   const actionedCases = Array.from(uniqueActionedCases.values());
+   
+   const totalActioned = actionedCases.length;
 
   /* ---------------------------------------------
      3️⃣ UPDATED CASES (NON-STATUS UPDATES)
@@ -3615,6 +3625,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

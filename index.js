@@ -3478,13 +3478,14 @@ function showSummaryInfo() {
   const uid = trackerState.user.uid;
   const today = getTeamToday(trackerState.teamConfig);
 
-  /* ---------------------------------------------
-     1️⃣ STATUS CHANGED TODAY (FOLLOWED UP CASES)
-     --------------------------------------------- */
-  const statusChangedToday = trackerState.allCases.filter(r =>
-    r.statusChangedBy === uid &&
-    r.statusChangedOn === today
-  );
+   /* ---------------------------------------------
+      1️⃣ STATUS CHANGED TODAY (FOLLOWED UP CASES)
+      --------------------------------------------- */
+   const statusChangedToday = trackerState.allCases.filter(r =>
+     r.statusChangedBy === uid &&
+     r.statusChangedOn === today &&
+     r.status && r.status.trim() !== ""   // ❌ ignore status changed to blank
+   );
 
   // Closed
   const closedCases = statusChangedToday.filter(r => r.status === "Closed");
@@ -3521,10 +3522,11 @@ function showSummaryInfo() {
   /* ---------------------------------------------
      2️⃣ TOTAL ACTIONED CASES (ANY ACTION TODAY)
      --------------------------------------------- */
-  const actionedToday = trackerState.allCases.filter(r =>
-    r.lastActionedBy === uid &&
-    r.lastActionedOn === today
-  );
+   const actionedToday = trackerState.allCases.filter(r =>
+     r.lastActionedBy === uid &&
+     r.lastActionedOn === today &&
+     r.status && r.status.trim() !== ""   // ❌ ignore status changed to blank
+   );
 
   const totalActioned = actionedToday.length;
 
@@ -3603,6 +3605,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

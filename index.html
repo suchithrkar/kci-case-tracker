@@ -786,8 +786,8 @@ tr.active-row {
 
 .rfc-report-overlay {
   position: fixed;
-  top: 59.7px;                      /* header height */
-  left: 400.733px;                  /* sidebar width */
+  top: var(--header-height, 0px);             /* header height */
+  left: var(--sidebar-width, 0px);            /* sidebar width */
   right: 0;                 
   bottom: 0;
 
@@ -1719,6 +1719,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

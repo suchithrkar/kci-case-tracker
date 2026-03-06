@@ -572,10 +572,30 @@ function setupSidebarControls() {
   // Open / close
    el.hamburger.onclick = () => {
    
-     // 🔒 If Case Options modal is open → close it first
-     if (modal.classList.contains("show")) {
-       closeModal();
-     }
+      // 🔒 If any modal is open → close it first
+      
+      // Case Options modal
+      if (modal.classList.contains("show")) {
+        closeModal();
+      }
+      
+      // Tracker Summary modal
+      const infoModal = document.getElementById("infoModal");
+      if (infoModal?.classList.contains("show")) {
+        infoModal.classList.remove("show");
+      }
+      
+      // Case Closure Survey modal
+      const closureModal = document.getElementById("closureModal");
+      if (closureModal?.classList.contains("show")) {
+        closureModal.classList.remove("show");
+      }
+      
+      /* Follow-up reminder modal
+      const reminderModal = document.getElementById("followUpReminderModal");
+      if (reminderModal?.classList.contains("show")) {
+        reminderModal.classList.remove("show");
+      } */
    
      // Then open sidebar
      el.sidebar.classList.add("open");
@@ -3578,6 +3598,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

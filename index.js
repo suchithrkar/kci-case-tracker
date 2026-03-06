@@ -3487,8 +3487,18 @@ function showSummaryInfo() {
      r.status && r.status.trim() !== ""   // ❌ ignore status changed to blank
    );
 
+   // Prevent double counting when the same case status
+   // is changed multiple times in the same day
+   const uniqueFollowedCases = new Map();
+   
+   statusChangedToday.forEach(r => {
+     uniqueFollowedCases.set(r.id, r);
+   });
+   
+   const followedUpCases = Array.from(uniqueFollowedCases.values());
+
   // Closed
-  const closedCases = statusChangedToday.filter(r => r.status === "Closed");
+  const closedCases = followedUpCases.filter(r => r.status === "Closed");
   const closedCount = closedCases.length;
 
   const met = closedCases.filter(
@@ -3511,13 +3521,13 @@ function showSummaryInfo() {
     "PNS": 0
   };
 
-  statusChangedToday.forEach(r => {
+  followedUpCases.forEach(r => {
     if (statusBreakdown[r.status] !== undefined) {
       statusBreakdown[r.status]++;
     }
   });
 
-  const totalFollowedUp = statusChangedToday.length;
+  const totalFollowedUp = followedUpCases.length;
 
   /* ---------------------------------------------
      2️⃣ TOTAL ACTIONED CASES (ANY ACTION TODAY)
@@ -3605,6 +3615,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

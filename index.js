@@ -29,6 +29,7 @@ import {
 import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
 import { showPopup } from "./js/utils.js";
 import { cleanupClosedCases } from "./js/utils.js";
+import { MAIL_TEMPLATES } from "./templates.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -60,6 +61,14 @@ const el = {
   badgeDue: document.getElementById("badgeDue"),
   badgeFlag: document.getElementById("badgeFlag"),
    badgePNS: document.getElementById("badgePNS"),
+};
+
+const TEMPLATE_RESOLUTION_MAP = {
+
+  "onsite solution": "onsite",
+  "offsite solution": "offsite",
+  "parts shipped": "parts"
+
 };
 
 /* =========================================================
@@ -663,6 +672,188 @@ function setupSidebarControls() {
 };
    
 }
+
+function renderTemplate(template, caseData, agentName){
+
+  const firstName = agentName.split(" ")[0];
+
+  return template
+    .replaceAll("{{customerName}}", caseData.customerName || "")
+    .replaceAll("{{caseId}}", caseData.id || "")
+    .replaceAll("{{productName}}", caseData.productName || "")
+    .replaceAll("{{serialNumber}}", caseData.serialNumber || "")
+    .replaceAll("{{trackingStatus}}", caseData.trackingStatus || "")
+    .replaceAll("{{partName}}", caseData.partName || "")
+    .replaceAll("{{partNumber}}", caseData.partNumber || "")
+    .replaceAll("{{agentFirstName}}", firstName);
+}
+
+function copyToClipboard(text){
+
+  navigator.clipboard.writeText(text);
+
+  showToast("Mail copied");
+}
+
+document.querySelectorAll(".tpl-btn").forEach(btn=>{
+
+  btn.addEventListener("click", ()=>{
+
+    const templateName = btn.dataset.template;
+
+    if(!templateName) return;
+
+    insertTemplate(templateName);
+
+  });
+
+});
+
+function insertTemplate(templateKey){
+
+  const caseData = currentCase;
+
+  const resKey =
+    TEMPLATE_RESOLUTION_MAP[caseData.caseResolutionCode];
+
+  const key = `${templateKey}_${resKey}`;
+
+  const template = MAIL_TEMPLATES[key];
+
+  if(!template) return;
+
+  const body = renderTemplate(
+    template.body,
+    caseData,
+    loggedInUser
+  );
+
+  const notesField = document.querySelector("#optNotes");
+
+  notesField.value += "\n\n" + body;
+
+}
+
+document.querySelectorAll(".tpl-mail").forEach(btn=>{
+
+  btn.addEventListener("contextmenu",(e)=>{
+
+    e.preventDefault();
+
+    const templateName = btn.dataset.template;
+
+    copyTemplateSubject(templateName);
+
+  });
+
+});
+
+function copyTemplateSubject(templateKey){
+
+  const caseData = currentCase;
+
+  const resKey =
+    TEMPLATE_RESOLUTION_MAP[caseData.caseResolutionCode];
+
+  const key = `${templateKey}_${resKey}`;
+
+  const template = MAIL_TEMPLATES[key];
+
+  const subject = renderTemplate(
+    template.subject,
+    caseData,
+    loggedInUser
+  );
+
+  navigator.clipboard.writeText(subject);
+
+  showToast("Subject copied");
+
+}
+
+document
+.getElementById("btnTemplateMore")
+.addEventListener("click",openTemplateModal);
+
+function openTemplateModal(){
+
+  const modal = document.getElementById("templateModal");
+
+  modal.style.display = "flex";
+
+  buildTemplateButtons();
+
+}
+
+function buildTemplateButtons(){
+
+  const container =
+    document.getElementById("templateButtons");
+
+  container.innerHTML = "";
+
+  const caseData = currentCase;
+
+  const resKey =
+    TEMPLATE_RESOLUTION_MAP[caseData.caseResolutionCode];
+
+  const allowed = TEMPLATE_LIST[resKey];
+
+  allowed.forEach(name=>{
+
+    const btn = document.createElement("button");
+
+    btn.className="tpl-btn";
+    btn.textContent=name;
+
+    btn.onclick=()=>loadTemplatePreview(name);
+
+    container.appendChild(btn);
+
+  });
+
+}
+
+function loadTemplatePreview(name){
+
+  const caseData=currentCase;
+
+  const resKey=
+  TEMPLATE_RESOLUTION_MAP[caseData.caseResolutionCode];
+
+  const key=`${name.toLowerCase()}_${resKey}`;
+
+  const template=MAIL_TEMPLATES[key];
+
+  const subject=renderTemplate(
+    template.subject,
+    caseData,
+    loggedInUser
+  );
+
+  const body=renderTemplate(
+    template.body,
+    caseData,
+    loggedInUser
+  );
+
+  document.getElementById("templateSubject").textContent=subject;
+  document.getElementById("templateBody").value=body;
+
+}
+
+btnCopySubject.onclick=()=>{
+  copyToClipboard(
+    document.getElementById("templateSubject").textContent
+  );
+};
+
+btnCopyBody.onclick=()=>{
+  copyToClipboard(
+    document.getElementById("templateBody").value
+  );
+};
+
 
 /* =======================================================================
    PRIMARY FILTERS - Data model + UI builder + sync helpers
@@ -3625,6 +3816,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

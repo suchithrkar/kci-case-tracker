@@ -561,38 +561,6 @@ tr.active-row {
   border-top:1px solid var(--border);
 }
 
-/* ===============================
-   Template Toolbar
-================================ */
-
-.template-toolbar{
-  display:flex;
-  gap:6px;
-  padding:10px 16px;
-  border-bottom:1px solid var(--border);
-  background:var(--panel-2);
-}
-
-.tpl-btn{
-  background:var(--panel);
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:6px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:13px;
-  transition:all .15s ease;
-}
-
-.tpl-btn:hover{
-  border-color:var(--accent);
-  color:var(--accent);
-}
-
-.tpl-btn:active{
-  transform:translateY(1px);
-}
-
 /* Toast */
 .toast{
   position:fixed;bottom:20px;right:20px;
@@ -1479,32 +1447,7 @@ tr.active-row {
       <div class="modal-title" id="modalTitle">Case Options</div>
       <button class="btn" id="btnModalClose">Close</button>
     </div>
-    
-    <!-- TEMPLATE TOOLBAR -->
-    <div class="template-toolbar">
-    
-      <button class="tpl-btn" data-template="kci_notes">
-        KCI Notes
-      </button>
-    
-      <button class="tpl-btn tpl-mail" data-template="ncm1">
-        NCM 1
-      </button>
-    
-      <button class="tpl-btn tpl-mail" data-template="ncm2">
-        NCM 2
-      </button>
-    
-      <button class="tpl-btn tpl-mail" data-template="ncm_closure">
-        NCM Closure
-      </button>
-    
-      <button class="tpl-btn" id="btnTemplateMore">
-        More ⋯
-      </button>
-    
-    </div>
-    
+
     <div class="modal-body">
 
       <!-- Warning banner -->
@@ -1772,44 +1715,140 @@ tr.active-row {
   </div>
 </div>
 
-<!-- EMAIL TEMPLATE PREVIEW MODAL -->
-
-<div class="modal" id="templateModal" style="display:none;">
-  <div class="modal-card" style="max-width:720px;">
-
-    <div class="modal-head">
-      <div class="modal-title" id="templateModalTitle">
-        Email Templates
-      </div>
-      <button class="btn" id="btnTemplateClose">Close</button>
-    </div>
-
-    <div class="modal-body">
-
-      <div id="templateButtons" class="template-grid"></div>
-
-      <div class="template-preview">
-
-        <div class="template-subject">
-          <strong>Subject:</strong>
-          <div id="templateSubject"></div>
-        </div>
-
-        <textarea id="templateBody"
-          style="width:100%;height:220px;margin-top:8px;"></textarea>
-
-        <div style="margin-top:10px;display:flex;gap:8px;">
-          <button class="btn" id="btnCopySubject">Copy Subject</button>
-          <button class="btn" id="btnCopyBody">Copy Body</button>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-</div>
-
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

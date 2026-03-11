@@ -2023,6 +2023,16 @@ const btnModalClose = document.getElementById("btnModalClose");
 const btnModalSave = document.getElementById("btnModalSave");
 const btnModalClear = document.getElementById("btnModalClear");
 
+/* ===============================
+   TEMPLATE TOOLBAR REFERENCES
+=============================== */
+
+const btnKciNotes = document.getElementById("btnKciNotes");
+const btnTemplateNCM1 = document.getElementById("btnTemplateNCM1");
+const btnTemplateNCM2 = document.getElementById("btnTemplateNCM2");
+const btnTemplateClosure = document.getElementById("btnTemplateClosure");
+const btnTemplateMore = document.getElementById("btnTemplateMore");
+
 
 modalWarning.style.display = "none";
 
@@ -2859,6 +2869,75 @@ function hideModalWarning() {
   modalWarning.style.display = "none";
 }
 
+/* ======================================================
+   MAIL TEMPLATE SYSTEM (BASE IMPLEMENTATION)
+   ====================================================== */
+
+function copyTemplate(templateKey, copySubject = false) {
+
+  if (!currentModalCaseId) return;
+
+  const row = trackerState.allCases.find(
+    r => r.id === currentModalCaseId
+  );
+
+  if (!row) return;
+
+  console.log("Template requested:", templateKey);
+
+  // placeholder logic until templates.js is connected
+  const text = copySubject
+    ? `[SUBJECT] ${templateKey}`
+    : `[BODY] ${templateKey}`;
+
+  navigator.clipboard.writeText(text);
+
+  showPopup("Template copied");
+}
+
+/* =========================
+   TEMPLATE BUTTON ACTIONS
+========================= */
+
+btnTemplateNCM1.onclick = (e) => {
+  copyTemplate("ncm1", e.button === 2);
+};
+
+btnTemplateNCM2.onclick = (e) => {
+  copyTemplate("ncm2", e.button === 2);
+};
+
+btnTemplateClosure.onclick = (e) => {
+  copyTemplate("closure", e.button === 2);
+};
+
+btnKciNotes.onclick = () => {
+  copyTemplate("kci_notes", false);
+};
+
+btnTemplateMore.onclick = () => {
+  openEmailPreviewModal();
+};
+
+btnTemplateNCM1.oncontextmenu = (e) => {
+  e.preventDefault();
+  copyTemplate("ncm1", true);
+};
+
+btnTemplateNCM2.oncontextmenu = (e) => {
+  e.preventDefault();
+  copyTemplate("ncm2", true);
+};
+
+btnTemplateClosure.oncontextmenu = (e) => {
+  e.preventDefault();
+  copyTemplate("closure", true);
+};
+
+function openEmailPreviewModal(){
+  showPopup("Email Preview Modal coming next phase");
+}
+
 // =====================================================
 // SAVE BUTTON AUTO-DISABLE LOGIC
 // =====================================================
@@ -3625,6 +3704,7 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
+
 
 
 

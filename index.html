@@ -561,6 +561,30 @@ tr.active-row {
   border-top:1px solid var(--border);
 }
 
+/* =========================================
+   TEMPLATE TOOLBAR
+========================================= */
+
+.template-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+}
+
+.template-segment{
+  display:flex;
+  gap:6px;
+}
+
+.template-btn{
+  padding:6px 12px;
+  font-size:13px;
+  border-radius:8px;
+}
+
 /* Toast */
 .toast{
   position:fixed;bottom:20px;right:20px;
@@ -1448,6 +1472,35 @@ tr.active-row {
       <button class="btn" id="btnModalClose">Close</button>
     </div>
 
+    <!-- TEMPLATE TOOLBAR -->
+    <div class="template-toolbar">
+    
+      <button class="btn template-btn" id="btnKciNotes">
+        KCI Notes
+      </button>
+    
+      <div class="template-segment">
+    
+        <button class="btn template-btn" id="btnTemplateNCM1">
+          NCM 1
+        </button>
+    
+        <button class="btn template-btn" id="btnTemplateNCM2">
+          NCM 2
+        </button>
+    
+        <button class="btn template-btn" id="btnTemplateClosure">
+          NCM Closure
+        </button>
+    
+        <button class="btn template-btn" id="btnTemplateMore">
+          More ⋯
+        </button>
+    
+      </div>
+    
+    </div>
+
     <div class="modal-body">
 
       <!-- Warning banner -->
@@ -1719,6 +1772,7 @@ tr.active-row {
 </body>
 
 </html>
+
 
 
 

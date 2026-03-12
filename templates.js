@@ -1,29 +1,48 @@
 export const MAIL_TEMPLATES = {
 
   ncm1_onsite: {
-    subject: "Follow-up on Your HP Service Case – {{caseId}}",
+    subject: "",
+    body: ""
+  },
 
-    body:
-`Hi {{customerName}},
+  ncm2_onsite: {
+    subject: "",
+    body: ""
+  },
 
-This email is in reference to Case Number: {{caseId}}.
-
-We attempted to reach you regarding your HP product {{productName}}.
-
-Please respond so we can proceed.
-
-Best Regards,
-{{agentFirstName}}`
+  closure_onsite: {
+    subject: "",
+    body: ""
   },
 
   ncm1_offsite: {
-    subject: "Follow-up on Your HP Service Case – {{caseId}}",
-    body: `...`
+    subject: "",
+    body: ""
+  },
+
+  ncm2_offsite: {
+    subject: "",
+    body: ""
+  },
+
+  closure_offsite: {
+    subject: "",
+    body: ""
   },
 
   ncm1_parts: {
-    subject: "Follow-up on Your HP Service Case – {{caseId}}",
-    body: `...`
+    subject: "",
+    body: ""
+  },
+
+  ncm2_parts: {
+    subject: "",
+    body: ""
+  },
+
+  closure_parts: {
+    subject: "",
+    body: ""
   }
 
 };

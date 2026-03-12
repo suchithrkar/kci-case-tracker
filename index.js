@@ -1863,89 +1863,6 @@ export function renderTable() {
   });
 }
 
-/* ======================================================
-   TEMPLATE VARIABLE ENGINE
-====================================================== */
-
-function replaceTemplateVariables(text, caseData){
-
-  const agentFirstName =
-    (window.currentUser?.name || "")
-      .split(" ")[0];
-
-  const map = {
-    "{{customerName}}": caseData.customerName || "",
-    "{{caseId}}": caseData.id || "",
-    "{{productName}}": caseData.productName || "",
-    "{{serialNumber}}": caseData.serialNumber || "",
-    "{{trackingStatus}}": caseData.trackingStatus || "",
-    "{{partName}}": caseData.partName || "",
-    "{{partNumber}}": caseData.partNumber || "",
-    "{{agentFirstName}}": agentFirstName
-  };
-
-  Object.keys(map).forEach(key=>{
-    text = text.replaceAll(key, map[key]);
-  });
-
-  return text;
-}
-
-/* ======================================================
-   TEMPLATE RESOLUTION CODE MAPPER
-====================================================== */
-
-function getTemplateKey(baseKey, resolutionCode){
-
-  const rc = (resolutionCode || "").toLowerCase();
-
-  if(rc === "onsite solution")
-    return `${baseKey}_onsite`;
-
-  if(rc === "offsite solution")
-    return `${baseKey}_offsite`;
-
-  if(rc === "parts shipped")
-    return `${baseKey}_parts`;
-
-  return null;
-}
-
-/* ======================================================
-   COPY TEMPLATE ENGINE
-====================================================== */
-
-function copyTemplate(baseKey, copySubject=false){
-
-  if(!currentModalCaseId) return;
-
-  const row = trackerState.allCases.find(
-    r => r.id === currentModalCaseId
-  );
-
-  if(!row) return;
-
-  const templateKey = getTemplateKey(
-    baseKey,
-    row.caseResolutionCode
-  );
-
-  const template = MAIL_TEMPLATES[templateKey];
-
-  if(!template){
-    showToast("Template not found");
-    return;
-  }
-
-  const text = copySubject
-    ? replaceTemplateVariables(template.subject,row)
-    : replaceTemplateVariables(template.body,row);
-
-  navigator.clipboard.writeText(text);
-
-  showToast("Template copied");
-}
-
 /* Gear button now a proper clickable button */
 function renderGearButton(caseId) {
   return `
@@ -2105,16 +2022,6 @@ const optLastActionedByName = document.getElementById("optLastActionedByName"); 
 const btnModalClose = document.getElementById("btnModalClose");
 const btnModalSave = document.getElementById("btnModalSave");
 const btnModalClear = document.getElementById("btnModalClear");
-
-/* ==========================================
-   TEMPLATE TOOLBAR REFERENCES
-========================================== */
-
-const btnKciNotes = document.getElementById("btnKciNotes");
-const btnTemplateNCM1 = document.getElementById("btnTemplateNCM1");
-const btnTemplateNCM2 = document.getElementById("btnTemplateNCM2");
-const btnTemplateClosure = document.getElementById("btnTemplateClosure");
-const btnTemplateMore = document.getElementById("btnTemplateMore");
 
 
 modalWarning.style.display = "none";
@@ -2907,57 +2814,6 @@ btnModalClear.onclick = () => {
   resizeNotes();
 };
 
-/* ======================================================
-   TEMPLATE TOOLBAR EVENTS
-====================================================== */
-
-if(btnTemplateNCM1){
-  btnTemplateNCM1.onclick = () => copyTemplate("ncm1", false);
-}
-
-if(btnTemplateNCM2){
-  btnTemplateNCM2.onclick = () => copyTemplate("ncm2", false);
-}
-
-if(btnTemplateClosure){
-  btnTemplateClosure.onclick = () => copyTemplate("closure", false);
-}
-
-if(btnKciNotes){
-  btnKciNotes.onclick = () => copyTemplate("kci_notes", false);
-}
-
-/* ===============================================
-   RIGHT CLICK → COPY SUBJECT
-=============================================== */
-
-if(btnTemplateNCM1){
-  btnTemplateNCM1.oncontextmenu = e=>{
-    e.preventDefault();
-    copyTemplate("ncm1", true);
-  };
-}
-
-if(btnTemplateNCM2){
-  btnTemplateNCM2.oncontextmenu = e=>{
-    e.preventDefault();
-    copyTemplate("ncm2", true);
-  };
-}
-
-if(btnTemplateClosure){
-  btnTemplateClosure.oncontextmenu = e=>{
-    e.preventDefault();
-    copyTemplate("closure", true);
-  };
-}
-
-if(btnTemplateMore){
-  btnTemplateMore.onclick = ()=>{
-    showToast("Email preview modal coming next");
-  };
-}
-
 function closeModal() {
 
   if (pendingStatusForModal && currentModalCaseId) {
@@ -3001,75 +2857,6 @@ function showModalWarning(msg) {
 }
 function hideModalWarning() {
   modalWarning.style.display = "none";
-}
-
-/* ======================================================
-   MAIL TEMPLATE SYSTEM (BASE IMPLEMENTATION)
-   ====================================================== */
-
-function copyTemplate(templateKey, copySubject = false) {
-
-  if (!currentModalCaseId) return;
-
-  const row = trackerState.allCases.find(
-    r => r.id === currentModalCaseId
-  );
-
-  if (!row) return;
-
-  console.log("Template requested:", templateKey);
-
-  // placeholder logic until templates.js is connected
-  const text = copySubject
-    ? `[SUBJECT] ${templateKey}`
-    : `[BODY] ${templateKey}`;
-
-  navigator.clipboard.writeText(text);
-
-  showPopup("Template copied");
-}
-
-/* =========================
-   TEMPLATE BUTTON ACTIONS
-========================= */
-
-btnTemplateNCM1.onclick = (e) => {
-  copyTemplate("ncm1", e.button === 2);
-};
-
-btnTemplateNCM2.onclick = (e) => {
-  copyTemplate("ncm2", e.button === 2);
-};
-
-btnTemplateClosure.onclick = (e) => {
-  copyTemplate("closure", e.button === 2);
-};
-
-btnKciNotes.onclick = () => {
-  copyTemplate("kci_notes", false);
-};
-
-btnTemplateMore.onclick = () => {
-  openEmailPreviewModal();
-};
-
-btnTemplateNCM1.oncontextmenu = (e) => {
-  e.preventDefault();
-  copyTemplate("ncm1", true);
-};
-
-btnTemplateNCM2.oncontextmenu = (e) => {
-  e.preventDefault();
-  copyTemplate("ncm2", true);
-};
-
-btnTemplateClosure.oncontextmenu = (e) => {
-  e.preventDefault();
-  copyTemplate("closure", true);
-};
-
-function openEmailPreviewModal(){
-  showPopup("Email Preview Modal coming next phase");
 }
 
 // =====================================================
@@ -3838,8 +3625,6 @@ negBtn.addEventListener("mouseenter", () => {
 negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
-
-
 
 
 

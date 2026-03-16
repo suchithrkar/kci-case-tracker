@@ -544,10 +544,42 @@ HP Inc.`
 
 },
   
-  unresolved: {
-    subject: "Unresolved Case",
-    body: `Unresolved Template`
+unresolved: {
+
+  getTemplate(caseData) {
+
+    return {
+      subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+      body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+We attempted to contact you on the phone number registered with the case; 
+however, we were unable to reach you.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+We would like to confirm whether the concern you reported with your HP device has already been resolved 
+or if you still require assistance from our support team.
+
+If you still require support, please reply to this email or contact our HP support helpline so that we can assist you further.
+
+If the issue has already been resolved, kindly let us know so that we may proceed accordingly with the case.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+    };
+
   }
+
+},
 
   /* templates */
 

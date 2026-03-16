@@ -3708,7 +3708,7 @@ function applyTemplateVariables(text, caseData) {
 
 async function copyTemplateRich(text) {
 
-  const html = text.replace(/\n/g, "<br>");
+  const html = `<div style="font-family:Arial;font-size:13px;line-height:1.4;">${text.replace(/\n/g,"<br>")}</div>`;
 
   const blobHtml = new Blob([html], { type: "text/html" });
   const blobText = new Blob([text], { type: "text/plain" });

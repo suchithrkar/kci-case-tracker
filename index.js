@@ -3657,7 +3657,13 @@ function applyTemplateVariables(text, caseData) {
    console.log("Template caseData:", caseData);
 
    const vars = {
-     customerName: caseData.customerName ?? "",
+     customerName: (() => {
+       let name = caseData.customerName || "";
+       let first = name.split(" ")[0] || "";
+       first = first.replace(/[^a-zA-Z]/g, "");
+       if (!first) return "";
+       return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+     })(),
      caseId: caseData.id ?? "",
      productName: caseData.productName ?? "",
      serialNumber: caseData.serialNumber ?? "",
@@ -3670,6 +3676,22 @@ function applyTemplateVariables(text, caseData) {
   Object.keys(vars).forEach(key => {
     text = text.replaceAll(`{{${key}}}`, vars[key]);
   });
+
+   /* Remove lines where template values are empty */
+   text = text
+     .split("\n")
+     .filter(line => {
+       if (line.includes("Product Name:") && !vars.productName) return false;
+       if (line.includes("Serial Number:") && !vars.serialNumber) return false;
+       if (line.includes("Part Name:") && !vars.partName) return false;
+       if (line.includes("Part Number:") && !vars.partNumber) return false;
+       if (line.includes("Delivery Details:") && !vars.trackingStatus) return false;
+       return true;
+     })
+     .join("\n");
+
+   /* Clean extra blank lines */
+   text = text.replace(/\n{2,}/g, "\n\n");
 
   if (vars.trackingStatus === "No status found") {
     text = text.replace(/\n?• Delivery Details:.*\n?/g, "");

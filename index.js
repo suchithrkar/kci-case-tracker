@@ -3806,9 +3806,20 @@ document.addEventListener("contextmenu", (e) => {
 
   let subject = applyTemplateVariables(tpl.subject, caseData);
 
-  navigator.clipboard.writeText(subject)
-    .then(() => showPopup("Template Subject Copied"))
-    .catch(() => showPopup("Copy Failed"));
+   navigator.clipboard.writeText(subject)
+     .then(() => {
+   
+       showPopup("Template Subject Copied");
+   
+       // Success flash animation (right click)
+       btn.classList.add("flash-success");
+   
+       setTimeout(() => {
+         btn.classList.remove("flash-success");
+       }, 900);
+   
+     })
+     .catch(() => showPopup("Copy Failed"));
 
 });
 

@@ -3848,9 +3848,9 @@ const tplMoreBtn = document.getElementById("tplMoreBtn");
 
 tplMoreBtn.addEventListener("click", () => {
 
-  if (!currentCaseData) return;
+  if (!currentCase) return;
 
-  openEmailPreviewModal(currentCaseData);
+  openEmailPreviewModal(currentCase);
 
 });
 
@@ -3868,7 +3868,7 @@ function openEmailPreviewModal(caseData) {
   emailPreviewSubject.value = "";
   emailPreviewBody.value = "";
 
-  modal.classList.remove("show");
+  caseModal.classList.remove("show");
   emailPreviewModal.classList.add("show");
 
 }
@@ -3906,10 +3906,20 @@ function renderEmailPreviewToolbar(caseData) {
 
     btn.className = "tpl-btn";
 
-    btn.textContent =
-      type
-        .replace(/([A-Z])/g," $1")
-        .replace(/^./,c=>c.toUpperCase());
+    const labelMap = {
+      ncm1: "NCM 1",
+      ncm2: "NCM 2",
+      closure: "NCM Closure",
+      confirmation: "Confirmation",
+      unresolved: "Unresolved",
+      resolved: "Resolved",
+      pod: "POD",
+      oooClosure: "OOO Closure",
+      returnLabelUpdate: "Return Label Update",
+      returnLabelRequest: "Return Label Request"
+    };
+   
+    btn.textContent = labelMap[type] || type;
 
     btn.addEventListener("click", () => {
       loadEmailTemplate(type, caseData);
@@ -3965,14 +3975,14 @@ btnEmailPreviewBack.addEventListener("click", () => {
 
   emailPreviewModal.classList.remove("show");
 
-  modal.classList.add("show");
+  caseModal.classList.add("show");
 
 });
 
 btnEmailPreviewClose.addEventListener("click", () => {
 
-  emailPreviewModal.classList.remove("show");
-  modal.classList.remove("show");
+   emailPreviewModal.classList.remove("show");
+   caseModal.classList.remove("show");
 
 });
 

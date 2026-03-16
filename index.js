@@ -2034,6 +2034,23 @@ const btnModalClose = document.getElementById("btnModalClose");
 const btnModalSave = document.getElementById("btnModalSave");
 const btnModalClear = document.getElementById("btnModalClear");
 
+/* =========================================================
+   EMAIL PREVIEW MODAL ELEMENTS
+   ========================================================= */
+
+const emailPreviewModal = document.getElementById("emailPreviewModal");
+const emailPreviewTitle = document.getElementById("emailPreviewTitle");
+const emailPreviewToolbar = document.getElementById("emailPreviewToolbar");
+
+const emailPreviewSubject = document.getElementById("emailPreviewSubject");
+const emailPreviewBody = document.getElementById("emailPreviewBody");
+
+const btnEmailPreviewBack = document.getElementById("btnEmailPreviewBack");
+const btnEmailPreviewClose = document.getElementById("btnEmailPreviewClose");
+
+const btnCopyEmailSubject = document.getElementById("btnCopyEmailSubject");
+const btnCopyEmailBody = document.getElementById("btnCopyEmailBody");
+
 
 modalWarning.style.display = "none";
 
@@ -3823,7 +3840,141 @@ document.addEventListener("contextmenu", (e) => {
 
 });
 
+/* =========================================================
+   TEMPLATE TOOLBAR — MORE BUTTON
+   ========================================================= */
 
+const tplMoreBtn = document.getElementById("tplMoreBtn");
+
+tplMoreBtn.addEventListener("click", () => {
+
+  if (!currentCaseData) return;
+
+  openEmailPreviewModal(currentCaseData);
+
+});
+
+/* =========================================================
+   EMAIL PREVIEW MODAL
+   ========================================================= */
+
+function openEmailPreviewModal(caseData) {
+
+  emailPreviewTitle.textContent =
+    `Emails Preview – ${caseData.caseId}`;
+
+  renderEmailPreviewToolbar(caseData);
+
+  emailPreviewSubject.value = "";
+  emailPreviewBody.value = "";
+
+  modal.classList.remove("show");
+  emailPreviewModal.classList.add("show");
+
+}
+
+function renderEmailPreviewToolbar(caseData) {
+
+  emailPreviewToolbar.innerHTML = "";
+
+  const resolution = caseData.caseResolutionCode;
+
+  const buttons = [
+    "ncm1",
+    "ncm2",
+    "closure",
+    "confirmation",
+    "unresolved",
+    "resolved"
+  ];
+
+  if (resolution === "Offsite Solution" ||
+      resolution === "Parts Shipped") {
+    buttons.push("pod");
+  }
+
+  if (resolution === "Parts Shipped") {
+    buttons.push("returnLabelUpdate");
+    buttons.push("returnLabelRequest");
+  }
+
+  buttons.push("oooClosure");
+
+  buttons.forEach(type => {
+
+    const btn = document.createElement("button");
+
+    btn.className = "tpl-btn";
+
+    btn.textContent =
+      type
+        .replace(/([A-Z])/g," $1")
+        .replace(/^./,c=>c.toUpperCase());
+
+    btn.addEventListener("click", () => {
+      loadEmailTemplate(type, caseData);
+    });
+
+    emailPreviewToolbar.appendChild(btn);
+
+  });
+
+}
+
+function loadEmailTemplate(type, caseData) {
+
+  const template = templates[type];
+
+  if (!template) return;
+
+  const tpl =
+    template.getTemplate
+      ? template.getTemplate(caseData)
+      : template;
+
+  if (!tpl) return;
+
+  const subject =
+    applyTemplateVariables(tpl.subject, caseData);
+
+  const body =
+    applyTemplateVariables(tpl.body, caseData);
+
+  emailPreviewSubject.value = subject;
+  emailPreviewBody.value = body;
+
+}
+
+btnCopyEmailSubject.addEventListener("click", () => {
+
+  navigator.clipboard.writeText(emailPreviewSubject.value);
+
+  showToast("Subject copied");
+
+});
+
+btnCopyEmailBody.addEventListener("click", () => {
+
+  navigator.clipboard.writeText(emailPreviewBody.value);
+
+  showToast("Email body copied");
+
+});
+
+btnEmailPreviewBack.addEventListener("click", () => {
+
+  emailPreviewModal.classList.remove("show");
+
+  modal.classList.add("show");
+
+});
+
+btnEmailPreviewClose.addEventListener("click", () => {
+
+  emailPreviewModal.classList.remove("show");
+  modal.classList.remove("show");
+
+});
 
 
 

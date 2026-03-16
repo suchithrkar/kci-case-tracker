@@ -147,10 +147,138 @@ HP Inc.`
 
 },
 
-  ncm2: {
-    subject: "NCM 2 Update",
-    body: `NCM 2 Template`
-  },
+ncm2: {
+
+  getTemplate(caseData) {
+
+    const { caseResolutionCode, benchRFC } = caseData;
+
+    if (caseResolutionCode === "Onsite Solution") {
+      return {
+        subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+        body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+We previously attempted to contact you to confirm whether the device listed below is functioning properly after the onsite repair; 
+however, we were unable to reach you. We had also shared a previous email requesting an update but have not received a response.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+As we have not received an update regarding the current status of the device, we will consider the issue to be resolved and proceed with closing the case by tomorrow.
+
+If the issue still persists or if you require any further assistance, please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    if (caseResolutionCode === "Offsite Solution" &&
+        benchRFC === "Order cancelled, not to be reopened") {
+
+      return {
+        subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+        body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+A pickup service had previously been arranged for the device listed below; however, the unit could not be collected due to multiple unsuccessful pickup attempts.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+We previously attempted to contact you and also shared an email requesting confirmation on whether you would still like to proceed with the repair service or if the issue has already been resolved. 
+However, we have not received any response.
+
+As we have not received an update, we will consider the issue to be resolved and proceed with closing the case by tomorrow.
+
+If you still require assistance or would like to proceed with the repair service, please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    if (caseResolutionCode === "Offsite Solution") {
+      return {
+        subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+        body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+We previously attempted to contact you to confirm whether the device listed below is functioning properly after being returned to you from our service center. 
+However, we were unable to reach you, and we have not received a response to our previous email.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+• Delivery Details: {{trackingStatus}}
+
+As we have not received an update regarding the current status of the device, we will consider the issue to be resolved and proceed with closing the case by tomorrow.
+
+If the issue still persists or if you require any further assistance, please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    if (caseResolutionCode === "Parts Shipped") {
+      return {
+        subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+        body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+We previously attempted to contact you to confirm whether the replacement part delivered for the device listed below has resolved the reported issue. 
+However, we were unable to reach you, and we have not received a response to our previous email.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+Part Details:
+• Part Name: {{partName}}
+• Part Number: {{partNumber}}
+• Delivery Details: {{trackingStatus}}
+
+As we have not received an update regarding the current status of the device, we will consider the issue to be resolved and proceed with closing the case by tomorrow.
+
+If the issue still persists or if you require any further assistance, please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    return null;
+  }
+
+},
 
   closure: {
     subject: "Case Closure",

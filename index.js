@@ -3694,7 +3694,7 @@ function applyTemplateVariables(text, caseData) {
    text = text.replace(/\n{2,}/g, "\n\n");
 
   if (vars.trackingStatus === "No status found") {
-    text = text.replace(/\n?• Delivery Details:.*\n?/g, "");
+    text = text.replace(/?• Delivery Details:.*\n?/g, "");
   }
 
   return text;

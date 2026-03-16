@@ -3495,7 +3495,7 @@ document.getElementById("btnInfoCopy").onclick = () => {
   navigator.clipboard.writeText(text)
     .then(() => {
       const toast = document.getElementById("toast");
-      toast.textContent = "Tracker Summary Copied!";
+      toast.textContent = "Copied!";
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 5000);
     })

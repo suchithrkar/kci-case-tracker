@@ -3495,9 +3495,9 @@ document.getElementById("btnInfoCopy").onclick = () => {
   navigator.clipboard.writeText(text)
     .then(() => {
       const toast = document.getElementById("toast");
-      toast.textContent = "Copied!";
+      toast.textContent = "Case ID Copied!";
       toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 3000);
+      setTimeout(() => toast.classList.remove("show"), 7000);
     })
     .catch(() => {
       alert("Copy failed. Your browser may block clipboard access.");

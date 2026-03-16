@@ -3631,6 +3631,35 @@ negBtn.addEventListener("mouseleave", () => {
    TEMPLATE TOOLBAR BUTTONS
    ========================================================= */
 
+function applyTemplateVariables(text, caseData) {
+
+  const agentFullName =
+    document.getElementById("userFullName")?.textContent || "";
+
+  const agentFirstName = agentFullName.split(" ")[0] || "";
+
+  const vars = {
+    customerName: caseData.customerName || "",
+    caseId: caseData.id || "",
+    productName: caseData.productName || "",
+    serialNumber: caseData.serialNumber || "",
+    trackingStatus: caseData.trackingStatus || "",
+    partName: caseData.partName || "",
+    partNumber: caseData.partNumber || "",
+    agentFirstName
+  };
+
+  Object.keys(vars).forEach(key => {
+    text = text.replaceAll(`{{${key}}}`, vars[key]);
+  });
+
+  if (vars.trackingStatus === "No status found") {
+    text = text.replace(/• Delivery Details:.*\n?/g, "");
+  }
+
+  return text;
+}
+
 document.addEventListener("click", (e) => {
 
   const btn = e.target.closest(".tpl-btn");
@@ -3639,13 +3668,26 @@ document.addEventListener("click", (e) => {
   const key = btn.dataset.template;
   if (!key) return;
 
-  const tpl = templates[key];
+  const tplDef = templates[key];
+  if (!tplDef) return;
+
+  /* Get currently opened case */
+  const caseData = currentCase || {};
+
+  /* Get template (static or dynamic) */
+  let tpl = tplDef;
+
+  if (typeof tplDef.getTemplate === "function") {
+    tpl = tplDef.getTemplate(caseData);
+  }
+
   if (!tpl) return;
 
-  // LEFT CLICK → copy body
-   navigator.clipboard.writeText(tpl.body)
-     .then(() => showPopup("Template Body Copied"))
-     .catch(() => showPopup("Copy Failed"));
+  let body = applyTemplateVariables(tpl.body, caseData);
+
+  navigator.clipboard.writeText(body)
+    .then(() => showPopup("Template Body Copied"))
+    .catch(() => showPopup("Copy Failed"));
 
 });
 
@@ -3657,15 +3699,26 @@ document.addEventListener("contextmenu", (e) => {
   const key = btn.dataset.template;
   if (!key) return;
 
-  const tpl = templates[key];
-  if (!tpl) return;
+  const tplDef = templates[key];
+  if (!tplDef) return;
 
   e.preventDefault();
 
-  // RIGHT CLICK → copy subject
-   navigator.clipboard.writeText(tpl.subject)
-     .then(() => showPopup("Template Subject Copied"))
-     .catch(() => showPopup("Copy Failed"));
+  const caseData = currentCase || {};
+
+  let tpl = tplDef;
+
+  if (typeof tplDef.getTemplate === "function") {
+    tpl = tplDef.getTemplate(caseData);
+  }
+
+  if (!tpl) return;
+
+  let subject = applyTemplateVariables(tpl.subject, caseData);
+
+  navigator.clipboard.writeText(subject)
+    .then(() => showPopup("Template Subject Copied"))
+    .catch(() => showPopup("Copy Failed"));
 
 });
 

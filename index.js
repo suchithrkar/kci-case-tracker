@@ -3706,6 +3706,21 @@ function applyTemplateVariables(text, caseData) {
   return text;
 }
 
+async function copyTemplateRich(text) {
+
+  const html = text.replace(/\n/g, "<br>");
+
+  const blobHtml = new Blob([html], { type: "text/html" });
+  const blobText = new Blob([text], { type: "text/plain" });
+
+  const clipboardItem = new ClipboardItem({
+    "text/html": blobHtml,
+    "text/plain": blobText
+  });
+
+  await navigator.clipboard.write([clipboardItem]);
+}
+
 document.addEventListener("click", (e) => {
 
   const btn = e.target.closest(".tpl-btn");
@@ -3740,7 +3755,7 @@ document.addEventListener("click", (e) => {
 
   let body = applyTemplateVariables(tpl.body, caseData);
 
-  navigator.clipboard.writeText(body)
+  copyTemplateRich(body)
     .then(() => showPopup("Template Body Copied"))
     .catch(() => showPopup("Copy Failed"));
 

@@ -440,10 +440,109 @@ HP Inc.`
 
 },
 
-  confirmation: {
-    subject: "Confirmation",
-    body: `Confirmation Template`
-  },
+confirmation: {
+
+  getTemplate(caseData) {
+
+    const { caseResolutionCode } = caseData;
+
+    if (caseResolutionCode === "Onsite Solution") {
+      return {
+        subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+        body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+As discussed over the phone, we received an update that the repair on the device listed below has been completed.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+Kindly confirm whether the issue you reported with your HP device has been resolved 
+or if you require any further assistance from our support team.
+
+If you require any further assistance with any HP product in the future, 
+please feel free to reach out and we will be glad to help.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    if (caseResolutionCode === "Offsite Solution") {
+      return {
+        subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+        body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+As discussed over the phone, we received an update that the device listed below has been repaired and returned from our service center.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+• Delivery Details: {{trackingStatus}}
+
+Kindly confirm whether the issue you reported with your HP device has been resolved 
+or if you require any further assistance from our support team.
+
+If you require any further assistance with any HP product in the future, 
+please feel free to reach out and we will be glad to help.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    if (caseResolutionCode === "Parts Shipped") {
+      return {
+        subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+        body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+As discussed over the phone, we received an update that the replacement part listed below has been delivered.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+Part Details:
+• Part Name: {{partName}}
+• Part Number: {{partNumber}}
+• Delivery Details: {{trackingStatus}}
+
+Kindly confirm whether the issue you reported with your HP device has been resolved after the replacement 
+or if you require any further assistance from our support team.
+
+If you require any further assistance with any HP product in the future, 
+please feel free to reach out and we will be glad to help.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    return null;
+  }
+
+},
   
   unresolved: {
     subject: "Unresolved Case",

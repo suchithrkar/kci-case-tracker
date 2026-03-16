@@ -586,6 +586,31 @@ tr.active-row {
   filter:brightness(1.1);
 }
 
+/* ============================================
+   TEMPLATE BUTTON SUCCESS FLASH
+   ============================================ */
+
+.tpl-btn.flash-success {
+  animation: tplFlash 0.9s ease;
+}
+
+@keyframes tplFlash {
+  0% {
+    box-shadow: 0 0 0 rgba(56,217,169,0);
+    background: var(--panel-2);
+  }
+
+  35% {
+    box-shadow: 0 0 12px rgba(56,217,169,0.7);
+    background: rgba(56,217,169,0.18);
+  }
+
+  100% {
+    box-shadow: 0 0 0 rgba(56,217,169,0);
+    background: var(--panel-2);
+  }
+}
+  
 .tpl-group {
   display: flex;
   border: 1px solid var(--border);

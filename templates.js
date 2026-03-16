@@ -18,7 +18,7 @@ export const templates = {
   closure: {
     subject: "Case Closure",
     body: `Closure Template`
-  }
+  },
 
   confirmation: {
     subject: "Confirmation",

@@ -3868,7 +3868,7 @@ function openEmailPreviewModal(caseData) {
   emailPreviewSubject.value = "";
   emailPreviewBody.value = "";
 
-  caseModal.classList.remove("show");
+  document.getElementById("modal").classList.remove("show");
   emailPreviewModal.classList.add("show");
 
 }
@@ -3975,14 +3975,14 @@ btnEmailPreviewBack.addEventListener("click", () => {
 
   emailPreviewModal.classList.remove("show");
 
-  caseModal.classList.add("show");
+  document.getElementById("modal").classList.add("show");
 
 });
 
 btnEmailPreviewClose.addEventListener("click", () => {
 
-   emailPreviewModal.classList.remove("show");
-   caseModal.classList.remove("show");
+  emailPreviewModal.classList.remove("show");
+  document.getElementById("modal").classList.remove("show");
 
 });
 

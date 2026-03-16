@@ -3690,6 +3690,12 @@ function applyTemplateVariables(text, caseData) {
      })
      .join("\n");
 
+   // Remove empty Product Details section if no product lines exist
+   text = text.replace(/Product Details:\s*\n(\s*\n)*/g, "");
+   
+   // Remove empty Part Details section if no part lines exist
+   text = text.replace(/Part Details:\s*\n(\s*\n)*/g, "");
+
    /* Clean extra blank lines */
    text = text.replace(/\n{2,}/g, "\n\n");
 

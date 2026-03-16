@@ -2034,6 +2034,9 @@ let prevStatusBeforeModal = null;   // to revert if modal cancelled
 let requireFollowUp = false;
 let closureSurveyCompleted = false;
 
+/* Holds the full case object for template engine */
+let currentCase = null;
+
 /* =========================================================
    CUSTOM CALENDAR — CLICK TO OPEN (SEGMENTED FIX)
    ========================================================= */
@@ -2525,6 +2528,8 @@ export function openCaseModal(caseId, enforce = false) {
 
   const r = trackerState.allCases.find(x => x.id === caseId);
   if (!r) return;
+
+  currentCase = r;
 
   modalTitle.textContent = `Case Options — ${caseId}`;
 
@@ -3402,6 +3407,7 @@ async function saveModalData() {
 
   requireFollowUp = false;
   currentModalCaseId = null;
+  currentCase = null;
   unupdatedProtect = false;
 
   return true;

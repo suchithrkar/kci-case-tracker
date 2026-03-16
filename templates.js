@@ -20,4 +20,14 @@ export const templates = {
     body: `Closure Template`
   }
 
+  confirmation: {
+    subject: "Confirmation",
+    body: `Confirmation Template`
+  },
+  
+  unresolved: {
+    subject: "Unresolved Case",
+    body: `Unresolved Template`
+  }
+
 };

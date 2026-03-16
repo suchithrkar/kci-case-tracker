@@ -3687,7 +3687,10 @@ document.addEventListener("click", (e) => {
     tpl = tplDef.getTemplate(caseData);
   }
 
-  if (!tpl) return;
+  if (!tpl) {
+    showPopup("Template not available for this case");
+    return;
+  }
 
   let body = applyTemplateVariables(tpl.body, caseData);
 
@@ -3718,7 +3721,10 @@ document.addEventListener("contextmenu", (e) => {
     tpl = tplDef.getTemplate(caseData);
   }
 
-  if (!tpl) return;
+  if (!tpl) {
+    showPopup("Template not available for this case");
+    return;
+  }
 
   let subject = applyTemplateVariables(tpl.subject, caseData);
 

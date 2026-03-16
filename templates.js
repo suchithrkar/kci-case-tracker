@@ -169,9 +169,11 @@ Product Details:
 • Product Name: {{productName}}
 • Serial Number: {{serialNumber}}
 
-As we have not received an update regarding the current status of the device, we will consider the issue to be resolved and proceed with closing the case by tomorrow.
+As we have not received an update regarding the current status of the device, 
+we will consider the issue to be resolved and proceed with closing the case by tomorrow.
 
-If the issue still persists or if you require any further assistance, please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
+If the issue still persists or if you require any further assistance, 
+please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
 
 Thank you for choosing HP.
 
@@ -192,18 +194,20 @@ I hope you are doing well.
 
 This email is in reference to Case Number: {{caseId}}.
 
-A pickup service had previously been arranged for the device listed below; however, the unit could not be collected due to multiple unsuccessful pickup attempts.
+A pickup service had previously been arranged for the device listed below; 
+however, the unit could not be collected due to multiple unsuccessful pickup attempts.
 
 Product Details:
 • Product Name: {{productName}}
 • Serial Number: {{serialNumber}}
 
-We previously attempted to contact you and also shared an email requesting confirmation on whether you would still like to proceed with the repair service or if the issue has already been resolved. 
-However, we have not received any response.
+We previously attempted to contact you and also shared an email requesting confirmation on whether you would still like to proceed with the repair service 
+or if the issue has already been resolved. However, we have not received any response.
 
 As we have not received an update, we will consider the issue to be resolved and proceed with closing the case by tomorrow.
 
-If you still require assistance or would like to proceed with the repair service, please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
+If you still require assistance or would like to proceed with the repair service, 
+please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
 
 Thank you for choosing HP.
 
@@ -230,9 +234,11 @@ Product Details:
 • Serial Number: {{serialNumber}}
 • Delivery Details: {{trackingStatus}}
 
-As we have not received an update regarding the current status of the device, we will consider the issue to be resolved and proceed with closing the case by tomorrow.
+As we have not received an update regarding the current status of the device, 
+we will consider the issue to be resolved and proceed with closing the case by tomorrow.
 
-If the issue still persists or if you require any further assistance, please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
+If the issue still persists or if you require any further assistance, 
+please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
 
 Thank you for choosing HP.
 
@@ -263,9 +269,11 @@ Part Details:
 • Part Number: {{partNumber}}
 • Delivery Details: {{trackingStatus}}
 
-As we have not received an update regarding the current status of the device, we will consider the issue to be resolved and proceed with closing the case by tomorrow.
+As we have not received an update regarding the current status of the device, 
+we will consider the issue to be resolved and proceed with closing the case by tomorrow.
 
-If the issue still persists or if you require any further assistance, please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
+If the issue still persists or if you require any further assistance, 
+please reply to this email or contact our HP support helpline so that we can assist you further and avoid case closure.
 
 Thank you for choosing HP.
 

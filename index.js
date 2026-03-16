@@ -3643,8 +3643,9 @@ document.addEventListener("click", (e) => {
   if (!tpl) return;
 
   // LEFT CLICK → copy body
-  navigator.clipboard.writeText(tpl.body);
-  showPopup("Template body copied");
+   navigator.clipboard.writeText(tpl.body)
+     .then(() => showPopup("Template Body Copied"))
+     .catch(() => showPopup("Copy Failed"));
 
 });
 
@@ -3662,8 +3663,9 @@ document.addEventListener("contextmenu", (e) => {
   e.preventDefault();
 
   // RIGHT CLICK → copy subject
-  navigator.clipboard.writeText(tpl.subject);
-  showPopup("Template subject copied");
+   navigator.clipboard.writeText(tpl.subject)
+     .then(() => showPopup("Template Subject Copied"))
+     .catch(() => showPopup("Copy Failed"));
 
 });
 

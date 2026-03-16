@@ -2664,7 +2664,7 @@ export function openCaseModal(caseId, enforce = false) {
      notesHeightLocked = true;
    
      // ⛔ Clamp saved height to max 400px
-     const clampedH = Math.min(parseInt(savedH, 10), 350);
+     const clampedH = Math.min(parseInt(savedH, 10), 300);
      optNotes.style.height = clampedH + "px";
    } else {
      notesHeightLocked = false;
@@ -3134,7 +3134,7 @@ optNotes.addEventListener("input", () => {
   optNotes.style.height = "auto";
 
   // ⛔ Clamp auto-grow to max 400px
-  const newH = Math.min(optNotes.scrollHeight + 6, 350);
+  const newH = Math.min(optNotes.scrollHeight + 6, 300);
   optNotes.style.height = newH + "px";
 });
 
@@ -3145,7 +3145,7 @@ optNotes.addEventListener("mouseup", () => {
   if (!h) return;
 
   // ⛔ Clamp to max 400px
-  h = Math.min(h, 350);
+  h = Math.min(h, 300);
 
   optNotes.style.height = h + "px";
   localStorage.setItem("notesBoxHeight", h + "px");
@@ -3159,7 +3159,7 @@ function resizeNotes() {
   if (notesHeightLocked) return;
 
   optNotes.style.height = "auto";
-  const newH = Math.min(optNotes.scrollHeight + 6, 350);
+  const newH = Math.min(optNotes.scrollHeight + 6, 300);
   optNotes.style.height = newH + "px";
 }
 

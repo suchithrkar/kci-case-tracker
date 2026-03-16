@@ -539,7 +539,17 @@ function setupRealtimeCases(teamId) {
         lastActionedOn: c.lastActionedOn || "",
         lastActionedBy: c.lastActionedBy || "",
         statusChangedOn: c.statusChangedOn || "",
-        statusChangedBy: c.statusChangedBy || ""
+        statusChangedBy: c.statusChangedBy || "",
+
+        // NEW TEMPLATE FIELDS
+        woClosureNotes: c.woClosureNotes || "",
+        trackingStatus: c.trackingStatus || "",
+        partNumber: c.partNumber || "",
+        partName: c.partName || "",
+        serialNumber: c.serialNumber || "",
+        productName: c.productName || "",
+        emailStatus: c.emailStatus || "",
+        dnap: c.dnap || ""
       }));
       
       // 🔥 Preserve protected rows during status override

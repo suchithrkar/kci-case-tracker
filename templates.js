@@ -1,15 +1,23 @@
-export const MAIL_TEMPLATES = {
+export const templates = {
 
-  ncm1_onsite: { subject:"", body:"" },
-  ncm2_onsite: { subject:"", body:"" },
-  closure_onsite: { subject:"", body:"" },
+  kci: {
+    subject: "KCI Notes",
+    body: `KCI Notes Template`
+  },
 
-  ncm1_offsite: { subject:"", body:"" },
-  ncm2_offsite: { subject:"", body:"" },
-  closure_offsite: { subject:"", body:"" },
+  ncm1: {
+    subject: "NCM 1 Update",
+    body: `NCM 1 Template`
+  },
 
-  ncm1_parts: { subject:"", body:"" },
-  ncm2_parts: { subject:"", body:"" },
-  closure_parts: { subject:"", body:"" }
+  ncm2: {
+    subject: "NCM 2 Update",
+    body: `NCM 2 Template`
+  },
+
+  closure: {
+    subject: "Case Closure",
+    body: `Closure Template`
+  }
 
 };

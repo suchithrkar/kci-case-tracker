@@ -1639,6 +1639,59 @@ tr.active-row {
   </div>
 </div>
 
+<!-- EMAIL PREVIEW MODAL -->
+<div class="modal" id="emailPreviewModal">
+  <div class="modal-card" style="width:min(900px,94vw);">
+
+    <div class="modal-head">
+      <div class="modal-title" id="emailPreviewTitle">
+        Email Preview
+      </div>
+
+      <div style="display:flex; gap:.5rem;">
+        <button class="btn" id="btnEmailPreviewBack">Back</button>
+        <button class="btn" id="btnEmailPreviewClose">Close</button>
+      </div>
+    </div>
+
+    <!-- TEMPLATE TOOLBAR -->
+    <div class="template-toolbar" id="emailPreviewToolbar">
+      <!-- JS will inject buttons dynamically -->
+    </div>
+
+    <div class="modal-body" style="gap:.8rem;">
+
+      <!-- SUBJECT -->
+      <input
+        id="emailPreviewSubject"
+        class="input"
+        style="width:100%;border-radius:10px"
+        placeholder="Email subject..."
+      />
+
+      <!-- BODY -->
+      <textarea
+        id="emailPreviewBody"
+        class="notes"
+        style="width:100%;min-height:320px"
+        placeholder="Email body preview..."
+      ></textarea>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="btnCopyEmailSubject">
+        Copy Email Subject
+      </button>
+
+      <button class="btn" id="btnCopyEmailBody">
+        Copy Email Body
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <!-- TRACKER SUMMARY — TODAY MODAL -->
 <div class="modal" id="infoModal">
   <div class="modal-card">

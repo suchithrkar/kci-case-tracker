@@ -29,6 +29,7 @@ import {
 import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
 import { showPopup } from "./js/utils.js";
 import { cleanupClosedCases } from "./js/utils.js";
+import { templates } from "./templates.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -3626,7 +3627,45 @@ negBtn.addEventListener("mouseleave", () => {
     globalTooltip.classList.remove("show-tooltip");
 });
 
+/* =========================================================
+   TEMPLATE TOOLBAR BUTTONS
+   ========================================================= */
 
+document.addEventListener("click", (e) => {
+
+  const btn = e.target.closest(".tpl-btn");
+  if (!btn) return;
+
+  const key = btn.dataset.template;
+  if (!key) return;
+
+  const tpl = templates[key];
+  if (!tpl) return;
+
+  // LEFT CLICK → copy body
+  navigator.clipboard.writeText(tpl.body);
+  showPopup("Template body copied");
+
+});
+
+document.addEventListener("contextmenu", (e) => {
+
+  const btn = e.target.closest(".tpl-btn");
+  if (!btn) return;
+
+  const key = btn.dataset.template;
+  if (!key) return;
+
+  const tpl = templates[key];
+  if (!tpl) return;
+
+  e.preventDefault();
+
+  // RIGHT CLICK → copy subject
+  navigator.clipboard.writeText(tpl.subject);
+  showPopup("Template subject copied");
+
+});
 
 
 

@@ -3644,23 +3644,25 @@ function applyTemplateVariables(text, caseData) {
 
   const agentFirstName = agentFullName.split(" ")[0] || "";
 
-  const vars = {
-    customerName: caseData.customerName || "",
-    caseId: caseData.id || "",
-    productName: caseData.productName || "",
-    serialNumber: caseData.serialNumber || "",
-    trackingStatus: caseData.trackingStatus || "",
-    partName: caseData.partName || "",
-    partNumber: caseData.partNumber || "",
-    agentFirstName
-  };
+   console.log("Template caseData:", caseData);
+
+   const vars = {
+     customerName: caseData.customerName ?? "",
+     caseId: caseData.id ?? "",
+     productName: caseData.productName ?? "",
+     serialNumber: caseData.serialNumber ?? "",
+     trackingStatus: caseData.trackingStatus ?? "",
+     partName: caseData.partName ?? "",
+     partNumber: caseData.partNumber ?? "",
+     agentFirstName: agentFirstName ?? ""
+   };
 
   Object.keys(vars).forEach(key => {
     text = text.replaceAll(`{{${key}}}`, vars[key]);
   });
 
   if (vars.trackingStatus === "No status found") {
-    text = text.replace(/• Delivery Details:.*\n?/g, "");
+    text = text.replace(/\n?• Delivery Details:.*\n?/g, "");
   }
 
   return text;

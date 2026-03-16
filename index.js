@@ -3708,6 +3708,12 @@ document.addEventListener("click", (e) => {
   const key = btn.dataset.template;
   if (!key) return;
 
+  // 🚫 Prevent template copy if no case modal is active
+  if (!currentCase) {
+    showPopup("Open a case before copying a template");
+    return;
+  }
+
   const tplDef = templates[key];
   if (!tplDef) return;
 
@@ -3741,6 +3747,12 @@ document.addEventListener("contextmenu", (e) => {
 
   const key = btn.dataset.template;
   if (!key) return;
+
+  // 🚫 Prevent template copy if no case modal is active
+  if (!currentCase) {
+    showPopup("Open a case before copying a template");
+    return;
+  }
 
   const tplDef = templates[key];
   if (!tplDef) return;

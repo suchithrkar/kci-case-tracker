@@ -3755,9 +3755,20 @@ document.addEventListener("click", (e) => {
 
   let body = applyTemplateVariables(tpl.body, caseData);
 
-  copyTemplateRich(body)
-    .then(() => showPopup("Template Body Copied"))
-    .catch(() => showPopup("Copy Failed"));
+   copyTemplateRich(body)
+     .then(() => {
+   
+       showPopup("Template Body Copied");
+   
+       // Success flash animation
+       btn.classList.add("flash-success");
+   
+       setTimeout(() => {
+         btn.classList.remove("flash-success");
+       }, 900);
+   
+     })
+     .catch(() => showPopup("Copy Failed"));
 
 });
 

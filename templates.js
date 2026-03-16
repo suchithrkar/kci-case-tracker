@@ -30,4 +30,6 @@ export const templates = {
     body: `Unresolved Template`
   }
 
+  /* templates */
+
 };

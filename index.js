@@ -2064,23 +2064,6 @@ let closureSurveyCompleted = false;
 /* Holds the full case object for template engine */
 let currentCase = null;
 
-function lockTextareaWidth(modalId){
-
-  const modal = document.getElementById(modalId);
-  if(!modal) return;
-
-  const textareas = modal.querySelectorAll("textarea");
-
-  textareas.forEach(t => {
-
-    const rect = t.getBoundingClientRect();
-
-    t.style.width = rect.width + "px";
-
-  });
-
-}
-
 /* =========================================================
    CUSTOM CALENDAR — CLICK TO OPEN (SEGMENTED FIX)
    ========================================================= */
@@ -2714,9 +2697,6 @@ export function openCaseModal(caseId, enforce = false) {
    }
 
   modal.classList.add("show");
-   requestAnimationFrame(()=>{
-     lockTextareaWidth("modal");
-   });
    animateModalOpen();
    setTimeout(resizeNotes, 60);
    updateSaveButtonState();
@@ -3894,10 +3874,6 @@ function openEmailPreviewModal(caseData) {
 
   document.getElementById("modal").classList.remove("show");
   emailPreviewModal.classList.add("show");
-
-  requestAnimationFrame(()=>{
-    lockTextareaWidth("emailPreviewModal");
-  });
 
 }
 

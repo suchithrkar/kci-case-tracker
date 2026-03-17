@@ -3965,11 +3965,11 @@ btnCopyEmailSubject.addEventListener("click", () => {
 
   btnCopyEmailSubject.classList.add("flash-success");
 
-  showToast("Email Subject Copied");
-
-  setTimeout(() => {
+  btnCopyEmailSubject.addEventListener("animationend", () => {
     btnCopyEmailSubject.classList.remove("flash-success");
-  }, 900);
+  }, { once: true });
+
+  showToast("Email Subject Copied");
 
 });
 
@@ -3979,11 +3979,11 @@ btnCopyEmailBody.addEventListener("click", () => {
 
   btnCopyEmailBody.classList.add("flash-success");
 
-  showToast("Email Body Copied");
-
-  setTimeout(() => {
+  btnCopyEmailBody.addEventListener("animationend", () => {
     btnCopyEmailBody.classList.remove("flash-success");
-  }, 900);
+  }, { once: true });
+
+  showToast("Email Body Copied");
 
 });
 

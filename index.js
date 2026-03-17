@@ -3863,7 +3863,7 @@ function openEmailPreviewModal(caseData) {
   const caseId = caseData["Case Id"];
 
   emailPreviewTitle.textContent =
-    "Emails Preview – " + (caseId || "");
+    "Emails Preview – " + (currentCase?.caseId || "");
 
   renderEmailPreviewToolbar(caseData);
 

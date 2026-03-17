@@ -510,6 +510,7 @@ tr.active-row {
 #modal textarea.notes,
 #emailPreviewModal textarea.notes{
   width:100%;
+  scroll-padding-bottom:.9rem;
 }
 .modal-head{
   display:flex;align-items:center;
@@ -600,6 +601,11 @@ tr.active-row {
 #emailPreviewModal input,
 #emailPreviewModal textarea{
   font-size:12px;
+}
+
+#emailPreviewModal textarea:focus{
+  outline:none;
+  box-shadow:none;
 }
 
 .notes::-webkit-scrollbar{

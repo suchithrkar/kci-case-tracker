@@ -3687,7 +3687,13 @@ function applyTemplateVariables(text, caseData) {
      trackingStatus: caseData.trackingStatus ?? "",
      partName: caseData.partName ?? "",
      partNumber: caseData.partNumber ?? "",
-     agentFirstName: agentFirstName ?? ""
+     agentFirstName: agentFirstName ?? "",
+   
+     /* KCI Notes variables */
+     onsiteRFC: caseData.onsiteRFC ?? "",
+     benchRFC: caseData.benchRFC ?? "",
+     csrRFC: caseData.csrRFC ?? "",
+     woClosureNotes: caseData.woClosureNotes ?? ""
    };
 
   Object.keys(vars).forEach(key => {

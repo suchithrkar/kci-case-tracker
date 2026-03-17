@@ -3963,7 +3963,13 @@ btnCopyEmailSubject.addEventListener("click", () => {
 
   navigator.clipboard.writeText(emailPreviewSubject.value);
 
-  showToast("Subject copied");
+  btnCopyEmailSubject.classList.add("flash-success");
+
+  showToast("Email Subject Copied");
+
+  setTimeout(() => {
+    btnCopyEmailSubject.classList.remove("flash-success");
+  }, 900);
 
 });
 
@@ -3971,7 +3977,13 @@ btnCopyEmailBody.addEventListener("click", () => {
 
   navigator.clipboard.writeText(emailPreviewBody.value);
 
-  showToast("Email body copied");
+  btnCopyEmailBody.classList.add("flash-success");
+
+  showToast("Email Body Copied");
+
+  setTimeout(() => {
+    btnCopyEmailBody.classList.remove("flash-success");
+  }, 900);
 
 });
 

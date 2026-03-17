@@ -3770,14 +3770,42 @@ document.addEventListener("click", (e) => {
     return;
   }
 
-  let body = applyTemplateVariables(tpl.body, caseData);
-
+   /* =========================
+      KCI NOTES TEMPLATE
+   ========================= */
+   
+   if (key === "kci") {
+   
+     let notes = applyTemplateVariables(tpl.body, caseData);
+   
+     navigator.clipboard.writeText(notes)
+       .then(() => {
+   
+         showPopup("KCI Notes Copied");
+   
+         btn.classList.add("flash-success");
+   
+         setTimeout(() => {
+           btn.classList.remove("flash-success");
+         }, 900);
+   
+       })
+       .catch(() => showPopup("Copy Failed"));
+   
+     return;
+   }
+   
+   /* =========================
+      EMAIL TEMPLATES
+   ========================= */
+   
+   let body = applyTemplateVariables(tpl.body, caseData);
+   
    copyTemplateRich(body)
      .then(() => {
    
        showPopup("Template Body Copied");
    
-       // Success flash animation
        btn.classList.add("flash-success");
    
        setTimeout(() => {
@@ -3796,6 +3824,12 @@ document.addEventListener("contextmenu", (e) => {
 
   const key = btn.dataset.template;
   if (!key) return;
+
+  /* Disable right-click for KCI Notes */
+  if (key === "kci") {
+    e.preventDefault();
+    return;
+  }
 
   // 🚫 Prevent template copy if no case modal is active
   if (!currentCase) {

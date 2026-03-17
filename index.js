@@ -3964,12 +3964,12 @@ function renderEmailPreviewToolbar(caseData) {
     buttons.push("pod");
   }
 
+  buttons.push("oooClosure");
+
   if (resolution === "Parts Shipped") {
     buttons.push("returnLabelUpdate");
     buttons.push("returnLabelRequest");
   }
-
-  buttons.push("oooClosure");
 
   buttons.forEach(type => {
 

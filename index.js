@@ -4046,9 +4046,10 @@ function loadEmailTemplate(type, caseData) {
 
 document.addEventListener("click", e => {
 
-  if (!e.target.classList.contains("email-copy")) return;
+  if (!e.target.closest(".email-copy-btn")) return;
 
-  const email = e.target.dataset.email;
+  const btn = e.target.closest(".email-copy-btn");
+  const email = btn.dataset.email;
 
   navigator.clipboard.writeText(email);
 

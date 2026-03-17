@@ -3993,7 +3993,17 @@ function renderEmailPreviewToolbar(caseData) {
     btn.textContent = labelMap[type] || type;
 
     btn.addEventListener("click", () => {
+   
+      // Remove highlight from all toolbar buttons
+      document.querySelectorAll("#emailPreviewToolbar .tpl-btn")
+        .forEach(b => b.classList.remove("active"));
+   
+      // Highlight the clicked button
+      btn.classList.add("active");
+   
+      // Load the selected email template
       loadEmailTemplate(type, caseData);
+   
     });
 
     emailPreviewToolbar.appendChild(btn);

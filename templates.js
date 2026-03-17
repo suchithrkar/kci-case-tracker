@@ -1,9 +1,179 @@
 export const templates = {
 
-  kci: {
-    subject: "KCI Notes",
-    body: `KCI Notes Template`
-  },
+kci: {
+
+  getTemplate(caseData) {
+
+    const {
+      caseResolutionCode,
+      onsiteRFC,
+      benchRFC,
+      csrRFC,
+      trackingStatus,
+      productName,
+      serialNumber,
+      partName,
+      woClosureNotes,
+      dnap
+    } = caseData;
+
+    /* =========================
+       ONSITE SOLUTION
+    ========================= */
+
+    if (caseResolutionCode === "Onsite Solution") {
+
+      if (
+        onsiteRFC === "Open - Completed" ||
+        onsiteRFC === "Closed - Posted"
+      ) {
+        return {
+          body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+- WO Status: {{onsiteRFC}}
+
+- WO Closure Notes:
+{{woClosureNotes}}
+
+-`
+        };
+      }
+
+      if (onsiteRFC === "Closed - Canceled") {
+        return {
+          body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+- WO Status: {{onsiteRFC}}
+
+-`
+        };
+      }
+
+      return {
+        body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+- WO Status: {{onsiteRFC}}
+
+-`
+      };
+    }
+
+    /* =========================
+       OFFSITE SOLUTION
+    ========================= */
+
+    if (caseResolutionCode === "Offsite Solution") {
+
+      if (dnap) {
+        return {
+          body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+- CSO Status: {{benchRFC}}
+- Delivery Status: {{trackingStatus}}
+
+- Quote Rejected
+- Unit returned unrepaired to customer
+- Moving case for closure as DNAP`
+        };
+      }
+
+      if (benchRFC === "Delivered") {
+        return {
+          body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+- CSO Status: {{benchRFC}}
+- Delivery Status: {{trackingStatus}}
+
+-`
+        };
+      }
+
+      if (benchRFC === "Order cancelled, not to be reopened") {
+        return {
+          body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+- CSO Status: {{benchRFC}}
+
+-`
+        };
+      }
+
+      return {
+        body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+- CSO Status: {{benchRFC}}
+
+-`
+      };
+    }
+
+    /* =========================
+       PARTS SHIPPED
+    ========================= */
+
+    if (caseResolutionCode === "Parts Shipped") {
+
+      if (csrRFC === "POD" || csrRFC === "Delivered") {
+        return {
+          body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+
+- Part Name: {{partName}}
+- MO Status: {{csrRFC}}
+- Delivery Status: {{trackingStatus}}
+
+-`
+        };
+      }
+
+      if (csrRFC === "Cancelled") {
+        return {
+          body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+
+- Part Name: {{partName}}
+- MO Status: {{csrRFC}}
+
+-`
+        };
+      }
+
+      return {
+        body: `-- KCI Notes
+
+- Product Name: {{productName}}
+- Serial Number: {{serialNumber}}
+
+- Part Name: {{partName}}
+- MO Status: {{csrRFC}}
+
+-`
+      };
+    }
+
+    return null;
+
+  }
+
+},
 
 ncm1: {
 

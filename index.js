@@ -4016,6 +4016,14 @@ function loadEmailTemplate(type, caseData) {
 
   const template = templates[type];
 
+  const emailRow = document.getElementById("returnLabelEmails");
+   
+  if (type === "returnLabelRequest") {
+    emailRow.style.display = "flex";
+  } else {
+    emailRow.style.display = "none";
+  }
+
   if (!template) return;
 
   const tpl =
@@ -4035,6 +4043,18 @@ function loadEmailTemplate(type, caseData) {
   emailPreviewBody.value = body;
 
 }
+
+document.addEventListener("click", e => {
+
+  if (!e.target.classList.contains("email-copy")) return;
+
+  const email = e.target.dataset.email;
+
+  navigator.clipboard.writeText(email);
+
+  showToast("Email copied");
+
+});
 
 btnCopyEmailSubject.addEventListener("click", () => {
 

@@ -3915,7 +3915,7 @@ function openEmailPreviewModal(caseData) {
   const caseId = caseData.id || "";
 
   emailPreviewTitle.textContent =
-     "Emails Preview – " + (caseData.id || "Unknown Case");
+     "Email Templates Preview – " + (caseData.id || "Unknown Case");
 
   renderEmailPreviewToolbar(caseData);
 

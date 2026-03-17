@@ -589,6 +589,12 @@ function setupSidebarControls() {
       if (modal.classList.contains("show")) {
         closeModal();
       }
+
+      // Email Preview modal
+      const emailPreviewModal = document.getElementById("emailPreviewModal");
+      if (emailPreviewModal?.classList.contains("show")) {
+        emailPreviewModal.classList.remove("show");
+      }
       
       // Tracker Summary modal
       const infoModal = document.getElementById("infoModal");

@@ -732,9 +732,15 @@ tr.active-row {
   border:none;
   background:transparent;
   padding:.45rem .6rem;
-  width:190px;
+  flex:1;
+  min-width:0;
   color:var(--text);
   border-right:1px solid var(--border);
+}
+
+.email-field:focus{
+  outline:none;
+  box-shadow:none;
 }
 
 .email-field:last-child{

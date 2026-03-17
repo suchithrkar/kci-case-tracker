@@ -127,7 +127,7 @@ kci: {
 
     if (caseResolutionCode === "Parts Shipped") {
 
-      if (csrRFC === "POD" || csrRFC === "Delivered") {
+      if (csrRFC === "POD" || csrRFC === "Closed") {
         return {
           body: `-- KCI Notes
 

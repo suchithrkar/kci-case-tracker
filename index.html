@@ -1695,13 +1695,13 @@ tr.active-row {
       <!-- JS will inject buttons dynamically -->
     </div>
 
-    <div class="modal-body" style="gap:.8rem;">
+    <div class="modal-body" id="emailPreviewBodyWrap" style="gap:0;">
 
       <!-- SUBJECT -->
       <input
         id="emailPreviewSubject"
         class="input"
-        style="width:100%;border-radius:10px"
+        style="width:100%;border-radius:8px 8px 0 0;border-bottom:none"
         placeholder="Email subject..."
       />
 
@@ -1709,20 +1709,22 @@ tr.active-row {
       <textarea
         id="emailPreviewBody"
         class="notes"
-        style="width:100%;min-height:320px"
+        style="width:100%;min-height:320px;border-radius:0;border-top:none;margin:0"
         placeholder="Email body preview..."
       ></textarea>
 
-    </div>
+      <div id="emailPreviewActions" style="display:flex;width:100%;">
+        <button class="btn" id="btnCopyEmailSubject"
+                style="flex:1;border-top:none;border-radius:0 0 0 8px;">
+          Copy Email Subject
+        </button>
+      
+        <button class="btn" id="btnCopyEmailBody"
+                style="flex:1;border-top:none;border-radius:0 0 8px 0;">
+          Copy Email Body
+        </button>
+      </div>
 
-    <div class="modal-foot">
-      <button class="btn" id="btnCopyEmailSubject">
-        Copy Email Subject
-      </button>
-
-      <button class="btn" id="btnCopyEmailBody">
-        Copy Email Body
-      </button>
     </div>
 
   </div>

@@ -3713,11 +3713,23 @@ function applyTemplateVariables(text, caseData) {
      })
      .join("\n");
 
-   // Remove empty Product Details section if no product lines exist
-   text = text.replace(/Product Details:\s*\n(\s*\n)*/g, "");
+   /* Remove Product Details section only if it contains no values */
+   text = text.replace(
+     /Product Details:\n((?:.*\n)*?)(?:\n|$)/,
+     (match, section) => {
+       const hasValue = section.match(/:\s*\S+/);
+       return hasValue ? match : "";
+     }
+   );
    
-   // Remove empty Part Details section if no part lines exist
-   text = text.replace(/Part Details:\s*\n(\s*\n)*/g, "");
+   /* Remove Part Details section only if it contains no values */
+   text = text.replace(
+     /Part Details:\n((?:.*\n)*?)(?:\n|$)/,
+     (match, section) => {
+       const hasValue = section.match(/:\s*\S+/);
+       return hasValue ? match : "";
+     }
+   );
 
    /* Clean extra blank lines */
    text = text.replace(/\n{2,}/g, "\n\n");

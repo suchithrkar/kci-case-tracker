@@ -511,6 +511,27 @@ tr.active-row {
 #emailPreviewModal textarea.notes{
   width:100%;
 }
+.textarea-wrap{
+  position:relative;
+}
+.textarea-bottom-spacer{
+  position:absolute;
+  left:1px;
+  right:1px;
+  bottom:0px;
+  height:1.1rem;
+  background:var(--panel-2);
+  pointer-events:none;
+}
+.textarea-top-spacer{
+  position:absolute;
+  left:1px;
+  right:1px;
+  top:1px;
+  height:1.1rem;
+  background:var(--panel-2);
+  pointer-events:none;
+}
 .modal-head{
   display:flex;align-items:center;
   justify-content:space-between;
@@ -1705,12 +1726,20 @@ tr.active-row {
       />
 
       <!-- BODY -->
-      <textarea
-        id="emailPreviewBody"
-        class="notes"
-        style="width:100%;min-height:320px;border-radius:0;margin:0;padding:.6rem .9rem"
-        placeholder="Email body preview..."
-      ></textarea>
+      <div class="textarea-wrap">
+
+        <div class="textarea-top-spacer"></div>
+      
+        <textarea
+          id="emailPreviewBody"
+          class="notes"
+          style="width:100%;min-height:320px;border-radius:0;margin:0;padding:1.1rem .9rem"
+          placeholder="Email body preview..."
+        ></textarea>
+      
+        <div class="textarea-bottom-spacer"></div>
+      
+      </div>
 
       <div id="emailPreviewActions" style="display:flex;width:100%;">
         <button class="btn" id="btnCopyEmailSubject"

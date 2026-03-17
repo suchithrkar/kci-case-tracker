@@ -503,6 +503,13 @@ tr.active-row {
   border-radius:16px;
   box-shadow:var(--shadow);
 }
+#modal .modal-card{
+  width:auto;
+  max-width:none;
+}
+#modal textarea.notes{
+  width:calc(100% - 140px);
+}
 .modal-head{
   display:flex;align-items:center;
   justify-content:space-between;
@@ -584,6 +591,24 @@ tr.active-row {
 
 .tpl-btn:hover {
   filter:brightness(1.1);
+}
+
+#emailPreviewModal textarea.notes{
+  width:100%;
+}
+
+#emailPreviewModal input,
+#emailPreviewModal textarea{
+  font-size:12px;
+}
+
+.notes::-webkit-scrollbar{
+  width:0;
+  height:0;
+}
+
+.notes{
+  scrollbar-width:none;
 }
 
 /* ============================================
@@ -1641,7 +1666,7 @@ tr.active-row {
 
 <!-- EMAIL PREVIEW MODAL -->
 <div class="modal" id="emailPreviewModal">
-  <div class="modal-card" style="width:min(900px,94vw);">
+  <div class="modal-card">
 
     <div class="modal-head">
       <div class="modal-title" id="emailPreviewTitle">

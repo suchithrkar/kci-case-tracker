@@ -1,3 +1,4 @@
+  /* templates */
 export const templates = {
 
 kci: {
@@ -751,6 +752,261 @@ HP Inc.`
 
 },
 
-  /* templates */
+pod: {
+
+  getTemplate(caseData) {
+
+    const { caseResolutionCode } = caseData;
+
+    /* =========================
+       OFFSITE SOLUTION
+    ========================= */
+
+    if (caseResolutionCode === "Offsite Solution") {
+      return {
+        subject: `Proof of Delivery – HP Case {{caseId}}`,
+        body: `Hi {{customerName}},
+
+Thank you for your email.
+
+This email is in reference to Case Number: {{caseId}}.
+
+I have reverified the service records, and according to the logistics update, 
+the device listed below was delivered on {{trackingStatus}}.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+For your reference, I have attached the proof of delivery document to this email.
+
+Kindly review the attached document and confirm whether the device has been received at your premises.
+
+Please feel free to reach out if you require any further assistance—we will be glad to help.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    /* =========================
+       PARTS SHIPPED
+    ========================= */
+
+    if (caseResolutionCode === "Parts Shipped") {
+      return {
+        subject: `Proof of Delivery – HP Case {{caseId}}`,
+        body: `Hi {{customerName}},
+
+Thank you for your email.
+
+This email is in reference to Case Number: {{caseId}}.
+
+I have reverified the service records, and according to the logistics update, 
+the replacement part listed below was delivered on {{trackingStatus}}.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+Part Details:
+• Part Name: {{partName}}
+• Part Number: {{partNumber}}
+
+For your reference, I have attached the proof of delivery document to this email.
+
+Kindly review the attached document and confirm whether the shipment has been received at your premises.
+
+Please feel free to reach out if you require any further assistance—we will be glad to help.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+    }
+
+    return null;
+
+  }
+
+},
+
+returnLabelUpdate: {
+
+  getTemplate(caseData) {
+
+    const { caseResolutionCode } = caseData;
+
+    if (caseResolutionCode === "Parts Shipped") {
+
+      return {
+        subject: `Return Label Request – HP Case {{caseId}}`,
+        body: `Hi {{customerName}},
+
+Thank you for the update.
+
+This email is in reference to Case Number: {{caseId}}.
+
+We have raised a request with our logistics team to generate a new return label for the replacement part associated with the device listed below.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+Part Details:
+• Part Name: {{partName}}
+• Part Number: {{partNumber}}
+
+You will receive the return label shortly via email.
+
+Once you receive the return label, please use the return label/reference number provided to contact the courier service 
+and arrange the pickup of the old part at your convenience.
+
+Please feel free to contact our HP support helpline if you require any further assistance.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+
+    }
+
+    return null;
+
+  }
+
+},
+
+returnLabelRequest: {
+
+  getTemplate(caseData) {
+
+    const { caseResolutionCode } = caseData;
+
+    if (caseResolutionCode === "Parts Shipped") {
+
+      return {
+        subject: `Return Label Request – Case {{caseId}}`,
+        body: `Hi Team,
+
+We spoke with the customer and received confirmation that they are ready to return the part associated with the case below. 
+However, they require a return label to proceed with the shipment.
+
+Case Number: {{caseId}}
+
+Part Number: {{partNumber}}
+
+Part Description: {{partName}}
+
+RMA: 
+
+Contact Name: {{customerName}}
+
+Contact Phone: 
+
+Contact Email: 
+
+Pickup Address:
+
+Other notes: NA
+
+Kindly arrange a return label for the above part and share the details so that the customer can proceed with the return.
+
+Thank you for your support.
+
+Regards,
+{{agentFirstName}}
+HP Inc.`
+      };
+
+    }
+
+    return null;
+
+  }
+
+},
+
+oooClosure: {
+
+  getTemplate(caseData) {
+
+    return {
+      subject: `Follow-up on Your HP Service Case – {{caseId}}`,
+      body: `Hi {{customerName}},
+
+I hope you are doing well.
+
+This email is in reference to Case Number: {{caseId}}.
+
+We previously attempted to contact you to obtain an update regarding the status of the device listed below and the support case raised for it. 
+However, we were unable to reach you and received an automated response indicating that you are currently out of office.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+As we have not received any update and are unable to keep cases open for extended periods without activity, we will proceed with closing the case.
+
+If you require any further assistance once you are available, please feel free to contact our HP support helpline and reference the same case number. 
+Our support team will be glad to assist you.
+
+Please note: This case will no longer be actively monitored after closure. 
+For any updates or immediate assistance, we recommend contacting our HP support helpline.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+    };
+
+  }
+
+},
+
+resolved: {
+
+  getTemplate(caseData) {
+
+    return {
+      subject: `Case Resolution Confirmation – HP Case {{caseId}}`,
+      body: `Hi {{customerName}},
+
+Thank you for your update.
+
+This email is in reference to Case Number: {{caseId}}.
+
+We are glad to know that the issue with the device listed below has been resolved.
+
+Product Details:
+• Product Name: {{productName}}
+• Serial Number: {{serialNumber}}
+
+As per your confirmation regarding the resolution of the issue, we will proceed with closing the case.
+
+If you require any further assistance in the future regarding this issue or any other HP product, please feel free to contact our HP support helpline and reference the same case number. 
+Our support team will be glad to assist you.
+
+Please note: This case will no longer be actively monitored after closure. 
+For any updates or immediate assistance, we recommend contacting our HP support helpline.
+
+Thank you for choosing HP.
+
+Kind regards,
+{{agentFirstName}}
+HP Inc.`
+    };
+
+  }
+
+},
 
 };

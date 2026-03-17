@@ -3860,12 +3860,10 @@ tplMoreBtn.addEventListener("click", () => {
 
 function openEmailPreviewModal(caseData) {
 
+  const caseId = caseData["Case Id"];
+
   emailPreviewTitle.textContent =
-     "Emails Preview – " +
-     (caseData.caseId ||
-     caseData.caseID ||
-     caseData["Case Id"] ||
-     "");
+    "Emails Preview – " + (caseId || "");
 
   renderEmailPreviewToolbar(caseData);
 

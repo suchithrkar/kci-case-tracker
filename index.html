@@ -22,6 +22,7 @@
   --border:#2a2f3a;
   --shadow:0 8px 24px rgba(0,0,0,.35);
   --radius:16px;
+  --email-copy-btn:#222838;
 }
 [data-theme="light"]{
   --bg:#f7f9fe;
@@ -34,6 +35,7 @@
   --ok:#2b8;
   --warn:#d59b00;
   --shadow:0 4px 12px rgba(0,0,0,.08);
+  --email-copy-btn:#e9edf6;
 }
 
 /* =====================================================
@@ -177,6 +179,11 @@ button,input,select,textarea{
   cursor:pointer;
 }
 .btn:hover{filter:brightness(1.1)}
+
+#btnCopyEmailSubject,
+#btnCopyEmailBody{
+  background:var(--email-copy-btn);
+}
 
 .icon-btn{
   width:38px;height:38px;

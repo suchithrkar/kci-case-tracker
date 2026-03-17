@@ -3969,7 +3969,7 @@ btnCopyEmailSubject.addEventListener("click", () => {
     btnCopyEmailSubject.classList.remove("flash-success");
   }, { once: true });
 
-  showToast("Email Subject Copied");
+  showPopup("Email Subject Copied");
 
 });
 
@@ -3983,7 +3983,7 @@ btnCopyEmailBody.addEventListener("click", () => {
     btnCopyEmailBody.classList.remove("flash-success");
   }, { once: true });
 
-  showToast("Email Body Copied");
+  showPopup("Email Body Copied");
 
 });
 

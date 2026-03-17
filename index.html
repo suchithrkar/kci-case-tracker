@@ -6,6 +6,7 @@
 <title>KCI Case Tracker</title>
 
 <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <style>
 :root{
@@ -696,6 +697,48 @@ tr.active-row {
 
 .tpl-group .tpl-btn:last-child {
   border-right: none;
+}
+
+/* =====================================================
+   RETURN LABEL EMAIL SEGMENTED CONTROL
+   ===================================================== */
+
+.email-segmented{
+  display:flex;
+  align-items:center;
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  background:var(--panel-2);
+}
+
+.email-copy-btn{
+  width:36px;
+  height:34px;
+  border:none;
+  border-right:1px solid var(--border);
+  background:var(--email-copy-btn);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.email-copy-btn i{
+  font-size:14px;
+}
+
+.email-field{
+  border:none;
+  background:transparent;
+  padding:.45rem .6rem;
+  width:190px;
+  color:var(--text);
+  border-right:1px solid var(--border);
+}
+
+.email-field:last-child{
+  border-right:none;
 }
 
 .more-btn {
@@ -1733,20 +1776,23 @@ tr.active-row {
 
     <!-- RETURN LABEL EMAIL IDS -->
     <div id="returnLabelEmails"
-         style="display:none;
-             flex-wrap:nowrap;
-             gap:8px;
-             padding:10px 0 10px 0;
-             align-items:center;">
+         class="email-segmented"
+         style="display:none;margin-bottom:10px;">
     
-      <button class="icon-btn email-copy" data-email="returns.csr.uki@hp.com">📋</button>
-      <input class="input" value="returns.csr.uki@hp.com" readonly style="flex:1">
+      <button class="email-copy-btn" data-email="returns.csr.uki@hp.com">
+        <i class="fa fa-copy"></i>
+      </button>
+      <input class="email-field" value="returns.csr.uki@hp.com" readonly>
     
-      <button class="icon-btn email-copy" data-email="returns.csr.rsa@hp.com">📋</button>
-      <input class="input" value="returns.csr.rsa@hp.com" readonly style="flex:1">
+      <button class="email-copy-btn" data-email="returns.csr.rsa@hp.com">
+        <i class="fa fa-copy"></i>
+      </button>
+      <input class="email-field" value="returns.csr.rsa@hp.com" readonly>
     
-      <button class="icon-btn email-copy" data-email="returns.csr.de@hp.com">📋</button>
-      <input class="input" value="returns.csr.de@hp.com" readonly style="flex:1">
+      <button class="email-copy-btn" data-email="returns.csr.de@hp.com">
+        <i class="fa fa-copy"></i>
+      </button>
+      <input class="email-field" value="returns.csr.de@hp.com" readonly>
     
     </div>
 

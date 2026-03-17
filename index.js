@@ -3619,6 +3619,17 @@ Total Actioned Cases: ${totalActioned}`;
      document.getElementById("btnSideClose").click();
    }
    
+   // Close Case Options modal if open
+   if (modal.classList.contains("show")) {
+     closeModal();
+   }
+   
+   // Close Email Preview modal if open
+   const emailPreviewModal = document.getElementById("emailPreviewModal");
+   if (emailPreviewModal?.classList.contains("show")) {
+     emailPreviewModal.classList.remove("show");
+   }
+   
    // Then open Tracker Summary modal
    infoModal.classList.add("show");
 }

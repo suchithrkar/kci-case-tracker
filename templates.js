@@ -15,7 +15,7 @@ function appendCustomerCalls(body, caseId) {
       .map(phone => `- Called customer on ${phone}`)
       .join("\n\n");
 
-    return body.replace(/-\s*$/, callLines);
+    return body.replace(/-\s*$/, callLines) || body + "\n" + callLines;
 
   } catch (e) {
     console.error("Error appending customer calls", e);

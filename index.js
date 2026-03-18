@@ -2043,39 +2043,42 @@ tbody.addEventListener("contextmenu", async (e) => {
   try {
     // 🔍 Get row
     const caseId = cell.textContent.trim();
-   
-    if (!caseId) {
-      showPopup("Invalid case ID");
-      return;
-    }
-   
-    const caseData = trackerState.allCases.find(
-      c => String(c.id) === String(caseId)
-    );
-   
-    if (!caseData) {
-      showPopup("Unable to fetch case data");
-      return;
-    }
 
-    if (!caseData) {
-      showPopup("Case data not found");
-      return;
-    }
-
-    // 🧠 Generate KCI template
-    const template = getTemplate(caseData);
-
-    if (!template || !template.body) {
-      showPopup("Template not available");
-      return;
-    }
-
-    // 📋 Copy to clipboard
-    await navigator.clipboard.writeText(template.body);
-
-    // ✅ Feedback
-    showPopup("KCI Notes copied");
+      if (!caseId) {
+        showPopup("Invalid case ID");
+        return;
+      }
+      
+      const caseData = allCases.find(
+        c => String(c.id) === String(caseId)
+      );
+      
+      if (!caseData) {
+        showPopup("Unable to fetch case data");
+        return;
+      }
+      
+      // ✅ FIXED TEMPLATE ACCESS
+      const tplDef = templates["kci"];
+      
+      if (!tplDef || typeof tplDef.getTemplate !== "function") {
+        showPopup("Template not available");
+        return;
+      }
+      
+      const template = tplDef.getTemplate(caseData);
+      
+      if (!template || !template.body) {
+        showPopup("Template not available");
+        return;
+      }
+      
+      // ✅ APPLY VARIABLES (IMPORTANT)
+      const notes = applyTemplateVariables(template.body, caseData);
+      
+      await navigator.clipboard.writeText(notes);
+      
+      showPopup("KCI Notes copied");
 
   } catch (err) {
     console.error(err);

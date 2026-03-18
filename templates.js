@@ -31,6 +31,8 @@ kci: {
   getTemplate(caseData) {
 
     const {
+      id,
+      caseId,
       caseResolutionCode,
       onsiteRFC,
       benchRFC,
@@ -42,6 +44,8 @@ kci: {
       woClosureNotes,
       dnap
     } = caseData;
+    
+    const resolvedCaseId = caseId || id;
 
     /* =========================
        ONSITE SOLUTION
@@ -65,7 +69,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.id)
+          body: appendCustomerCalls(body, resolvedCaseId)
         };
       }
 
@@ -79,7 +83,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.id)
+          body: appendCustomerCalls(body, resolvedCaseId)
         };
       }
 
@@ -92,7 +96,7 @@ kci: {
 -`;
 
       return {
-        body: appendCustomerCalls(body, caseData.id)
+        body: appendCustomerCalls(body, resolvedCaseId)
       };
     }
 
@@ -129,7 +133,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.id)
+          body: appendCustomerCalls(body, resolvedCaseId)
         };
       }
 
@@ -143,7 +147,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.id)
+          body: appendCustomerCalls(body, resolvedCaseId)
         };
       }
 
@@ -156,7 +160,7 @@ kci: {
 -`;
 
       return {
-        body: appendCustomerCalls(body, caseData.id)
+        body: appendCustomerCalls(body, resolvedCaseId)
       };
     }
 
@@ -179,7 +183,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.id)
+          body: appendCustomerCalls(body, resolvedCaseId)
         };
       }
 
@@ -195,7 +199,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.id)
+          body: appendCustomerCalls(body, resolvedCaseId)
         };
       }
 
@@ -210,7 +214,7 @@ kci: {
 -`;
 
       return {
-        body: appendCustomerCalls(body, caseData.id)
+        body: appendCustomerCalls(body, resolvedCaseId)
       };
     }
 

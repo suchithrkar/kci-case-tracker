@@ -2032,6 +2032,55 @@ tbody.addEventListener("dblclick", (e) => {
   setTimeout(() => toast.classList.remove("show"), 800);
 });
 
+// ✅ RIGHT-CLICK → COPY KCI NOTES
+tbody.addEventListener("contextmenu", async (e) => {
+
+  const cell = e.target.closest(".caseid");
+  if (!cell) return;
+
+  e.preventDefault(); // 🚫 disable default right-click menu
+
+  try {
+    // 🔍 Get row
+    const row = cell.closest("tr");
+
+    // ⚠️ IMPORTANT: get index (same way used elsewhere)
+    const index = row?.dataset?.index;
+
+    if (index === undefined) {
+      showPopup("Unable to fetch case data");
+      return;
+    }
+
+    // 📦 Get caseData (same source used in rendering)
+    const caseData = filteredData[Number(index)];
+
+    if (!caseData) {
+      showPopup("Case data not found");
+      return;
+    }
+
+    // 🧠 Generate KCI template
+    const template = getTemplate(caseData);
+
+    if (!template) {
+      showPopup("Template not available");
+      return;
+    }
+
+    // 📋 Copy to clipboard
+    await navigator.clipboard.writeText(template);
+
+    // ✅ Feedback
+    showPopup("KCI Notes copied");
+
+  } catch (err) {
+    console.error(err);
+    showPopup("Failed to copy KCI Notes");
+  }
+
+});
+
 /* =======================================================================
    PHASE 3 — STATUS CHANGE ENGINE + FIRESTORE UPDATE
    ======================================================================= */

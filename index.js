@@ -4055,28 +4055,31 @@ document.addEventListener("click", e => {
   navigator.clipboard.writeText(email);
 
   // ✅ FLASH BUTTON
-   btn.classList.add("flash-success");
-   
-   const input = btn.nextElementSibling;
-   if (input && input.classList.contains("email-field")) {
-     input.classList.add("flash-success");
-   }
-   
-   // ✅ Helper function
-   const applyAutoRemove = (el) => {
-     const remove = () => {
-       el.classList.remove("flash-success");
-       el.removeEventListener("animationend", remove);
-     };
-     el.addEventListener("animationend", remove);
-   };
-   
-   // ✅ Apply to both
-   applyAutoRemove(btn);
-   if (input) applyAutoRemove(input);
-   
-   // ✅ Toast
-   showPopup("Returns Email Address Copied");
+  btn.classList.add("flash-success");
+
+  const input = btn.nextElementSibling;
+  if (input && input.classList.contains("email-field")) {
+    input.classList.add("flash-success");
+  }
+
+  // ✅ Helper function
+  const applyAutoRemove = (el) => {
+    const remove = () => {
+      el.classList.remove("flash-success");
+      el.removeEventListener("animationend", remove);
+    };
+    el.addEventListener("animationend", remove);
+  };
+
+  // ✅ Apply safely
+  applyAutoRemove(btn);
+
+  if (input && input.classList.contains("email-field")) {
+    applyAutoRemove(input);
+  }
+
+  // ✅ Toast
+  showPopup("Returns Email Address Copied");
 
 });
 

@@ -4,7 +4,8 @@ function appendCustomerCalls(body, caseId) {
     if (!stored) return body;
 
     const data = JSON.parse(stored);
-    const contact = data[caseId?.toString().toUpperCase().trim()];
+    const normalizedId = String(caseId || "").trim();
+    const contact = data[normalizedId];
 
     if (!contact || !contact.phones || contact.phones.length === 0) {
       return body;

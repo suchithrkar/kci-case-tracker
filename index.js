@@ -3939,6 +3939,9 @@ function openEmailPreviewModal(caseData) {
   emailPreviewSubject.value = "";
   emailPreviewBody.value = "";
 
+  // 🔒 Reset return label email row
+  document.getElementById("returnLabelEmails").style.display = "none";
+
   document.getElementById("modal").classList.remove("show");
   emailPreviewModal.classList.add("show");
 

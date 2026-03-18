@@ -4046,14 +4046,34 @@ function loadEmailTemplate(type, caseData) {
 
 document.addEventListener("click", e => {
 
-  if (!e.target.closest(".email-copy-btn")) return;
-
   const btn = e.target.closest(".email-copy-btn");
+  if (!btn) return;
+
   const email = btn.dataset.email;
+  if (!email) return;
 
   navigator.clipboard.writeText(email);
 
-  showToast("Email copied");
+  // ✅ FLASH BUTTON
+   btn.classList.add("flash-success");
+   
+   const input = btn.nextElementSibling;
+   if (input && input.classList.contains("email-field")) {
+     input.classList.add("flash-success");
+   }
+   
+   // ✅ Auto remove when animation ends
+   const handleAnimationEnd = () => {
+     btn.classList.remove("flash-success");
+     if (input) input.classList.remove("flash-success");
+   
+     btn.removeEventListener("animationend", handleAnimationEnd);
+   };
+   
+   btn.addEventListener("animationend", handleAnimationEnd);
+
+  // ✅ UPDATED TOAST MESSAGE
+  showPopup("Returns Email Address Copied");
 
 });
 

@@ -2097,6 +2097,13 @@ function handleExcelUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  // FILE TYPE VALIDATION
+  if (!file.name.match(/\.(xlsx|xls)$/i)) {
+    showPopup("Please upload a valid Excel file");
+    event.target.value = ""; // reset input
+    return;
+  }
+
   const reader = new FileReader();
 
   reader.onload = function (e) {

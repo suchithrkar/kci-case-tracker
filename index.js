@@ -2063,13 +2063,13 @@ tbody.addEventListener("contextmenu", async (e) => {
     // 🧠 Generate KCI template
     const template = getTemplate(caseData);
 
-    if (!template) {
+    if (!template || !template.body) {
       showPopup("Template not available");
       return;
     }
 
     // 📋 Copy to clipboard
-    await navigator.clipboard.writeText(template);
+    await navigator.clipboard.writeText(template.body);
 
     // ✅ Feedback
     showPopup("KCI Notes copied");

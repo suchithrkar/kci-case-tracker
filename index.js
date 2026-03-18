@@ -63,6 +63,21 @@ const el = {
    badgePNS: document.getElementById("badgePNS"),
 };
 
+// ================================
+// CONTACT DATA STORE (LOCAL ONLY)
+// ================================
+let contactDataStore = {};
+
+// Load from localStorage on startup
+try {
+  const stored = localStorage.getItem("kciContactData");
+  if (stored) {
+    contactDataStore = JSON.parse(stored);
+  }
+} catch (e) {
+  console.error("Failed to load contact data", e);
+}
+
 /* =========================================================
    HEADER HEIGHT → MODAL OFFSET
    ========================================================= */
@@ -1030,8 +1045,6 @@ return;
     applyFilters();
     return;
 }
-
-
    
 });
 
@@ -2057,6 +2070,16 @@ const btnEmailPreviewClose = document.getElementById("btnEmailPreviewClose");
 const btnCopyEmailSubject = document.getElementById("btnCopyEmailSubject");
 const btnCopyEmailBody = document.getElementById("btnCopyEmailBody");
 
+const btnUploadExcel = document.getElementById("btnUploadExcel");
+const excelFileInput = document.getElementById("excelFileInput");
+
+if (btnUploadExcel && excelFileInput) {
+  btnUploadExcel.addEventListener("click", () => {
+    excelFileInput.click();
+  });
+
+  excelFileInput.addEventListener("change", handleExcelUpload);
+}
 
 modalWarning.style.display = "none";
 
@@ -2069,6 +2092,92 @@ let closureSurveyCompleted = false;
 
 /* Holds the full case object for template engine */
 let currentCase = null;
+
+function handleExcelUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+      const newStore = {};
+
+      json.forEach(row => {
+        let caseId = (row["Case ID"] || "").toString().trim().toUpperCase();
+        if (!caseId) return;
+
+        // Collect all phone fields
+        const rawPhones = [
+          row["Phone"],
+          row["Mobile Phone"],
+          row["Other Phone (Primary Contact) (Contact)"],
+          row["Work (Primary Contact) (Contact)"]
+        ];
+
+        // Clean + normalize phones
+        const cleanedPhones = rawPhones
+          .filter(Boolean)
+          .map(p => p.toString()
+            .replace(/[^\d]/g, "")   // remove all non-digits
+            .trim()
+          )
+          .filter(p => p.length > 0);
+
+        // Deduplicate phones
+        const uniquePhones = [...new Set(cleanedPhones)];
+
+        // Clean email
+        let email = (row["Email Address (Primary Contact) (Contact)"] || "")
+          .toString()
+          .trim();
+
+        newStore[caseId] = {
+          phones: uniquePhones,
+          email: email || ""
+        };
+      });
+
+      // Merge with existing (overwrite same caseId)
+      contactDataStore = {
+        ...contactDataStore,
+        ...newStore
+      };
+
+      // Save locally
+      localStorage.setItem(
+        "kciContactData",
+        JSON.stringify(contactDataStore)
+      );
+
+      showToast("Excel uploaded successfully");
+
+      console.log("Contact Data Store:", contactDataStore);
+
+    } catch (err) {
+      console.error("Excel processing failed:", err);
+      showToast("Failed to process Excel");
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+
+  // Reset input so same file can be uploaded again
+  event.target.value = "";
+}
+
+function getContactByCaseId(caseId) {
+  if (!caseId) return null;
+  return contactDataStore[caseId.toString().trim().toUpperCase()] || null;
+}
 
 /* =========================================================
    CUSTOM CALENDAR — CLICK TO OPEN (SEGMENTED FIX)

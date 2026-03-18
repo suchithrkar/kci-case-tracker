@@ -2122,7 +2122,7 @@ function handleExcelUpload(event) {
       ];
       
       // Get headers from first row
-      const sheetHeaders = Object.keys(json[0] || {});
+      const sheetHeaders = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0] || [];
       
       // Check missing columns
       const missingColumns = requiredColumns.filter(

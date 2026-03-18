@@ -2049,7 +2049,7 @@ tbody.addEventListener("contextmenu", async (e) => {
       return;
     }
    
-    const caseData = allCases.find(
+    const caseData = trackerState.allCases.find(
       c => String(c.id) === String(caseId)
     );
    

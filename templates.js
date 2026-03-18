@@ -1,4 +1,28 @@
-  /* templates */
+function appendCustomerCalls(body, caseId) {
+  try {
+    const stored = localStorage.getItem("kciContactData");
+    if (!stored) return body;
+
+    const data = JSON.parse(stored);
+    const contact = data[caseId?.toUpperCase()?.trim()];
+
+    if (!contact || !contact.phones || contact.phones.length === 0) {
+      return body;
+    }
+
+    const callLines = contact.phones
+      .map(phone => `- Called customer on ${phone}`)
+      .join("\n\n");
+
+    return body.replace(/-\s*$/, callLines);
+
+  } catch (e) {
+    console.error("Error appending customer calls", e);
+    return body;
+  }
+}
+
+/* ---------- templates ---------- */
 export const templates = {
 
 kci: {
@@ -28,8 +52,7 @@ kci: {
         onsiteRFC === "Open - Completed" ||
         onsiteRFC === "Closed - Posted"
       ) {
-        return {
-          body: `-- KCI Notes
+        const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
@@ -38,30 +61,37 @@ kci: {
 - WO Closure Notes:
 {{woClosureNotes}}
 
--`
+-`;
+
+        return {
+          body: appendCustomerCalls(body, caseData.caseId)
         };
       }
 
       if (onsiteRFC === "Closed - Canceled") {
-        return {
-          body: `-- KCI Notes
+        const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
 - WO Status: {{onsiteRFC}}
 
--`
+-`;
+
+        return {
+          body: appendCustomerCalls(body, caseData.caseId)
         };
       }
 
-      return {
-        body: `-- KCI Notes
+      const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
 - WO Status: {{onsiteRFC}}
 
--`
+-`;
+
+      return {
+        body: appendCustomerCalls(body, caseData.caseId)
       };
     }
 
@@ -71,6 +101,7 @@ kci: {
 
     if (caseResolutionCode === "Offsite Solution") {
 
+      // ❌ DO NOT MODIFY DNAP
       if (dnap) {
         return {
           body: `-- KCI Notes
@@ -87,38 +118,44 @@ kci: {
       }
 
       if (benchRFC === "Delivered") {
-        return {
-          body: `-- KCI Notes
+        const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
 - CSO Status: {{benchRFC}}
 - Delivery Status: {{trackingStatus}}
 
--`
+-`;
+
+        return {
+          body: appendCustomerCalls(body, caseData.caseId)
         };
       }
 
       if (benchRFC === "Order cancelled, not to be reopened") {
-        return {
-          body: `-- KCI Notes
+        const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
 - CSO Status: {{benchRFC}}
 
--`
+-`;
+
+        return {
+          body: appendCustomerCalls(body, caseData.caseId)
         };
       }
 
-      return {
-        body: `-- KCI Notes
+      const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
 - CSO Status: {{benchRFC}}
 
--`
+-`;
+
+      return {
+        body: appendCustomerCalls(body, caseData.caseId)
       };
     }
 
@@ -129,8 +166,7 @@ kci: {
     if (caseResolutionCode === "Parts Shipped") {
 
       if (csrRFC === "POD" || csrRFC === "Closed") {
-        return {
-          body: `-- KCI Notes
+        const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
@@ -139,13 +175,15 @@ kci: {
 - MO Status: {{csrRFC}}
 - Delivery Status: {{trackingStatus}}
 
--`
+-`;
+
+        return {
+          body: appendCustomerCalls(body, caseData.caseId)
         };
       }
 
       if (csrRFC === "Cancelled") {
-        return {
-          body: `-- KCI Notes
+        const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
@@ -153,12 +191,14 @@ kci: {
 - Part Name: {{partName}}
 - MO Status: {{csrRFC}}
 
--`
+-`;
+
+        return {
+          body: appendCustomerCalls(body, caseData.caseId)
         };
       }
 
-      return {
-        body: `-- KCI Notes
+      const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
@@ -166,7 +206,10 @@ kci: {
 - Part Name: {{partName}}
 - MO Status: {{csrRFC}}
 
--`
+-`;
+
+      return {
+        body: appendCustomerCalls(body, caseData.caseId)
       };
     }
 

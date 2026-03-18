@@ -64,7 +64,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.caseId)
+          body: appendCustomerCalls(body, caseData.id)
         };
       }
 
@@ -78,7 +78,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.caseId)
+          body: appendCustomerCalls(body, caseData.id)
         };
       }
 
@@ -91,7 +91,7 @@ kci: {
 -`;
 
       return {
-        body: appendCustomerCalls(body, caseData.caseId)
+        body: appendCustomerCalls(body, caseData.id)
       };
     }
 
@@ -128,7 +128,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.caseId)
+          body: appendCustomerCalls(body, caseData.id)
         };
       }
 
@@ -142,7 +142,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.caseId)
+          body: appendCustomerCalls(body, caseData.id)
         };
       }
 
@@ -155,7 +155,7 @@ kci: {
 -`;
 
       return {
-        body: appendCustomerCalls(body, caseData.caseId)
+        body: appendCustomerCalls(body, caseData.id)
       };
     }
 
@@ -178,7 +178,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.caseId)
+          body: appendCustomerCalls(body, caseData.id)
         };
       }
 
@@ -194,7 +194,7 @@ kci: {
 -`;
 
         return {
-          body: appendCustomerCalls(body, caseData.caseId)
+          body: appendCustomerCalls(body, caseData.id)
         };
       }
 
@@ -209,7 +209,7 @@ kci: {
 -`;
 
       return {
-        body: appendCustomerCalls(body, caseData.caseId)
+        body: appendCustomerCalls(body, caseData.id)
       };
     }
 

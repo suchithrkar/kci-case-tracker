@@ -4066,9 +4066,8 @@ document.addEventListener("click", e => {
   const applyAutoRemove = (el) => {
     const remove = () => {
       el.classList.remove("flash-success");
-      el.removeEventListener("animationend", remove);
     };
-    el.addEventListener("animationend", remove);
+    el.addEventListener("animationend", remove, { once: true });
   };
 
   // ✅ Apply safely

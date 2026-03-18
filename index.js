@@ -2042,18 +2042,21 @@ tbody.addEventListener("contextmenu", async (e) => {
 
   try {
     // 🔍 Get row
-    const row = cell.closest("tr");
-
-    // ⚠️ IMPORTANT: get index (same way used elsewhere)
-    const index = row?.dataset?.index;
-
-    if (index === undefined) {
+    const caseId = cell.textContent.trim();
+   
+    if (!caseId) {
+      showPopup("Invalid case ID");
+      return;
+    }
+   
+    const caseData = filteredData.find(
+      c => String(c.id) === String(caseId)
+    );
+   
+    if (!caseData) {
       showPopup("Unable to fetch case data");
       return;
     }
-
-    // 📦 Get caseData (same source used in rendering)
-    const caseData = filteredData[Number(index)];
 
     if (!caseData) {
       showPopup("Case data not found");

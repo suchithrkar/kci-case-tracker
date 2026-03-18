@@ -1775,6 +1775,18 @@ tr.active-row {
       </div>
 
       <div style="display:flex; gap:.5rem;">
+      
+        <button class="tpl-btn" id="btnUploadExcel">
+          Upload Excel
+        </button>
+      
+        <input
+          type="file"
+          id="excelFileInput"
+          accept=".xlsx,.xls"
+          style="display:none;"
+        />
+      
         <button class="btn" id="btnEmailPreviewBack">Back</button>
         <button class="btn" id="btnEmailPreviewClose">Close</button>
       </div>
@@ -1904,6 +1916,8 @@ tr.active-row {
 <!-- TOAST --><!-- TOAST -->
 <div class="toast" id="toast">Copied!</div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
 <!-- MAIN TRACKER LOGIC (WILL BE SECTION 2 + SECTION 3) -->
 <script type="module" src="./index.js?v=9"></script>
 

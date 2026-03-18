@@ -2158,13 +2158,13 @@ function handleExcelUpload(event) {
         JSON.stringify(contactDataStore)
       );
 
-      showToast("Excel uploaded successfully");
+      showPopup("Excel uploaded successfully");
 
       console.log("Contact Data Store:", contactDataStore);
 
     } catch (err) {
       console.error("Excel processing failed:", err);
-      showToast("Failed to process Excel");
+      showPopup("Failed to process Excel");
     }
   };
 

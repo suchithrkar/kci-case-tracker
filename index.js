@@ -2049,7 +2049,7 @@ tbody.addEventListener("contextmenu", async (e) => {
       return;
     }
    
-    const caseData = filteredData.find(
+    const caseData = casesData.find(
       c => String(c.id) === String(caseId)
     );
    

@@ -1,21 +1,37 @@
 function appendCustomerCalls(body, caseId) {
+  console.log("🚀 appendCustomerCalls called with caseId:", caseId);
   try {
     const stored = localStorage.getItem("kciContactData");
+    console.log("📦 localStorage raw:", stored);
     if (!stored) return body;
 
     const data = JSON.parse(stored);
+    console.log("📊 parsed data keys:", Object.keys(data));
     const normalizedId = String(caseId || "").trim();
+    console.log("🔍 normalizedId:", normalizedId);
     const contact = data[normalizedId];
+    console.log("📞 matched contact:", contact);
+
+    if (!contact) console.log("❌ No contact found for ID");
+    if (contact && (!contact.phones || contact.phones.length === 0)) {
+      console.log("⚠️ No phones found");
+    }
 
     if (!contact || !contact.phones || contact.phones.length === 0) {
       return body;
     }
 
+    console.log("📱 phones found:", contact.phones);
     const callLines = contact.phones
       .map(phone => `- Called customer on ${phone}`)
       .join("\n\n");
 
-    return body.replace(/-\s*$/, callLines) || body + "\n" + callLines;
+    const updatedBody = body.replace(/-\s*$/, callLines);
+
+    console.log("🧾 final callLines:", callLines);
+    console.log("🧾 updatedBody preview:", updatedBody);
+    
+    return updatedBody || body + "\n" + callLines;
 
   } catch (e) {
     console.error("Error appending customer calls", e);
@@ -29,6 +45,7 @@ export const templates = {
 kci: {
 
   getTemplate(caseData) {
+    console.log("📦 caseData received:", caseData);
 
     const {
       id,
@@ -46,6 +63,7 @@ kci: {
     } = caseData;
     
     const resolvedCaseId = caseId || id;
+    console.log("🆔 resolvedCaseId:", resolvedCaseId);
 
     /* =========================
        ONSITE SOLUTION

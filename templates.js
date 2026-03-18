@@ -901,8 +901,6 @@ This email is in reference to Case Number: {{caseId}}.
 We spoke with the customer and received confirmation that they are ready to return the part associated with the case. 
 However, they require a return label to proceed with the shipment.
 
-Case Number: {{caseId}}
-
 Part Number: {{partNumber}}
 
 Part Description: {{partName}}

@@ -2109,6 +2109,34 @@ function handleExcelUpload(event) {
 
       const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
+      // ================================
+      // VALIDATE REQUIRED COLUMNS
+      // ================================
+      const requiredColumns = [
+        "Case ID",
+        "Phone",
+        "Mobile Phone",
+        "Other Phone (Primary Contact) (Contact)",
+        "Work (Primary Contact) (Contact)",
+        "Email Address (Primary Contact) (Contact)"
+      ];
+      
+      // Get headers from first row
+      const sheetHeaders = Object.keys(json[0] || {});
+      
+      // Check missing columns
+      const missingColumns = requiredColumns.filter(
+        col => !sheetHeaders.includes(col)
+      );
+      
+      if (missingColumns.length > 0) {
+        showPopup(
+          "Invalid Excel format.\nMissing columns:\n" +
+          missingColumns.join(", ")
+        );
+        return;
+      }
+
       const newStore = {};
 
       json.forEach(row => {

@@ -4062,18 +4062,21 @@ document.addEventListener("click", e => {
      input.classList.add("flash-success");
    }
    
-   // ✅ Auto remove when animation ends
-   const handleAnimationEnd = () => {
-     btn.classList.remove("flash-success");
-     if (input) input.classList.remove("flash-success");
-   
-     btn.removeEventListener("animationend", handleAnimationEnd);
+   // ✅ Helper function
+   const applyAutoRemove = (el) => {
+     const remove = () => {
+       el.classList.remove("flash-success");
+       el.removeEventListener("animationend", remove);
+     };
+     el.addEventListener("animationend", remove);
    };
    
-   btn.addEventListener("animationend", handleAnimationEnd);
-
-  // ✅ UPDATED TOAST MESSAGE
-  showPopup("Returns Email Address Copied");
+   // ✅ Apply to both
+   applyAutoRemove(btn);
+   if (input) applyAutoRemove(input);
+   
+   // ✅ Toast
+   showPopup("Returns Email Address Copied");
 
 });
 

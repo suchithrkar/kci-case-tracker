@@ -1408,14 +1408,18 @@ function buildStatusPanel() {
      }
    
      // ✅ Disable/enable other checkboxes
-     const isDnapActive = uiState.statusList.includes("DNAP_ONLY");
-   
-     el.statusPanel.querySelectorAll("input[type='checkbox']").forEach(input => {
-       if (input.dataset.status !== "DNAP_ONLY") {
-         input.disabled = isDnapActive;
-         if (isDnapActive) input.checked = false;
-       }
-     });
+      const isDnapActive = uiState.statusList.includes("DNAP_ONLY");
+      
+      el.statusPanel.querySelectorAll("input[type='checkbox']").forEach(input => {
+        if (input.dataset.status !== "DNAP_ONLY") {
+          input.disabled = isDnapActive;
+      
+          // ✅ Reset checked state only when activating DNAP
+          if (isDnapActive) {
+            input.checked = false;
+          }
+        }
+      });
    
      updateStatusLabel();
    };

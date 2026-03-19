@@ -1568,13 +1568,17 @@ if (uiState.rfcMode === "negative") {
   }
 
   /* STATUS MULTI-SELECT */
-   if (uiState.statusList.length > 0) {
+   const selectedStatuses = uiState.statusList.filter(
+     s => s !== "SHOW_ALL_NCM" && s !== "EMAIL_NEW"
+   );
+   
+   if (selectedStatuses.length > 0) {
      rows = rows.filter(r => {
    
        // ✅ Keep rows currently being edited
        if (pendingStatusOverride.has(r.id)) return true;
    
-       return uiState.statusList.includes(r.status);
+       return selectedStatuses.includes(r.status);
      });
    }
 

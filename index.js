@@ -1502,6 +1502,10 @@ export function applyFilters() {
    
      trackerState.filteredCases = rows;
      updateBadges();
+   
+     // ✅ ADD THIS LINE (CRITICAL)
+     renderTable();
+   
      return;
    }
 

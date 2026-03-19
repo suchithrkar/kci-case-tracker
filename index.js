@@ -1363,17 +1363,62 @@ function buildStatusPanel() {
      </label>
    `;
 
+   // ✅ Divider before DNAP
+   el.statusPanel.innerHTML += `
+     <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
+   `;
+   
+   // ✅ Offsite DNAP Cases (exclusive filter)
+   el.statusPanel.innerHTML += `
+     <label>
+       <input type="checkbox" data-status="DNAP_ONLY"
+         ${uiState.statusList.includes("DNAP_ONLY") ? "checked" : ""}/>
+       Offsite DNAP Cases
+     </label>
+   `;
+
   updateStatusLabel();
 
   /* Record selections but DO NOT apply yet */
-  el.statusPanel.onchange = (e) => {
-    const c = e.target.closest("input");
-    if (!c) return;
-    const set = new Set(uiState.statusList);
-    c.checked ? set.add(c.dataset.status) : set.delete(c.dataset.status);
-    uiState.statusList = [...set];
-    updateStatusLabel();
-  };
+   el.statusPanel.onchange = (e) => {
+     const c = e.target.closest("input");
+     if (!c) return;
+   
+     const val = c.dataset.status;
+   
+     // ✅ DNAP_ONLY → exclusive behavior
+     if (val === "DNAP_ONLY") {
+   
+       if (c.checked) {
+         uiState.statusList = ["DNAP_ONLY"];
+       } else {
+         uiState.statusList = [];
+       }
+   
+     } else {
+   
+       // ❌ If DNAP is active → block all other selections
+       if (uiState.statusList.includes("DNAP_ONLY")) {
+         return;
+       }
+   
+       const set = new Set(uiState.statusList);
+       c.checked ? set.add(val) : set.delete(val);
+       uiState.statusList = [...set];
+     }
+   
+     // ✅ Disable/enable other checkboxes
+     const isDnapActive = uiState.statusList.includes("DNAP_ONLY");
+   
+     el.statusPanel.querySelectorAll("input[type='checkbox']").forEach(input => {
+       if (input.dataset.status !== "DNAP_ONLY") {
+         input.disabled = isDnapActive;
+         if (isDnapActive) input.checked = false;
+       }
+     });
+   
+     updateStatusLabel();
+   };
 }
 
 function updateStatusLabel() {
@@ -1384,7 +1429,7 @@ function updateStatusLabel() {
   }
 
   const displayList = uiState.statusList
-    .filter(s => s !== "SHOW_ALL_NCM" && s !== "EMAIL_NEW");
+    .filter(s => s !== "SHOW_ALL_NCM" && s !== "EMAIL_NEW" && s !== "DNAP_ONLY");
 
   if (uiState.statusList.includes("SHOW_ALL_NCM")) {
     displayList.push("All NCM");
@@ -1392,6 +1437,10 @@ function updateStatusLabel() {
 
   if (uiState.statusList.includes("EMAIL_NEW")) {
     displayList.push("Email New");
+  }
+
+  if (uiState.statusList.includes("DNAP_ONLY")) {
+    displayList.push("DNAP");
   }
 
   el.statusLabel.textContent = displayList.join(", ");
@@ -1435,13 +1484,22 @@ function restrictNcmCasesForUser(rows, user) {
 export function applyFilters() {
   // 🚫 Global protection: do NOT auto-refresh if modal process is happening in Unupdated mode
   // 🚫 Global fail-safe override:
-if (uiState.unupdatedActive && unupdatedProtect) {
-  return;
-}
+   if (uiState.unupdatedActive && unupdatedProtect) {
+     return;
+   }
 
 
   const today = getTeamToday(trackerState.teamConfig);
   let rows = [...trackerState.allCases];
+
+   // ✅ DNAP_ONLY override (exclusive filter)
+   if (uiState.statusList.includes("DNAP_ONLY")) {
+     rows = rows.filter(r => Boolean(r.dnap));
+   
+     trackerState.filteredCases = rows;
+     updateBadges();
+     return;
+   }
 
   /* ===============================================================
    RFC MODE: TOTAL  (NEW — does NOT return early)

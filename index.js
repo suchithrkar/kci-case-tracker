@@ -1399,6 +1399,14 @@ function buildStatusPanel() {
      tag.style.display = showAllNcm ? "none" : "inline";
    });
 
+   const isDnapActive = uiState.statusList.includes("DNAP_ONLY");
+
+   el.statusPanel.querySelectorAll("input[type='checkbox']").forEach(input => {
+     if (input.dataset.status !== "DNAP_ONLY") {
+       input.disabled = isDnapActive;
+     }
+   });
+
   /* Record selections but DO NOT apply yet */
    el.statusPanel.onchange = (e) => {
      const c = e.target.closest("input");

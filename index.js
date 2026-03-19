@@ -1332,13 +1332,27 @@ function setupStatusPanel() {
 function buildStatusPanel() {
   const statuses = ["Closed", "NCM 1", "NCM 2", "PNS", "Service Pending", "Monitoring"];
 
-  el.statusPanel.innerHTML = statuses.map(s => `
-    <label>
-      <input type="checkbox" data-status="${s}"
-        ${uiState.statusList.includes(s) ? "checked" : ""}/>
-      ${s}
-    </label>
-  `).join("");
+   el.statusPanel.innerHTML = statuses.map(s => {
+   
+     if (s === "NCM 1" || s === "NCM 2") {
+       return `
+         <label style="display:flex;align-items:center;">
+           <input type="checkbox" data-status="${s}"
+             ${uiState.statusList.includes(s) ? "checked" : ""}/>
+           <span style="flex:1">${s}</span>
+           <span class="ncm-own-tag" style="font-size:11px;opacity:0.6;">Own</span>
+         </label>
+       `;
+     }
+   
+     return `
+       <label>
+         <input type="checkbox" data-status="${s}"
+           ${uiState.statusList.includes(s) ? "checked" : ""}/>
+         ${s}
+       </label>
+     `;
+   }).join("");
 
    // ✅ Divider
    el.statusPanel.innerHTML += `
@@ -1377,7 +1391,13 @@ function buildStatusPanel() {
      </label>
    `;
 
-  updateStatusLabel();
+   updateStatusLabel();
+
+   const showAllNcm = uiState.statusList.includes("SHOW_ALL_NCM");
+
+   el.statusPanel.querySelectorAll(".ncm-own-tag").forEach(tag => {
+     tag.style.display = showAllNcm ? "none" : "inline";
+   });
 
   /* Record selections but DO NOT apply yet */
    el.statusPanel.onchange = (e) => {
@@ -1419,6 +1439,12 @@ function buildStatusPanel() {
             input.checked = false;
           }
         }
+      });
+
+      const showAllNcm = uiState.statusList.includes("SHOW_ALL_NCM");
+
+      el.statusPanel.querySelectorAll(".ncm-own-tag").forEach(tag => {
+        tag.style.display = showAllNcm ? "none" : "inline";
       });
    
      updateStatusLabel();

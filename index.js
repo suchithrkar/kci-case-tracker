@@ -1340,6 +1340,20 @@ function buildStatusPanel() {
     </label>
   `).join("");
 
+   // ✅ Divider
+   el.statusPanel.innerHTML += `
+     <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
+   `;
+   
+   // ✅ Show All NCM Cases option (override flag)
+   el.statusPanel.innerHTML += `
+     <label>
+       <input type="checkbox" data-status="SHOW_ALL_NCM"
+         ${uiState.statusList.includes("SHOW_ALL_NCM") ? "checked" : ""}/>
+       Show All NCM Cases
+     </label>
+   `;
+
   updateStatusLabel();
 
   /* Record selections but DO NOT apply yet */
@@ -1354,10 +1368,20 @@ function buildStatusPanel() {
 }
 
 function updateStatusLabel() {
-  if (uiState.statusList.length === 0)
+
+  if (uiState.statusList.length === 0) {
     el.statusLabel.textContent = "All Statuses";
-  else
-    el.statusLabel.textContent = uiState.statusList.join(", ");
+    return;
+  }
+
+  const displayList = uiState.statusList
+    .filter(s => s !== "SHOW_ALL_NCM");
+
+  if (uiState.statusList.includes("SHOW_ALL_NCM")) {
+    displayList.push("All NCM");
+  }
+
+  el.statusLabel.textContent = displayList.join(", ");
 }
 
 /* =======================================================================
@@ -1373,6 +1397,11 @@ function restrictNcmCasesForUser(rows, user) {
 
   const ncm1Selected = uiState.statusList.includes("NCM 1");
   const ncm2Selected = uiState.statusList.includes("NCM 2");
+
+   // ✅ NEW: Override — Show all NCM cases
+   if (uiState.statusList.includes("SHOW_ALL_NCM")) {
+     return rows;
+   }
 
   // If neither selected → return normally
   if (!ncm1Selected && !ncm2Selected) return rows;

@@ -1354,6 +1354,15 @@ function buildStatusPanel() {
      </label>
    `;
 
+   // ✅ Email Status New filter
+   el.statusPanel.innerHTML += `
+     <label>
+       <input type="checkbox" data-status="EMAIL_NEW"
+         ${uiState.statusList.includes("EMAIL_NEW") ? "checked" : ""}/>
+       Email Status New
+     </label>
+   `;
+
   updateStatusLabel();
 
   /* Record selections but DO NOT apply yet */
@@ -1375,10 +1384,14 @@ function updateStatusLabel() {
   }
 
   const displayList = uiState.statusList
-    .filter(s => s !== "SHOW_ALL_NCM");
+    .filter(s => s !== "SHOW_ALL_NCM" && s !== "EMAIL_NEW");
 
   if (uiState.statusList.includes("SHOW_ALL_NCM")) {
     displayList.push("All NCM");
+  }
+
+  if (uiState.statusList.includes("EMAIL_NEW")) {
+    displayList.push("Email New");
   }
 
   el.statusLabel.textContent = displayList.join(", ");
@@ -1642,12 +1655,13 @@ else {
   rows.sort((a, b) => a.excelOrder - b.excelOrder);
 }
 
-
-
-
 /* APPLY SPECIAL NCM FILTERING */
 rows = restrictNcmCasesForUser(rows, trackerState.user);
 
+// ✅ Email Status New filter (AND condition)
+if (uiState.statusList.includes("EMAIL_NEW")) {
+  rows = rows.filter(r => r.emailStatus === "New");
+}
 
 trackerState.filteredCases = rows;
 updateBadges();

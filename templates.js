@@ -817,8 +817,6 @@ pod: {
         subject: `Proof of Delivery – HP Case {{caseId}}`,
         body: `Hi {{customerName}},
 
-Thank you for your email.
-
 This email is in reference to Case Number: {{caseId}}.
 
 I have reverified the service records, and according to the logistics update, 
@@ -850,8 +848,6 @@ HP Inc.`
       return {
         subject: `Proof of Delivery – HP Case {{caseId}}`,
         body: `Hi {{customerName}},
-
-Thank you for your email.
 
 This email is in reference to Case Number: {{caseId}}.
 

@@ -4027,6 +4027,15 @@ negBtn.addEventListener("mouseleave", () => {
    TEMPLATE TOOLBAR BUTTONS
    ========================================================= */
 
+function formatPartName(partName) {
+  if (!partName || typeof partName !== "string") return partName;
+
+  const index = partName.indexOf("-");
+  if (index === -1) return partName;
+
+  return partName.substring(index + 1).trim();
+}
+
 function applyTemplateVariables(text, caseData) {
 
   const agentFullName =
@@ -4048,7 +4057,14 @@ function applyTemplateVariables(text, caseData) {
      productName: caseData.productName ?? "",
      serialNumber: caseData.serialNumber ?? "",
      trackingStatus: caseData.trackingStatus ?? "",
-     partName: caseData.partName ?? "",
+     partName: (() => {
+       // 🚫 Skip formatting for Return Label Request templates
+       if (text.includes("Return Label Request")) {
+         return caseData.partName ?? "";
+       }
+      
+       return formatPartName(caseData.partName ?? "");
+     })(),
      partNumber: caseData.partNumber ?? "",
      agentFirstName: agentFirstName ?? "",
    

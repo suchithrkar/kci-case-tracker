@@ -894,8 +894,6 @@ returnLabelUpdate: {
         subject: `Return Label Request – HP Case {{caseId}}`,
         body: `Hi {{customerName}},
 
-Thank you for the update.
-
 This email is in reference to Case Number: {{caseId}}.
 
 We have raised a request with our logistics team to generate a new return label for the replacement part associated with the device listed below.

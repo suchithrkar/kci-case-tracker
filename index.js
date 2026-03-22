@@ -4054,10 +4054,12 @@ function applyTemplateVariables(text, caseData, templateKey = "") {
          return name
            .split(" ")
            .filter(Boolean)
-           .map(word =>
-             word.charAt(0).toUpperCase() +
-             word.slice(1).toLowerCase()
-           )
+           .map(word => {
+             const clean = word.replace(/[^a-zA-Z]/g, "");
+             if (!clean) return "";
+             return clean.charAt(0).toUpperCase() +
+                    clean.slice(1).toLowerCase();
+           })
            .join(" ");
        }
       

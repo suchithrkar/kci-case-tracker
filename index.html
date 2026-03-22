@@ -24,6 +24,7 @@
   --shadow:0 8px 24px rgba(0,0,0,.35);
   --radius:16px;
   --email-copy-btn:#222838;
+  --upload-btn-hover: rgba(79,140,240,0.18);
 }
 [data-theme="light"]{
   --bg:#f7f9fe;
@@ -37,6 +38,7 @@
   --warn:#d59b00;
   --shadow:0 4px 12px rgba(0,0,0,.08);
   --email-copy-btn:#e9edf6;
+  --upload-btn-hover: rgba(79,140,240,0.18);
 }
 
 /* =====================================================
@@ -627,23 +629,17 @@ tr.active-row {
 }
 
 /* ============================================
-   Upload Excel Button (subtle highlight)
+   Upload Excel Button (theme-consistent)
    ============================================ */
 .tpl-btn.upload-btn {
-  background: rgba(79,140,240,0.12);   /* very subtle accent tint */
-  border-color: rgba(79,140,240,0.25);
+  background: var(--email-copy-btn);
+  border: none;
   color: var(--text);
 }
 
+/* Hover — use brightness instead of rgba */
 .tpl-btn.upload-btn:hover {
-  background: rgba(79,140,240,0.18);
-  filter: none;
-}
-
-/* Light theme adjustment */
-[data-theme="light"] .tpl-btn.upload-btn {
-  background: rgba(79,140,240,0.10);
-  border-color: rgba(79,140,240,0.2);
+  filter: var(--upload-btn-hover);
 }
 
 /* Active email template button highlight */

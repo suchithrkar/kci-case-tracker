@@ -4491,15 +4491,23 @@ btnCopyEmailSubject.addEventListener("click", () => {
 
 btnCopyEmailBody.addEventListener("click", () => {
 
-  navigator.clipboard.writeText(emailPreviewBody.value);
+  const body = emailPreviewBody.value || "";
 
-  btnCopyEmailBody.classList.add("flash-success");
+  copyTemplateRich(body)
+    .then(() => {
 
-  btnCopyEmailBody.addEventListener("animationend", () => {
-    btnCopyEmailBody.classList.remove("flash-success");
-  }, { once: true });
+      btnCopyEmailBody.classList.add("flash-success");
 
-  showPopup("Email Body Copied");
+      btnCopyEmailBody.addEventListener("animationend", () => {
+        btnCopyEmailBody.classList.remove("flash-success");
+      }, { once: true });
+
+      showPopup("Email Body Copied");
+
+    })
+    .catch(() => {
+      showPopup("Copy Failed");
+    });
 
 });
 

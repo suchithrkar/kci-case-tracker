@@ -2221,7 +2221,7 @@ tbody.addEventListener("contextmenu", async (e) => {
       }
       
       // ✅ APPLY VARIABLES (IMPORTANT)
-      const notes = applyTemplateVariables(template.body, caseData);
+      const notes = applyTemplateVariables(template.body, caseData, "kci");
       
       await navigator.clipboard.writeText(notes);
       
@@ -4036,7 +4036,7 @@ function formatPartName(partName) {
   return partName.substring(index + 1).trim();
 }
 
-function applyTemplateVariables(text, caseData) {
+function applyTemplateVariables(text, caseData, templateKey = "") {
 
   const agentFullName =
     document.getElementById("userFullName")?.textContent || "";
@@ -4059,7 +4059,7 @@ function applyTemplateVariables(text, caseData) {
      trackingStatus: caseData.trackingStatus ?? "",
      partName: (() => {
        // 🚫 Skip formatting for Return Label Request templates
-       if (text.includes("Return Label Request")) {
+       if (templateKey === "returnLabelRequest") {
          return caseData.partName ?? "";
        }
       
@@ -4173,7 +4173,7 @@ document.addEventListener("click", (e) => {
    
    if (key === "kci") {
    
-     let notes = applyTemplateVariables(tpl.body, caseData);
+     let notes = applyTemplateVariables(tpl.body, caseData, key);
    
      navigator.clipboard.writeText(notes)
        .then(() => {
@@ -4196,7 +4196,7 @@ document.addEventListener("click", (e) => {
       EMAIL TEMPLATES
    ========================= */
    
-   let body = applyTemplateVariables(tpl.body, caseData);
+   let body = applyTemplateVariables(tpl.body, caseData, key);
    
    copyTemplateRich(body)
      .then(() => {
@@ -4252,7 +4252,7 @@ document.addEventListener("contextmenu", (e) => {
     return;
   }
 
-  let subject = applyTemplateVariables(tpl.subject, caseData);
+  let subject = applyTemplateVariables(tpl.subject, caseData, key);
 
    navigator.clipboard.writeText(subject)
      .then(() => {
@@ -4399,10 +4399,10 @@ function loadEmailTemplate(type, caseData) {
   if (!tpl) return;
 
   const subject =
-    applyTemplateVariables(tpl.subject, caseData);
-
+    applyTemplateVariables(tpl.subject, caseData, type);
+   
   const body =
-    applyTemplateVariables(tpl.body, caseData);
+    applyTemplateVariables(tpl.body, caseData, type);
 
   emailPreviewSubject.value = subject;
   emailPreviewBody.value = body;

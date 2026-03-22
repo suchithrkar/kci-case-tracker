@@ -4048,10 +4048,26 @@ function applyTemplateVariables(text, caseData, templateKey = "") {
    const vars = {
      customerName: (() => {
        let name = caseData.customerName || "";
+      
+       // 🚫 Special case: Return Label Request → FULL NAME
+       if (templateKey === "returnLabelRequest") {
+         return name
+           .split(" ")
+           .filter(Boolean)
+           .map(word =>
+             word.charAt(0).toUpperCase() +
+             word.slice(1).toLowerCase()
+           )
+           .join(" ");
+       }
+      
+       // ✅ Default → FIRST NAME ONLY
        let first = name.split(" ")[0] || "";
        first = first.replace(/[^a-zA-Z]/g, "");
        if (!first) return "";
-       return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+      
+       return first.charAt(0).toUpperCase() +
+              first.slice(1).toLowerCase();
      })(),
      caseId: caseData.id ?? "",
      productName: caseData.productName ?? "",

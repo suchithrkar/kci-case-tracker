@@ -2403,7 +2403,7 @@ function handleExcelUpload(event) {
         JSON.stringify(contactDataStore)
       );
 
-      console.log(caseId, uniquePhones, email);
+      console.log("Processed contacts:", newStore);
 
       showPopup("Excel uploaded successfully");
 

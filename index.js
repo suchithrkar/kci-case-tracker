@@ -4150,9 +4150,14 @@ function applyTemplateVariables(text, caseData, templateKey = "") {
 
 async function copyTemplateRich(text) {
 
-  const html = `<div style="font-family:Arial;font-size:15px;line-height:1.4;">
-     ${text.replace(/\n/g,"<br>")}
-   </div>`;
+  const html = `
+  <div style="font-family:Arial;font-size:15px;line-height:1.5;">
+    ${text
+      .trim() // ✅ REMOVE leading & trailing empty lines
+      .split("\n")
+      .map(line => `<div>${line || "&nbsp;"}</div>`)
+      .join("")}
+  </div>`;
 
   const blobHtml = new Blob([html], { type: "text/html" });
   const blobText = new Blob([text], { type: "text/plain" });

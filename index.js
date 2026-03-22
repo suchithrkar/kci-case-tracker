@@ -2325,6 +2325,8 @@ function handleExcelUpload(event) {
         "Case ID",
         "Phone",
         "Mobile Phone",
+        "Phone (Primary Contact) (Contact)",
+        "Mobile Phone (Primary Contact) (Contact)",
         "Other Phone (Primary Contact) (Contact)",
         "Work (Primary Contact) (Contact)",
         "Email Address (Primary Contact) (Contact)"
@@ -2356,16 +2358,22 @@ function handleExcelUpload(event) {
         const rawPhones = [
           row["Phone"],
           row["Mobile Phone"],
+          row["Phone (Primary Contact) (Contact)"],
+          row["Mobile Phone (Primary Contact) (Contact)"],
           row["Other Phone (Primary Contact) (Contact)"],
           row["Work (Primary Contact) (Contact)"]
         ];
 
         // Clean + normalize phones
         const cleanedPhones = rawPhones
-          .filter(Boolean)
-          .map(p => p.toString()
-            .replace(/[^\d]/g, "")   // remove all non-digits
-            .trim()
+          .filter(p => p !== null && p !== undefined)
+          .map(p => p.toString().trim())
+          .filter(p =>
+            p &&
+            !["na", "n/a", "-", "--", "null"].includes(p.toLowerCase())
+          )
+          .map(p =>
+            p.replace(/[^\d]/g, "") // keep only digits
           )
           .filter(p => p.length > 0);
 
@@ -2394,6 +2402,8 @@ function handleExcelUpload(event) {
         "kciContactData",
         JSON.stringify(contactDataStore)
       );
+
+      console.log(caseId, uniquePhones, email);
 
       showPopup("Excel uploaded successfully");
 

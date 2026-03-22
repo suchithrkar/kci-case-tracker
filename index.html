@@ -207,24 +207,6 @@ button,input,select,textarea{
   box-shadow: 0 0 0 1px rgba(79,140,240,0.25) inset;
 }
 
-/* ============================================
-   PRIMARY ACTION BUTTON (Upload Excel)
-   ============================================ 
-.btn-primary {
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: white;
-}
-
-.btn-primary:hover {
-  filter: brightness(1.1);
-}
-
-/* Light theme adjustment 
-[data-theme="light"] .btn-primary {
-  color: white;
-} */
-
 /* Sort direction arrow badge */
 #sortArrow {
   background: none;
@@ -642,6 +624,26 @@ tr.active-row {
 
 .tpl-btn:hover {
   filter:brightness(1.1);
+}
+
+/* ============================================
+   Upload Excel Button (subtle highlight)
+   ============================================ */
+.tpl-btn.upload-btn {
+  background: rgba(79,140,240,0.12);   /* very subtle accent tint */
+  border-color: rgba(79,140,240,0.25);
+  color: var(--text);
+}
+
+.tpl-btn.upload-btn:hover {
+  background: rgba(79,140,240,0.18);
+  filter: none;
+}
+
+/* Light theme adjustment */
+[data-theme="light"] .tpl-btn.upload-btn {
+  background: rgba(79,140,240,0.10);
+  border-color: rgba(79,140,240,0.2);
 }
 
 /* Active email template button highlight */
@@ -1794,8 +1796,8 @@ tr.active-row {
 
       <div style="display:flex;gap:.5rem;align-items:center;">
       
-        <button class="btn btn-primary" id="btnUploadExcel">
-          Upload Excel
+        <button class="tpl-btn upload-btn" id="btnUploadExcel">
+          📤 Upload Excel
         </button>
       
         <input

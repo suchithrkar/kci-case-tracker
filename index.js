@@ -579,6 +579,7 @@ function setupRealtimeCases(teamId) {
       });
 
       updateDynamicPrimaryOptions();
+      buildPrimaryFilters();
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
     if (uiState.unupdatedActive && unupdatedProtect) {

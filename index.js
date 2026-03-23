@@ -817,14 +817,15 @@ function buildPrimaryFilters() {
          buildPrimaryFilters();
    
          // 🟡 STEP 2: Restore scroll AFTER rebuild
-         setTimeout(() => {
-           const sidebarAfter = document.getElementById("sidebar");
-           if (sidebarAfter) sidebarAfter.scrollTop = prevScroll;
-   
-           // Keep country filter open
-           const body = document.getElementById("filter-body-country");
-           if (body) body.classList.add("open");
-         }, 0);
+         requestAnimationFrame(() => {
+           requestAnimationFrame(() => {
+             const sidebarAfter = document.getElementById("sidebar");
+             if (sidebarAfter) sidebarAfter.scrollTop = prevScroll;
+         
+             const body = document.getElementById("filter-body-country");
+             if (body) body.classList.add("open");
+           });
+         });
        };
      }
    }

@@ -289,6 +289,8 @@ const uiState = {
     benchRFC: [],
     country: []
   }
+
+  countryInvert: false,
 };
 
 let unupdatedProtect = false;
@@ -741,8 +743,18 @@ function buildPrimaryFilters() {
     block.innerHTML = `
       <div class="filter-head" data-key="${key}">
         <div class="filter-title">${title}</div>
-        <div>
+        <div style="display:flex;align-items:center;gap:.5rem;">
+        
+          ${key === "country" ? `
+            <div 
+              class="switch ${uiState.countryInvert ? "on" : ""}" 
+              id="countryInvertToggle"
+              title="Exclude selected countries"
+            ></div>
+          ` : ""}
+        
           <span style="margin-left:8px;">▾</span>
+        
         </div>
       </div>
       <div class="filter-body" id="filter-body-${key}">
@@ -761,7 +773,31 @@ function buildPrimaryFilters() {
 
     // expand/collapse
     const head = block.querySelector(".filter-head");
+
+    // COUNTRY INVERT TOGGLE
+    if (key === "country") {
+      const toggle = block.querySelector("#countryInvertToggle");
+      
+      if (toggle) {
+        toggle.onclick = (e) => {
+          e.stopPropagation(); // prevent collapse
+      
+          uiState.countryInvert = !uiState.countryInvert;
+      
+          // Rebuild filters to update UI
+          buildPrimaryFilters();
+      
+          // Keep country filter open after rebuild
+          setTimeout(() => {
+            const body = document.getElementById("filter-body-country");
+            if (body) body.classList.add("open");
+          }, 0);
+        };
+      }
+    }
+     
     const body = block.querySelector(".filter-body");
+     
     head.onclick = (e) => {
       // clicking lock should not toggle body
       if (e.target.classList.contains("lock")) return;
@@ -1709,16 +1745,25 @@ if (uiState.rfcMode === "negative") {
      });
    }
 
-     /* PRIMARY TABLE FILTERS (AND across filters; OR within each filter's options) */
+   /* PRIMARY TABLE FILTERS (AND across filters; OR within each filter's options) */
    // For each primary filter, if selection exists, keep rows matching any of its options.
    Object.keys(uiState.primaries).forEach(key => {
      const sel = uiState.primaries[key] || [];
      if (!sel || sel.length === 0) return;
    
-     rows = rows.filter(r => {
-       const val = (r[key] || "").toString().trim();
-       return sel.includes(val);
-     });
+     if (key === "country" && uiState.countryInvert) {
+       // EXCLUDE MODE
+       rows = rows.filter(r => {
+         const val = (r[key] || "").toString().trim();
+         return !sel.includes(val);
+       });
+     } else {
+       // NORMAL MODE
+       rows = rows.filter(r => {
+         const val = (r[key] || "").toString().trim();
+         return sel.includes(val);
+       });
+     }
    });
 
 /* ===============================================================

@@ -893,11 +893,20 @@ openFilters.forEach(key => {
 
 });
 
+// Deselect row when click in not inside any row
 document.addEventListener("click", (e) => {
   const clickedRow = e.target.closest("#tbody tr");
 
   // If click is NOT inside any row → deselect
   if (!clickedRow && activeRow) {
+    activeRow.classList.remove("active-row");
+    activeRow = null;
+  }
+});
+
+// Deselect any row by clicking ESC button
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && activeRow) {
     activeRow.classList.remove("active-row");
     activeRow = null;
   }

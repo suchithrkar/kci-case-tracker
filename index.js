@@ -1978,13 +1978,13 @@ function escapeHtml(s) {
 let activeRow = null;
 
 function setActiveRow(tr) {
-  if (activeRow === tr) {
-    tr.classList.remove("active-row");
-    activeRow = null;
-    return;
-  }
+  if (!tr) return;
+
+  // If already active → DO NOTHING (critical fix)
+  if (activeRow === tr) return;
 
   if (activeRow) activeRow.classList.remove("active-row");
+
   tr.classList.add("active-row");
   activeRow = tr;
 }

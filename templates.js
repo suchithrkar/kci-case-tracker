@@ -60,7 +60,8 @@ kci: {
         onsiteRFC === "Open - Completed" ||
         onsiteRFC === "Closed - Posted"
       ) {
-        const hideWoNotes = status === "NCM 1" || status === "NCM 2";
+        const normalizedStatus = (status || "").toUpperCase().trim();
+        const hideWoNotes = normalizedStatus === "NCM 1" || normalizedStatus === "NCM 2";
 
 const body = `-- KCI Notes
 

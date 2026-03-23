@@ -579,7 +579,6 @@ function setupRealtimeCases(teamId) {
       });
 
       updateDynamicPrimaryOptions();
-      buildPrimaryFilters();
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
     if (uiState.unupdatedActive && unupdatedProtect) {
@@ -799,26 +798,27 @@ function buildPrimaryFilters() {
     // expand/collapse
     const head = block.querySelector(".filter-head");
 
-    // COUNTRY INVERT TOGGLE
-   if (key === "country") {
-     const toggle = block.querySelector("#countryInvertToggle");
-   
-     toggle.onclick = (e) => {
-        e.stopPropagation();
+      // COUNTRY INVERT TOGGLE
+      if (key === "country") {
+        const toggle = block.querySelector("#countryInvertToggle");
       
-        // Toggle state
-        uiState.countryInvert = !uiState.countryInvert;
+        if (toggle) {   // ✅ safety check (recommended)
+          toggle.onclick = (e) => {
+            e.stopPropagation();
       
-        // Update toggle UI instantly
-        toggle.classList.toggle("on", uiState.countryInvert);
+            // Toggle state
+            uiState.countryInvert = !uiState.countryInvert;
       
-        // Apply filtering WITHOUT rebuilding sidebar
-        applyFilters();
-      };
-     }
-   }
-     
-    const body = block.querySelector(".filter-body");
+            // Update toggle UI instantly
+            toggle.classList.toggle("on", uiState.countryInvert);
+      
+            // Apply filtering WITHOUT rebuilding sidebar
+            applyFilters();
+          };
+        }
+      }
+      
+      const body = block.querySelector(".filter-body");
      
     head.onclick = (e) => {
       // clicking lock should not toggle body

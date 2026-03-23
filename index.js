@@ -288,7 +288,7 @@ const uiState = {
     csrRFC: [],
     benchRFC: [],
     country: []
-  }
+  },
 
   countryInvert: false
 };

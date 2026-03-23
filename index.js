@@ -290,7 +290,7 @@ const uiState = {
     country: []
   }
 
-  countryInvert: false,
+  countryInvert: false
 };
 
 let unupdatedProtect = false;

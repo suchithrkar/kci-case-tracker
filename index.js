@@ -1989,6 +1989,24 @@ function setActiveRow(tr) {
   activeRow = tr;
 }
 
+function setActiveRowByCaseId(caseId) {
+  if (!caseId) return;
+
+  const row = tbody.querySelector(`tr td.caseid[data-id="${caseId}"]`);
+  if (!row) return;
+
+  const tr = row.closest("tr");
+  if (!tr) return;
+
+  setActiveRow(tr);
+
+  // Optional: scroll into view
+  tr.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
+
 
 /* Render Table — Clean, optimized */
 export function renderTable() {
@@ -3229,6 +3247,11 @@ function closeModal() {
     pendingUnupdated.delete(currentModalCaseId);
   }
 
+  // ✅ Set active row back after modal closes
+  if (currentModalCaseId) {
+    setActiveRowByCaseId(currentModalCaseId);
+  } 
+
   unupdatedProtect = false;
   currentModalCaseId = null;
 
@@ -3237,6 +3260,8 @@ function closeModal() {
   animateModalClose(() => {
     modal.classList.remove("show");
   });
+
+
 
   window.__fromReminder = false;
   closureSurveyCompleted = false;

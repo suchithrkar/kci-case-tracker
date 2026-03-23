@@ -44,7 +44,8 @@ kci: {
       serialNumber,
       partName,
       woClosureNotes,
-      dnap
+      dnap,
+      status
     } = caseData;
     
     const resolvedCaseId = caseId || id;
@@ -59,15 +60,18 @@ kci: {
         onsiteRFC === "Open - Completed" ||
         onsiteRFC === "Closed - Posted"
       ) {
-        const body = `-- KCI Notes
+        const hideWoNotes = status === "NCM 1" || status === "NCM 2";
+
+const body = `-- KCI Notes
 
 - Product Name: {{productName}}
 - Serial Number: {{serialNumber}}
 - WO Status: {{onsiteRFC}}
 
-- WO Closure Notes:
+${hideWoNotes ? "" : `- WO Closure Notes:
 {{woClosureNotes}}
 
+`}
 -`;
 
         return {

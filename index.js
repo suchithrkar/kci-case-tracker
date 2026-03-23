@@ -597,7 +597,9 @@ function setupRealtimeCases(teamId) {
     }
    
     // Normal realtime refresh
-    applyFilters();
+      requestAnimationFrame(() => {
+        applyFilters();
+      });
      
   });
 }

@@ -803,17 +803,24 @@ function buildPrimaryFilters() {
     if (key === "country") {
       const toggle = block.querySelector("#countryInvertToggle");
       
-      if (toggle) {
         toggle.onclick = (e) => {
           e.stopPropagation(); // prevent collapse
-      
+        
+          // 🟡 STEP 1: Capture scroll position
+          const sidebar = document.getElementById("sidebar");
+          const prevScroll = sidebar ? sidebar.scrollTop : 0;
+        
           uiState.countryInvert = !uiState.countryInvert;
-      
-          // Rebuild filters to update UI
+        
+          // Rebuild filters
           buildPrimaryFilters();
-      
-          // Keep country filter open after rebuild
+        
+          // 🟡 STEP 2: Restore scroll AFTER rebuild
           setTimeout(() => {
+            const sidebarAfter = document.getElementById("sidebar");
+            if (sidebarAfter) sidebarAfter.scrollTop = prevScroll;
+        
+            // Keep country filter open
             const body = document.getElementById("filter-body-country");
             if (body) body.classList.add("open");
           }, 0);

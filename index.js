@@ -578,15 +578,16 @@ function setupRealtimeCases(teamId) {
         return newRow;
       });
 
+      updateDynamicPrimaryOptions();
+
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
-if (uiState.unupdatedActive && unupdatedProtect) {
-  return;
-}
-
-// Normal realtime refresh
-applyFilters();
-
-
+    if (uiState.unupdatedActive && unupdatedProtect) {
+      return;
+    }
+   
+    // Normal realtime refresh
+    applyFilters();
+     
   });
 }
 
@@ -716,16 +717,39 @@ if (!uiState.primaryLocks) {
   };
 }
 
+function getUniqueValues(data, key) {
+  const set = new Set();
+
+  data.forEach(row => {
+    const val = (row[key] || "").toString().trim();
+    if (val) set.add(val);
+  });
+
+  return Array.from(set).sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: "base" })
+  );
+}
+
+function updateDynamicPrimaryOptions() {
+  const data = trackerState.allCases || [];
+
+  // 🔥 Dynamic TL
+  PRIMARY_OPTIONS.tl = getUniqueValues(data, "tl");
+
+  // 🔥 Dynamic Country
+  PRIMARY_OPTIONS.country = getUniqueValues(data, "country");
+}
+
 /* Filter options (fixed order & labels) */
 const PRIMARY_OPTIONS = {
   caseResolutionCode: ["Onsite Solution", "Offsite Solution", "Parts Shipped"],
-  tl: ["Aarthi", "Sandeep", "Ratan"],
+  tl: [],         // ✅ dynamic
   sbd: ["Met", "Not Met", "NA"],
   caGroup: ["0-3 Days","3-5 Days","5-10 Days","10-15 Days","15-30 Days","30-60 Days","60-90 Days","> 90 Days"],
   onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
   csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
   benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Order processing hold","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
-  country: ["Austria","Belgium","Czech Republic","Denmark","Germany","Hungary","Ireland","Jersey","Netherlands","Nigeria","Norway","South Africa","Sweden","Switzerland","United Kingdom","Luxembourg","Poland"]
+  country: []    // ✅ dynamic
 };
 
 /* Build sidebar markup for all primary filters and attach handlers */

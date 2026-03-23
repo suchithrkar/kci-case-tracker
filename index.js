@@ -893,6 +893,15 @@ openFilters.forEach(key => {
 
 });
 
+document.addEventListener("click", (e) => {
+  const clickedRow = e.target.closest("#tbody tr");
+
+  // If click is NOT inside any row → deselect
+  if (!clickedRow && activeRow) {
+    activeRow.classList.remove("active-row");
+    activeRow = null;
+  }
+});
 
 
 // CLEAR button — clears only primary filters

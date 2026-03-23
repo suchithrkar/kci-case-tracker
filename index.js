@@ -897,6 +897,15 @@ openFilters.forEach(key => {
 document.addEventListener("click", (e) => {
   const clickedRow = e.target.closest("#tbody tr");
 
+  // ❗ Ignore clicks inside modal or important UI
+  if (
+    e.target.closest(".modal") ||
+    e.target.closest(".custom-select") ||
+    e.target.closest(".icon-btn")
+  ) {
+    return;
+  }
+
   // If click is NOT inside any row → deselect
   if (!clickedRow && activeRow) {
     activeRow.classList.remove("active-row");

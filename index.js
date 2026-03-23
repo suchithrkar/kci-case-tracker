@@ -578,8 +578,18 @@ function setupRealtimeCases(teamId) {
         return newRow;
       });
 
+      const prevTL = JSON.stringify(PRIMARY_OPTIONS.tl);
+      const prevCountry = JSON.stringify(PRIMARY_OPTIONS.country);
+      
       updateDynamicPrimaryOptions();
-      buildPrimaryFilters();
+      
+      const newTL = JSON.stringify(PRIMARY_OPTIONS.tl);
+      const newCountry = JSON.stringify(PRIMARY_OPTIONS.country);
+      
+      // 🔥 Only rebuild if options actually changed
+      if (prevTL !== newTL || prevCountry !== newCountry) {
+        buildPrimaryFilters();
+      }
 
     // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
     if (uiState.unupdatedActive && unupdatedProtect) {
@@ -805,17 +815,18 @@ function buildPrimaryFilters() {
       
         if (toggle) {   // ✅ safety check (recommended)
           toggle.onclick = (e) => {
-            e.stopPropagation();
-      
-            // Toggle state
-            uiState.countryInvert = !uiState.countryInvert;
-      
-            // Update toggle UI instantly
-            toggle.classList.toggle("on", uiState.countryInvert);
-      
-            // Apply filtering WITHOUT rebuilding sidebar
-            applyFilters();
-          };
+           e.stopPropagation();
+         
+           uiState.countryInvert = !uiState.countryInvert;
+         
+           // ✅ UI first (instant)
+           toggle.classList.toggle("on", uiState.countryInvert);
+         
+           // ✅ Defer heavy work (smooth animation)
+           requestAnimationFrame(() => {
+             applyFilters();
+           });
+         };
         }
       }
       

@@ -2131,7 +2131,7 @@ function renderEmptyState(message) {
   const tbody = document.getElementById("tbody");
 
   tbody.innerHTML = `
-    <tr>
+    <tr class="empty-state-row">
       <td colspan="10" style="padding:0;">
         <div id="emptyStateContainer" class="empty-state-container">
           <div class="empty-message" style="font-size:20px;">${message}</div>
@@ -2374,6 +2374,9 @@ tbody.addEventListener("click", (e) => {
 tbody.addEventListener("click", (e) => {
   const tr = e.target.closest("tr");
   if (!tr) return;
+
+  // ✅ ADD THIS BLOCK
+  if (tr.classList.contains("empty-state-row")) return;
 
   setActiveRow(tr);
 });

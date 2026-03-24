@@ -399,6 +399,7 @@ onAuthStateChanged(auth, async (user) => {
 
   trackerState.user = { uid: user.uid, ...data };
   trackerState.teamId = getCurrentTrackerTeam(trackerState.user);
+  applyFilters();
 
    /* Load team name for Excel filename */
 if (trackerState.teamId) {

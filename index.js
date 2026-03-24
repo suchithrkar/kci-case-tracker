@@ -789,11 +789,15 @@ function buildPrimaryFilters() {
         <div style="display:flex;align-items:center;gap:.5rem;">
         
           ${key === "country" ? `
-            <div 
-              class="switch ${uiState.countryInvert ? "on" : ""}" 
-              id="countryInvertToggle"
-              title="Exclude selected countries"
-            ></div>
+            <label class="exclude-toggle" title="Exclude selected countries">
+              <input 
+                type="checkbox" 
+                id="countryInvertToggle" 
+                ${uiState.countryInvert ? "checked" : ""}
+              />
+              <span class="toggle-box"></span>
+              <span class="toggle-label">Exclude</span>
+            </label>
           ` : ""}
         
           <span style="margin-left:8px;">▾</span>
@@ -821,20 +825,16 @@ function buildPrimaryFilters() {
       if (key === "country") {
         const toggle = block.querySelector("#countryInvertToggle");
       
-        if (toggle) {   // ✅ safety check (recommended)
-          toggle.onclick = (e) => {
-           e.stopPropagation();
+        if (toggle) {   // toggle is now the CHECKBOX
+          toggle.addEventListener("change", (e) => {
+            e.stopPropagation();
          
-           uiState.countryInvert = !uiState.countryInvert;
+            uiState.countryInvert = toggle.checked;
          
-           // ✅ UI first (instant)
-           toggle.classList.toggle("on", uiState.countryInvert);
-         
-           // ✅ Defer heavy work (smooth animation)
-           requestAnimationFrame(() => {
-             applyFilters();
-           });
-         };
+            requestAnimationFrame(() => {
+              applyFilters();
+            });
+          });
         }
       }
       

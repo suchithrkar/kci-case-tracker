@@ -2138,9 +2138,10 @@ function renderEmptyState(message) {
       document.getElementById("btnClear").click();
     });
   }
+
+  setEmptyStateHeight();
 }
 
-setEmptyStateHeight();
 
 function setEmptyStateHeight() {
   const container = document.getElementById("emptyStateContainer");

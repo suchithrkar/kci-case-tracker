@@ -2172,14 +2172,16 @@ function setEmptyStateHeight() {
 }
 
 function getEmptyStateMessage() {
-  const filtersActive =
-    uiState.search ||
-    (uiState.statusList && uiState.statusList.length > 0) ||
-    uiState.unupdatedActive ||
-    uiState.dueTodayActive ||
-    uiState.flaggedActive ||
-    uiState.PNSActive ||
-    uiState.repeatingActive;
+   const filtersActive =
+     uiState.search ||
+     (uiState.statusList && uiState.statusList.length > 0) ||
+     uiState.unupdatedActive ||
+     uiState.repeatActive ||       // ✅ FIXED (was repeatingActive)
+     (uiState.rfcMode && uiState.rfcMode !== "normal") ||         // ✅ RFC mode (anything other than default)
+     (uiState.set2Mode && uiState.set2Mode !== "normal") ||         // ✅ Set2 filters (Due / Flagged / PNS) 
+     Object.values(uiState.primaries).some(arr => arr && arr.length > 0) ||      // ✅ Primary filters (any selected)
+     uiState.countryInvert ||            // ✅ Country invert toggle
+     uiState.sortByDateAsc !== null;      // ✅ Sorting (if applied)
 
   // ✅ PRIORITY 1 — 🔍 Filters active
   if (filtersActive) {

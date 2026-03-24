@@ -2117,11 +2117,59 @@ function setActiveRowByCaseId(caseId) {
   });
 }
 
+function renderEmptyState(message) {
+  const tbody = document.getElementById("tbody");
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="10" style="
+        text-align:center;
+        padding:24px;
+        color:var(--muted);
+        font-size:14px;
+      ">
+        ${message}
+      </td>
+    </tr>
+  `;
+}
+
+function getEmptyStateMessage() {
+  const { user } = trackerState;
+
+  // ❌ Case 1: No team assigned
+  if (!user || !user.team) {
+    return "⚠️ No team assigned to your account. Please contact admin.";
+  }
+
+  // 🔍 Case 2: Filters active
+  const filtersActive =
+    uiState.search ||
+    (uiState.statusList && uiState.statusList.length > 0) ||
+    uiState.unupdatedActive ||
+    uiState.dueTodayActive ||
+    uiState.flaggedActive ||
+    uiState.PNSActive ||
+    uiState.repeatingActive;
+
+  if (filtersActive) {
+    return "🔍 No cases match the current filters.";
+  }
+
+  // 📂 Case 3: No data for team
+  return "📭 No cases available for your team.";
+}
+
 
 /* Render Table — Clean, optimized */
 export function renderTable() {
   const rows = trackerState.filteredCases;
   const today = getTeamToday(trackerState.teamConfig);
+
+  if (!rows || rows.length === 0) {
+    renderEmptyState(getEmptyStateMessage());
+    return;
+  }
 
   // 🔁 Clear existing follow-up timers before re-render
   followUpTimers.forEach(clearTimeout);

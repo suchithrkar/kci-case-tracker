@@ -609,7 +609,7 @@ tr.active-row {
 .switch.on::after{left:21px;background:white}
 
 /* =====================================================
-   EXCLUDE TOGGLE (SUBTLE CHECKBOX MORPH)
+   EXCLUDE TOGGLE (DIV-BASED, MORPH)
    ===================================================== */
 
 .exclude-toggle {
@@ -621,10 +621,7 @@ tr.active-row {
   font-size: 12px;
 }
 
-.exclude-toggle input {
-  display: none;
-}
-
+/* ICON BASE (square) */
 .exclude-toggle .icon {
   width: 16px;
   height: 16px;
@@ -635,11 +632,6 @@ tr.active-row {
     border-radius 0.18s ease,
     background 0.18s ease,
     border-color 0.18s ease;
-}
-
-/* Hover */
-.exclude-toggle:hover .icon {
-  background: rgba(79,140,240,0.08);
 }
 
 /* DOT */
@@ -656,19 +648,25 @@ tr.active-row {
   transition: transform 0.15s ease;
 }
 
+/* HOVER */
+.exclude-toggle:hover .icon {
+  background: rgba(79,140,240,0.08);
+}
+
 /* ACTIVE (Exclude mode) */
-.exclude-toggle input:checked + .icon {
+.exclude-toggle.active .icon {
   border-radius: 50%;
   background: rgba(79,140,240,0.18);
   border-color: rgba(79,140,240,0.5);
 }
 
-.exclude-toggle input:checked + .icon::after {
+/* SHOW DOT */
+.exclude-toggle.active .icon::after {
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* Optional label highlight */
-.exclude-toggle input:checked ~ .label {
+/* Label highlight */
+.exclude-toggle.active .label {
   color: var(--accent);
 }
 

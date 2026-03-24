@@ -258,8 +258,9 @@ function openFollowUpReminderModal(r) {
 export const trackerState = {
   user: null,
   teamId: null,
-    teamName: "",
+  teamName: "",
   allCases: [],
+  dataLoaded: false,
   filteredCases: []
 };
 
@@ -580,6 +581,8 @@ function setupRealtimeCases(teamId) {
         }
         return newRow;
       });
+
+      trackerState.dataLoaded = true;
 
       const prevTL = JSON.stringify(PRIMARY_OPTIONS.tl);
       const prevCountry = JSON.stringify(PRIMARY_OPTIONS.country);
@@ -1622,6 +1625,12 @@ function restrictNcmCasesForUser(rows, user) {
 
 
 export function applyFilters() {
+
+   if (!trackerState.dataLoaded) {
+     renderEmptyState("⏳ Loading cases...");
+     return;
+   }
+   
   // 🚫 Global protection: do NOT auto-refresh if modal process is happening in Unupdated mode
   // 🚫 Global fail-safe override:
    if (uiState.unupdatedActive && unupdatedProtect) {

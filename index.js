@@ -2134,7 +2134,7 @@ function renderEmptyState(message) {
     <tr>
       <td colspan="10" style="padding:0;">
         <div id="emptyStateContainer" class="empty-state-container">
-          <div class="empty-message">${message}</div>
+          <div class="empty-message" style="font-size:20px;">${message}</div>
         </div>
       </td>
     </tr>
@@ -2185,7 +2185,7 @@ function getEmptyStateMessage() {
   if (filtersActive) {
     return `
       🔍 No cases match the current filters.<br><br>
-      <button id="emptyClearFiltersBtn" class="btn">
+      <button id="emptyClearFiltersBtn" style="border-radius:10px;" class="btn">
         Clear Filters
       </button>
     `;

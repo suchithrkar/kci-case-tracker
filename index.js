@@ -573,7 +573,9 @@ function setupRealtimeCases(teamId) {
       trackerState.allCases = incoming.map(newRow => {
         if (pendingStatusOverride.has(newRow.id)) {
           const existing = trackerState.allCases.find(r => r.id === newRow.id);
-          return existing || newRow;
+         
+          // ✅ Merge new data into existing row (preserve UI stability + update fields)
+          return existing ? { ...existing, ...newRow } : newRow;
         }
         return newRow;
       });

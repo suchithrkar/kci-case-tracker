@@ -2779,6 +2779,7 @@ function handleStatusChange(caseId, newStatus) {
        statusChangedBy: trackerState.user.uid
      }).then(() => {
        pendingUnupdated.delete(caseId);
+       pendingStatusOverride.delete(caseId);
        applyFilters();
      }).catch(err => {
        pendingUnupdated.delete(caseId);
@@ -2837,6 +2838,7 @@ function handleStatusChange(caseId, newStatus) {
      statusChangedBy: trackerState.user.uid
    }).then(() => {
      pendingUnupdated.delete(caseId);
+     pendingStatusOverride.delete(caseId);
      applyFilters();
    }).catch(err => {
      // On failure, remove pending and show popup (prevents permanent stuck case)
@@ -3907,6 +3909,8 @@ async function saveModalData() {
     await firestoreUpdateCase(caseId, updateObj);
      // NEW: Remove pending lock for this case after modal save
     pendingUnupdated.delete(caseId);
+
+    pendingStatusOverride.delete(caseId);
 
    // You allowed unupdated list to refresh after modal save
    if (uiState.unupdatedActive) {

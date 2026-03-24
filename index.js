@@ -2156,7 +2156,7 @@ function setEmptyStateHeight() {
 
   const totalUsed = headerH + controlsH + theadH;
 
-  const availableHeight = window.innerHeight - totalUsed;
+  const availableHeight = Math.max(120, window.innerHeight - totalUsed);
 
   container.style.height = `${availableHeight}px`;
 }

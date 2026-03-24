@@ -1372,6 +1372,8 @@ function resetAllFilters({
     });
   }
 
+  uiState.countryInvert = false;
+
   // 3️⃣ Set 1 (Search + Status)
   if (clearSet1) {
     uiState.search = "";

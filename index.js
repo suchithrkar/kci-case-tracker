@@ -2160,9 +2160,34 @@ function getEmptyStateMessage() {
     uiState.PNSActive ||
     uiState.repeatingActive;
 
+  function getEmptyStateMessage() {
+  const filtersActive =
+    uiState.search ||
+    (uiState.statusList && uiState.statusList.length > 0) ||
+    uiState.unupdatedActive ||
+    uiState.dueTodayActive ||
+    uiState.flaggedActive ||
+    uiState.PNSActive ||
+    uiState.repeatingActive;
+
+  // ✅ PRIORITY 1 — filters
   if (filtersActive) {
-    return "🔍 No cases match the current filters.";
+    return `
+      🔍 No cases match the current filters.<br><br>
+      <button id="emptyClearFiltersBtn" class="btn">
+        Clear Filters
+      </button>
+    `;
   }
+
+  // ✅ PRIORITY 2 — team check (CORRECTED)
+  if (!trackerState.teamId) {
+    return "⚠️ No team assigned to your account. Please contact admin.";
+  }
+
+  // ✅ DEFAULT
+  return "📭 No cases available for your team.";
+}
 
   // 📂 Case 3: No data for team
   return "📭 No cases available for your team.";

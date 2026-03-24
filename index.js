@@ -2143,14 +2143,6 @@ function renderEmptyState(message) {
 }
 
 function getEmptyStateMessage() {
-  const { user } = trackerState;
-
-  // ❌ Case 1: No team assigned
-  if (!trackerState.teamId || trackerState.teamId === "") {
-    return "⚠️ No team assigned to your account. Please contact admin.";
-  }
-
-  // 🔍 Case 2: Filters active
   const filtersActive =
     uiState.search ||
     (uiState.statusList && uiState.statusList.length > 0) ||
@@ -2160,17 +2152,7 @@ function getEmptyStateMessage() {
     uiState.PNSActive ||
     uiState.repeatingActive;
 
-  function getEmptyStateMessage() {
-  const filtersActive =
-    uiState.search ||
-    (uiState.statusList && uiState.statusList.length > 0) ||
-    uiState.unupdatedActive ||
-    uiState.dueTodayActive ||
-    uiState.flaggedActive ||
-    uiState.PNSActive ||
-    uiState.repeatingActive;
-
-  // ✅ PRIORITY 1 — filters
+  // ✅ PRIORITY 1 — 🔍 Filters active
   if (filtersActive) {
     return `
       🔍 No cases match the current filters.<br><br>
@@ -2180,16 +2162,12 @@ function getEmptyStateMessage() {
     `;
   }
 
-  // ✅ PRIORITY 2 — team check (CORRECTED)
+  // ✅ PRIORITY 2 — team check (CORRECTED) - ❌ No team assigned
   if (!trackerState.teamId) {
     return "⚠️ No team assigned to your account. Please contact admin.";
   }
 
-  // ✅ DEFAULT
-  return "📭 No cases available for your team.";
-}
-
-  // 📂 Case 3: No data for team
+  // ✅ DEFAULT - 📂 No data for team
   return "📭 No cases available for your team.";
 }
 

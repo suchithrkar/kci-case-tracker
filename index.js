@@ -1,4 +1,4 @@
-/* =====================================================
+/* =======================================================
    PHASE 1 — CORE ENGINE REBUILD
    ======================================================= */
 
@@ -789,15 +789,11 @@ function buildPrimaryFilters() {
         <div style="display:flex;align-items:center;gap:.5rem;">
         
           ${key === "country" ? `
-            <label class="exclude-toggle" title="Exclude selected countries">
-              <input 
-                type="checkbox" 
-                id="countryInvertToggle" 
-                ${uiState.countryInvert ? "checked" : ""}
-              />
-              <span class="toggle-box"></span>
-              <span class="toggle-label">Exclude</span>
-            </label>
+            <div 
+              class="switch ${uiState.countryInvert ? "on" : ""}" 
+              id="countryInvertToggle"
+              title="Exclude selected countries"
+            ></div>
           ` : ""}
         
           <span style="margin-left:8px;">▾</span>
@@ -825,16 +821,20 @@ function buildPrimaryFilters() {
       if (key === "country") {
         const toggle = block.querySelector("#countryInvertToggle");
       
-        if (toggle) {   // toggle is now the CHECKBOX
-          toggle.addEventListener("change", (e) => {
-            e.stopPropagation();
+        if (toggle) {   // ✅ safety check (recommended)
+          toggle.onclick = (e) => {
+           e.stopPropagation();
          
-            uiState.countryInvert = toggle.checked;
+           uiState.countryInvert = !uiState.countryInvert;
          
-            requestAnimationFrame(() => {
-              applyFilters();
-            });
-          });
+           // ✅ UI first (instant)
+           toggle.classList.toggle("on", uiState.countryInvert);
+         
+           // ✅ Defer heavy work (smooth animation)
+           requestAnimationFrame(() => {
+             applyFilters();
+           });
+         };
         }
       }
       
@@ -2180,7 +2180,7 @@ function getEmptyStateMessage() {
      (uiState.rfcMode && uiState.rfcMode !== "normal") ||         // ✅ RFC mode (anything other than default)
      (uiState.set2Mode && uiState.set2Mode !== "normal") ||         // ✅ Set2 filters (Due / Flagged / PNS) 
      Object.values(uiState.primaries).some(arr => arr && arr.length > 0) ||      // ✅ Primary filters (any selected)
-   /* uiState.countryInvert ||            // ✅ Country invert toggle */
+     uiState.countryInvert ||            // ✅ Country invert toggle
      uiState.sortByDateAsc !== null;      // ✅ Sorting (if applied)
 
   // ✅ PRIORITY 1 — 🔍 Filters active

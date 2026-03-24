@@ -471,6 +471,13 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
   min-height: 200px;
   gap: 10px; /* ✅ spacing between message & button */
 }
+tbody tr.empty-state-row:hover {
+  background: transparent !important;
+}
+tr.empty-state-row.active-row {
+  outline: none !important;
+  background: transparent !important;
+}
 
 .sno{width:64px;text-align:right}
 .caseid{font-weight:600;cursor:pointer}

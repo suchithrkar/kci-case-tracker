@@ -2123,13 +2123,10 @@ function renderEmptyState(message) {
 
   tbody.innerHTML = `
     <tr>
-      <td colspan="10" style="
-        text-align:center;
-        padding:24px;
-        color:var(--muted);
-        font-size:14px;
-      ">
-        ${message}
+      <td colspan="10" style="padding:0;">
+        <div id="emptyStateContainer" class="empty-state-container">
+          ${message}
+        </div>
       </td>
     </tr>
   `;
@@ -2141,6 +2138,27 @@ function renderEmptyState(message) {
       document.getElementById("btnClear").click();
     });
   }
+}
+
+setEmptyStateHeight();
+
+function setEmptyStateHeight() {
+  const container = document.getElementById("emptyStateContainer");
+  if (!container) return;
+
+  const header = document.querySelector(".header");
+  const controls = document.querySelector(".controls");
+  const thead = document.querySelector("thead");
+
+  const headerH = header?.offsetHeight || 0;
+  const controlsH = controls?.offsetHeight || 0;
+  const theadH = thead?.offsetHeight || 0;
+
+  const totalUsed = headerH + controlsH + theadH;
+
+  const availableHeight = window.innerHeight - totalUsed;
+
+  container.style.height = `${availableHeight}px`;
 }
 
 function getEmptyStateMessage() {
@@ -4725,191 +4743,6 @@ btnEmailPreviewClose.addEventListener("click", () => {
 
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+window.addEventListener("resize", () => {
+  setEmptyStateHeight();
+});

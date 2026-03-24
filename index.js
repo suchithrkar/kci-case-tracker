@@ -2146,7 +2146,7 @@ function getEmptyStateMessage() {
   const { user } = trackerState;
 
   // ❌ Case 1: No team assigned
-  if (!trackerState.teamId || trackerState.teamId === "")
+  if (!trackerState.teamId || trackerState.teamId === "") {
     return "⚠️ No team assigned to your account. Please contact admin.";
   }
 

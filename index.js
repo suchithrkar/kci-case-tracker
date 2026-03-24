@@ -822,7 +822,7 @@ function buildPrimaryFilters() {
         const toggle = block.querySelector("#countryInvertToggle");
       
         if (toggle) {
-          toggle.onchange = (e) => {
+          toggle.onclick = (e) => {
             e.stopPropagation();
       
             uiState.countryInvert = toggle.checked;

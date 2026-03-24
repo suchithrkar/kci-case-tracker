@@ -823,6 +823,11 @@ function buildPrimaryFilters() {
       // COUNTRY INVERT TOGGLE (NEW)
       if (key === "country") {
         const toggle = block.querySelector("#countryInvertToggle");
+
+        if (toggle) {
+          toggle.style.pointerEvents = uiState.primaryLocks[key] ? "none" : "auto";
+          toggle.style.opacity = uiState.primaryLocks[key] ? "0.5" : "1";
+        }
       
         if (toggle) {
            toggle.onclick = (e) => {
@@ -1371,14 +1376,21 @@ function resetAllFilters({
   }
 
   // 2️⃣ Primary filters
-  if (clearPrimaries) {
-    Object.keys(uiState.primaries).forEach(k => {
-      uiState.primaries[k] = [];
-      uiState.primaryLocks[k] = false;
-    });
-  }
-
-  uiState.countryInvert = false;
+   if (clearPrimaries) {
+     Object.keys(uiState.primaries).forEach(k => {
+   
+       // 🔒 Respect lock
+       if (uiState.primaryLocks[k]) return;
+   
+       uiState.primaries[k] = [];
+       uiState.primaryLocks[k] = false;
+   
+       // 🔥 ALSO reset invert ONLY if NOT locked
+       if (k === "country") {
+         uiState.countryInvert = false;
+       }
+     });
+   }
 
   // 3️⃣ Set 1 (Search + Status)
   if (clearSet1) {

@@ -2132,6 +2132,14 @@ function renderEmptyState(message) {
       </td>
     </tr>
   `;
+
+  // ✅ ADD THIS BLOCK (AFTER innerHTML)
+  const clearBtn = document.getElementById("emptyClearFiltersBtn");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      document.getElementById("btnClear").click();
+    });
+  }
 }
 
 function getEmptyStateMessage() {
@@ -2153,8 +2161,13 @@ function getEmptyStateMessage() {
     uiState.repeatingActive;
 
   if (filtersActive) {
-    return "🔍 No cases match the current filters.";
-  }
+     return `
+       🔍 No cases match the current filters.<br><br>
+       <button id="emptyClearFiltersBtn" class="btn">
+         Clear Filters
+       </button>
+     `;
+   }
 
   // 📂 Case 3: No data for team
   return "📭 No cases available for your team.";

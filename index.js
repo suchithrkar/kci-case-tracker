@@ -2134,7 +2134,7 @@ function renderEmptyState(message) {
     <tr>
       <td colspan="10" style="padding:0;">
         <div id="emptyStateContainer" class="empty-state-container">
-          ${message}
+          <div class="empty-message">${message}</div>
         </div>
       </td>
     </tr>

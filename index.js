@@ -2163,7 +2163,7 @@ function getEmptyStateMessage() {
   }
 
   // ✅ PRIORITY 2 — team check (CORRECTED) - ❌ No team assigned
-  if (!trackerState.teamId) {
+  if (!trackerState.teamId || trackerState.teamId === "") {
     return "⚠️ No team assigned to your account. Please contact admin.";
   }
 

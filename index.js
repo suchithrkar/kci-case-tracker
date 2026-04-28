@@ -274,6 +274,7 @@ const userNameMap = {};
 const uiState = {
   search: "",
   statusList: [],
+  notActionedToday: false,
   rfcMode: "normal",     // RFC buttons only
   set2Mode: "normal",    // Due / Flagged / PNS only
   unupdatedActive: false,
@@ -1396,6 +1397,7 @@ function resetAllFilters({
   if (clearSet1) {
     uiState.search = "";
     uiState.statusList = [];
+    uiState.notActionedToday = false;
     el.txtSearch.value = "";
     buildStatusPanel();
   }
@@ -1498,6 +1500,15 @@ function buildStatusPanel() {
      </label>
    `;
 
+   // ✅ Not Actioned Today filter
+   el.statusPanel.innerHTML += `
+     <label>
+       <input type="checkbox" id="NOT_ACTIONED_TODAY"
+         ${uiState.notActionedToday ? "checked" : ""}/>
+       Not Actioned Today
+     </label>
+   `;
+
    // ✅ Divider before DNAP
    el.statusPanel.innerHTML += `
      <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
@@ -1513,6 +1524,14 @@ function buildStatusPanel() {
    `;
 
    updateStatusLabel();
+
+   // 🔥 sync Not Actioned Today checkbox → state
+   const notActionedCb = document.getElementById("NOT_ACTIONED_TODAY");
+   if (notActionedCb) {
+     notActionedCb.onchange = () => {
+       uiState.notActionedToday = notActionedCb.checked;
+     };
+   }
 
    const showAllNcm = uiState.statusList.includes("SHOW_ALL_NCM");
 
@@ -1806,6 +1825,26 @@ if (uiState.rfcMode === "negative") {
        if (pendingStatusOverride.has(r.id)) return true;
    
        return selectedStatuses.includes(r.status);
+     });
+   }
+
+   /* ===============================================================
+      NOT ACTIONED TODAY FILTER
+      =============================================================== */
+   if (uiState.notActionedToday) {
+   
+     const today = getTeamToday(trackerState.teamConfig);
+   
+     rows = rows.filter(r => {
+   
+       // ❌ exclude empty/null
+       if (!r.lastActionedOn) return false;
+   
+       // ❌ exclude today
+       if (r.lastActionedOn === today) return false;
+   
+       // ✅ keep valid past entries
+       return true;
      });
    }
 

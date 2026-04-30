@@ -943,7 +943,10 @@ async function applyExcelChanges() {
        teamId: excelState.teamId,
        cases: excelState.excelCases,
        todayISO,
-       generatedBy: adminState.user.uid
+       generatedBy: adminState.user.uid,
+
+       newCasesCount: newCases.length,
+       deletedCasesCount: deleted.length
      });
    
      updateProgress("Daily report updated.");
@@ -1155,149 +1158,154 @@ async function applyFullRestore() {
 }
 
 async function generateDailyRepairReport({
-  teamId,
-  cases,
-  todayISO,
-  generatedBy
-}) {
-  // ===============================
-  // TOTAL OPEN
-  // ===============================
-  const onsiteAll = cases.filter(
-    c => c.caseResolutionCode === "Onsite Solution"
-  );
-  const offsiteAll = cases.filter(
-    c => c.caseResolutionCode === "Offsite Solution"
-  );
-  const csrAll = cases.filter(
-    c => c.caseResolutionCode === "Parts Shipped"
-  );
-
-  // ===============================
-  // READY FOR CLOSURE
-  // ===============================
-  const onsiteRFC = onsiteAll.filter(c =>
-    ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
-      .includes(c.onsiteRFC)
-  );
-
-  const offsiteRFC = offsiteAll.filter(c =>
-    ["Delivered", "Order cancelled, not to be reopened"].includes(c.benchRFC)
-  );
-
-  const csrRFC = csrAll.filter(c =>
-    ["Cancelled", "Closed", "POD"].includes(c.csrRFC)
-  );
-
-  const rfcIds = new Set(
-    [...onsiteRFC, ...offsiteRFC, ...csrRFC].map(c => c.id)
-  );
-
-  // ===============================
-  // OVERDUE (NEGATIVE LOGIC)
-  // ===============================
-  let overdue = cases.filter(c => !rfcIds.has(c.id));
-
-  overdue = overdue.filter(c => !(
-    c.caseResolutionCode === "Onsite Solution" &&
-    ["0-3 Days", "3-5 Days"].includes(c.caGroup)
-  ));
-
-  overdue = overdue.filter(c => !(
-    c.caseResolutionCode === "Offsite Solution" &&
-    ["0-3 Days", "3-5 Days", "5-10 Days"].includes(c.caGroup)
-  ));
-
-  overdue = overdue.filter(c => !(
-    c.caseResolutionCode === "Parts Shipped" &&
-    c.caGroup === "0-3 Days"
-  ));
-
-  // ===============================
-  // WRITE REPORT
-  // ===============================
-
-   // ===============================
-   // CA GROUP DISTRIBUTION (ALL CASES)
-   // ===============================
-   const caGroups = {
-     "0-3 Days": 0,
-     "3-5 Days": 0,
-     "5-10 Days": 0,
-     "10-15 Days": 0,
-     "15-30 Days": 0,
-     "30-60 Days": 0,
-     "60-90 Days": 0,
-     "> 90 Days": 0
-   };
-   
-   cases.forEach(c => {
-     if (caGroups[c.caGroup] !== undefined) {
-       caGroups[c.caGroup]++;
-     }
-   });
-   
-   // Total cases > 30 days
-   const caAbove30Total =
-     caGroups["30-60 Days"] +
-     caGroups["60-90 Days"] +
-     caGroups["> 90 Days"];
-   
-   const reportRef = doc(
-     db,
-     "cases",
      teamId,
-     "reports",
-     todayISO
-   );
+     cases,
+     todayISO,
+     generatedBy,
+     newCasesCount,
+     deletedCasesCount
+   }) {
+     // ===============================
+     // TOTAL OPEN
+     // ===============================
+     const onsiteAll = cases.filter(
+       c => c.caseResolutionCode === "Onsite Solution"
+     );
+     const offsiteAll = cases.filter(
+       c => c.caseResolutionCode === "Offsite Solution"
+     );
+     const csrAll = cases.filter(
+       c => c.caseResolutionCode === "Parts Shipped"
+     );
+   
+     // ===============================
+     // READY FOR CLOSURE
+     // ===============================
+     const onsiteRFC = onsiteAll.filter(c =>
+       ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
+         .includes(c.onsiteRFC)
+     );
+   
+     const offsiteRFC = offsiteAll.filter(c =>
+       ["Delivered", "Order cancelled, not to be reopened"].includes(c.benchRFC)
+     );
+   
+     const csrRFC = csrAll.filter(c =>
+       ["Cancelled", "Closed", "POD"].includes(c.csrRFC)
+     );
+   
+     const rfcIds = new Set(
+       [...onsiteRFC, ...offsiteRFC, ...csrRFC].map(c => c.id)
+     );
+   
+     // ===============================
+     // OVERDUE (NEGATIVE LOGIC)
+     // ===============================
+     let overdue = cases.filter(c => !rfcIds.has(c.id));
+   
+     overdue = overdue.filter(c => !(
+       c.caseResolutionCode === "Onsite Solution" &&
+       ["0-3 Days", "3-5 Days"].includes(c.caGroup)
+     ));
+   
+     overdue = overdue.filter(c => !(
+       c.caseResolutionCode === "Offsite Solution" &&
+       ["0-3 Days", "3-5 Days", "5-10 Days"].includes(c.caGroup)
+     ));
+   
+     overdue = overdue.filter(c => !(
+       c.caseResolutionCode === "Parts Shipped" &&
+       c.caGroup === "0-3 Days"
+     ));
+   
+     // ===============================
+     // WRITE REPORT
+     // ===============================
+   
+      // ===============================
+      // CA GROUP DISTRIBUTION (ALL CASES)
+      // ===============================
+      const caGroups = {
+        "0-3 Days": 0,
+        "3-5 Days": 0,
+        "5-10 Days": 0,
+        "10-15 Days": 0,
+        "15-30 Days": 0,
+        "30-60 Days": 0,
+        "60-90 Days": 0,
+        "> 90 Days": 0
+      };
+      
+      cases.forEach(c => {
+        if (caGroups[c.caGroup] !== undefined) {
+          caGroups[c.caGroup]++;
+        }
+      });
+      
+      // Total cases > 30 days
+      const caAbove30Total =
+        caGroups["30-60 Days"] +
+        caGroups["60-90 Days"] +
+        caGroups["> 90 Days"];
+      
+      const reportRef = doc(
+        db,
+        "cases",
+        teamId,
+        "reports",
+        todayISO
+      );
+   
+      await setDoc(
+        reportRef,
+        {
+          // TOTAL OPEN
+          totalOpen: cases.length,
+          totalOpenOnsite: onsiteAll.length,
+          totalOpenOffsite: offsiteAll.length,
+          totalOpenCSR: csrAll.length,
+      
+          // READY FOR CLOSURE
+          readyForClosureTotal: rfcIds.size,
+          readyForClosureOnsite: onsiteRFC.length,
+          readyForClosureOffsite: offsiteRFC.length,
+          readyForClosureCSR: csrRFC.length,
+      
+          // OVERDUE
+          overdueTotal: overdue.length,
+          overdueOnsite: overdue.filter(c =>
+            c.caseResolutionCode === "Onsite Solution"
+          ).length,
+          overdueOffsite: overdue.filter(c =>
+            c.caseResolutionCode === "Offsite Solution"
+          ).length,
+          overdueCSR: overdue.filter(c =>
+            c.caseResolutionCode === "Parts Shipped"
+          ).length,
+      
+          // CA GROUP
+          ca_0_3: caGroups["0-3 Days"],
+          ca_3_5: caGroups["3-5 Days"],
+          ca_5_10: caGroups["5-10 Days"],
+          ca_10_15: caGroups["10-15 Days"],
+          ca_15_30: caGroups["15-30 Days"],
+          ca_30_60: caGroups["30-60 Days"],
+          ca_60_90: caGroups["60-90 Days"],
+          ca_gt_90: caGroups["> 90 Days"],
+          ca_gt_30_total: caAbove30Total,
 
-   await setDoc(
-     reportRef,
-     {
-       // TOTAL OPEN
-       totalOpen: cases.length,
-       totalOpenOnsite: onsiteAll.length,
-       totalOpenOffsite: offsiteAll.length,
-       totalOpenCSR: csrAll.length,
-   
-       // READY FOR CLOSURE
-       readyForClosureTotal: rfcIds.size,
-       readyForClosureOnsite: onsiteRFC.length,
-       readyForClosureOffsite: offsiteRFC.length,
-       readyForClosureCSR: csrRFC.length,
-   
-       // OVERDUE
-       overdueTotal: overdue.length,
-       overdueOnsite: overdue.filter(c =>
-         c.caseResolutionCode === "Onsite Solution"
-       ).length,
-       overdueOffsite: overdue.filter(c =>
-         c.caseResolutionCode === "Offsite Solution"
-       ).length,
-       overdueCSR: overdue.filter(c =>
-         c.caseResolutionCode === "Parts Shipped"
-       ).length,
-   
-       // CA GROUP
-       ca_0_3: caGroups["0-3 Days"],
-       ca_3_5: caGroups["3-5 Days"],
-       ca_5_10: caGroups["5-10 Days"],
-       ca_10_15: caGroups["10-15 Days"],
-       ca_15_30: caGroups["15-30 Days"],
-       ca_30_60: caGroups["30-60 Days"],
-       ca_60_90: caGroups["60-90 Days"],
-       ca_gt_90: caGroups["> 90 Days"],
-   
-       ca_gt_30_total: caAbove30Total,
-       generatedAt: new Date(),
-       generatedBy
-     },
-     { merge: true }
-   );
-   
-   await cleanupDailyReports(teamId, todayISO);
-   
-   showPopup(`Daily repair report generated for ${todayISO}`);
+          newCasesCount: newCasesCount || 0,
+          deletedCasesCount: deletedCasesCount || 0,
+           
+          generatedAt: new Date(),
+          generatedBy
+        },
+        { merge: true }
+      );
+      
+      await cleanupDailyReports(teamId, todayISO);
+      
+      showPopup(`Daily repair report generated for ${todayISO}`);
 }
 
 /* ============================================================

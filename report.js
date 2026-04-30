@@ -385,6 +385,38 @@ async function loadTeamsForReport() {
    
     renderDistributionTable();
     renderTodaySummary();
+
+     // ✅ Refresh month options based on selected team
+      const optionsElView =
+        el.reportViewSelect.querySelector(".custom-options");
+      
+      const months = await loadAvailableMonths();
+      
+      let html = `
+        <div class="custom-option" data-value="today">
+          Today
+        </div>
+      
+        <div class="custom-option disabled">────────</div>
+      `;
+      
+      months.forEach(m => {
+        html += `
+          <div class="custom-option" data-value="month" data-month="${m}">
+            ${formatMonthLabel(m)}
+          </div>
+        `;
+      });
+      
+      html += `
+        <div class="custom-option disabled">────────</div>
+      
+        <div class="custom-option" data-value="quarter">
+          Quarter
+        </div>
+      `;
+      
+      optionsElView.innerHTML = html;
   };
 }
 
@@ -511,6 +543,43 @@ function renderTodaySummary() {
 function setupControls() {
   if (setupControls._initialized) return;
   setupControls._initialized = true;
+
+   (async function initViewOptions() {
+   
+     const optionsEl =
+       el.reportViewSelect.querySelector(".custom-options");
+   
+     const months = await loadAvailableMonths();
+   
+     let html = `
+       <div class="custom-option" data-value="today">
+         Today
+       </div>
+   
+       <div class="custom-option disabled">────────</div>
+     `;
+   
+     // ✅ Dynamic months
+     months.forEach(m => {
+       html += `
+         <div class="custom-option" data-value="month" data-month="${m}">
+           ${formatMonthLabel(m)}
+         </div>
+       `;
+     });
+   
+     html += `
+       <div class="custom-option disabled">────────</div>
+   
+       <div class="custom-option" data-value="quarter">
+         Quarter
+       </div>
+     `;
+   
+     optionsEl.innerHTML = html;
+   
+   })();
+   
   // View dropdown — option selection only
    el.reportViewSelect
      .querySelector(".custom-options")
@@ -519,6 +588,11 @@ function setupControls() {
        if (!opt || opt.classList.contains("disabled")) return;
    
          reportState.view = opt.dataset.value;
+         
+         // ✅ If month option selected
+         if (opt.dataset.month) {
+           reportState.currentMonth = opt.dataset.month;
+         }
          
          // 🔑 UPDATE DROPDOWN LABEL VISUALLY (MISSING)
          const viewTrigger =
@@ -599,10 +673,15 @@ function setupReportTabs() {
       reportState.activeMetric = tab.dataset.metric;
       reportState.view = "month";
 
+      reportState.currentMonth = reportState.todayISO.slice(0, 7);
+
       // 🔑 sync view dropdown label to Month
-      const viewTrigger =
-        el.reportViewSelect.querySelector(".custom-select-trigger");
-      if (viewTrigger) viewTrigger.textContent = "Month";
+      const viewTrigger = el.reportViewSelect.querySelector(".custom-select-trigger");
+       
+      if (viewTrigger) {
+        viewTrigger.textContent =
+          formatMonthLabel(reportState.currentMonth);
+      }
 
       // re-render content
       updateView();
@@ -712,6 +791,66 @@ async function loadMonthlyReports(monthKey) {
       reportState.dailyReports[docSnap.id] = docSnap.data();
     });
   }
+}
+
+async function loadAvailableMonths() {
+  const monthsSet = new Set();
+
+  // ✅ TOTAL MODE → scan all teams
+  if (reportState.teamId === "TOTAL") {
+
+    const teamsSnap = await getDocs(collection(db, "teams"));
+
+    for (const teamDoc of teamsSnap.docs) {
+
+      const reportsRef = collection(
+        db,
+        "cases",
+        teamDoc.id,
+        "reports"
+      );
+
+      const snap = await getDocs(reportsRef);
+
+      snap.forEach(docSnap => {
+        const date = docSnap.id; // YYYY-MM-DD
+        const month = date.slice(0, 7); // YYYY-MM
+        monthsSet.add(month);
+      });
+    }
+
+  } else {
+
+    // ✅ SINGLE TEAM MODE
+    const reportsRef = collection(
+      db,
+      "cases",
+      reportState.teamId,
+      "reports"
+    );
+
+    const snap = await getDocs(reportsRef);
+
+    snap.forEach(docSnap => {
+      const date = docSnap.id;
+      const month = date.slice(0, 7);
+      monthsSet.add(month);
+    });
+  }
+
+  // Convert to array + sort (NEWEST FIRST)
+  return Array.from(monthsSet).sort().reverse();
+}
+
+function formatMonthLabel(monthKey) {
+  const [year, month] = monthKey.split("-");
+  const date = new Date(`${monthKey}-01`);
+
+  const monthName = date.toLocaleString("en-US", {
+    month: "short"
+  });
+
+  return `${monthName} - ${year}`;
 }
 
 function getDaysInMonth(monthKey) {

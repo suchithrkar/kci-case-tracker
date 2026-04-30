@@ -692,9 +692,14 @@ function setupReportTabs() {
 
       // update state
       reportState.activeMetric = tab.dataset.metric;
+      
+      // ✅ Only reset month if coming from non-month view
+      if (reportState.view !== "month") {
+        reportState.currentMonth =
+          reportState.todayISO.slice(0, 7);
+      }
+      
       reportState.view = "month";
-
-      reportState.currentMonth = reportState.todayISO.slice(0, 7);
 
       // 🔑 sync view dropdown label to Month
       const viewTrigger = el.reportViewSelect.querySelector(".custom-select-trigger");

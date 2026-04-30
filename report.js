@@ -625,24 +625,93 @@ function setupReportTabs() {
 async function loadMonthlyReports(monthKey) {
   reportState.dailyReports = {};
 
-   const reportsRef = collection(
-     db,
-     "cases",
-     reportState.teamId,
-     "reports"
-   );
+  // ✅ TOTAL MODE
+  if (reportState.teamId === "TOTAL") {
 
-  const q = query(
-    reportsRef,
-    where("__name__", ">=", `${monthKey}-01`),
-    where("__name__", "<=", `${monthKey}-31`)
-  );
+    const teamsSnap = await getDocs(collection(db, "teams"));
 
-  const snap = await getDocs(q);
+    for (const teamDoc of teamsSnap.docs) {
 
-  snap.forEach(docSnap => {
-    reportState.dailyReports[docSnap.id] = docSnap.data();
-  });
+      const reportsRef = collection(
+        db,
+        "cases",
+        teamDoc.id,
+        "reports"
+      );
+
+      const q = query(
+        reportsRef,
+        where("__name__", ">=", `${monthKey}-01`),
+        where("__name__", "<=", `${monthKey}-31`)
+      );
+
+      const snap = await getDocs(q);
+
+      snap.forEach(docSnap => {
+        const dateKey = docSnap.id;
+        const d = docSnap.data();
+
+        // Initialize if not exists
+        if (!reportState.dailyReports[dateKey]) {
+          reportState.dailyReports[dateKey] = {
+            totalOpenOnsite: 0,
+            totalOpenOffsite: 0,
+            totalOpenCSR: 0,
+            totalOpen: 0,
+
+            readyForClosureOnsite: 0,
+            readyForClosureOffsite: 0,
+            readyForClosureCSR: 0,
+            readyForClosureTotal: 0,
+
+            overdueOnsite: 0,
+            overdueOffsite: 0,
+            overdueCSR: 0,
+            overdueTotal: 0
+          };
+        }
+
+        const target = reportState.dailyReports[dateKey];
+
+        target.totalOpenOnsite += d.totalOpenOnsite || 0;
+        target.totalOpenOffsite += d.totalOpenOffsite || 0;
+        target.totalOpenCSR += d.totalOpenCSR || 0;
+        target.totalOpen += d.totalOpen || 0;
+
+        target.readyForClosureOnsite += d.readyForClosureOnsite || 0;
+        target.readyForClosureOffsite += d.readyForClosureOffsite || 0;
+        target.readyForClosureCSR += d.readyForClosureCSR || 0;
+        target.readyForClosureTotal += d.readyForClosureTotal || 0;
+
+        target.overdueOnsite += d.overdueOnsite || 0;
+        target.overdueOffsite += d.overdueOffsite || 0;
+        target.overdueCSR += d.overdueCSR || 0;
+        target.overdueTotal += d.overdueTotal || 0;
+      });
+    }
+
+  } else {
+
+    // ✅ SINGLE TEAM MODE (existing logic)
+    const reportsRef = collection(
+      db,
+      "cases",
+      reportState.teamId,
+      "reports"
+    );
+
+    const q = query(
+      reportsRef,
+      where("__name__", ">=", `${monthKey}-01`),
+      where("__name__", "<=", `${monthKey}-31`)
+    );
+
+    const snap = await getDocs(q);
+
+    snap.forEach(docSnap => {
+      reportState.dailyReports[docSnap.id] = docSnap.data();
+    });
+  }
 }
 
 function getDaysInMonth(monthKey) {

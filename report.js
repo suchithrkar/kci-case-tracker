@@ -403,7 +403,15 @@ async function loadTeamsForReport() {
       months.forEach(m => {
         html += `
           <div class="custom-option" data-value="month" data-month="${m}">
-            ${formatMonthLabel(m)}
+            ${(() => {
+              const { month, year } = formatMonthLabel(m);
+              return `
+                <div class="month-option">
+                  <span class="month-name">${month}</span>
+                  <span class="month-year">${year}</span>
+                </div>
+              `;
+            })()}
           </div>
         `;
       });
@@ -577,7 +585,15 @@ function setupControls() {
      months.forEach(m => {
        html += `
          <div class="custom-option" data-value="month" data-month="${m}">
-           ${formatMonthLabel(m)}
+           ${(() => {
+             const { month, year } = formatMonthLabel(m);
+             return `
+               <div class="month-option">
+                 <span class="month-name">${month}</span>
+                 <span class="month-year">${year}</span>
+               </div>
+             `;
+           })()}
          </div>
        `;
      });
@@ -876,7 +892,10 @@ function formatMonthLabel(monthKey) {
     month: "short"
   });
 
-  return `${monthName} - ${year}`;
+  return {
+    month: date.toLocaleString("en-US", { month: "long" }),
+    year
+  };
 }
 
 function getDaysInMonth(monthKey) {

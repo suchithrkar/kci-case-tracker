@@ -472,7 +472,7 @@ async function parseExcelFile(file) {
             createdBy: String(r[3] || "").trim(),
             modifiedBy: String(r[4] || "").trim(),
             modifiedOn: excelToDate(r[5]),
-            caseClosedDate: excelToDate(r[6]),
+            caseClosedDate: excelToDateTime(r[6]),
             closedBy: String(r[7] || "").trim(),
             country: String(r[8] || "").trim(),
             caseResolutionCode: String(r[9] || "").trim(),
@@ -2394,6 +2394,37 @@ function excelToDate(value) {
   } catch (err) {
     console.warn("Invalid date encountered in Excel:", value);
     return "";
+  }
+}
+
+function excelToDateTime(value) {
+  if (!value) return null;
+
+  try {
+    // If already Date
+    if (value instanceof Date && !isNaN(value)) {
+      return value;
+    }
+
+    // Excel numeric date-time
+    if (typeof value === "number") {
+      const epoch = new Date(Date.UTC(1899, 11, 30));
+      const ms = value * 86400000;
+      const date = new Date(epoch.getTime() + ms);
+
+      return isNaN(date) ? null : date;
+    }
+
+    // String date-time
+    if (typeof value === "string") {
+      const parsed = new Date(value);
+      return isNaN(parsed) ? null : parsed;
+    }
+
+    return null;
+  } catch (err) {
+    console.warn("Invalid datetime:", value);
+    return null;
   }
 }
 

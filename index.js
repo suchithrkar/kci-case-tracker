@@ -1498,6 +1498,15 @@ function buildStatusPanel() {
      </label>
    `;
 
+   // ✅ Not Actioned Today filter
+   el.statusPanel.innerHTML += `
+     <label>
+       <input type="checkbox" data-status="NOT_ACTIONED_TODAY"
+         ${uiState.statusList.includes("NOT_ACTIONED_TODAY") ? "checked" : ""}/>
+       Not Actioned Today
+     </label>
+   `;
+
    // ✅ Divider before DNAP
    el.statusPanel.innerHTML += `
      <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
@@ -1901,6 +1910,16 @@ rows = restrictNcmCasesForUser(rows, trackerState.user);
 // ✅ Email Status New filter (AND condition)
 if (uiState.statusList.includes("EMAIL_NEW")) {
   rows = rows.filter(r => r.emailStatus === "New");
+}
+
+// ✅ Not Actioned Today filter (AND condition)
+if (uiState.statusList.includes("NOT_ACTIONED_TODAY")) {
+  const today = getTeamToday(trackerState.teamConfig);
+
+  rows = rows.filter(r => {
+    if (!r.lastActionedOn) return false;
+    return r.lastActionedOn !== today;
+  });
 }
 
 trackerState.filteredCases = rows;

@@ -397,7 +397,7 @@ async function loadTeamsForReport() {
           Today
         </div>
       
-        <div class="custom-option disabled">────────</div>
+        <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
       `;
       
       months.forEach(m => {
@@ -409,7 +409,7 @@ async function loadTeamsForReport() {
       });
       
       html += `
-        <div class="custom-option disabled">────────</div>
+        <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
       
         <div class="custom-option" data-value="quarter">
           Quarter
@@ -566,12 +566,12 @@ function setupControls() {
      const months = await loadAvailableMonths();
    
      let html = `
-       <div class="custom-option" data-value="today">
-         Today
-       </div>
-   
-       <div class="custom-option disabled">────────</div>
-     `;
+        <div class="custom-option" data-value="today">
+          Today
+        </div>
+      
+        <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
+      `;
    
      // ✅ Dynamic months
      months.forEach(m => {
@@ -583,7 +583,7 @@ function setupControls() {
      });
    
      html += `
-       <div class="custom-option disabled">────────</div>
+       <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
    
        <div class="custom-option" data-value="quarter">
          Quarter

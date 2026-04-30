@@ -876,7 +876,7 @@ function formatMonthLabel(monthKey) {
     month: "short"
   });
 
-  return `${monthName} - ${year}`;
+  return `${monthName} ${year}`;
 }
 
 function getDaysInMonth(monthKey) {

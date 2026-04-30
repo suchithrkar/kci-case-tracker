@@ -1917,8 +1917,7 @@ if (uiState.statusList.includes("NOT_ACTIONED_TODAY")) {
   const today = getTeamToday(trackerState.teamConfig);
 
   rows = rows.filter(r => {
-    if (!r.lastActionedOn) return false;
-    return r.lastActionedOn !== today;
+    return !r.lastActionedOn || r.lastActionedOn !== today;
   });
 }
 

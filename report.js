@@ -436,9 +436,8 @@ async function loadTeamsForReport() {
         el.reportViewSelect.querySelector(".custom-select-trigger");
       
       if (viewTrigger && reportState.view === "month") {
-        viewTrigger.textContent =
-          const { month, year } = formatMonthLabel(reportState.currentMonth);
-          viewTrigger.textContent = `${month} ${year}`;
+        const { month, year } = formatMonthLabel(reportState.currentMonth);
+        viewTrigger.textContent = `${month} ${year}`;
       }
   };
 }

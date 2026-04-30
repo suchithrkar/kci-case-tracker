@@ -417,6 +417,20 @@ async function loadTeamsForReport() {
       `;
       
       optionsElView.innerHTML = html;
+
+      // ✅ Ensure currentMonth is valid for new team
+      if (!months.includes(reportState.currentMonth)) {
+        reportState.currentMonth = months[0] || reportState.todayISO.slice(0, 7);
+      }
+      
+      // ✅ Update dropdown label
+      const viewTrigger =
+        el.reportViewSelect.querySelector(".custom-select-trigger");
+      
+      if (viewTrigger && reportState.view === "month") {
+        viewTrigger.textContent =
+          formatMonthLabel(reportState.currentMonth);
+      }
   };
 }
 
@@ -577,6 +591,13 @@ function setupControls() {
      `;
    
      optionsEl.innerHTML = html;
+
+     const viewTrigger =
+        el.reportViewSelect.querySelector(".custom-select-trigger");
+      
+      if (viewTrigger) {
+        viewTrigger.textContent = "Today";
+      }
    
    })();
    

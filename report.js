@@ -436,8 +436,7 @@ async function loadTeamsForReport() {
         el.reportViewSelect.querySelector(".custom-select-trigger");
       
       if (viewTrigger && reportState.view === "month") {
-        const { month, year } = formatMonthLabel(reportState.currentMonth);
-        viewTrigger.textContent = `${month} ${year}`;
+        viewTrigger.textContent = formatMonthLabel(reportState.currentMonth);
       }
   };
 }
@@ -726,8 +725,7 @@ function setupReportTabs() {
       const viewTrigger = el.reportViewSelect.querySelector(".custom-select-trigger");
        
       if (viewTrigger) {
-        const { month, year } = formatMonthLabel(reportState.currentMonth);
-        viewTrigger.textContent = `${month} ${year}`;
+        viewTrigger.textContent = formatMonthLabel(reportState.currentMonth);
       }
 
       // re-render content

@@ -635,7 +635,12 @@ function setupControls() {
          const viewTrigger =
            el.reportViewSelect.querySelector(".custom-select-trigger");
          if (viewTrigger) {
-           viewTrigger.textContent = opt.textContent;
+           if (opt.dataset.month) {
+             const { month, year } = formatMonthLabel(opt.dataset.month);
+             viewTrigger.textContent = `${month} ${year}`;
+           } else {
+             viewTrigger.textContent = opt.textContent;
+           }
          }
          
          // clear all tabs first
@@ -885,12 +890,8 @@ async function loadAvailableMonths() {
 }
 
 function formatMonthLabel(monthKey) {
-  const [year, month] = monthKey.split("-");
+  const [year] = monthKey.split("-");
   const date = new Date(`${monthKey}-01`);
-
-  const monthName = date.toLocaleString("en-US", {
-    month: "short"
-  });
 
   return {
     month: date.toLocaleString("en-US", { month: "long" }),

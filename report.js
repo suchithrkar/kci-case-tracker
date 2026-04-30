@@ -419,8 +419,8 @@ async function loadTeamsForReport() {
       html += `
         <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
       
-        <div class="custom-option" data-value="quarter">
-          Quarter
+        <div class="custom-option" data-value="quarterly">
+          Quarterly
         </div>
       `;
       
@@ -601,8 +601,8 @@ function setupControls() {
      html += `
        <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
    
-       <div class="custom-option" data-value="quarter">
-         Quarter
+       <div class="custom-option" data-value="quarterly">
+         Quarterly
        </div>
      `;
    

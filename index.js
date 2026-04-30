@@ -1597,7 +1597,12 @@ function updateStatusLabel() {
   }
 
   const displayList = uiState.statusList
-    .filter(s => s !== "SHOW_ALL_NCM" && s !== "EMAIL_NEW" && s !== "DNAP_ONLY" && s !== "NOT_ACTIONED_TODAY");
+    .filter(s => 
+      s !== "SHOW_ALL_NCM" && 
+      s !== "EMAIL_NEW" && 
+      s !== "DNAP_ONLY" &&
+      s !== "NOT_ACTIONED_TODAY"
+    );
 
   if (uiState.statusList.includes("SHOW_ALL_NCM")) {
     displayList.push("All NCM");
@@ -1611,7 +1616,12 @@ function updateStatusLabel() {
     displayList.push("DNAP");
   }
 
-  el.statusLabel.textContent = displayList.join(", ");
+  if (uiState.statusList.includes("NOT_ACTIONED_TODAY")) {
+    displayList.push("Not Actioned Today");
+  }
+
+  el.statusLabel.textContent =
+    displayList.length ? displayList.join(", ") : "All Statuses";
 }
 
 /* =======================================================================

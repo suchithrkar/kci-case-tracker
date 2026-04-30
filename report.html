@@ -68,12 +68,17 @@
      ===================================================== */
   
   *{box-sizing:border-box}
-  html,body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto;
+  html, body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.45 system-ui,-apple-system,Segoe UI,Roboto;
     overflow-x: hidden;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
   }
   
   .hidden{display:none}
@@ -461,6 +466,7 @@
   <button class="hdr-btn" id="btnLogout">Log Out</button>
 </header>
 
+  <div class="page-content">
   <!-- =====================================================
        SECTION 1 — TOTAL OPEN REPAIR CASES (TODAY)
        ===================================================== -->
@@ -578,6 +584,8 @@
     </div>
 
   </div>
+
+  </div>  
 
 
 <!-- =========================

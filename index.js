@@ -1805,7 +1805,10 @@ if (uiState.rfcMode === "negative") {
 
   /* STATUS MULTI-SELECT */
    const selectedStatuses = uiState.statusList.filter(
-     s => s !== "SHOW_ALL_NCM" && s !== "EMAIL_NEW"
+     s =>
+       s !== "SHOW_ALL_NCM" &&
+       s !== "EMAIL_NEW" &&
+       s !== "NOT_ACTIONED_TODAY"
    );
    
    if (selectedStatuses.length > 0) {

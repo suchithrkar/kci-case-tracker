@@ -136,19 +136,31 @@ onAuthStateChanged(auth, async (user) => {
      : getCurrentTrackerTeam(data);
 
   /* Load team config */
-  const teamSnap = await getDoc(
-    doc(db, "teams", reportState.teamId)
-  );
-
-  reportState.teamConfig = teamSnap.exists()
-    ? {
-        resetTimezone: teamSnap.data().resetTimezone || "UTC",
-        resetHour:
-          typeof teamSnap.data().resetHour === "number"
-            ? teamSnap.data().resetHour
-            : 0
-      }
-    : { resetTimezone: "UTC", resetHour: 0 };
+  if (reportState.teamId !== "TOTAL") {
+   
+     const teamSnap = await getDoc(
+       doc(db, "teams", reportState.teamId)
+     );
+   
+     reportState.teamConfig = teamSnap.exists()
+       ? {
+           resetTimezone: teamSnap.data().resetTimezone || "UTC",
+           resetHour:
+             typeof teamSnap.data().resetHour === "number"
+               ? teamSnap.data().resetHour
+               : 0
+         }
+       : { resetTimezone: "UTC", resetHour: 0 };
+   
+   } else {
+   
+     // TOTAL → no team-specific config
+     reportState.teamConfig = {
+       resetTimezone: "UTC",
+       resetHour: 0
+     };
+   
+   }
 
   reportState.todayISO = getTeamToday(reportState.teamConfig);
   reportState.currentMonth = reportState.todayISO.slice(0, 7);

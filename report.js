@@ -131,7 +131,9 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   reportState.user = { uid: user.uid, ...data };
-  reportState.teamId = getCurrentTrackerTeam(data);
+  reportState.teamId = isPrimary(data)
+     ? "TOTAL"
+     : getCurrentTrackerTeam(data);
 
   /* Load team config */
   const teamSnap = await getDoc(
@@ -247,16 +249,77 @@ async function loadLiveCases() {
 }
 
 async function loadTodaySummary() {
-   const ref = doc(
-     db,
-     "cases",
-     reportState.teamId,
-     "reports",
-     reportState.todayISO
-   );
 
-  const snap = await getDoc(ref);
-  reportState.todayReport = snap.exists() ? snap.data() : {};
+  // ✅ TOTAL MODE
+  if (reportState.teamId === "TOTAL") {
+
+    const teamsSnap = await getDocs(collection(db, "teams"));
+
+    const combined = {
+      totalOpenOnsite: 0,
+      totalOpenOffsite: 0,
+      totalOpenCSR: 0,
+      totalOpen: 0,
+
+      readyForClosureOnsite: 0,
+      readyForClosureOffsite: 0,
+      readyForClosureCSR: 0,
+      readyForClosureTotal: 0,
+
+      overdueOnsite: 0,
+      overdueOffsite: 0,
+      overdueCSR: 0,
+      overdueTotal: 0
+    };
+
+    for (const teamDoc of teamsSnap.docs) {
+
+      const ref = doc(
+        db,
+        "cases",
+        teamDoc.id,
+        "reports",
+        reportState.todayISO
+      );
+
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) continue;
+
+      const d = snap.data();
+
+      combined.totalOpenOnsite += d.totalOpenOnsite || 0;
+      combined.totalOpenOffsite += d.totalOpenOffsite || 0;
+      combined.totalOpenCSR += d.totalOpenCSR || 0;
+      combined.totalOpen += d.totalOpen || 0;
+
+      combined.readyForClosureOnsite += d.readyForClosureOnsite || 0;
+      combined.readyForClosureOffsite += d.readyForClosureOffsite || 0;
+      combined.readyForClosureCSR += d.readyForClosureCSR || 0;
+      combined.readyForClosureTotal += d.readyForClosureTotal || 0;
+
+      combined.overdueOnsite += d.overdueOnsite || 0;
+      combined.overdueOffsite += d.overdueOffsite || 0;
+      combined.overdueCSR += d.overdueCSR || 0;
+      combined.overdueTotal += d.overdueTotal || 0;
+    }
+
+    reportState.todayReport = combined;
+
+  } else {
+
+    // ✅ SINGLE TEAM MODE
+    const ref = doc(
+      db,
+      "cases",
+      reportState.teamId,
+      "reports",
+      reportState.todayISO
+    );
+
+    const snap = await getDoc(ref);
+    reportState.todayReport = snap.exists() ? snap.data() : {};
+  }
 }
 
 async function loadTeamsForReport() {
@@ -306,7 +369,10 @@ async function loadTeamsForReport() {
         : opt.dataset.team;
 
     await loadLiveCases();
+    await loadTodaySummary();
+   
     renderDistributionTable();
+    renderTodaySummary();
   };
 }
 

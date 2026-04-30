@@ -1597,7 +1597,7 @@ function updateStatusLabel() {
   }
 
   const displayList = uiState.statusList
-    .filter(s => s !== "SHOW_ALL_NCM" && s !== "EMAIL_NEW" && s !== "DNAP_ONLY");
+    .filter(s => s !== "SHOW_ALL_NCM" && s !== "EMAIL_NEW" && s !== "DNAP_ONLY" && s !== "NOT_ACTIONED_TODAY");
 
   if (uiState.statusList.includes("SHOW_ALL_NCM")) {
     displayList.push("All NCM");

@@ -481,31 +481,45 @@
   }
   
   /* Team merged cell */
-  .team-cell{
-    font-weight:700;
-    vertical-align:middle;
-    border-right:2px solid var(--border);
-  }
-  
-  /* Type labels */
-  .type-cell{
-    font-weight:600;
-  }
-  
-  /* Divider after each team */
-  .team-divider td{
-    border-bottom:2px solid var(--border);
-  }
-  
-  /* Grand total styling */
-  .grand-total-row td{
-    background:rgba(79,140,240,.08);
-  }
-  
-  .grand-total-team{
-    color:var(--accent);
-    font-weight:700;
-  }
+.team-cell{
+  font-weight:700;
+  vertical-align:middle;
+  border-right:2px solid var(--border);
+}
+
+/* Type labels */
+.type-cell{
+  font-weight:600;
+  border-right:2px solid var(--border);
+}
+
+/* Team total rows */
+.team-total-row td{
+  background:rgba(255,255,255,.03);
+  font-weight:600;
+}
+
+/* Total label cell */
+.team-total-label{
+  text-align:left;
+  padding-left:1rem;
+  border-right:2px solid var(--border);
+}
+
+/* Proper divider between teams */
+.team-section-start td{
+  border-top:3px solid var(--border);
+}
+
+/* Grand total styling */
+.grand-total-row td{
+  background:rgba(79,140,240,.08);
+}
+
+.grand-total-label{
+  color:var(--accent);
+  font-weight:700;
+}
   
 </style>
 </head>

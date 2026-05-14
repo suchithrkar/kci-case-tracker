@@ -575,31 +575,25 @@ function renderTodaySummary() {
     const d = reportState.todayReport || {};
 
     const rows = [
-      {
-        label: "Onsite",
-        total: d.totalOpenOnsite || 0,
-        rfc: d.readyForClosureOnsite || 0,
-        overdue: d.overdueOnsite || 0
-      },
-      {
-        label: "Offsite",
-        total: d.totalOpenOffsite || 0,
-        rfc: d.readyForClosureOffsite || 0,
-        overdue: d.overdueOffsite || 0
-      },
-      {
-        label: "CSR",
-        total: d.totalOpenCSR || 0,
-        rfc: d.readyForClosureCSR || 0,
-        overdue: d.overdueCSR || 0
-      },
-      {
-        label: "Total",
-        total: d.totalOpen || 0,
-        rfc: d.readyForClosureTotal || 0,
-        overdue: d.overdueTotal || 0
-      }
-    ];
+     {
+       label: "Onsite",
+       total: d.totalOpenOnsite || 0,
+       rfc: d.readyForClosureOnsite || 0,
+       overdue: d.overdueOnsite || 0
+     },
+     {
+       label: "Offsite",
+       total: d.totalOpenOffsite || 0,
+       rfc: d.readyForClosureOffsite || 0,
+       overdue: d.overdueOffsite || 0
+     },
+     {
+       label: "CSR",
+       total: d.totalOpenCSR || 0,
+       rfc: d.readyForClosureCSR || 0,
+       overdue: d.overdueCSR || 0
+     }
+   ];
 
     container.innerHTML = `
       <table class="today-summary-table">
@@ -688,31 +682,54 @@ function renderTodaySummary() {
     ];
 
     rows.forEach((r, index) => {
+   
+     html += `
+       <tr class="${teams.indexOf(team) !== 0 && index === 0
+         ? "team-section-start"
+         : ""}">
+   
+         ${
+           index === 0
+             ? `
+               <td class="team-cell" rowspan="3">
+                 ${team.teamName}
+               </td>
+             `
+             : ""
+         }
+   
+         <td class="type-cell">
+           ${r.label}
+         </td>
+   
+         <td>${r.total}</td>
+         <td>${r.rfc}</td>
+         <td>${r.overdue}</td>
+   
+       </tr>
+     `;
+   });
 
-      html += `
-        <tr class="${index === 3 ? "team-divider" : ""}">
-
-          ${
-            index === 0
-              ? `
-                <td class="team-cell" rowspan="4">
-                  ${team.teamName}
-                </td>
-              `
-              : ""
-          }
-
-          <td class="type-cell">
-            ${r.label}
-          </td>
-
-          <td>${r.total}</td>
-          <td>${r.rfc}</td>
-          <td>${r.overdue}</td>
-
-        </tr>
-      `;
-    });
+   html += `
+     <tr class="team-total-row">
+   
+       <td class="team-total-label"
+           colspan="2">
+   
+         ${team.teamName} Total
+   
+       </td>
+   
+       <td>${d.totalOpen || 0}</td>
+   
+       <td>
+         ${d.readyForClosureTotal || 0}
+       </td>
+   
+       <td>${d.overdueTotal || 0}</td>
+   
+     </tr>
+   `;
   });
 
   // =====================================================
@@ -720,59 +737,77 @@ function renderTodaySummary() {
   // =====================================================
 
   const grandRows = [
-    {
-      label: "Onsite",
-      total: grandTotal.totalOpenOnsite || 0,
-      rfc: grandTotal.readyForClosureOnsite || 0,
-      overdue: grandTotal.overdueOnsite || 0
-    },
-    {
-      label: "Offsite",
-      total: grandTotal.totalOpenOffsite || 0,
-      rfc: grandTotal.readyForClosureOffsite || 0,
-      overdue: grandTotal.overdueOffsite || 0
-    },
-    {
-      label: "CSR",
-      total: grandTotal.totalOpenCSR || 0,
-      rfc: grandTotal.readyForClosureCSR || 0,
-      overdue: grandTotal.overdueCSR || 0
-    },
-    {
-      label: "Total",
-      total: grandTotal.totalOpen || 0,
-      rfc: grandTotal.readyForClosureTotal || 0,
-      overdue: grandTotal.overdueTotal || 0
-    }
-  ];
+     {
+       label: "Onsite",
+       total: grandTotal.totalOpenOnsite || 0,
+       rfc: grandTotal.readyForClosureOnsite || 0,
+       overdue: grandTotal.overdueOnsite || 0
+     },
+     {
+       label: "Offsite",
+       total: grandTotal.totalOpenOffsite || 0,
+       rfc: grandTotal.readyForClosureOffsite || 0,
+       overdue: grandTotal.overdueOffsite || 0
+     },
+     {
+       label: "CSR",
+       total: grandTotal.totalOpenCSR || 0,
+       rfc: grandTotal.readyForClosureCSR || 0,
+       overdue: grandTotal.overdueCSR || 0
+     }
+   ];
 
   grandRows.forEach((r, index) => {
+   
+     html += `
+       <tr class="
+         grand-total-row
+         ${index === 0 ? "team-section-start" : ""}
+       ">
+   
+         ${
+           index === 0
+             ? `
+               <td class="team-cell grand-total-label"
+                   rowspan="3">
+                 Grand Total
+               </td>
+             `
+             : ""
+         }
+   
+         <td class="type-cell">
+           ${r.label}
+         </td>
+   
+         <td>${r.total}</td>
+         <td>${r.rfc}</td>
+         <td>${r.overdue}</td>
+   
+       </tr>
+     `;
+   });
 
-    html += `
-      <tr class="grand-total-row">
-
-        ${
-          index === 0
-            ? `
-              <td class="team-cell grand-total-team"
-                  rowspan="4">
-                Grand Total
-              </td>
-            `
-            : ""
-        }
-
-        <td class="type-cell">
-          ${r.label}
-        </td>
-
-        <td>${r.total}</td>
-        <td>${r.rfc}</td>
-        <td>${r.overdue}</td>
-
-      </tr>
-    `;
-  });
+   html += `
+     <tr class="grand-total-row">
+   
+       <td class="team-total-label grand-total-label"
+           colspan="2">
+   
+         Overall Grand Total
+   
+       </td>
+   
+       <td>${grandTotal.totalOpen || 0}</td>
+   
+       <td>
+         ${grandTotal.readyForClosureTotal || 0}
+       </td>
+   
+       <td>${grandTotal.overdueTotal || 0}</td>
+   
+     </tr>
+   `;
 
   html += `
       </tbody>

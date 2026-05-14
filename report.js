@@ -702,7 +702,7 @@ function renderTodaySummary() {
               : ""
           }
 
-          <td class="type-cell" colspan="2">
+          <td class="type-cell">
             ${r.label}
           </td>
 

@@ -453,39 +453,58 @@
   }
 
   /* =====================================================
-   TEAM SUMMARY BLOCKS
+   TODAY SUMMARY — TEAM GROUPED TABLE
    ===================================================== */
   
   .today-summary-container{
     width:100%;
     display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:1.5rem;
+    justify-content:center;
   }
   
-  .team-summary-block{
-    width:60%;
+  .today-summary-table{
+    width:80%;
+    border:1px solid var(--border);
+    table-layout:fixed;
   }
   
-  .team-summary-title{
-    font-size:14px;
+  /* Team column */
+  .today-summary-table th:first-child,
+  .today-summary-table td.team-cell{
+    width:180px;
+  }
+  
+  /* Type column */
+  .today-summary-table th:nth-child(2),
+  .today-summary-table td.type-cell{
+    width:120px;
+  }
+  
+  /* Team merged cell */
+  .team-cell{
     font-weight:700;
-    margin-bottom:.5rem;
-    padding-left:.25rem;
-    color:var(--text);
+    vertical-align:middle;
+    border-right:2px solid var(--border);
   }
   
-  .team-summary-block.grand-total .team-summary-title{
-    color:var(--accent);
+  /* Type labels */
+  .type-cell{
+    font-weight:600;
   }
   
-  .team-summary-block.grand-total table{
-    border:2px solid var(--accent);
+  /* Divider after each team */
+  .team-divider td{
+    border-bottom:2px solid var(--border);
   }
   
-  .team-summary-block.grand-total tbody tr:last-child{
+  /* Grand total styling */
+  .grand-total-row td{
     background:rgba(79,140,240,.08);
+  }
+  
+  .grand-total-team{
+    color:var(--accent);
+    font-weight:700;
   }
   
 </style>

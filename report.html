@@ -501,8 +501,13 @@
     background:rgba(79,140,240,.08);
   }
   
-  /* Only first grand-total row gets top divider */
-  .team-total-label.grand-total-label td{
+  /* Divider before grand total section */
+  .grand-total-row.team-section-start td{
+    border-top:1px solid var(--border);
+  }
+  
+  /* Divider before Overall Grand Total row */
+  .team-total-label.grand-total-label{
     border-top:1px solid var(--border);
   }
   

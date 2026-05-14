@@ -695,7 +695,7 @@ function renderTodaySummary() {
           ${
             index === 0
               ? `
-                <td class="team-cell" rowspan="3">
+                <td class="team-cell" rowspan="4">
                   ${team.teamName}
                 </td>
               `

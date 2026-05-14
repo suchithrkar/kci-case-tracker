@@ -708,12 +708,9 @@ function renderTodaySummary() {
     rows.forEach((r, index) => {
    
      html += `
-       <tr class="
-           team-group-${team.teamId}
-           ${teams.indexOf(team) !== 0 && index === 0
-             ? "team-section-start"
-             : ""}
-         ">
+       <tr class="${teams.indexOf(team) !== 0 && index === 0
+         ? "team-section-start"
+         : ""}">
    
          ${
            index === 0
@@ -738,7 +735,7 @@ function renderTodaySummary() {
    });
 
    html += `
-     <tr class="team-total-row team-group-${team.teamId}">
+     <tr class="team-total-row">
    
        <td class="team-total-label"
            colspan="2">

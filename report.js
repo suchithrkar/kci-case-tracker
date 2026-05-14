@@ -270,7 +270,19 @@ async function loadTodaySummary() {
     const teamsSnap = await getDocs(
       collection(db, "teams")
     );
-
+   
+    const sortedTeams = teamsSnap.docs
+      .map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }))
+      .sort((a, b) => {
+        const aTime = a.createdAt?.seconds || 0;
+        const bTime = b.createdAt?.seconds || 0;
+   
+        return aTime - bTime; // oldest → newest
+      });
+   
     const teamReports = [];
 
     const grandTotal = {
@@ -290,7 +302,7 @@ async function loadTodaySummary() {
       overdueTotal: 0
     };
 
-    for (const teamDoc of teamsSnap.docs) {
+    for (const teamDoc of sortedTeams) {
 
       const ref = doc(
         db,
@@ -310,7 +322,7 @@ async function loadTodaySummary() {
       teamReports.push({
         teamId: teamDoc.id,
         teamName:
-          teamDoc.data().name || teamDoc.id,
+          teamDoc.name || teamDoc.id,
         report: data
       });
 
@@ -401,15 +413,27 @@ async function loadTeamsForReport() {
   `;
 
   const snap = await getDocs(collection(db, "teams"));
-
-  snap.forEach(docSnap => {
-    const t = docSnap.data();
-    html += `
-      <div class="custom-option" data-team="${docSnap.id}">
-        ${t.name || docSnap.id}
-      </div>
-    `;
-  });
+   
+   const teams = snap.docs
+     .map(docSnap => ({
+       id: docSnap.id,
+       ...docSnap.data()
+     }))
+     .sort((a, b) => {
+       const aTime = a.createdAt?.seconds || 0;
+       const bTime = b.createdAt?.seconds || 0;
+   
+       return aTime - bTime; // oldest → newest
+     });
+   
+   teams.forEach(t => {
+   
+     html += `
+       <div class="custom-option" data-team="${t.id}">
+         ${t.name || t.id}
+       </div>
+     `;
+   });
 
   optionsEl.innerHTML = html;
 

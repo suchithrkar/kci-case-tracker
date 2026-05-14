@@ -789,7 +789,7 @@ function renderTodaySummary() {
    });
 
    html += `
-     <tr class="grand-total-row">
+     <tr class="grand-total-row overall-grand-total-row">
    
        <td class="team-total-label grand-total-label"
            colspan="2">

@@ -468,58 +468,52 @@
     table-layout:fixed;
   }
   
-  /* Team column */
-  .today-summary-table th:first-child,
-  .today-summary-table td.team-cell{
-    width:180px;
-  }
-  
-  /* Type column */
-  .today-summary-table th:nth-child(2),
-  .today-summary-table td.type-cell{
-    width:120px;
+  /* Equal column widths */
+  .today-summary-table th,
+  .today-summary-table td{
+    width:20%;
   }
   
   /* Team merged cell */
-.team-cell{
-  font-weight:700;
-  vertical-align:middle;
-  border-right:2px solid var(--border);
-}
-
-/* Type labels */
-.type-cell{
-  font-weight:600;
-  border-right:2px solid var(--border);
-}
-
-/* Team total rows */
-.team-total-row td{
-  background:rgba(255,255,255,.03);
-  font-weight:600;
-}
-
-/* Total label cell */
-.team-total-label{
-  text-align:left;
-  padding-left:1rem;
-  border-right:2px solid var(--border);
-}
-
-/* Proper divider between teams */
-.team-section-start td{
-  border-top:3px solid var(--border);
-}
-
-/* Grand total styling */
-.grand-total-row td{
-  background:rgba(79,140,240,.08);
-}
-
-.grand-total-label{
-  color:var(--accent);
-  font-weight:700;
-}
+  .team-cell{
+    font-weight:700;
+    vertical-align:middle;
+    border-right:2px solid var(--border);
+  }
+  
+  /* Type labels */
+  .type-cell{
+    font-weight:600;
+    border-right:2px solid var(--border);
+  }
+  
+  /* Team total rows */
+  .team-total-row td{
+    background:rgba(255,255,255,.03);
+    font-weight:600;
+  }
+  
+  /* Total label cell */
+  .team-total-label{
+    text-align:left;
+    padding-left:1rem;
+    border-right:2px solid var(--border);
+  }
+  
+  /* Proper divider between teams */
+  .team-section-start td{
+    border-top:3px solid var(--border);
+  }
+  
+  /* Grand total styling */
+  .grand-total-row td{
+    background:rgba(79,140,240,.08);
+  }
+  
+  .grand-total-label{
+    color:var(--accent);
+    font-weight:700;
+  }
   
 </style>
 </head>

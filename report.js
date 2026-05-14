@@ -58,9 +58,8 @@ const el = {
     .querySelector("tbody"),
 
   todaySummaryBlock: document.getElementById("todaySummaryBlock"),
-  todaySummaryTable: document
-    .getElementById("todaySummaryTable")
-    .querySelector("tbody"),
+  todaySummaryContainer:
+     document.getElementById("todaySummaryContainer"),
 
   monthlyBlock: document.getElementById("monthlyReportBlock"),
   monthlyChartWrap: document.querySelector("#monthlyReportBlock .chart-wrap"),
@@ -262,12 +261,19 @@ async function loadLiveCases() {
 
 async function loadTodaySummary() {
 
-  // ✅ TOTAL MODE
+  // =====================================================
+  // TOTAL MODE
+  // =====================================================
+
   if (reportState.teamId === "TOTAL") {
 
-    const teamsSnap = await getDocs(collection(db, "teams"));
+    const teamsSnap = await getDocs(
+      collection(db, "teams")
+    );
 
-    const combined = {
+    const teamReports = [];
+
+    const grandTotal = {
       totalOpenOnsite: 0,
       totalOpenOffsite: 0,
       totalOpenCSR: 0,
@@ -296,42 +302,81 @@ async function loadTodaySummary() {
 
       const snap = await getDoc(ref);
 
-      if (!snap.exists()) continue;
+      const data = snap.exists()
+        ? snap.data()
+        : {};
 
-      const d = snap.data();
+      // Store team report
+      teamReports.push({
+        teamId: teamDoc.id,
+        teamName:
+          teamDoc.data().name || teamDoc.id,
+        report: data
+      });
 
-      combined.totalOpenOnsite += d.totalOpenOnsite || 0;
-      combined.totalOpenOffsite += d.totalOpenOffsite || 0;
-      combined.totalOpenCSR += d.totalOpenCSR || 0;
-      combined.totalOpen += d.totalOpen || 0;
+      // Accumulate grand total
+      grandTotal.totalOpenOnsite +=
+        data.totalOpenOnsite || 0;
 
-      combined.readyForClosureOnsite += d.readyForClosureOnsite || 0;
-      combined.readyForClosureOffsite += d.readyForClosureOffsite || 0;
-      combined.readyForClosureCSR += d.readyForClosureCSR || 0;
-      combined.readyForClosureTotal += d.readyForClosureTotal || 0;
+      grandTotal.totalOpenOffsite +=
+        data.totalOpenOffsite || 0;
 
-      combined.overdueOnsite += d.overdueOnsite || 0;
-      combined.overdueOffsite += d.overdueOffsite || 0;
-      combined.overdueCSR += d.overdueCSR || 0;
-      combined.overdueTotal += d.overdueTotal || 0;
+      grandTotal.totalOpenCSR +=
+        data.totalOpenCSR || 0;
+
+      grandTotal.totalOpen +=
+        data.totalOpen || 0;
+
+      grandTotal.readyForClosureOnsite +=
+        data.readyForClosureOnsite || 0;
+
+      grandTotal.readyForClosureOffsite +=
+        data.readyForClosureOffsite || 0;
+
+      grandTotal.readyForClosureCSR +=
+        data.readyForClosureCSR || 0;
+
+      grandTotal.readyForClosureTotal +=
+        data.readyForClosureTotal || 0;
+
+      grandTotal.overdueOnsite +=
+        data.overdueOnsite || 0;
+
+      grandTotal.overdueOffsite +=
+        data.overdueOffsite || 0;
+
+      grandTotal.overdueCSR +=
+        data.overdueCSR || 0;
+
+      grandTotal.overdueTotal +=
+        data.overdueTotal || 0;
     }
 
-    reportState.todayReport = combined;
+    reportState.todayReport = {
+      teams: teamReports,
+      grandTotal
+    };
 
-  } else {
-
-    // ✅ SINGLE TEAM MODE
-    const ref = doc(
-      db,
-      "cases",
-      reportState.teamId,
-      "reports",
-      reportState.todayISO
-    );
-
-    const snap = await getDoc(ref);
-    reportState.todayReport = snap.exists() ? snap.data() : {};
+    return;
   }
+
+  // =====================================================
+  // SINGLE TEAM MODE
+  // =====================================================
+
+  const ref = doc(
+    db,
+    "cases",
+    reportState.teamId,
+    "reports",
+    reportState.todayISO
+  );
+
+  const snap = await getDoc(ref);
+
+  reportState.todayReport = snap.exists()
+    ? snap.data()
+    : {};
 }
 
 async function loadTeamsForReport() {
@@ -517,7 +562,71 @@ function renderDistributionTable() {
    ========================================================= */
 
 function renderTodaySummary() {
-  const d = reportState.todayReport || {};
+
+  const container =
+    el.todaySummaryContainer;
+
+  container.innerHTML = "";
+
+  // =====================================================
+  // TOTAL MODE
+  // =====================================================
+
+  if (reportState.teamId === "TOTAL") {
+
+    const teams =
+      reportState.todayReport?.teams || [];
+
+    const grandTotal =
+      reportState.todayReport?.grandTotal || {};
+
+    teams.forEach(team => {
+
+      container.innerHTML += `
+        <div class="team-summary-block">
+
+          <div class="team-summary-title">
+            ${team.teamName}
+          </div>
+
+          ${buildTodaySummaryTable(team.report)}
+
+        </div>
+      `;
+    });
+
+    // Grand Total Block
+    container.innerHTML += `
+      <div class="team-summary-block grand-total">
+
+        <div class="team-summary-title">
+          Grand Total
+        </div>
+
+        ${buildTodaySummaryTable(grandTotal)}
+
+      </div>
+    `;
+
+    return;
+  }
+
+  // =====================================================
+  // SINGLE TEAM MODE
+  // =====================================================
+
+  container.innerHTML = `
+    <div class="team-summary-block">
+
+      ${buildTodaySummaryTable(
+        reportState.todayReport || {}
+      )}
+
+    </div>
+  `;
+}
+
+function buildTodaySummaryTable(d) {
 
   const rows = [
     {
@@ -546,16 +655,35 @@ function renderTodaySummary() {
     }
   ];
 
-  el.todaySummaryTable.innerHTML = rows
-    .map(r => `
-      <tr>
-        <td><strong>${r.label}</strong></td>
-        <td>${r.total}</td>
-        <td>${r.rfc}</td>
-        <td>${r.overdue}</td>
-      </tr>
-    `)
-    .join("");
+  return `
+    <div class="table-wrap">
+
+      <table class="today-summary-table">
+
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Total Open</th>
+            <th>Ready for Closure</th>
+            <th>Overdue</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td><strong>${r.label}</strong></td>
+              <td>${r.total}</td>
+              <td>${r.rfc}</td>
+              <td>${r.overdue}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+
+      </table>
+
+    </div>
+  `;
 }
 
 /* =========================================================

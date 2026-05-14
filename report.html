@@ -452,6 +452,11 @@
     border:1px solid var(--border);
     table-layout:fixed;
   }
+
+  /* Remove default row borders for this table only */
+  .today-summary-table tbody td{
+    border-bottom:none;
+  }
   
   /* Equal column widths */
   .today-summary-table th,
@@ -476,29 +481,31 @@
   .team-total-row td{
     background:rgba(255,255,255,.03);
     font-weight:600;
-    text-align: center;
+    border-top:1px solid var(--border);
   }
   
   /* Total label cell */
   .team-total-label{
-    text-align:left;
+    text-align:center;
     padding-left:1rem;
     border-right:2px solid var(--border);
   }
   
   /* Proper divider between teams */
   .team-section-start td{
-    border-top:3px solid var(--border);
+    border-top:1px solid var(--border);
   }
   
   /* Grand total styling */
   .grand-total-row td{
     background:rgba(79,140,240,.08);
+    border-top:1px solid var(--border);
   }
   
   .grand-total-label{
     color:var(--accent);
     font-weight:700;
+    text-align:center;
   }
   
 </style>

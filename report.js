@@ -592,7 +592,13 @@ function renderTodaySummary() {
        total: d.totalOpenCSR || 0,
        rfc: d.readyForClosureCSR || 0,
        overdue: d.overdueCSR || 0
-     }
+     },
+     {
+        label: "Total",
+        total: d.totalOpen || 0,
+        rfc: d.readyForClosureTotal || 0,
+        overdue: d.overdueTotal || 0
+      }
    ];
 
     container.innerHTML = `

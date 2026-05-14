@@ -451,6 +451,42 @@
     text-align: right;
     opacity: 0.7;
   }
+
+  /* =====================================================
+   TEAM SUMMARY BLOCKS
+   ===================================================== */
+  
+  .today-summary-container{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1.5rem;
+  }
+  
+  .team-summary-block{
+    width:60%;
+  }
+  
+  .team-summary-title{
+    font-size:14px;
+    font-weight:700;
+    margin-bottom:.5rem;
+    padding-left:.25rem;
+    color:var(--text);
+  }
+  
+  .team-summary-block.grand-total .team-summary-title{
+    color:var(--accent);
+  }
+  
+  .team-summary-block.grand-total table{
+    border:2px solid var(--accent);
+  }
+  
+  .team-summary-block.grand-total tbody tr:last-child{
+    background:rgba(79,140,240,.08);
+  }
   
 </style>
 </head>
@@ -561,20 +597,8 @@
     <!-- TODAY SUMMARY TABLE -->
     <div id="todaySummaryBlock">
 
-      <div class="table-wrap">
-        <table id="todaySummaryTable" class="today-summary-table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Total Open</th>
-              <th>Ready for Closure</th>
-              <th>Overdue</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- JS injects rows -->
-          </tbody>
-        </table>
+      <div id="todaySummaryContainer"
+           class="today-summary-container">
       </div>
 
     </div>

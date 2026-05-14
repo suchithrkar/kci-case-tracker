@@ -695,15 +695,14 @@ function renderTodaySummary() {
           ${
             index === 0
               ? `
-                <td class="team-cell"
-                    rowspan="4">
+                <td class="team-cell" rowspan="3">
                   ${team.teamName}
                 </td>
               `
               : ""
           }
 
-          <td class="type-cell">
+          <td class="type-cell" colspan="2">
             ${r.label}
           </td>
 

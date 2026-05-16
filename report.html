@@ -387,6 +387,15 @@
     border: 1px solid var(--border);
   }
 
+  /* ============================================================
+   TOP LEVEL PAGE TABS
+   ============================================================ */
+
+  .top-level-tabs{
+    margin:0;
+    border-top:none;
+  }
+
   .chart-legend {
     display: flex;
     justify-content: center;      /* center horizontally */
@@ -550,7 +559,26 @@
   <button class="hdr-btn" id="btnLogout">Log Out</button>
 </header>
 
-  <div class="page-content">
+<!-- ============================================================
+     TOP LEVEL PAGE TABS
+     ============================================================ -->
+<div class="tab-bar top-level-tabs">
+
+  <div class="tab active" id="tabReports">
+    📋 REPORTS
+  </div>
+
+  <div class="tab" id="tabAgentStats">
+    📊 AGENT STATS
+  </div>
+
+</div>
+
+<div class="page-content">
+
+  <!-- REPORTS SECTION -->
+  <div id="sectionReports">
+    
   <!-- =====================================================
        SECTION 1 — TOTAL OPEN REPAIR CASES (TODAY)
        ===================================================== -->
@@ -657,7 +685,14 @@
 
   </div>
 
-  </div>  
+    </div>
+
+  <!-- AGENT STATS SECTION -->
+  <div id="sectionAgentStats" style="display:none;">
+
+  </div>
+
+</div>
 
 
 <!-- =========================

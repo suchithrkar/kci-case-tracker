@@ -1102,18 +1102,9 @@ function setupPageTabs() {
      await loadAllUsersForStats();
      await loadStatsCasesOnce();
    
-     buildTeamSelector();
+     buildStatsControls();
      renderStatsTableNew();
    };
-
-  el.tabAgentStats.onclick = () => {
-
-    el.tabAgentStats.classList.add("active");
-    el.tabReports.classList.remove("active");
-
-    el.sectionReports.style.display = "none";
-    el.sectionAgentStats.style.display = "block";
-  };
 
 }
 

@@ -115,13 +115,6 @@ const btnNoFollowOk = document.getElementById("btnNoFollowOk");
 btnNoFollowClose.onclick = () => modalNoFollow.classList.remove("show");
 btnNoFollowOk.onclick = () => modalNoFollow.classList.remove("show");
 
-// ================================================
-// AGENT STATS STATE
-// ================================================
-
-let statsCases = [];
-let allUsers = [];
-
 /* =========================================================
    TEAM-AWARE TODAY CALCULATION (REUSED)
    ========================================================= */

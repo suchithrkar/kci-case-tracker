@@ -689,6 +689,95 @@
     background: var(--panel-2);
     border: 1px solid var(--border);
   }
+
+  /* ============================================================
+   AGENT STATS ONLY STYLING
+   ============================================================ */
+  
+  #sectionAgentStats .btn-boxed {
+    border-radius: 10px;
+  }
+  
+  #sectionAgentStats button,
+  #sectionAgentStats .btn,
+  #sectionAgentStats .hdr-btn {
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    border-radius: 999px;
+    padding: .6rem 1rem;
+  
+    cursor: pointer;
+    font: inherit;
+    white-space: nowrap;
+  }
+  
+  #sectionAgentStats table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  #sectionAgentStats #statsTableWrap {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Minimum row height */
+  #sectionAgentStats tbody tr {
+    height: 50px;
+    min-height: 50px;
+  }
+  
+  #sectionAgentStats tbody tr:hover {
+    background: rgba(255,255,255,0.05);
+  }
+  
+  #sectionAgentStats tbody td {
+    border-bottom: 1px solid var(--border);
+    padding: .55rem .75rem;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: center;
+  }
+  
+  #sectionAgentStats thead th {
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+  
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: .6px;
+  
+    padding: .55rem .75rem;
+  
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  
+  #sectionAgentStats .custom-option {
+    padding: 4.8px 6px;
+    border-radius: 4px;
+  
+    color: var(--select-text);
+    font-weight: 500;
+    background: transparent;
+  
+    text-align: left;
+  
+    cursor: pointer;
+    font-size: 13px;
+  }
+  
+  #sectionAgentStats .custom-option:last-child {
+    margin-bottom: 0;
+  }
+  
+  #sectionAgentStats .custom-option:hover {
+    background: var(--option-hover);
+  }
   
 </style>
 </head>

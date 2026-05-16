@@ -153,6 +153,18 @@ function getTeamToday(teamConfig) {
   return teamDate;
 }
 
+// =====================================================
+// ROLE HELPERS
+// =====================================================
+
+function isPrimary(user) {
+  return user?.role === "primary";
+}
+
+function isSecondary(user) {
+  return user?.role === "secondary";
+}
+
 /* =========================================================
    AUTH + INIT
    ========================================================= */
@@ -1936,6 +1948,96 @@ let teamConfig = {
 let statsCases = [];
 let allUsers = [];
 
+
+function initCustomSelect(root) {
+  const trigger = root.querySelector(".custom-select-trigger");
+  const options = root.querySelector(".custom-options");
+
+  if (!trigger || !options) return;
+
+  let portal = null;
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    closeAllCustomSelects();
+
+    const rect = trigger.getBoundingClientRect();
+
+    portal = options;
+    portal.dataset.portalFor = root.id;
+
+      // ✅ Mark dropdowns for scroll styling (portal-safe)
+      portal.classList.remove(
+        "team-modal-dropdown",
+        "admin-team-dropdown"
+      );
+      
+      // Create / Manage Team modal selects
+      if (root.id === "newTeamTimezone" || root.id === "newTeamResetHour") {
+        portal.classList.add("team-modal-dropdown");
+      }
+      
+      // Admin Users → Team dropdown
+      if (root.classList.contains("user-team-dd")) {
+        portal.classList.add("admin-team-dropdown");
+      }
+      
+      // Admin Stats → Team selector
+      if (root.classList.contains("stats-team-select")) {
+        portal.classList.add("admin-team-dropdown");
+      }
+   
+    portal.style.position = "fixed";
+    portal.style.top = `${rect.bottom}px`;
+    portal.style.left = `${rect.left}px`;
+    portal.style.width = `${rect.width}px`;
+    portal.style.zIndex = 5000;
+    portal.style.display = "block";
+
+    document.body.appendChild(portal);
+    root.classList.add("open");
+  });
+
+  options.querySelectorAll(".custom-option").forEach(opt => {
+    opt.addEventListener("click", () => {
+      trigger.textContent = opt.textContent;
+      root.dataset.value = opt.dataset.value;
+
+      closePortal();
+      root.dispatchEvent(new Event("change"));
+    });
+  });
+
+  function closePortal() {
+    if (portal) {
+      portal.style.display = "none";
+      root.appendChild(portal);
+      portal = null;
+    }
+    root.classList.remove("open");
+  }
+
+  document.addEventListener("click", closePortal);
+}
+
+function closeAllCustomSelects() {
+  document.querySelectorAll(".custom-select.open").forEach(root => {
+    const options = document.querySelector(
+      ".custom-options[data-portal-for='" + root.id + "']"
+    );
+
+    if (options) {
+      options.style.display = "none";
+      root.appendChild(options);
+      options.removeAttribute("data-portal-for");
+    }
+
+    root.classList.remove("open");
+  });
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener("click", closeAllCustomSelects);
 
 
 /* ============================================================

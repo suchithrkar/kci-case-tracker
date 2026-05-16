@@ -153,18 +153,6 @@ function getTeamToday(teamConfig) {
   return teamDate;
 }
 
-// =====================================================
-// ROLE HELPERS
-// =====================================================
-
-function isPrimary(user) {
-  return user?.role === "primary";
-}
-
-function isSecondary(user) {
-  return user?.role === "secondary";
-}
-
 /* =========================================================
    AUTH + INIT
    ========================================================= */

@@ -2689,14 +2689,6 @@ async function loadStatsCasesOnce() {
 ------------------------------------------------------------ */
 function buildStatsControls() {
   statsControls.innerHTML = `
-    <!-- Cases Report button -->
-    <button
-      class="btn-cases-report"
-      id="btnCasesReport"
-      title="Open Cases Report"
-    >
-      Cases Report
-    </button>
 
     <!-- Refresh button -->
     <button
@@ -2715,11 +2707,6 @@ function buildStatsControls() {
     await loadStatsCasesOnce();
     await loadAllUsersForStats();
     renderStatsTableNew();
-  };
-
-  // Navigate to report page
-  document.getElementById("btnCasesReport").onclick = () => {
-    location.href = "report.html";
   };
 }
 

@@ -175,7 +175,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   reportState.user = { uid: user.uid, ...data };
-  adminState.user = { uid: user.uid, ...data };
+  agentStatsState.user = { uid: user.uid, ...data };
   reportState.teamId = isPrimary(data)
      ? "TOTAL"
      : getCurrentTrackerTeam(data);
@@ -222,7 +222,7 @@ onAuthStateChanged(auth, async (user) => {
    
      const teamsSnap = await getDocs(collection(db, "teams"));
    
-     adminState.allTeams = teamsSnap.docs.map(doc => ({
+     agentStatsState.allTeams = teamsSnap.docs.map(doc => ({
        id: doc.id,
        ...doc.data()
      }));
@@ -235,7 +235,7 @@ onAuthStateChanged(auth, async (user) => {
      // SECONDARY USER TEAM
      // =====================================================
    
-     adminState.allTeams = [{
+     agentStatsState.allTeams = [{
        id: data.teamId,
        name: data.teamName || data.teamId
      }];
@@ -1113,20 +1113,47 @@ function setupPageTabs() {
   };
 
   el.tabAgentStats.onclick = async () => {
+
+     try {
+      
+        el.tabAgentStats.classList.add("active");
+        el.tabReports.classList.remove("active");
+      
+        el.sectionAgentStats.style.display = "block";
+        el.sectionReports.style.display = "none";
    
-     el.tabAgentStats.classList.add("active");
-     el.tabReports.classList.remove("active");
+        // Already initialized once
+        if (statsTableWrap.dataset.loaded === "true") {
+          return;
+        }
    
-     el.sectionAgentStats.style.display = "block";
-     el.sectionReports.style.display = "none";
-   
-     statsTableWrap.innerHTML = "Loading...";
-   
-     await loadAllUsersForStats();
-     await loadStatsCasesOnce();
-   
-     buildTeamSelector();
-     renderStatsTableNew();
+        // Prevent duplicate rebuilds
+        statsControls.innerHTML = "";
+      
+        statsTableWrap.innerHTML = "Loading...";
+      
+        await loadAllUsersForStats();
+        await loadStatsCasesOnce();
+      
+        buildTeamSelector();
+        renderStatsTableNew();
+        statsTableWrap.dataset.loaded = "true";
+      
+      } catch (err) {
+      
+        console.error("Agent Stats Error:", err);
+      
+        statsTableWrap.innerHTML = `
+          <div style="
+            color:#ff6b6b;
+            padding:1rem;
+            font-weight:600;
+          ">
+            Failed to load Agent Statistics.
+            Check console for details.
+          </div>
+        `;
+      }
    };
 
 }
@@ -1850,7 +1877,7 @@ function openAuditModal(userId) {
   document.querySelector("#modalAudit .modal-title").textContent =
     `Audit — ${userName}`;
    
-  const today = getTeamToday(teamConfig);
+  const today = getTeamToday(reportState.teamConfig);
 
   // Get cases actioned today by this user (only status updates)
   const userTodayCases = statsCases.filter(r =>
@@ -1918,18 +1945,10 @@ function openNoFollowModal(userId) {
 /* ============================================================
    GLOBAL ADMIN STATE
    ============================================================ */
-export const adminState = {
+export const agentStatsState = {
   user: null,
   allTeams: [],
   selectedStatsTeam: "TOTAL",
-};
-
-// ================================================
-// GLOBAL TEAM CONFIG FOR STATS (Admin)
-// ================================================
-let teamConfig = {
-  resetTimezone: "UTC",
-  resetHour: 0
 };
 
 
@@ -2037,10 +2056,10 @@ document.addEventListener("click", closeAllCustomSelects);
 
 /*
   INPUT:
-    - adminState.allCases = ALL cases from Firestore (admin-level access)
-    - adminState.allUsers = all users
-    - adminState.selectedTeam = team selected in dropdown ("TOTAL" or teamId)
-    - adminState.user = logged-in admin (primary/secondary)
+    - agentStatsState.allCases = ALL cases from Firestore (admin-level access)
+    - agentStatsState.allUsers = all users
+    - agentStatsState.selectedTeam = team selected in dropdown ("TOTAL" or teamId)
+    - agentStatsState.user = logged-in admin (primary/secondary)
 
   OUTPUT:
     {
@@ -2050,9 +2069,9 @@ document.addEventListener("click", closeAllCustomSelects);
 */
 
 async function computeStatsEngine() {
-  const cases = adminState.allCases;
-  const users = adminState.allUsers;
-  const today = getTeamToday(teamConfig);
+  const cases = agentStatsState.allCases;
+  const users = agentStatsState.allUsers;
+  const today = getTeamToday(reportState.teamConfig);
 
   let filteredCases;
 
@@ -2066,14 +2085,14 @@ async function computeStatsEngine() {
      Option B (Primary Admin TOTAL mode):
        Team = "TOTAL" → show all cases.
      ============================================================= */
-  if (!isPrimary(adminState.user)) {
+  if (!isPrimary(agentStatsState.user)) {
     // NON-PRIMARY → force their own team only
-    filteredCases = cases.filter(c => c.teamId === adminState.user.teamId);
+    filteredCases = cases.filter(c => c.teamId === agentStatsState.user.teamId);
   } else {
-    if (adminState.selectedTeam === "TOTAL") {
+    if (agentStatsState.selectedTeam === "TOTAL") {
       filteredCases = [...cases]; // All cases across all teams
     } else {
-      filteredCases = cases.filter(c => c.teamId === adminState.selectedTeam);
+      filteredCases = cases.filter(c => c.teamId === agentStatsState.selectedTeam);
     }
   }
 
@@ -2084,13 +2103,13 @@ async function computeStatsEngine() {
 
   for (const u of users) {
     // Secondary/general users only show their own team rows
-    if (!isPrimary(adminState.user)) {
-      if (u.teamId !== adminState.user.teamId) continue;
+    if (!isPrimary(agentStatsState.user)) {
+      if (u.teamId !== agentStatsState.user.teamId) continue;
     }
 
     // Primary admin (team mode) → include only users of that team
-    if (isPrimary(adminState.user) && adminState.selectedTeam !== "TOTAL") {
-      if (u.teamId !== adminState.selectedTeam) continue;
+    if (isPrimary(agentStatsState.user) && agentStatsState.selectedTeam !== "TOTAL") {
+      if (u.teamId !== agentStatsState.selectedTeam) continue;
     }
 
     // Compute metrics
@@ -2210,25 +2229,25 @@ const Z_difference = X_lastActionedToday - Y_statusChangedToday;
   This block expects the following globals (already present earlier in your file):
     - statsCases  (keeps latest cases from onSnapshot)
     - allUsers    (loaded by loadAllUsersForStats())
-    - adminState.selectedStatsTeam
-    - adminState.user
+    - agentStatsState.selectedStatsTeam
+    - agentStatsState.user
     - isPrimary() helper
     - isSecondary() helper
     - showPopup() helper
 */
 
 function computeStatsEngineAdaptive(casesList, usersList) {
-  const today = getTeamToday(teamConfig);
+  const today = getTeamToday(reportState.teamConfig);
 
   // TEAM FILTERING
   let filteredCases;
-  if (!isPrimary(adminState.user)) {
-    filteredCases = casesList.filter(c => c.teamId === adminState.user.teamId);
+  if (!isPrimary(agentStatsState.user)) {
+    filteredCases = casesList.filter(c => c.teamId === agentStatsState.user.teamId);
   } else {
-    if (adminState.selectedStatsTeam === "TOTAL") {
+    if (agentStatsState.selectedStatsTeam === "TOTAL") {
       filteredCases = [...casesList];
     } else {
-      filteredCases = casesList.filter(c => c.teamId === adminState.selectedStatsTeam);
+      filteredCases = casesList.filter(c => c.teamId === agentStatsState.selectedStatsTeam);
     }
   }
 
@@ -2240,10 +2259,10 @@ function computeStatsEngineAdaptive(casesList, usersList) {
     if (u.role === "secondary") continue;
 
     // enforce visibility rules
-    if (!isPrimary(adminState.user)) {
-      if (u.teamId !== adminState.user.teamId) continue;
+    if (!isPrimary(agentStatsState.user)) {
+      if (u.teamId !== agentStatsState.user.teamId) continue;
     } else {
-      if (adminState.selectedStatsTeam !== "TOTAL" && u.teamId !== adminState.selectedStatsTeam) continue;
+      if (agentStatsState.selectedStatsTeam !== "TOTAL" && u.teamId !== agentStatsState.selectedStatsTeam) continue;
     }
 
          // Cases owned by this user (needed for other metrics)
@@ -2463,7 +2482,7 @@ statsTableWrap.querySelectorAll(".no-follow-link").forEach(el => {
 
 // Calculate user summary (same logic as user Info modal)
 function computeUserSummary(userId) {
-  const today = getTeamToday(teamConfig);
+  const today = getTeamToday(reportState.teamConfig);
 
   // -------------------------------
   // 1. ALL STATUS CHANGES DONE TODAY BY USER (NO DUPLICATES)
@@ -2604,9 +2623,9 @@ function setupStatsAutoRefresh() {
    Load users ONCE for stats tab
 ------------------------------------------------------------ */
 async function loadAllUsersForStats() {
-  const q = isPrimary(adminState.user)
+  const q = isPrimary(agentStatsState.user)
     ? query(collection(db, "users"))
-    : query(collection(db, "users"), where("teamId", "==", adminState.user.teamId));
+    : query(collection(db, "users"), where("teamId", "==", agentStatsState.user.teamId));
 
   const snap = await getDocs(q);
   allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2620,11 +2639,11 @@ async function loadStatsCasesOnce() {
     let allCases = [];
 
     // SECONDARY → only their team
-    if (!isPrimary(adminState.user)) {
+    if (!isPrimary(agentStatsState.user)) {
       const colRef = collection(
         db,
         "cases",
-        adminState.user.teamId,
+        agentStatsState.user.teamId,
         "casesList"
       );
 
@@ -2634,11 +2653,11 @@ async function loadStatsCasesOnce() {
 
     // PRIMARY
     else {
-      const selectedTeam = adminState.selectedStatsTeam;
+      const selectedTeam = agentStatsState.selectedStatsTeam;
 
       // TOTAL mode → loop all teams
       if (selectedTeam === "TOTAL") {
-        for (const t of adminState.allTeams) {
+        for (const t of agentStatsState.allTeams) {
           const colRef = collection(db, "cases", t.id, "casesList");
           const snap = await getDocs(colRef);
           snap.forEach(d => {
@@ -2714,18 +2733,18 @@ function buildTeamSelector() {
   /* =====================================================
      🔒 SECONDARY ADMIN / NON-PRIMARY — LOCKED TO OWN TEAM
      ===================================================== */
-  if (!isPrimary(adminState.user)) {
+  if (!isPrimary(agentStatsState.user)) {
     // force selected team
-    adminState.selectedStatsTeam = adminState.user.teamId;
+    agentStatsState.selectedStatsTeam = agentStatsState.user.teamId;
 
     const myTeam =
-      adminState.allTeams.find(t => t.id === adminState.user.teamId);
+      agentStatsState.allTeams.find(t => t.id === agentStatsState.user.teamId);
 
-    const label = myTeam ? myTeam.name : adminState.user.teamId;
+    const label = myTeam ? myTeam.name : agentStatsState.user.teamId;
 
     const locked = document.createElement("div");
     locked.className = "custom-select stats-team-select";
-    locked.dataset.value = adminState.user.teamId;
+    locked.dataset.value = agentStatsState.user.teamId;
 
     locked.innerHTML = `
       <div class="custom-select-trigger" style="opacity:0.7; cursor:not-allowed;">
@@ -2749,7 +2768,7 @@ function buildTeamSelector() {
     <div class="custom-option" data-value="TOTAL">TOTAL</div>
   `;
 
-  adminState.allTeams
+  agentStatsState.allTeams
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach(t => {
@@ -2761,14 +2780,14 @@ function buildTeamSelector() {
     });
 
   const currentLabel =
-    adminState.selectedStatsTeam === "TOTAL"
+    agentStatsState.selectedStatsTeam === "TOTAL"
       ? "TOTAL"
-      : adminState.allTeams.find(t => t.id === adminState.selectedStatsTeam)?.name
+      : agentStatsState.allTeams.find(t => t.id === agentStatsState.selectedStatsTeam)?.name
         || "TOTAL";
 
   const wrapper = document.createElement("div");
   wrapper.className = "custom-select stats-team-select";
-  wrapper.dataset.value = adminState.selectedStatsTeam || "TOTAL";
+  wrapper.dataset.value = agentStatsState.selectedStatsTeam || "TOTAL";
 
   wrapper.innerHTML = `
     <div class="custom-select-trigger">${currentLabel}</div>
@@ -2789,14 +2808,14 @@ function buildTeamSelector() {
 
   wrapper.addEventListener("change", () => {
     const val = wrapper.dataset.value || "TOTAL";
-    adminState.selectedStatsTeam = val;
+    agentStatsState.selectedStatsTeam = val;
 
     const team =
       val === "TOTAL"
         ? null
-        : adminState.allTeams.find(t => t.id === val);
+        : agentStatsState.allTeams.find(t => t.id === val);
 
-    teamConfig = {
+    reportState.teamConfig = {
       resetTimezone: team?.resetTimezone || "UTC",
       resetHour:
         typeof team?.resetHour === "number" ? team.resetHour : 0
@@ -2806,7 +2825,7 @@ function buildTeamSelector() {
   });
 }
 
-adminState.selectedStatsTeam = "TOTAL";
+agentStatsState.selectedStatsTeam = "TOTAL";
 
 /* ------------------------------------------------------------
    Disable the old real-time stats subscription

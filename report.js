@@ -1958,22 +1958,10 @@ document.body.dataset.authready = "true";
    document.body.dataset.role = data.role;
 
 
-  // Display user name
-  el.adminUserName.textContent = `${data.firstName} ${data.lastName}`;
-
   // Theme
   document.documentElement.dataset.theme = data.theme || "dark";
   el.adminTheme.textContent = data.theme === "light" ? "🌙" : "☀️";
   el.adminTheme.onclick = () => toggleTheme(adminState.user);
-
-  // Role-based visibility
-  if (isPrimary(data)) {
-    el.btnUpdateData.style.display = "inline-block";
-    el.btnCreateTeam.style.display = "inline-block";
-  } else {
-    el.btnUpdateData.style.display = "none";
-    el.btnCreateTeam.style.display = "none";
-  }
 
   // Navigation
   el.btnGotoTracker.onclick = () => location.href = "index.html";

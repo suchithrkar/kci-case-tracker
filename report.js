@@ -65,6 +65,13 @@ const el = {
   monthlyChartWrap: document.querySelector("#monthlyReportBlock .chart-wrap"),
 
   reportViewSelect: document.getElementById("reportViewSelect"),
+
+   /* TOP PAGE TABS */
+   tabReports: document.getElementById("tabReports"),
+   tabAgentStats: document.getElementById("tabAgentStats"),
+   
+   sectionReports: document.getElementById("sectionReports"),
+   sectionAgentStats: document.getElementById("sectionAgentStats"),
 };
 
 const reportTeamControls =
@@ -177,9 +184,11 @@ onAuthStateChanged(auth, async (user) => {
   await loadTodaySummary();
 
   renderDistributionTable();
-  renderTodaySummary();
-  setupControls();
-  setupReportTabs();
+   renderTodaySummary();
+   
+   setupControls();
+   setupReportTabs();
+   setupPageTabs();
 });
 
 /* =========================================================
@@ -1025,6 +1034,32 @@ function setupReportTabs() {
       }, 100);
     });
   });
+}
+
+/* =========================================================
+   TOP LEVEL PAGE TAB SWITCHING
+   ========================================================= */
+
+function setupPageTabs() {
+
+  el.tabReports.onclick = () => {
+
+    el.tabReports.classList.add("active");
+    el.tabAgentStats.classList.remove("active");
+
+    el.sectionReports.style.display = "block";
+    el.sectionAgentStats.style.display = "none";
+  };
+
+  el.tabAgentStats.onclick = () => {
+
+    el.tabAgentStats.classList.add("active");
+    el.tabReports.classList.remove("active");
+
+    el.sectionReports.style.display = "none";
+    el.sectionAgentStats.style.display = "block";
+  };
+
 }
 
 /* =========================================================

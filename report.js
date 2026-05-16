@@ -175,6 +175,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   reportState.user = { uid: user.uid, ...data };
+  adminState.user = { uid: user.uid, ...data };
   reportState.teamId = isPrimary(data)
      ? "TOTAL"
      : getCurrentTrackerTeam(data);
@@ -211,11 +212,33 @@ onAuthStateChanged(auth, async (user) => {
 
   initHeader(data);
 
-   if (isPrimary(data)) {
+  if (isPrimary(data)) {
      reportTeamControls.classList.remove("hidden");
      await loadTeamsForReport();
+   
+     // =====================================================
+     // AGENT STATS TEAM LIST
+     // =====================================================
+   
+     const teamsSnap = await getDocs(collection(db, "teams"));
+   
+     adminState.allTeams = teamsSnap.docs.map(doc => ({
+       id: doc.id,
+       ...doc.data()
+     }));
+   
    } else {
+   
      reportTeamControls.classList.add("hidden");
+   
+     // =====================================================
+     // SECONDARY USER TEAM
+     // =====================================================
+   
+     adminState.allTeams = [{
+       id: data.teamId,
+       name: data.teamName || data.teamId
+     }];
    }
    
   await loadLiveCases();
@@ -1102,7 +1125,7 @@ function setupPageTabs() {
      await loadAllUsersForStats();
      await loadStatsCasesOnce();
    
-     buildStatsControls();
+     buildTeamSelector();
      renderStatsTableNew();
    };
 

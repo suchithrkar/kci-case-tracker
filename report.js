@@ -3504,14 +3504,6 @@ statsTableWrap.querySelectorAll(".no-follow-link").forEach(el => {
 
 // ---------------- USER STATS MODAL ---------------- //
 
-const modalUserStats = document.getElementById("modalUserStats");
-const userStatsBody  = document.getElementById("userStatsBody");
-const userStatsTitle = document.getElementById("userStatsTitle");
-const btnUserStatsClose = document.getElementById("btnUserStatsClose");
-const btnUserStatsOk = document.getElementById("btnUserStatsOk");
-
-btnUserStatsClose.onclick = () => modalUserStats.classList.remove("show");
-btnUserStatsOk.onclick    = () => modalUserStats.classList.remove("show");
 
 // Calculate user summary (same logic as user Info modal)
 function computeUserSummary(userId) {

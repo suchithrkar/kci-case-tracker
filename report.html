@@ -525,6 +525,91 @@
     font-weight:700;
     text-align:center;
   }
+
+  /* ============================================================
+   STATS TABLE — CLICKABLE USER CELL (SOFT ACCENT WASH)
+   ============================================================ */
+  .stats-user-link {
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.18s ease;
+  }
+  
+  /* Soft accent wash with edge fade */
+  .stats-user-link:hover {
+    background: linear-gradient(
+      to right,
+      rgba(79, 140, 240, 0.00),
+      rgba(79, 140, 240, 0.14),
+      rgba(79, 140, 240, 0.18),
+      rgba(79, 140, 240, 0.14),
+      rgba(79, 140, 240, 0.00)
+    );
+  }
+
+  /* Ensure stats team select + refresh stay in one row */
+  #statsControls {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  /* Tooltips for stats table header */
+  th .tooltip {
+    position: absolute;
+    top: 31px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: .35rem .5rem;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 40;
+     text-transform: none;
+  }
+  
+  /* Show tooltip on hover */
+  th:hover .tooltip {
+    opacity: 1;
+  }
+
+  /* ==========================================================
+   ADMIN PAGE — USER TEAM & STATS TEAM DROPDOWNS
+   Scrollable dropdown with hidden scrollbar
+   ========================================================== */
+  
+  .custom-options.admin-team-dropdown {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  /* Hide scrollbar — Chrome, Edge, Safari */
+  .custom-options.admin-team-dropdown::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+  
+  /* Hide scrollbar — Firefox */
+  .custom-options.admin-team-dropdown {
+    scrollbar-width: none;
+  }
+  
+  /* Hide scrollbar — Chrome, Edge, Safari */
+  .custom-options.team-modal-dropdown::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+  
+  /* Hide scrollbar — Firefox */
+  .custom-options.team-modal-dropdown {
+    scrollbar-width: none;
+  }
   
 </style>
 </head>
@@ -690,8 +775,78 @@
   <!-- AGENT STATS SECTION -->
   <div id="sectionAgentStats" style="display:none;">
 
+    <div class="stats-header">
+      <h2>Agent Statistics</h2>
+
+      <div class="stats-header-right">
+        <div id="statsControls"></div>
+      </div>
+    </div>
+
+    <div id="statsTableWrap"></div>
+
   </div>
 
+</div>
+
+<!-- ============================================================
+     AUDIT MODAL (RANDOM 5 CASES)
+     ============================================================ -->
+<div class="modal" id="modalAudit">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">Audit — Random 5 Cases</div>
+      <button class="modal-btn" id="btnAuditClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+      <div id="auditList"></div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="modal-btn" id="btnAuditOk">OK</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     SP/MON NO FOLLOW CASES MODAL
+     ============================================================ -->
+<div class="modal" id="modalNoFollow">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" id="noFollowTitle">Cases</div>
+      <button class="modal-btn" id="btnNoFollowClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+      <div id="noFollowList"></div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="modal-btn" id="btnNoFollowOk">OK</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="modalUserStats">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" id="userStatsTitle">User Stats</div>
+      <button class="modal-btn" id="btnUserStatsClose">Close</button>
+    </div>
+
+    <div class="modal-body">
+      <pre id="userStatsBody"
+           style="font-size:14px;white-space:pre-wrap;"></pre>
+    </div>
+
+    <div class="modal-foot">
+      <button class="modal-btn" id="btnUserStatsOk">OK</button>
+    </div>
+  </div>
 </div>
 
 

@@ -683,11 +683,22 @@
 
   /* Action buttons always readable */
   .action-btn,
-  .hdr-btn,
-  .modal-btn {
+  .hdr-btn {
     color: var(--text);
     background: var(--panel-2);
     border: 1px solid var(--border);
+  }
+
+  .modal-btn {
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    border-radius: 999px;
+  
+    padding: .6rem 1rem;
+  
+    cursor: pointer;
+    font: inherit;
+    white-space: nowrap;
   }
 
   /* ============================================================

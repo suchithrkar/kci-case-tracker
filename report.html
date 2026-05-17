@@ -694,13 +694,13 @@
    AGENT STATS ONLY STYLING
    ============================================================ */
   
-  #sectionAgentStats .btn-boxed {
+  .agent-stats-section .btn-boxed {
     border-radius: 10px;
   }
   
-  #sectionAgentStats button,
-  #sectionAgentStats .btn,
-  #sectionAgentStats .hdr-btn {
+  .agent-stats-section button,
+  .agent-stats-section .btn,
+  .agent-stats-section .hdr-btn {
     border: 1px solid var(--border);
     background: var(--panel-2);
     border-radius: 999px;
@@ -711,29 +711,29 @@
     white-space: nowrap;
   }
   
-  #sectionAgentStats table {
+  .agent-stats-section table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
   }
   
-  #sectionAgentStats #statsTableWrap {
+  #statsTableWrap {
     width: 100%;
     padding: 0;
     margin: 0;
   }
   
   /* Minimum row height */
-  #sectionAgentStats tbody tr {
+  .agent-stats-section tbody tr {
     height: 50px;
     min-height: 50px;
   }
   
-  #sectionAgentStats tbody tr:hover {
+  .agent-stats-section tbody tr:hover {
     background: rgba(255,255,255,0.05);
   }
   
-  #sectionAgentStats tbody td {
+  .agent-stats-section tbody td {
     border-bottom: 1px solid var(--border);
     padding: .55rem .75rem;
     vertical-align: middle;
@@ -741,7 +741,7 @@
     text-align: center;
   }
   
-  #sectionAgentStats thead th {
+  .agent-stats-section thead th {
     background: var(--panel-2);
     border-bottom: 1px solid var(--border);
     border-top: 1px solid var(--border);
@@ -757,7 +757,7 @@
     white-space: nowrap;
   }
   
-  #sectionAgentStats .custom-option {
+  .custom-options.admin-team-dropdown .custom-option {
     padding: 4.8px 6px;
     border-radius: 4px;
   
@@ -771,11 +771,11 @@
     font-size: 13px;
   }
   
-  #sectionAgentStats .custom-option:last-child {
+  .custom-options.admin-team-dropdown .custom-option:last-child {
     margin-bottom: 0;
   }
   
-  #sectionAgentStats .custom-option:hover {
+  .custom-options.admin-team-dropdown .custom-option:hover {
     background: var(--option-hover);
   }
   
@@ -941,7 +941,7 @@
     </div>
 
   <!-- AGENT STATS SECTION -->
-  <div id="sectionAgentStats" style="display:none;">
+  <div id="sectionAgentStats" class="agent-stats-section" style="display:none;">
 
     <div class="stats-header">
       <h2>Agent Statistics</h2>

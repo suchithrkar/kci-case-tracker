@@ -3130,11 +3130,6 @@ submitBtn.textContent = "Submit";
    
      const todayISO = getTeamToday(trackerState.teamConfig);
    
-     await incrementDailyClosedCount(
-       trackerState.teamId,
-       todayISO
-     );
-   
      try {
         await handleClosedCaseArchival(caseId);
       } catch (err) {

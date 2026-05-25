@@ -3387,7 +3387,62 @@ function subscribeStatsCases() {
   return;
 }
 
+// TEMP DEBUG FUNCTION
+window.copyReports = async function () {
 
+  const teams = [
+    "EMEA_ACS",
+    "EMEA_ADX",
+    "EMEA_PRIORITY",
+    "EMEA_TRADE",
+    "EMEA_OTHERS"
+  ];
+
+  const oldDate = "2026-05-25";
+  const newDate = "2026-05-22";
+
+  for (const teamId of teams) {
+
+    try {
+
+      const oldRef = doc(
+        db,
+        "cases",
+        teamId,
+        "reports",
+        oldDate
+      );
+
+      const newRef = doc(
+        db,
+        "cases",
+        teamId,
+        "reports",
+        newDate
+      );
+
+      const snap = await getDoc(oldRef);
+
+      if (!snap.exists()) {
+        console.log(`❌ Missing report for ${teamId}`);
+        continue;
+      }
+
+      const data = snap.data();
+
+      await setDoc(newRef, data);
+
+      console.log(`✅ Copied ${teamId}: ${oldDate} → ${newDate}`);
+
+    } catch (err) {
+
+      console.error(`❌ Failed for ${teamId}`, err);
+
+    }
+  }
+
+  console.log("🎉 Done");
+};
 
 
 

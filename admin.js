@@ -3388,7 +3388,7 @@ function subscribeStatsCases() {
 }
 
 // TEMP DEBUG FUNCTION
-window.copyReports = async function () {
+window.moveReports = async function () {
 
   const teams = [
     "EMEA_ACS",
@@ -3398,8 +3398,8 @@ window.copyReports = async function () {
     "EMEA_OTHERS"
   ];
 
-  const oldDate = "2026-05-25";
-  const newDate = "2026-05-22";
+  const oldDate = "2026-05-26";
+  const newDate = "2026-05-25";
 
   for (const teamId of teams) {
 
@@ -3430,9 +3430,13 @@ window.copyReports = async function () {
 
       const data = snap.data();
 
+      // Create/overwrite new doc
       await setDoc(newRef, data);
 
-      console.log(`✅ Copied ${teamId}: ${oldDate} → ${newDate}`);
+      // Delete old doc
+      await deleteDoc(oldRef);
+
+      console.log(`✅ Moved ${teamId}: ${oldDate} → ${newDate}`);
 
     } catch (err) {
 
@@ -3443,15 +3447,6 @@ window.copyReports = async function () {
 
   console.log("🎉 Done");
 };
-
-
-
-
-
-
-
-
-
 
 
 

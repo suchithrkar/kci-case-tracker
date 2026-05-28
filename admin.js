@@ -3398,8 +3398,8 @@ window.moveReports = async function () {
     "EMEA_OTHERS"
   ];
 
-  const oldDate = "2026-05-26";
-  const newDate = "2026-05-25";
+  const oldDate = "2026-05-28";
+  const newDate = "2026-05-27";
 
   for (const teamId of teams) {
 

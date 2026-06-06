@@ -5,8 +5,6 @@
    - Team Management
    - Users Tab
    - Excel Upload + Backup
-   - Stats Engine
-   - Audit Modal
    ===================================================== */
 
 /* =====================================================
@@ -192,12 +190,9 @@ const el = {
   btnCreateTeam:   document.getElementById("btnCreateTeam"),
   btnGotoTracker:  document.getElementById("btnGotoTracker"),
   btnAdminLogout:  document.getElementById("btnAdminLogout"),
-
+   
   tabUsers:        document.getElementById("tabUsers"),
-  tabStats:        document.getElementById("tabStats"),
-
   sectionUsers:    document.getElementById("sectionUsers"),
-  sectionStats:    document.getElementById("sectionStats"),
 };
 
 const teamList            = document.getElementById("teamList");
@@ -1336,19 +1331,6 @@ const btnReassignConfirm  = document.getElementById("btnReassignConfirm");
 
 const usersTableWrap      = document.getElementById("usersTableWrap");
 
-const statsControls       = document.getElementById("statsControls");
-const statsTableWrap      = document.getElementById("statsTableWrap");
-
-
-
-// Buttons to close modal
-btnAuditClose.onclick = () => modalAudit.classList.remove("show");
-btnAuditOk.onclick = () => modalAudit.classList.remove("show");
-
-// SP/MON No Follow modal close handlers
-btnNoFollowClose.onclick = () => modalNoFollow.classList.remove("show");
-btnNoFollowOk.onclick = () => modalNoFollow.classList.remove("show");
-
 
 // ================================================
 // NEW: PREVIEW CHANGES BUTTON (replaces Process Excel)
@@ -1475,21 +1457,9 @@ document.body.dataset.authready = "true";
    SECTION 2 — TAB SWITCHING
    ============================================================ */
 function setupTabs() {
-
-  // Hide stats completely
-  if (el.tabStats) {
-    el.tabStats.style.display = "none";
-  }
-
-  if (el.sectionStats) {
-    el.sectionStats.style.display = "none";
-  }
-
-  // Users tab always active
   el.tabUsers.classList.add("active");
   el.sectionUsers.style.display = "block";
 }
-
 
 
 /* ============================================================

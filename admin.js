@@ -1616,30 +1616,30 @@ document.addEventListener("click", async (e) => {
   teamModalTitle.textContent = "Update Team";
 
   btnTeamCreate.onclick = async () => {
-  const updatedName = newTeamName.value.trim();
-  const updatedTimezone = newTeamTimezone.value;
-  const updatedResetHour = newTeamResetHour.value;
-
-  if (!updatedName || !updatedTimezone || updatedResetHour === "") {
-    alert("Please fill all team fields.");
-    return;
-  }
-
-  try {
-    await updateDoc(doc(db, "teams", teamId), {
-      name: updatedName,
-      resetTimezone: updatedTimezone,
-      resetHour: Number(updatedResetHour)
-    });
-
-    resetTeamModalState();
-    await loadTeamsForAdmin();
-    showPopup("Team updated successfully.");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to update team.");
-  }
-};
+     const updatedName = newTeamName.value.trim();
+     const updatedTimezone = newTeamTimezone.dataset.value;
+     const updatedResetHour = newTeamResetHour.dataset.value;
+   
+     if (!updatedName || !updatedTimezone || updatedResetHour === "") {
+       alert("Please fill all team fields.");
+       return;
+     }
+   
+     try {
+       await updateDoc(doc(db, "teams", teamId), {
+         name: updatedName,
+         resetTimezone: updatedTimezone,
+         resetHour: Number(updatedResetHour)
+       });
+   
+       resetTeamModalState();
+       await loadTeamsForAdmin();
+       showPopup("Team updated successfully.");
+     } catch (err) {
+       console.error(err);
+       alert("Failed to update team.");
+     }
+   };
 
 });
 

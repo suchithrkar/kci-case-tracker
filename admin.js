@@ -1538,8 +1538,6 @@ document.body.dataset.authready = "true";
 
   loadUsersForAdmin();
   
-  buildTeamSelector();
-  
 });
 
 
@@ -1548,47 +1546,19 @@ document.body.dataset.authready = "true";
    SECTION 2 — TAB SWITCHING
    ============================================================ */
 function setupTabs() {
-  el.tabUsers.onclick = () => {
-    el.tabUsers.classList.add("active");
-    el.tabStats.classList.remove("active");
-    el.sectionUsers.style.display = "block";
+
+  // Hide stats completely
+  if (el.tabStats) {
+    el.tabStats.style.display = "none";
+  }
+
+  if (el.sectionStats) {
     el.sectionStats.style.display = "none";
-  };
+  }
 
-  el.tabStats.onclick = async () => {
-  el.tabStats.classList.add("active");
-  el.tabUsers.classList.remove("active");
-  el.sectionUsers.style.display = "none";
-  el.sectionStats.style.display = "block";
-
-  // Load data ONLY when entering stats (manual mode)
-statsTableWrap.innerHTML = "Loading...";
-
-  await loadAllUsersForStats();
-  await loadStatsCasesOnce();
-
-  // --------------------------------------------------
-// Initialize teamConfig for first Stats render
-// --------------------------------------------------
-const initialTeam =
-  adminState.selectedStatsTeam === "TOTAL"
-    ? null
-    : adminState.allTeams.find(
-        t => t.id === adminState.selectedStatsTeam
-      );
-
-teamConfig = {
-  resetTimezone: initialTeam?.resetTimezone || "UTC",
-  resetHour:
-    typeof initialTeam?.resetHour === "number"
-      ? initialTeam.resetHour
-      : 0
-};
-
-     
-  renderStatsTableNew();
-};
-
+  // Users tab always active
+  el.tabUsers.classList.add("active");
+  el.sectionUsers.style.display = "block";
 }
 
 

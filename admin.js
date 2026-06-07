@@ -201,7 +201,9 @@ const el = {
   tabManageTeams: document.getElementById("tabManageTeams"),
 
   manageUpdateDataSection: document.getElementById("manageUpdateDataSection"),
-  manageTeamsSection: document.getElementById("manageTeamsSection")
+  manageTeamsSection: document.getElementById("manageTeamsSection"),
+  tabManageGroups: document.getElementById("tabManageGroups"),
+  manageGroupsSection: document.getElementById("manageGroupsSection")
 };
 
 const teamList            = document.getElementById("teamList");
@@ -214,6 +216,10 @@ const newTeamTimezone = document.getElementById("newTeamTimezone");
 const newTeamResetHour = document.getElementById("newTeamResetHour");
 
 const updateTeamList      = document.getElementById("updateTeamList");
+
+const groupList = document.getElementById("groupList");
+const newGroupName = document.getElementById("newGroupName");
+const btnGroupCreate = document.getElementById("btnGroupCreate");
 
 $("excelInput").onchange = async (e) => {
   const file = e.target.files[0];
@@ -1420,7 +1426,8 @@ $("btnPreviewChanges").onclick = async () => {
    ============================================================ */
 export const adminState = {
   user: null,
-  allTeams: []
+  allTeams: [],
+  allGroups: []
 };
 
 // ================================================
@@ -1494,6 +1501,7 @@ document.body.dataset.authready = "true";
   setupTabs();
 
   // Load Teams + Stats + Users
+  await loadGroupsForAdmin();
   await loadTeamsForAdmin();
    // --------------------------------------------------
    // Init custom selects in Create / Manage Team modal
@@ -1547,6 +1555,10 @@ function setupTabs() {
     activateManageTeams();
   };
 
+  el.tabManageGroups.onclick = () => {
+    activateManageGroups();
+  };
+
   activateManageUpdateData();
 }
 
@@ -1567,6 +1579,141 @@ function activateManageTeams() {
   el.manageTeamsSection.style.display = "block";
   el.manageUpdateDataSection.style.display = "none";
 }
+
+function activateManageGroups() {
+
+  el.tabManageGroups.classList.add("active");
+  el.tabManageTeams.classList.remove("active");
+  el.tabManageUpdateData.classList.remove("active");
+
+  el.manageGroupsSection.style.display = "block";
+  el.manageTeamsSection.style.display = "none";
+  el.manageUpdateDataSection.style.display = "none";
+}
+
+/* ============================================================
+   GROUP MANAGEMENT
+   ============================================================ */
+
+async function loadGroupsForAdmin() {
+
+  adminState.allGroups = [];
+
+  const snap = await getDocs(
+    collection(db, "groups")
+  );
+
+  snap.forEach(d => {
+    adminState.allGroups.push({
+      id: d.id,
+      ...d.data()
+    });
+  });
+
+  populateGroupList();
+}
+
+async function createGroupHandler() {
+
+  const name = newGroupName.value.trim();
+
+  if (!name) {
+    return showPopup("Please enter a group name.");
+  }
+
+  const groupId = name
+    .toUpperCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^A-Z0-9_]/g, "");
+
+  const ref = doc(db, "groups", groupId);
+
+  const existing = await getDoc(ref);
+
+  if (existing.exists()) {
+    return showPopup("Group already exists.");
+  }
+
+  await setDoc(ref, {
+    name,
+    createdAt: new Date()
+  });
+
+  newGroupName.value = "";
+
+  await loadGroupsForAdmin();
+
+  showPopup("Group created.");
+}
+
+btnGroupCreate.onclick = createGroupHandler;
+
+function populateGroupList() {
+
+  groupList.innerHTML = "";
+
+  adminState.allGroups
+    .sort((a,b) => a.name.localeCompare(b.name))
+    .forEach(g => {
+
+      const row = document.createElement("div");
+
+      row.style.marginBottom = "0.6rem";
+
+      row.innerHTML = `
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+        ">
+
+          <div>
+            <strong>${g.name}</strong>
+          </div>
+
+          <div>
+            <button
+              class="action-btn btnDeleteGroup btn-boxed"
+              data-id="${g.id}"
+              style="
+                border-radius:8px;
+                padding:0.35rem 0.6rem;
+              ">
+              Delete
+            </button>
+          </div>
+
+        </div>
+      `;
+
+      groupList.appendChild(row);
+    });
+}
+
+document.addEventListener("click", async (e) => {
+
+  const btn = e.target.closest(".btnDeleteGroup");
+
+  if (!btn) return;
+
+  const groupId = btn.dataset.id;
+
+  if (
+    !confirm(
+      "Delete this group?"
+    )
+  ) {
+    return;
+  }
+
+  await deleteDoc(
+    doc(db, "groups", groupId)
+  );
+
+  await loadGroupsForAdmin();
+
+  showPopup("Group deleted.");
+});
 
 
 /* ============================================================
@@ -1626,6 +1773,7 @@ async function createTeamHandler() {
     });
 
     resetTeamModalState();
+    await loadGroupsForAdmin();
     await loadTeamsForAdmin();
     showPopup("Team created successfully.");
   } catch (err) {
@@ -1720,6 +1868,7 @@ document.addEventListener("click", async (e) => {
        });
    
        resetTeamModalState();
+       await loadGroupsForAdmin();
        await loadTeamsForAdmin();
        showPopup("Team updated successfully.");
      } catch (err) {
@@ -1765,6 +1914,7 @@ async function deleteTeam(teamId) {
   await deleteDoc(doc(db, "teams", teamId));
 
   showPopup("Team deleted successfully.");
+  await loadGroupsForAdmin();
   await loadTeamsForAdmin();
 }
 
@@ -1827,6 +1977,7 @@ btnReassignConfirm.onclick = async () => {
   modalReassign.classList.remove("show");
   showPopup("Team deleted successfully.");
 
+  await loadGroupsForAdmin();
   await loadTeamsForAdmin();
 };
 

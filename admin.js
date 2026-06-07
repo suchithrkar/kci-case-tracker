@@ -2341,11 +2341,34 @@ function bindUserGroupCustomSelects() {
 
           try {
 
+            const userObj =
+              allUsers.find(
+                u => u.id === uid
+              );
+            
+            let updateData = {
+              groupId: newGroup
+            };
+            
+            if (userObj?.teamId) {
+            
+              const currentTeam =
+                adminState.allTeams.find(
+                  t => t.id === userObj.teamId
+                );
+            
+              const teamStillValid =
+                currentTeam &&
+                currentTeam.groupId === newGroup;
+            
+              if (!teamStillValid) {
+                updateData.teamId = "";
+              }
+            }
+            
             await updateDoc(
               doc(db, "users", uid),
-              {
-                groupId: newGroup
-              }
+              updateData
             );
 
             showPopup(
@@ -2355,6 +2378,8 @@ function bindUserGroupCustomSelects() {
                   : " (removed)"
               }.`
             );
+
+            await loadTeamsForAdmin(); 
 
           } catch (err) {
 
@@ -2452,39 +2477,66 @@ function renderGroupDropdown(u) {
 }
 
 function renderTeamDropdown(u) {
+
   if (!isPrimary(adminState.user)) {
     return u.teamId || "—";
   }
 
-  const teams = adminState.allTeams
-    .slice()
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const filteredTeams =
+    adminState.allTeams
+      .filter(t => {
+
+        // No group selected → show all teams
+        if (!u.groupId) return true;
+
+        return t.groupId === u.groupId;
+      })
+      .sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
 
   const currentTeam =
-    teams.find(t => t.id === u.teamId)?.name || "— No Team —";
+    filteredTeams.find(
+      t => t.id === u.teamId
+    )?.name || "— No Team —";
 
-  let optionsHtml = `<div class="custom-option" data-value="">— No Team —</div>`;
+  let optionsHtml = `
+    <div
+      class="custom-option"
+      data-value="">
+      — No Team —
+    </div>
+  `;
 
-  teams.forEach(t => {
+  filteredTeams.forEach(t => {
+
     optionsHtml += `
-      <div class="custom-option" data-value="${t.id}">
+      <div
+        class="custom-option"
+        data-value="${t.id}">
         ${t.name}
       </div>
     `;
+
   });
 
   return `
-    <div class="custom-select user-team-dd"
-         data-uid="${u.id}"
-         data-value="${u.teamId || ""}">
-      <div class="custom-select-trigger">${currentTeam}</div>
+    <div
+      class="custom-select user-team-dd"
+      data-uid="${u.id}"
+      data-value="${u.teamId || ""}">
+
+      <div class="custom-select-trigger">
+        ${currentTeam}
+      </div>
+
       <div class="custom-options">
         ${optionsHtml}
       </div>
+
     </div>
   `;
 }
-
 
 
 /* ---------- USER ACTIONS ---------- */

@@ -210,7 +210,7 @@ const btnTeamCreate       = document.getElementById("btnTeamCreate");
 const btnTeamClose        = document.getElementById("btnTeamClose");
 const btnTeamDone         = document.getElementById("btnTeamDone");
 const modalCreateTeam     = document.getElementById("modalCreateTeam");
-const teamModalTitle = document.getElementById("teamModalTitle");
+const teamModalTitle      = document.getElementById("teamManagementTitle");
 
 // Team reset settings inputs
 const newTeamTimezone = document.getElementById("newTeamTimezone");
@@ -1526,29 +1526,9 @@ export async function loadTeamsForAdmin() {
 /* ---------- CREATE TEAM ---------- */
 btnCreateTeam.onclick = () => {
   if (!isPrimary(adminState.user)) return;
-  modalCreateTeam.classList.add("show");
-};
 
-btnTeamClose.onclick = () => {
-  resetTeamModalState();
-  modalCreateTeam.classList.remove("show");
-};
-
-btnTeamDone.onclick = () => {
-  resetTeamModalState();
-  modalCreateTeam.classList.remove("show");
-};
-
-modalCreateTeam.addEventListener("click", (e) => {
-  if (e.target === modalCreateTeam) {
-    resetTeamModalState();
-    modalCreateTeam.classList.remove("show");
-  }
-});
-
-btnTeamCancel.onclick = () => {
-  resetTeamModalState();
-  modalCreateTeam.classList.remove("show");
+  el.tabManage.click();
+  activateManageTeams();
 };
 
 

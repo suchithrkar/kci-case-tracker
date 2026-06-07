@@ -184,15 +184,24 @@ function clearProgress() {
    GLOBAL DOM REFERENCES
    ============================================================ */
 const el = {
-  adminUserName:   document.getElementById("adminUserName"),
-  adminTheme:      document.getElementById("adminTheme"),
-  btnUpdateData:   document.getElementById("btnUpdateData"),
-  btnCreateTeam:   document.getElementById("btnCreateTeam"),
-  btnGotoTracker:  document.getElementById("btnGotoTracker"),
-  btnAdminLogout:  document.getElementById("btnAdminLogout"),
-   
-  tabUsers:        document.getElementById("tabUsers"),
-  sectionUsers:    document.getElementById("sectionUsers"),
+  adminUserName: document.getElementById("adminUserName"),
+  adminTheme: document.getElementById("adminTheme"),
+  btnUpdateData: document.getElementById("btnUpdateData"),
+  btnCreateTeam: document.getElementById("btnCreateTeam"),
+  btnGotoTracker: document.getElementById("btnGotoTracker"),
+  btnAdminLogout: document.getElementById("btnAdminLogout"),
+
+  tabUsers: document.getElementById("tabUsers"),
+  tabManage: document.getElementById("tabManage"),
+
+  sectionUsers: document.getElementById("sectionUsers"),
+  sectionManage: document.getElementById("sectionManage"),
+
+  tabManageUpdateData: document.getElementById("tabManageUpdateData"),
+  tabManageTeams: document.getElementById("tabManageTeams"),
+
+  manageUpdateDataSection: document.getElementById("manageUpdateDataSection"),
+  manageTeamsSection: document.getElementById("manageTeamsSection")
 };
 
 const teamList            = document.getElementById("teamList");
@@ -1457,8 +1466,58 @@ document.body.dataset.authready = "true";
    SECTION 2 — TAB SWITCHING
    ============================================================ */
 function setupTabs() {
-  el.tabUsers.classList.add("active");
-  el.sectionUsers.style.display = "block";
+
+  // Main tabs
+
+  el.tabUsers.onclick = () => {
+
+    el.tabUsers.classList.add("active");
+    el.tabManage.classList.remove("active");
+
+    el.sectionUsers.style.display = "block";
+    el.sectionManage.style.display = "none";
+  };
+
+  el.tabManage.onclick = () => {
+
+    el.tabManage.classList.add("active");
+    el.tabUsers.classList.remove("active");
+
+    el.sectionManage.style.display = "block";
+    el.sectionUsers.style.display = "none";
+
+    activateManageUpdateData();
+  };
+
+  // Manage subtabs
+
+  el.tabManageUpdateData.onclick = () => {
+    activateManageUpdateData();
+  };
+
+  el.tabManageTeams.onclick = () => {
+    activateManageTeams();
+  };
+
+  activateManageUpdateData();
+}
+
+function activateManageUpdateData() {
+
+  el.tabManageUpdateData.classList.add("active");
+  el.tabManageTeams.classList.remove("active");
+
+  el.manageUpdateDataSection.style.display = "block";
+  el.manageTeamsSection.style.display = "none";
+}
+
+function activateManageTeams() {
+
+  el.tabManageTeams.classList.add("active");
+  el.tabManageUpdateData.classList.remove("active");
+
+  el.manageTeamsSection.style.display = "block";
+  el.manageUpdateDataSection.style.display = "none";
 }
 
 

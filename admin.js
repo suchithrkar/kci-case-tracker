@@ -1566,18 +1566,22 @@ function activateManageUpdateData() {
 
   el.tabManageUpdateData.classList.add("active");
   el.tabManageTeams.classList.remove("active");
+  el.tabManageGroups.classList.remove("active");
 
   el.manageUpdateDataSection.style.display = "block";
   el.manageTeamsSection.style.display = "none";
+  el.manageGroupsSection.style.display = "none";
 }
 
 function activateManageTeams() {
 
   el.tabManageTeams.classList.add("active");
   el.tabManageUpdateData.classList.remove("active");
+  el.tabManageGroups.classList.remove("active");
 
   el.manageTeamsSection.style.display = "block";
   el.manageUpdateDataSection.style.display = "none";
+  el.manageGroupsSection.style.display = "none";
 }
 
 function activateManageGroups() {
@@ -1773,7 +1777,6 @@ async function createTeamHandler() {
     });
 
     resetTeamModalState();
-    await loadGroupsForAdmin();
     await loadTeamsForAdmin();
     showPopup("Team created successfully.");
   } catch (err) {
@@ -1868,7 +1871,6 @@ document.addEventListener("click", async (e) => {
        });
    
        resetTeamModalState();
-       await loadGroupsForAdmin();
        await loadTeamsForAdmin();
        showPopup("Team updated successfully.");
      } catch (err) {
@@ -1914,7 +1916,6 @@ async function deleteTeam(teamId) {
   await deleteDoc(doc(db, "teams", teamId));
 
   showPopup("Team deleted successfully.");
-  await loadGroupsForAdmin();
   await loadTeamsForAdmin();
 }
 
@@ -1977,7 +1978,6 @@ btnReassignConfirm.onclick = async () => {
   modalReassign.classList.remove("show");
   showPopup("Team deleted successfully.");
 
-  await loadGroupsForAdmin();
   await loadTeamsForAdmin();
 };
 

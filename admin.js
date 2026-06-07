@@ -2564,10 +2564,10 @@ function renderTeamDropdown(u) {
   const filteredTeams =
     adminState.allTeams
       .filter(t => {
-
-        // No group selected → show all teams
-        if (!u.groupId) return true;
-
+   
+        // No group selected → no teams available
+        if (!u.groupId) return false;
+   
         return t.groupId === u.groupId;
       })
       .sort((a, b) =>
@@ -2586,6 +2586,17 @@ function renderTeamDropdown(u) {
       — No Team —
     </div>
   `;
+
+  if (!u.groupId) {
+    optionsHtml += `
+      <div
+        class="custom-option"
+        data-value=""
+        style="opacity:.6;">
+        Select a Group First
+      </div>
+    `;
+  } 
 
   filteredTeams.forEach(t => {
 

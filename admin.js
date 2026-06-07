@@ -514,7 +514,8 @@ async function parseExcelFile(file) {
             
             if (
               detectedExcelTeam &&
-              closedRowTeam !== detectedExcelTeam
+              closedRowTeam.toUpperCase() !==
+                detectedExcelTeam.toUpperCase()
             ) {
               alert(
                 `Closed Cases Data sheet validation failed.\n\nTeam mismatch detected.\n\nExpected: ${detectedExcelTeam}\nFound: ${closedRowTeam}`
@@ -2276,6 +2277,7 @@ function resetExcelUI() {
   excelState.rawRows = [];
   excelState.excelCases = [];
   excelState.firestoreCases = [];
+  excelState.closedCases = [];
   excelState.diff = { new: [], updated: [], deleted: [] };
 
   $("selectedFileName").textContent = "No file selected";

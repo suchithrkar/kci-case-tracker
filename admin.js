@@ -2033,21 +2033,6 @@ function renderTeamDropdown(u) {
   `;
 }
 
-function bindTeamDropdowns() {
-  if (!isPrimary(adminState.user)) return;
-
-  document.querySelectorAll(".user-team-dd").forEach(sel => {
-    sel.onchange = async () => {
-      const uid = sel.dataset.uid;
-      const newTeam = sel.value;
-
-      await updateDoc(doc(db, "users", uid), { teamId: newTeam });
-
-      showPopup(`Team updated${newTeam ? "" : " (removed)"}.`);
-    };
-  });
-}
-
 
 
 /* ---------- USER ACTIONS ---------- */

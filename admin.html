@@ -790,7 +790,7 @@ button:hover,
      ============================================================ -->
 <div class="tab-bar">
   <div class="tab active" id="tabUsers">👤 USERS</div>
-  <div class="tab" id="tabStats">📊 STATS</div>
+  <div class="tab" id="tabManage">⚙️ MANAGE</div>
 </div>
 
 
@@ -808,17 +808,37 @@ button:hover,
   </div>
 
   <!-- STATS TAB -->
-  <div id="sectionStats" style="display:none;">
-    <div class="stats-header">
-    <h2>Team Statistics</h2>
-
-    <div class="stats-header-right">
-        <div id="statsControls"></div>
-    </div>
-</div>
-
-    <div id="statsTableWrap"></div>
-  </div>
+  <div id="sectionManage" style="display:none;">
+   
+     <div class="users-header">
+       <h2>Manage System</h2>
+     </div>
+   
+     <div class="tab-bar" id="manageTabBar" style="margin-bottom:1rem;">
+       <div class="tab active" id="tabManageUpdateData">
+         📤 UPDATE DATA
+       </div>
+   
+       <div class="tab" id="tabManageTeams">
+         👥 MANAGE TEAMS
+       </div>
+     </div>
+   
+     <div id="manageUpdateDataSection">
+       <div style="padding:0 1.2rem;">
+         <h3>Update Data</h3>
+         <p>Update Data content will be migrated here in Phase 2.</p>
+       </div>
+     </div>
+   
+     <div id="manageTeamsSection" style="display:none;">
+       <div style="padding:0 1.2rem;">
+         <h3>Manage Teams</h3>
+         <p>Manage Teams content will be migrated here in Phase 3.</p>
+       </div>
+     </div>
+   
+   </div>
 
 </div>
 

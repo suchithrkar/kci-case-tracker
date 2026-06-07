@@ -1762,10 +1762,25 @@ document.addEventListener("click", async (e) => {
        t => t.groupId === groupId
      );
    
-   if (assignedTeams.length > 0) {
+   const usersSnap = await getDocs(
+     query(
+       collection(db, "users"),
+       where("groupId", "==", groupId)
+     )
+   );
+   
+   const assignedUsers =
+     usersSnap.size;
+   
+   if (
+     assignedTeams.length > 0 ||
+     assignedUsers > 0
+   ) {
    
      return showPopup(
-       `Cannot delete group.\n\n${assignedTeams.length} team(s) are assigned to this group.`
+       `Cannot delete group.\n\n` +
+       `Teams assigned: ${assignedTeams.length}\n` +
+       `Users assigned: ${assignedUsers}`
      );
    } 
 
@@ -1988,16 +2003,63 @@ document.addEventListener("click", async (e) => {
      }
    
      try {
-       await updateDoc(doc(db, "teams", teamId), {
-         name: updatedName,
-         groupId: updatedGroupId,
-         resetTimezone: updatedTimezone,
-         resetHour: Number(updatedResetHour)
-       });
+       const previousGroupId =
+           team.groupId || "";
+         
+         await updateDoc(doc(db, "teams", teamId), {
+           name: updatedName,
+           groupId: updatedGroupId,
+           resetTimezone: updatedTimezone,
+           resetHour: Number(updatedResetHour)
+         });
+         
+         if (
+           previousGroupId !== updatedGroupId
+         ) {
+         
+           const usersSnap = await getDocs(
+             query(
+               collection(db, "users"),
+               where("teamId", "==", teamId)
+             )
+           );
+         
+           const updates = [];
+         
+           usersSnap.forEach(userDoc => {
+         
+             updates.push(
+               updateDoc(
+                 userDoc.ref,
+                 {
+                   groupId: updatedGroupId
+                 }
+               )
+             );
+         
+           });
+         
+           await Promise.all(updates);
+         }
    
        resetTeamModalState();
        await loadTeamsForAdmin();
-       showPopup("Team updated successfully.");
+       
+       if (
+         previousGroupId !== updatedGroupId
+       ) {
+      
+         showPopup(
+           "Team updated. Assigned users were synchronized to the new group."
+         );
+      
+       } else {
+      
+         showPopup(
+           "Team updated successfully."
+         );
+      
+       }
      } catch (err) {
        console.error(err);
        alert("Failed to update team.");

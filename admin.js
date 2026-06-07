@@ -103,7 +103,10 @@ function initCustomSelect(root) {
       }
       
       // Admin Users → Team dropdown
-      if (root.classList.contains("user-team-dd")) {
+      if (
+        root.classList.contains("user-team-dd") ||
+        root.classList.contains("user-group-dd")
+      ) {
         portal.classList.add("admin-team-dropdown");
       }
       
@@ -2216,15 +2219,6 @@ function renderUsersTable(users) {
 
     const name = `${capitalize(u.firstName)} ${capitalize(u.lastName)}`;
     const teamName = (u.teamId || "—").toUpperCase();
-
-    const team = adminState.allTeams.find(
-      t => t.id === u.teamId
-    ); 
-
-    const groupName =
-      adminState.allGroups.find(
-        g => g.id === u.groupId
-      )?.name || "—"; 
 
     if (isSecondary(adminState.user)) {
       // SECONDARY ADMIN ROW

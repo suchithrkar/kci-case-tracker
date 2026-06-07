@@ -272,8 +272,12 @@ function initHeader(user) {
       user.theme === "dark" ? "☀️" : "🌙";
   };
 
-   el.btnAdmin.style.display = "inline-block";
-   el.btnAdmin.onclick = () => (location.href = "admin.html");
+   if (isPrimary(user)) {
+     el.btnAdmin.style.display = "inline-block";
+     el.btnAdmin.onclick = () => (location.href = "admin.html");
+   } else {
+     el.btnAdmin.style.display = "none";
+   }
    
    el.btnTracker.onclick = () => (location.href = "index.html");
    

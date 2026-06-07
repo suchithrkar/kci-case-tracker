@@ -214,6 +214,7 @@ const teamModalTitle      = document.getElementById("teamManagementTitle");
 // Team reset settings inputs
 const newTeamTimezone = document.getElementById("newTeamTimezone");
 const newTeamResetHour = document.getElementById("newTeamResetHour");
+const newTeamGroup = document.getElementById("newTeamGroup");
 
 const updateTeamList      = document.getElementById("updateTeamList");
 
@@ -247,13 +248,20 @@ $("excelInput").onchange = async (e) => {
 function resetTeamModalState() {
   // Clear inputs
   newTeamName.value = "";
-   newTeamTimezone.dataset.value = "";
-   newTeamTimezone.querySelector(".custom-select-trigger").textContent =
-     "Select Team Timezone";
+
+  newTeamGroup.dataset.value = "";
+
+  newTeamGroup.querySelector(
+    ".custom-select-trigger"
+  ).textContent = "Select Group";
    
-   newTeamResetHour.dataset.value = "";
-   newTeamResetHour.querySelector(".custom-select-trigger").textContent =
-     "Reset Time";
+  newTeamTimezone.dataset.value = "";
+  newTeamTimezone.querySelector(".custom-select-trigger").textContent =
+    "Select Team Timezone";
+   
+  newTeamResetHour.dataset.value = "";
+  newTeamResetHour.querySelector(".custom-select-trigger").textContent =
+    "Reset Time";
 
   // Restore title
   teamModalTitle.textContent = "Create New Team";
@@ -1506,9 +1514,11 @@ document.body.dataset.authready = "true";
    // --------------------------------------------------
    // Init custom selects in Create / Manage Team modal
    // --------------------------------------------------
+   const groupSelect = document.getElementById("newTeamGroup");
    const tzSelect = document.getElementById("newTeamTimezone");
    const resetSelect = document.getElementById("newTeamResetHour");
    
+   if (groupSelect) initCustomSelect(groupSelect);
    if (tzSelect) initCustomSelect(tzSelect);
    if (resetSelect) initCustomSelect(resetSelect);
 
@@ -1615,6 +1625,7 @@ async function loadGroupsForAdmin() {
   });
 
   populateGroupList();
+  populateTeamGroupDropdown(); 
 }
 
 async function createGroupHandler() {
@@ -1651,6 +1662,39 @@ async function createGroupHandler() {
 }
 
 btnGroupCreate.onclick = createGroupHandler;
+
+function populateTeamGroupDropdown() {
+
+  if (!newTeamGroup) return;
+
+  const options =
+    newTeamGroup.querySelector(".custom-options");
+
+  options.innerHTML = `
+    <div class="custom-option" data-value="">
+      Select Group
+    </div>
+  `;
+
+  adminState.allGroups
+    .sort((a,b) => a.name.localeCompare(b.name))
+    .forEach(g => {
+
+      options.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div
+          class="custom-option"
+          data-value="${g.id}">
+          ${g.name}
+        </div>
+        `
+      );
+
+    });
+
+  initCustomSelect(newTeamGroup);
+}
 
 function populateGroupList() {
 
@@ -1749,10 +1793,12 @@ btnCreateTeam.onclick = () => {
 // ============================================================
 async function createTeamHandler() {
   const name = newTeamName.value.trim();
+  const groupId = newTeamGroup.dataset.value;
   const timezone = newTeamTimezone.dataset.value;
   const resetHour = newTeamResetHour.dataset.value;
 
   if (!name) return alert("Please enter a team name.");
+  if (!groupId) return alert("Please select a group.");
   if (!timezone) return alert("Please select a team timezone.");
   if (resetHour === "") return alert("Please select a daily reset time.");
 
@@ -1771,6 +1817,7 @@ async function createTeamHandler() {
 
     await setDoc(teamRef, {
       name,
+      groupId,
       resetTimezone: timezone,
       resetHour: Number(resetHour),
       createdAt: new Date()
@@ -1837,6 +1884,20 @@ document.addEventListener("click", async (e) => {
 
   // Pre-fill inputs
   newTeamName.value = team.name || "";
+
+   newTeamGroup.dataset.value =
+     team.groupId || "";
+   
+   const selectedGroup =
+     adminState.allGroups.find(
+       g => g.id === team.groupId
+     );
+   
+   newTeamGroup.querySelector(
+     ".custom-select-trigger"
+   ).textContent =
+     selectedGroup?.name || "Select Group";
+   
   newTeamTimezone.dataset.value = team.resetTimezone || "";
    newTeamTimezone.querySelector(".custom-select-trigger").textContent =
      team.resetTimezone || "Select Team Timezone";
@@ -1855,10 +1916,16 @@ document.addEventListener("click", async (e) => {
 
   btnTeamCreate.onclick = async () => {
      const updatedName = newTeamName.value.trim();
+     const updatedGroupId = newTeamGroup.dataset.value;
      const updatedTimezone = newTeamTimezone.dataset.value;
      const updatedResetHour = newTeamResetHour.dataset.value;
    
-     if (!updatedName || !updatedTimezone || updatedResetHour === "") {
+     if (
+       !updatedName ||
+       !updatedGroupId ||
+       !updatedTimezone ||
+       updatedResetHour === ""
+     ) {
        alert("Please fill all team fields.");
        return;
      }
@@ -1866,6 +1933,7 @@ document.addEventListener("click", async (e) => {
      try {
        await updateDoc(doc(db, "teams", teamId), {
          name: updatedName,
+         groupId: updatedGroupId,
          resetTimezone: updatedTimezone,
          resetHour: Number(updatedResetHour)
        });

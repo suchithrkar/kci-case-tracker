@@ -218,9 +218,6 @@ const newTeamResetHour = document.getElementById("newTeamResetHour");
 const btnTeamCancel = document.getElementById("btnTeamCancel");
 
 const updateTeamList      = document.getElementById("updateTeamList");
-const modalUpdateData     = document.getElementById("modalUpdateData");
-const btnUpdateClose      = document.getElementById("btnUpdateClose");
-const btnUpdateDone       = document.getElementById("btnUpdateDone");
 
 $("excelInput").onchange = async (e) => {
   const file = e.target.files[0];
@@ -1316,18 +1313,9 @@ async function generateDailyRepairReport({
    FIX — Enable Update Data Modal
    ============================================================ */
 el.btnUpdateData.onclick = () => {
+  el.tabManage.click();
+  activateManageUpdateData();
   resetExcelUI();
-  modalUpdateData.classList.add("show");
-};
-
-
-btnUpdateClose.onclick = () => {
-  resetExcelUI();
-  modalUpdateData.classList.remove("show");
-};
-btnUpdateDone.onclick = () => {
-  resetExcelUI();
-  modalUpdateData.classList.remove("show");
 };
 
 
@@ -2275,8 +2263,11 @@ function resetExcelUI() {
   clearProgress();
 
   // Reset modal preview buttons if preview modal was opened
-  $("btnConfirmImport").disabled = false;
-  $("allowDeletion").disabled = false;
+  if ($("btnConfirmImport"))
+    $("btnConfirmImport").disabled = false;
+   
+  if ($("allowDeletion"))
+    $("allowDeletion").disabled = false;
 
    $("previewSection").style.display = "none";
    $("previewCounts").innerHTML = "";

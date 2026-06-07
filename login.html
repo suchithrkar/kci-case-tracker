@@ -249,11 +249,17 @@ tabSignup.onclick = () => {
 // AUTO-REDIRECT IF LOGGED IN
 watchAuth((user) => {
   if (user && user.status === "approved") {
-    if (user.role === "primary" || user.role === "secondary") {
+
+    if (user.role === "primary") {
       location.href = "admin.html";
+
+    } else if (user.role === "secondary") {
+      location.href = "report.html";
+
     } else {
       location.href = "index.html";
     }
+
   }
 });
 

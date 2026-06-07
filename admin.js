@@ -2245,7 +2245,7 @@ function renderUsersTable(users) {
           <td>${renderRoleDropdown(u)}</td>
           <td>${capitalize(u.status)}</td>
           <td>${created}</td>
-          <td>${groupName}</td>
+          <td>${renderGroupDropdown(u)}</td>
           <td>${renderTeamDropdown(u)}</td>
           <td>${renderUserActions(u)}</td>
         </tr>
@@ -2258,7 +2258,8 @@ function renderUsersTable(users) {
 
    if (isPrimary(adminState.user)) {
      bindUserRoleCustomSelects();
-     bindUserTeamCustomSelects(); // (we add this next)
+     bindUserGroupCustomSelects();
+     bindUserTeamCustomSelects();
      bindUserActions();
    }
 }
@@ -2320,6 +2321,64 @@ function bindUserRoleCustomSelects() {
   });
 }
 
+function bindUserGroupCustomSelects() {
+
+  if (!isPrimary(adminState.user)) return;
+
+  document
+    .querySelectorAll(
+      ".custom-select.user-group-dd"
+    )
+    .forEach(cs => {
+
+      initCustomSelect(cs);
+
+      cs.addEventListener(
+        "change",
+        async () => {
+
+          const uid =
+            cs.dataset.uid;
+
+          const newGroup =
+            cs.dataset.value || "";
+
+          if (!uid) return;
+
+          try {
+
+            await updateDoc(
+              doc(db, "users", uid),
+              {
+                groupId: newGroup
+              }
+            );
+
+            showPopup(
+              `Group updated${
+                newGroup
+                  ? ""
+                  : " (removed)"
+              }.`
+            );
+
+          } catch (err) {
+
+            console.error(err);
+
+            showPopup(
+              "Failed to update group."
+            );
+
+          }
+
+        }
+      );
+
+    });
+
+}
+
 function bindUserTeamCustomSelects() {
   if (!isPrimary(adminState.user)) return;
 
@@ -2348,6 +2407,56 @@ function bindUserTeamCustomSelects() {
 /* -----------------------------------------------------------------------
    FIXED TEAM DROPDOWN
    ----------------------------------------------------------------------- */
+
+function renderGroupDropdown(u) {
+
+  if (!isPrimary(adminState.user)) {
+    return u.groupId || "—";
+  }
+
+  const groups = adminState.allGroups
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const currentGroup =
+    groups.find(g => g.id === u.groupId)?.name
+    || "— No Group —";
+
+  let optionsHtml =
+    `<div class="custom-option" data-value="">
+      — No Group —
+    </div>`;
+
+  groups.forEach(g => {
+
+    optionsHtml += `
+      <div
+        class="custom-option"
+        data-value="${g.id}">
+        ${g.name}
+      </div>
+    `;
+
+  });
+
+  return `
+    <div
+      class="custom-select user-group-dd"
+      data-uid="${u.id}"
+      data-value="${u.groupId || ""}">
+
+      <div class="custom-select-trigger">
+        ${currentGroup}
+      </div>
+
+      <div class="custom-options">
+        ${optionsHtml}
+      </div>
+
+    </div>
+  `;
+}
+
 function renderTeamDropdown(u) {
   if (!isPrimary(adminState.user)) {
     return u.teamId || "—";

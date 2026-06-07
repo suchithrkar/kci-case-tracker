@@ -822,6 +822,10 @@ button:hover,
        <div class="tab" id="tabManageTeams">
          👥 MANAGE TEAMS
        </div>
+
+       <div class="tab" id="tabManageGroups">
+         🌐 MANAGE GROUPS
+       </div> 
      </div>
    
      <div id="manageUpdateDataSection">
@@ -1045,6 +1049,40 @@ button:hover,
         </div>
       
       </div>
+
+     <div id="manageGroupsSection" style="display:none;">
+
+     <div style="padding:0 1.2rem;">
+   
+       <h3 id="groupManagementTitle">
+         Create New Group
+       </h3>
+   
+       <div class="create-team-row">
+   
+         <input
+           class="input"
+           id="newGroupName"
+           placeholder="Enter group name..."
+         />
+   
+         <button
+           class="modal-btn btn-boxed"
+           id="btnGroupCreate">
+           Create Group
+         </button>
+   
+       </div>
+   
+       <hr style="margin:1rem 0;border-color:var(--border);" />
+   
+       <h3>Existing Groups</h3>
+   
+       <div id="groupList"></div>
+   
+     </div>
+   
+   </div>
    
    </div>
 

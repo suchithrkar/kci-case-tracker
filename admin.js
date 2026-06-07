@@ -1482,7 +1482,7 @@ onAuthStateChanged(auth, async (user) => {
 
   adminState.user = { uid: user.uid, ...data };
    // EXCEL IMPORT is disabled until Auth is ready
-document.body.dataset.authready = "true";
+   document.body.dataset.authready = "true";
 
    document.body.dataset.role = data.role;
 
@@ -2496,7 +2496,7 @@ function renderTeamDropdown(u) {
       );
 
   const currentTeam =
-    filteredTeams.find(
+    adminState.allTeams.find(
       t => t.id === u.teamId
     )?.name || "— No Team —";
 

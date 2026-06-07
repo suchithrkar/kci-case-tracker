@@ -2145,8 +2145,21 @@ function populateReassignTeams() {
 
 /* CONFIRM BUTTON — Reassign Users THEN Delete Team */
 btnReassignConfirm.onclick = async () => {
+
   const newTeam = reassignTeamSelect.value;
-  if (!newTeam) return showPopup("Please select a team.");
+
+  if (!newTeam) {
+    return showPopup("Please select a team.");
+  }
+
+  const destinationTeam =
+    adminState.allTeams.find(
+      t => t.id === newTeam
+    );
+
+  if (!destinationTeam) {
+    return showPopup("Selected team not found.");
+  }
 
   showPopup("Reassigning users...");
 

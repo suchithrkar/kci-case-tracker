@@ -2194,6 +2194,7 @@ function renderUsersTable(users) {
       <th>Role</th>
       <th>Status</th>
       <th>Created</th>
+      <th>Group</th>
       <th>Team</th>
       <th>Actions</th>
     `;
@@ -2216,6 +2217,11 @@ function renderUsersTable(users) {
     const name = `${capitalize(u.firstName)} ${capitalize(u.lastName)}`;
     const teamName = (u.teamId || "—").toUpperCase();
 
+    const groupName =
+      adminState.allGroups.find(
+        g => g.id === u.groupId
+      )?.name || "—"; 
+
     if (isSecondary(adminState.user)) {
       // SECONDARY ADMIN ROW
       html += `
@@ -2235,6 +2241,7 @@ function renderUsersTable(users) {
           <td>${renderRoleDropdown(u)}</td>
           <td>${capitalize(u.status)}</td>
           <td>${created}</td>
+          <td>${groupName}</td>
           <td>${renderTeamDropdown(u)}</td>
           <td>${renderUserActions(u)}</td>
         </tr>

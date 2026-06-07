@@ -1847,13 +1847,55 @@ function populateTeamList() {
       const row = document.createElement("div");
       row.style.marginBottom = "0.6rem";
 
+      const groupName =
+        adminState.allGroups.find(
+          g => g.id === t.groupId
+        )?.name || "No Group";
+      
       row.innerHTML = `
-        <div style="display:flex;justify-content:space-between;">
-          <div style="display:flex;align-items:center;"><strong>${t.name}</strong></div>
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:1rem;
+          "
+        >
+      
           <div>
-            <button class="action-btn btnUpdateTeam btn-boxed" style="border-radius:8px;padding:0.35rem 0.6rem;" data-action="rename" data-id="${t.id}">Update</button>
-            <button class="action-btn btn-boxed" style="border-radius:8px;padding:0.35rem 0.6rem;" data-action="delete" data-id="${t.id}">Delete</button>
+            <div>
+              <strong>${t.name}</strong>
+            </div>
+      
+            <div
+              style="
+                font-size:12px;
+                opacity:.75;
+                margin-top:2px;
+              "
+            >
+              Group: ${groupName}
+            </div>
           </div>
+      
+          <div>
+            <button
+              class="action-btn btnUpdateTeam btn-boxed"
+              style="border-radius:8px;padding:0.35rem 0.6rem;"
+              data-action="rename"
+              data-id="${t.id}">
+              Update
+            </button>
+      
+            <button
+              class="action-btn btn-boxed"
+              style="border-radius:8px;padding:0.35rem 0.6rem;"
+              data-action="delete"
+              data-id="${t.id}">
+              Delete
+            </button>
+          </div>
+      
         </div>
       `;
 

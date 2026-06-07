@@ -2217,6 +2217,10 @@ function renderUsersTable(users) {
     const name = `${capitalize(u.firstName)} ${capitalize(u.lastName)}`;
     const teamName = (u.teamId || "—").toUpperCase();
 
+    const team = adminState.allTeams.find(
+      t => t.id === u.teamId
+    ); 
+
     const groupName =
       adminState.allGroups.find(
         g => g.id === u.groupId

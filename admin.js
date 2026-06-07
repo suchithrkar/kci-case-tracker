@@ -2151,7 +2151,13 @@ btnReassignConfirm.onclick = async () => {
   showPopup("Reassigning users...");
 
   for (const uid of reassignUserList) {
-    await updateDoc(doc(db, "users", uid), { teamId: newTeam });
+    await updateDoc(
+      doc(db, "users", uid),
+      {
+        teamId: newTeam,
+        groupId: destinationTeam.groupId
+      }
+    );
   }
 
   showPopup("Deleting old team and its cases...");

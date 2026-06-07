@@ -207,15 +207,11 @@ const el = {
 const teamList            = document.getElementById("teamList");
 const newTeamName         = document.getElementById("newTeamName");
 const btnTeamCreate       = document.getElementById("btnTeamCreate");
-const btnTeamClose        = document.getElementById("btnTeamClose");
-const btnTeamDone         = document.getElementById("btnTeamDone");
-const modalCreateTeam     = document.getElementById("modalCreateTeam");
 const teamModalTitle      = document.getElementById("teamManagementTitle");
 
 // Team reset settings inputs
 const newTeamTimezone = document.getElementById("newTeamTimezone");
 const newTeamResetHour = document.getElementById("newTeamResetHour");
-const btnTeamCancel = document.getElementById("btnTeamCancel");
 
 const updateTeamList      = document.getElementById("updateTeamList");
 
@@ -1632,9 +1628,9 @@ document.addEventListener("click", async (e) => {
    newTeamResetHour.dataset.value =
      typeof team.resetHour === "number" ? String(team.resetHour) : "";
    newTeamResetHour.querySelector(".custom-select-trigger").textContent =
-     typeof team.resetHour === "number"
-       ? `${team.resetHour}:00`
-       : "Reset Time";
+     newTeamResetHour
+       .querySelector(`.custom-option[data-value="${team.resetHour}"]`)
+       ?.textContent || "Reset Time";
 
 
   // Switch Create → Update mode

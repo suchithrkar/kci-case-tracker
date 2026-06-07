@@ -1695,8 +1695,6 @@ function populateTeamGroupDropdown() {
       );
 
     });
-
-  initCustomSelect(newTeamGroup);
 }
 
 function populateGroupList() {
@@ -2163,15 +2161,17 @@ btnReassignConfirm.onclick = async () => {
 
   showPopup("Reassigning users...");
 
-  for (const uid of reassignUserList) {
-    await updateDoc(
+  const updates = reassignUserList.map(uid =>
+    updateDoc(
       doc(db, "users", uid),
       {
         teamId: newTeam,
         groupId: destinationTeam.groupId
       }
-    );
-  }
+    )
+  );
+   
+  await Promise.all(updates);
 
   showPopup("Deleting old team and its cases...");
 
@@ -2459,8 +2459,6 @@ function bindUserGroupCustomSelects() {
                   : " (removed)"
               }.`
             );
-
-            await loadTeamsForAdmin(); 
 
           } catch (err) {
 

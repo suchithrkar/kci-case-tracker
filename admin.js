@@ -1754,6 +1754,18 @@ document.addEventListener("click", async (e) => {
     return;
   }
 
+  const assignedTeams =
+     adminState.allTeams.filter(
+       t => t.groupId === groupId
+     );
+   
+   if (assignedTeams.length > 0) {
+   
+     return showPopup(
+       `Cannot delete group.\n\n${assignedTeams.length} team(s) are assigned to this group.`
+     );
+   } 
+
   await deleteDoc(
     doc(db, "groups", groupId)
   );

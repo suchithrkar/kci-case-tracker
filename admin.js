@@ -371,7 +371,9 @@ async function parseExcelFile(file) {
         19: "serial",
         20: "product",
         21: "email",
-        22: "dnap"
+        22: "dnap",
+        23: "workgroup",
+        24: "team"
       };
 
       const headerRow = rows[0] || [];
@@ -408,6 +410,7 @@ async function parseExcelFile(file) {
       updateProgress("Excel loaded. Processing rows...");
 
       const parsed = [];
+      let detectedExcelTeam = null;
 
       for (let i = 1; i < rows.length; i++) {
         const r = rows[i];
@@ -415,6 +418,26 @@ async function parseExcelFile(file) {
 
         const id = String(r[0]).trim();
         if (!id) continue;
+
+         const rowTeam = String(r[24] || "").trim();
+         
+         if (!rowTeam) {
+           alert(
+             `Repair Cases sheet validation failed.\n\nMissing Team value on row ${i + 1}.`
+           );
+           resolve();
+           return;
+         }
+         
+         if (!detectedExcelTeam) {
+           detectedExcelTeam = rowTeam;
+         } else if (detectedExcelTeam !== rowTeam) {
+           alert(
+             `Repair Cases sheet validation failed.\n\nMultiple Team values detected.\n\nFound:\n${detectedExcelTeam}\n${rowTeam}`
+           );
+           resolve();
+           return;
+         }
 
         parsed.push({
            id: String(r[0] || "").trim(),              // A
@@ -443,9 +466,26 @@ async function parseExcelFile(file) {
            serialNumber: String(r[19] || "").trim(),   // T
            productName: String(r[20] || "").trim(),    // U
            emailStatus: String(r[21] || "").trim(),    // V
-           dnap: String(r[22] || "").trim(),           // W         
+           dnap: String(r[22] || "").trim(),           // W
+           workgroup: String(r[23] || "").trim(),      // X
+         
            excelOrder: i
          });
+      }
+
+      if (
+        detectedExcelTeam &&
+        detectedExcelTeam.toUpperCase() !==
+          excelState.teamId.toUpperCase()
+      ) {
+        alert(
+          `Selected Team and Excel Team do not match.\n\n` +
+          `Selected Team: ${excelState.teamId}\n` +
+          `Excel Team: ${detectedExcelTeam}`
+        );
+      
+        resolve();
+        return;
       }
 
       excelState.excelCases = parsed;
@@ -461,6 +501,27 @@ async function parseExcelFile(file) {
         for (let i = 1; i < closedRows.length; i++) {
           const r = closedRows[i];
           if (!r || !r[0]) continue;
+
+           const closedRowTeam = String(r[16] || "").trim();
+            
+            if (!closedRowTeam) {
+              alert(
+                `Closed Cases Data sheet validation failed.\n\nMissing Team value on row ${i + 1}.`
+              );
+              resolve();
+              return;
+            }
+            
+            if (
+              detectedExcelTeam &&
+              closedRowTeam !== detectedExcelTeam
+            ) {
+              alert(
+                `Closed Cases Data sheet validation failed.\n\nTeam mismatch detected.\n\nExpected: ${detectedExcelTeam}\nFound: ${closedRowTeam}`
+              );
+              resolve();
+              return;
+            }
       
           excelState.closedCases.push({
             id: String(r[0] || "").trim(),
@@ -477,7 +538,8 @@ async function parseExcelFile(file) {
             otcCode: String(r[11] || "").trim(),
             tl: String(r[12] || "").trim(),
             sbd: String(r[13] || "").trim(),
-            market: String(r[14] || "").trim()
+            market: String(r[14] || "").trim(),
+            workgroup: String(r[15] || "").trim()
           });
         }
       }
@@ -613,7 +675,8 @@ function computeDiff() {
        ex.serialNumber !== fs.serialNumber ||
        ex.productName !== fs.productName ||
        ex.emailStatus !== fs.emailStatus ||
-       ex.dnap !== fs.dnap;
+       ex.dnap !== fs.dnap ||
+       ex.workgroup !== fs.workgroup;
    
      if (changed) diff.updated.push(ex);
    }
@@ -829,6 +892,7 @@ async function applyExcelChanges() {
          productName: ex.productName,
          emailStatus: ex.emailStatus,
          dnap: ex.dnap,
+         workgroup: ex.workgroup,
    
          // default fields
          status: "",

@@ -428,12 +428,16 @@ tbody tr:hover {
   grid-template-columns: 1fr 1fr auto;
 }
 
-.team-tz {
+.team-group {
   grid-column: 1 / 2;
 }
 
-.team-reset {
+.team-tz {
   grid-column: 2 / 3;
+}
+
+.team-reset {
+  grid-column: 1 / 3;
 }
 
 .team-submit {
@@ -946,6 +950,17 @@ button:hover,
               id="btnTeamCreate">
               Create Team
             </button>
+
+            <div class="custom-select team-group" id="newTeamGroup">
+              <div class="custom-select-trigger">Select Group</div>
+              <div class="custom-options">
+            
+                <div class="custom-option" data-value="">
+                  Select Group
+                </div>
+            
+              </div>
+            </div> 
       
             <div class="custom-select team-tz" id="newTeamTimezone">
               <div class="custom-select-trigger">Select Team Timezone</div>

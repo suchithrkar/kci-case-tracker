@@ -825,11 +825,103 @@ button:hover,
      </div>
    
      <div id="manageUpdateDataSection">
-       <div style="padding:0 1.2rem;">
-         <h3>Update Data</h3>
-         <p>Update Data content will be migrated here in Phase 2.</p>
-       </div>
-     </div>
+      
+        <div style="padding:0 1.2rem;">
+      
+          <p>Select a team to upload data for:</p>
+          <div id="updateTeamList"></div>
+      
+          <hr style="margin:1rem 0;border-color:var(--border);">
+      
+          <h3>Data Upload (XLSX)</h3>
+      
+          <div class="upload-row">
+      
+            <label class="file-input-label">
+              <span>📄 Choose File</span>
+              <input type="file" id="excelInput" accept=".xlsx,.xls">
+            </label>
+      
+            <div id="selectedFileName"
+                 style="opacity:0.8;font-size:13px;">
+              No file selected
+            </div>
+      
+            <button
+              class="modal-btn btn-boxed"
+              id="btnPreviewChanges"
+              style="padding:0.55rem 1rem;border-radius:999px;font-size:13px;"
+              disabled>
+              PREVIEW CHANGES
+            </button>
+      
+          </div>
+      
+          <div id="uploadSummary" style="margin-top:1rem;">
+            <strong>Selected Team:</strong> -
+          </div>
+      
+          <div id="excelProgress"
+               style="margin-top:1rem;display:none;font-size:14px;line-height:1.5;">
+          </div>
+      
+          <div id="previewSection"
+               style="display:none;margin-top:1.5rem;">
+      
+            <h3>Preview Changes</h3>
+      
+            <div id="previewCounts"
+                 style="font-size:15px;line-height:1.7;margin-top:0.5rem;">
+            </div>
+      
+            <div id="deleteCheckboxWrap"
+                 style="margin-top:1rem;display:none;">
+              <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                <input type="checkbox" id="allowDeletion">
+                <span>Allow deletion of missing cases</span>
+              </label>
+            </div>
+      
+            <div id="dailyReportWrap"
+                 style="margin-top:1rem;">
+              <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                <input type="checkbox" id="updateDailyReport">
+                <span>Update daily repair report data</span>
+              </label>
+            </div>
+      
+            <div id="overwriteWrap"
+                 style="margin-top:1rem;display:none;">
+              <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                <input type="checkbox" id="overwriteUserActions">
+                <span>
+                  Overwrite user action fields
+                  <br>
+                  <small style="opacity:.7;">
+                    (status, notes, follow-ups, PNS, survey, timestamps)
+                  </small>
+                </span>
+              </label>
+            </div>
+      
+            <div style="margin-top:1rem;display:flex;gap:0.6rem;">
+              <button class="modal-btn btn-boxed"
+                      id="btnConfirmImport"
+                      disabled>
+                Confirm Update
+              </button>
+      
+              <button class="modal-btn"
+                      id="btnPreviewCancel">
+                Cancel Preview
+              </button>
+            </div>
+      
+          </div>
+      
+        </div>
+
+      </div>
    
      <div id="manageTeamsSection" style="display:none;">
        <div style="padding:0 1.2rem;">
@@ -945,111 +1037,6 @@ button:hover,
      <button class="modal-btn" id="btnTeamCancel">Cancel</button>
      <button class="modal-btn" id="btnTeamDone">Done</button>
    </div>
-  </div>
-</div>
-
-
-<!-- ============================================================
-     UPDATE DATA MODAL (EXCEL UPLOAD PER TEAM)
-     ============================================================ -->
-<div class="modal" id="modalUpdateData">
-  <div class="modal-card">
-    <div class="modal-head">
-      <div class="modal-title">Update Case Data</div>
-      <button class="modal-btn" id="btnUpdateClose">Close</button>
-    </div>
-
-    <div class="modal-body">
-
-      <p>Select a team to upload data for:</p>
-      <div id="updateTeamList"></div>
-
-      <hr style="margin:1rem 0;border-color:var(--border);">
-
-      <h3>Data Upload (XLSX)</h3>
-
-<!-- Upload Row -->
-<div class="upload-row">
-
-  <!-- Custom File Selector -->
-  <label class="file-input-label">
-    <span>📄 Choose File</span>
-    <input type="file" id="excelInput" accept=".xlsx,.xls">
-  </label>
-
-  <!-- Selected file name -->
-  <div id="selectedFileName" style="opacity:0.8; font-size:13px;">No file selected</div>
-
-  <!-- PREVIEW CHANGES button -->
-  <button class="modal-btn btn-boxed" id="btnPreviewChanges" style="padding: 0.55rem 1rem;border-radius: 999px;font-size: 13px;" disabled>
-    PREVIEW CHANGES
-  </button>
-
-</div>
-
-<!-- Summary Area -->
-<div id="uploadSummary" style="margin-top:1rem;">
-  <strong>Selected Team:</strong> -
-</div>
-
-<!-- Progress Area (hidden until needed) -->
-<div id="excelProgress" style="margin-top:1rem; display:none; font-size:14px; line-height:1.5;"></div>
-
-       <!-- Preview Results (hidden until PREVIEW CHANGES is clicked) -->
-<div id="previewSection" style="display:none; margin-top:1.5rem;">
-
-  <h3>Preview Changes</h3>
-
-  <div id="previewCounts" style="font-size:15px; line-height:1.7; margin-top:0.5rem;">
-    <!-- filled by JS -->
-  </div>
-
-  <!-- Deletion Checkbox -->
-  <div id="deleteCheckboxWrap" style="margin-top:1rem; display:none;">
-    <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer;">
-      <input type="checkbox" id="allowDeletion">
-      <span>Allow deletion of missing cases</span>
-    </label>
-  </div>
-
-   <!-- Daily Report Update Option -->
-   <div id="dailyReportWrap" style="margin-top:1rem;">
-     <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer;">
-       <input type="checkbox" id="updateDailyReport">
-       <span>Update daily repair report data</span>
-     </label>
-   </div>
-
-   <!-- Import-only option -->
-   <div id="overwriteWrap" style="margin-top:1rem; display:none;">
-     <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
-       <input type="checkbox" id="overwriteUserActions">
-       <span>
-         Overwrite user action fields
-         <br>
-         <small style="opacity:.7;">
-           (status, notes, follow-ups, PNS, survey, timestamps)
-         </small>
-       </span>
-     </label>
-   </div>
-
-  <!-- Preview Buttons -->
-  <div style="margin-top:1rem; display:flex; gap:0.6rem;">
-    <button class="modal-btn btn-boxed" id="btnConfirmImport" disabled>Confirm Update</button>
-    <button class="modal-btn" id="btnPreviewCancel">Cancel Preview</button>
-  </div>
-
-</div>
-
-
-
-
-    </div>
-
-    <div class="modal-foot">
-      <button class="modal-btn" id="btnUpdateDone">Done</button>
-    </div>
   </div>
 </div>
 

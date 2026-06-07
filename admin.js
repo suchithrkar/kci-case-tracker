@@ -1314,7 +1314,6 @@ async function generateDailyRepairReport({
    ============================================================ */
 el.btnUpdateData.onclick = () => {
   el.tabManage.click();
-  activateManageUpdateData();
   resetExcelUI();
 };
 
@@ -2257,8 +2256,11 @@ function resetExcelUI() {
   $("selectedFileName").textContent = "No file selected";
   $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> -`;
   $("btnPreviewChanges").disabled = true;
-  $("allowDeletion").checked = false;
-  $("updateDailyReport").checked = false;
+  if ($("allowDeletion"))
+    $("allowDeletion").checked = false;
+   
+  if ($("updateDailyReport"))
+    $("updateDailyReport").checked = false;
 
   clearProgress();
 

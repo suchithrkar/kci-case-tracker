@@ -834,7 +834,10 @@ $("btnConfirmImport").onclick = async () => {
      await applyExcelChanges();
    }  // main engine
 
-  updateProgress("\nDONE.\nYou may close this window.");
+  updateProgress(
+     "\nDONE.\nTeam data updated successfully.\nClick NEW UPLOAD to process another team."
+  );
+  $("uploadCompleteActions").style.display = "block"; 
 
 };
 
@@ -2820,6 +2823,9 @@ function resetExcelUI() {
 
   clearProgress();
 
+  if ($("uploadCompleteActions"))
+    $("uploadCompleteActions").style.display = "none"; 
+
   // Reset modal preview buttons if preview modal was opened
   if ($("btnConfirmImport"))
     $("btnConfirmImport").disabled = false;
@@ -2927,6 +2933,14 @@ updateTeamList.addEventListener("click", async (e) => {
   if (action === "export") exportBackup(teamId);
   if (action === "import") importBackupPrompt(teamId);
 });
+
+$("btnNewUpload").onclick = () => {
+  resetExcelUI();
+
+  $("excelInput").value = "";
+
+  showPopup("Ready for next upload.");
+};
 
 // -----------------------------
 // Prevent file picker when no team selected

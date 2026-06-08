@@ -62,7 +62,24 @@ const excelState = {
   excelCases: [],
   firestoreCases: [],
   closedCases: [],
-  diff: { new: [], updated: [], deleted: [] }
+
+  diff: {
+    new: [],
+    updated: [],
+    deleted: []
+  },
+
+  rfcDiff: {
+    newOnsite: [],
+    newOffsite: [],
+    newCSR: [],
+    newTotal: [],
+
+    deletedOnsite: [],
+    deletedOffsite: [],
+    deletedCSR: [],
+    deletedTotal: []
+  }
 };
 
 let processing = false;
@@ -707,6 +724,108 @@ function computeDiff() {
   excelState.diff = diff;
 }
 
+function computeRFCDiff() {
+
+  function getOnsiteRFC(c) {
+    return (
+      c.caseResolutionCode === "Onsite Solution" &&
+      [
+        "Closed - Canceled",
+        "Closed - Posted",
+        "Open - Completed"
+      ].includes(c.onsiteRFC)
+    );
+  }
+
+  function getOffsiteRFC(c) {
+    return (
+      c.caseResolutionCode === "Offsite Solution" &&
+      [
+        "Delivered",
+        "Order cancelled, not to be reopened"
+      ].includes(c.benchRFC)
+    );
+  }
+
+  function getCSRRFC(c) {
+    return (
+      c.caseResolutionCode === "Parts Shipped" &&
+      [
+        "Cancelled",
+        "Closed",
+        "POD"
+      ].includes(c.csrRFC)
+    );
+  }
+
+  const currentOnsite = new Set(
+    excelState.firestoreCases
+      .filter(getOnsiteRFC)
+      .map(c => c.id)
+  );
+
+  const currentOffsite = new Set(
+    excelState.firestoreCases
+      .filter(getOffsiteRFC)
+      .map(c => c.id)
+  );
+
+  const currentCSR = new Set(
+    excelState.firestoreCases
+      .filter(getCSRRFC)
+      .map(c => c.id)
+  );
+
+  const currentTotal = new Set([
+    ...currentOnsite,
+    ...currentOffsite,
+    ...currentCSR
+  ]);
+
+  const excelOnsite = new Set(
+    excelState.excelCases
+      .filter(getOnsiteRFC)
+      .map(c => c.id)
+  );
+
+  const excelOffsite = new Set(
+    excelState.excelCases
+      .filter(getOffsiteRFC)
+      .map(c => c.id)
+  );
+
+  const excelCSR = new Set(
+    excelState.excelCases
+      .filter(getCSRRFC)
+      .map(c => c.id)
+  );
+
+  const excelTotal = new Set([
+    ...excelOnsite,
+    ...excelOffsite,
+    ...excelCSR
+  ]);
+
+  const added = (newSet, oldSet) =>
+    [...newSet].filter(id => !oldSet.has(id));
+
+  const removed = (oldSet, newSet) =>
+    [...oldSet].filter(id => !newSet.has(id));
+
+  excelState.rfcDiff = {
+
+    newOnsite: added(excelOnsite, currentOnsite),
+    newOffsite: added(excelOffsite, currentOffsite),
+    newCSR: added(excelCSR, currentCSR),
+    newTotal: added(excelTotal, currentTotal),
+
+    deletedOnsite: removed(currentOnsite, excelOnsite),
+    deletedOffsite: removed(currentOffsite, excelOffsite),
+    deletedCSR: removed(currentCSR, excelCSR),
+    deletedTotal: removed(currentTotal, excelTotal)
+  };
+}
+
 async function loadFirestoreCasesForTeam(teamId) {
   updateProgress("Loading existing Firestore cases...");
 
@@ -733,11 +852,33 @@ async function loadFirestoreCasesForTeam(teamId) {
 async function openPreviewModal() {
   const d = excelState.diff;
 
-  $("previewCounts").innerHTML = `
-    <strong>New Cases:</strong> ${d.new.length}<br>
-    <strong>Updated Cases:</strong> ${d.updated.length}<br>
-    <strong>Deleted Cases:</strong> ${d.deleted.length}
-  `;
+  const r = excelState.rfcDiff;
+
+   $("previewCounts").innerHTML = `
+     <strong>New Cases:</strong> ${d.new.length}<br>
+     <strong>Updated Cases:</strong> ${d.updated.length}<br>
+     <strong>Deleted Cases:</strong> ${d.deleted.length}
+   
+     <br><br>
+   
+     <strong>RFC Changes</strong>
+   
+     <br><br>
+   
+     <strong>New RFC</strong><br>
+     Onsite: ${r.newOnsite.length}<br>
+     Offsite: ${r.newOffsite.length}<br>
+     CSR: ${r.newCSR.length}<br>
+     Total: ${r.newTotal.length}
+   
+     <br><br>
+   
+     <strong>Deleted RFC</strong><br>
+     Onsite: ${r.deletedOnsite.length}<br>
+     Offsite: ${r.deletedOffsite.length}<br>
+     CSR: ${r.deletedCSR.length}<br>
+     Total: ${r.deletedTotal.length}
+   `;
 
   // show preview section
   $("previewSection").style.display = "block";
@@ -1026,9 +1167,11 @@ async function applyExcelChanges() {
        cases: excelState.excelCases,
        todayISO,
        generatedBy: adminState.user.uid,
-
+     
        newCasesCount: newCases.length,
-       deletedCasesCount: deleted.length
+       deletedCasesCount: deleted.length,
+     
+       rfcDiff: excelState.rfcDiff
      });
    
      updateProgress("Daily report updated.");
@@ -1245,7 +1388,8 @@ async function generateDailyRepairReport({
      todayISO,
      generatedBy,
      newCasesCount,
-     deletedCasesCount
+     deletedCasesCount,
+     rfcDiff
    }) {
      // ===============================
      // TOTAL OPEN
@@ -1378,6 +1522,24 @@ async function generateDailyRepairReport({
 
           newCasesCount: newCasesCount || 0,
           deletedCasesCount: deletedCasesCount || 0,
+
+          newRFCOnsiteCount: rfcDiff?.newOnsite?.length || 0,
+          newRFCOffsiteCount: rfcDiff?.newOffsite?.length || 0,
+          newRFCCSRCount: rfcDiff?.newCSR?.length || 0,
+          newRFCTotalCount: rfcDiff?.newTotal?.length || 0,
+         
+          deletedRFCOnsiteCount: rfcDiff?.deletedOnsite?.length || 0,
+          deletedRFCOffsiteCount: rfcDiff?.deletedOffsite?.length || 0,
+          deletedRFCCSRCount: rfcDiff?.deletedCSR?.length || 0,
+          deletedRFCTotalCount: rfcDiff?.deletedTotal?.length || 0,
+         
+          newRFCOnsiteCases: rfcDiff?.newOnsite || [],
+          newRFCOffsiteCases: rfcDiff?.newOffsite || [],
+          newRFCCSRCases: rfcDiff?.newCSR || [],
+         
+          deletedRFCOnsiteCases: rfcDiff?.deletedOnsite || [],
+          deletedRFCOffsiteCases: rfcDiff?.deletedOffsite || [],
+          deletedRFCCSRCases: rfcDiff?.deletedCSR || [], 
            
           generatedAt: new Date(),
           generatedBy
@@ -1429,8 +1591,10 @@ $("btnPreviewChanges").onclick = async () => {
   await loadFirestoreCasesForTeam(excelState.teamId);
 
   updateProgress("Comparing Excel → Firestore...");
+   
   computeDiff();
-
+  computeRFCDiff();
+   
   await openPreviewModal();
 };
 
@@ -2810,7 +2974,23 @@ function resetExcelUI() {
   excelState.excelCases = [];
   excelState.firestoreCases = [];
   excelState.closedCases = [];
-  excelState.diff = { new: [], updated: [], deleted: [] };
+  excelState.diff = {
+    new: [],
+    updated: [],
+    deleted: []
+  };
+   
+  excelState.rfcDiff = {
+    newOnsite: [],
+    newOffsite: [],
+    newCSR: [],
+    newTotal: [],
+   
+    deletedOnsite: [],
+    deletedOffsite: [],
+    deletedCSR: [],
+    deletedTotal: []
+  };
 
   $("selectedFileName").textContent = "No file selected";
   $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> -`;

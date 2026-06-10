@@ -993,6 +993,27 @@ async function applyExcelChanges() {
   updateProgress(`Updated: ${updated.length}`);
   updateProgress(`Deleted: ${deleted.length}`);
 
+   // ======================================================
+   // AUTO RESET PREVIOUS-DAY SERVICE ARRANGED CASES
+   // ======================================================
+   
+   const teamCfg = adminState.allTeams.find(
+     t => t.id === excelState.teamId
+   );
+   
+   const todayISO = getTeamToday(teamCfg);
+   
+   const serviceArrangedCases =
+     excelState.firestoreCases.filter(c =>
+       c.status === "Service Arranged" &&
+       c.statusChangedOn &&
+       c.statusChangedOn !== todayISO
+     );
+   
+   updateProgress(
+     `Service Arranged Reset Candidates: ${serviceArrangedCases.length}`
+   ); 
+
   const batchLimit = 400; // Safe threshold below Firestore 500 limit
 
   // Utility to run batches safely
@@ -1020,6 +1041,51 @@ async function applyExcelChanges() {
   }
 
   try {
+        // ======================================================
+        // RESET PREVIOUS-DAY SERVICE ARRANGED CASES
+        // ======================================================
+      
+        if (serviceArrangedCases.length > 0) {
+      
+          updateProgress(
+            "\nResetting previous-day Service Arranged cases..."
+          );
+      
+          await runBatches(
+            serviceArrangedCases.map(c =>
+              updateDoc(
+                doc(
+                  db,
+                  "cases",
+                  excelState.teamId,
+                  "casesList",
+                  c.id
+                ),
+                {
+                  status: "",
+                  followDate: "",
+                  followTime: "",
+      
+                  flagged: false,
+                  pns: false,
+      
+                  surveyPrediction: "",
+                  predictionComment: "",
+                  notes: "",
+      
+                  lastActionedOn: "",
+                  lastActionedBy: "",
+      
+                  statusChangedOn: "",
+                  statusChangedBy: ""
+                }
+              )
+            ),
+            "Service Arranged Reset"
+          );
+        }
+     
+     
      // ======================================================
      // NEW CASES → setDoc
      // ======================================================
@@ -1089,68 +1155,26 @@ async function applyExcelChanges() {
       
         let data = { ...ex, teamId: excelState.teamId };
       
-        if (!overwrite && existing) {
-
-           const teamCfg = adminState.allTeams.find(
-             t => t.id === excelState.teamId
-           );
+        const preserve = [
+           "status",
+           "followDate",
+           "followTime",
+           "flagged",
+           "notes",
+           "pns",
+           "surveyPrediction",
+           "predictionComment",
+           "lastActionedOn",
+           "lastActionedBy",
+           "statusChangedOn",
+           "statusChangedBy"
+         ];
          
-           const todayISO = getTeamToday(teamCfg);
-         
-           // ==========================================
-           // AUTO RESET PREVIOUS-DAY SERVICE ARRANGED
-           // ==========================================
-           if (
-             existing.status === "Service Arranged" &&
-             existing.statusChangedOn &&
-             existing.statusChangedOn !== todayISO
-           ) {
-         
-             data.status = "";
-             data.followDate = "";
-             data.followTime = "";
-         
-             data.flagged = false;
-             data.pns = false;
-         
-             data.surveyPrediction = "";
-             data.predictionComment = "";
-             data.notes = "";
-         
-             data.lastActionedOn = "";
-             data.lastActionedBy = "";
-         
-             data.statusChangedOn = "";
-             data.statusChangedBy = "";
+         preserve.forEach(f => {
+           if (existing[f] !== undefined) {
+             data[f] = existing[f];
            }
-         
-           // ==========================================
-           // NORMAL PRESERVE LOGIC
-           // ==========================================
-           else {
-         
-             const preserve = [
-               "status",
-               "followDate",
-               "followTime",
-               "flagged",
-               "notes",
-               "pns",
-               "surveyPrediction",
-               "predictionComment",
-               "lastActionedOn",
-               "lastActionedBy",
-               "statusChangedOn",
-               "statusChangedBy"
-             ];
-         
-             preserve.forEach(f => {
-               if (existing[f] !== undefined) {
-                 data[f] = existing[f];
-               }
-             });
-           }
-         }
+         });
       
          return setDoc(
            doc(db, "cases", excelState.teamId, "casesList", ex.id),

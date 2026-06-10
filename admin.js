@@ -1001,13 +1001,13 @@ async function applyExcelChanges() {
      t => t.id === excelState.teamId
    );
    
-   const todayISO = getTeamToday(teamCfg);
+   const resetTodayISO = getTeamToday(teamCfg);
    
    const serviceArrangedCases =
      excelState.firestoreCases.filter(c =>
        c.status === "Service Arranged" &&
        c.statusChangedOn &&
-       c.statusChangedOn !== todayISO
+       c.statusChangedOn !== resetTodayISO
      );
    
    updateProgress(
@@ -1170,11 +1170,13 @@ async function applyExcelChanges() {
            "statusChangedBy"
          ];
          
-         preserve.forEach(f => {
-           if (existing[f] !== undefined) {
-             data[f] = existing[f];
-           }
-         });
+         if (existing) {
+           preserve.forEach(f => {
+             if (existing[f] !== undefined) {
+               data[f] = existing[f];
+             }
+           });
+         }
       
          return setDoc(
            doc(db, "cases", excelState.teamId, "casesList", ex.id),

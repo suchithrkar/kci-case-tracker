@@ -1479,6 +1479,28 @@ function buildStatusPanel() {
    el.statusPanel.innerHTML += `
      <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
    `;
+
+   el.statusPanel.innerHTML += `
+     <label>
+       <input type="checkbox" data-status="Escalated / Elevated"
+         ${uiState.statusList.includes("Escalated / Elevated") ? "checked" : ""}/>
+       Escalated / Elevated
+     </label>
+   
+     <label>
+       <input type="checkbox" data-status="Service Arranged"
+         ${uiState.statusList.includes("Service Arranged") ? "checked" : ""}/>
+       Service Arranged
+     </label>
+   
+     <label>
+       <input type="checkbox" data-status="Pending Closure"
+         ${uiState.statusList.includes("Pending Closure") ? "checked" : ""}/>
+       Pending Closure
+     </label>
+   
+     <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
+   `;
    
    // ✅ Show All NCM Cases option (override flag)
    el.statusPanel.innerHTML += `
@@ -2319,14 +2341,17 @@ function renderGearButton(caseId) {
 /* Status dropdown — NO MORE RESET BUG */
 function renderStatusSelect(row) {
   const statuses = [
-    "",
-    "Closed",
-    "NCM 1",
-    "NCM 2",
-    "PNS",
-    "Service Pending",
-    "Monitoring"
-  ];
+     "",
+     "Closed",
+     "NCM 1",
+     "NCM 2",
+     "PNS",
+     "Service Pending",
+     "Monitoring",
+     "Escalated / Elevated",
+     "Service Arranged",
+     "Pending Closure"
+   ];
 
   return `
     <div class="custom-select" data-id="${row.id}">
@@ -2905,7 +2930,12 @@ function handleStatusChange(caseId, newStatus) {
   const row = trackerState.allCases.find(r => r.id === caseId);
   if (!row) return;
 
-  const needsFollow = (newStatus === "Service Pending" || newStatus === "Monitoring");
+  const needsFollow =
+   (
+     newStatus === "Service Pending" ||
+     newStatus === "Monitoring" ||
+     newStatus === "Escalated / Elevated"
+   );
 
    // ✅ AUTO-PNS: If status is set to PNS, auto-enable PNS flag
    if (newStatus === "PNS") {
@@ -3007,7 +3037,11 @@ document.addEventListener("click", (e) => {
    label.innerHTML = value || "&nbsp;";
    
    // 🔄 If switching to NON follow-up status, clear enforcement
-   if (value !== "Service Pending" && value !== "Monitoring") {
+   if (
+     value !== "Service Pending" &&
+     value !== "Monitoring" &&
+     value !== "Escalated / Elevated"
+   ) {
      pendingStatusForModal = null;
      requireFollowUp = false;
      hideModalWarning();
@@ -3221,14 +3255,17 @@ export function openCaseModal(caseId, enforce = false) {
            </div>
            <div class="custom-options">
              ${[
-               "",
-               "Closed",
-               "NCM 1",
-               "NCM 2",
-               "PNS",
-               "Service Pending",
-               "Monitoring"
-             ].map(s => `
+                 "",
+                 "Closed",
+                 "NCM 1",
+                 "NCM 2",
+                 "PNS",
+                 "Service Pending",
+                 "Monitoring",
+                 "Escalated / Elevated",
+                 "Service Arranged",
+                 "Pending Closure"
+               ].map(s => `
                <div class="custom-option" data-value="${s}">
                  ${s || "&nbsp;"}
                </div>
@@ -3985,8 +4022,11 @@ async function saveModalData() {
      requireFollowUp ||
      (
        window.__fromReminder &&
-       (effectiveStatus === "Service Pending" ||
-        effectiveStatus === "Monitoring")
+       (
+         effectiveStatus === "Service Pending" ||
+         effectiveStatus === "Monitoring" ||
+         effectiveStatus === "Escalated / Elevated"
+       )
      );
    
    if (needsFollowUpEnforced && !follow) {
@@ -4185,12 +4225,15 @@ function showSummaryInfo() {
 
   // Other status breakdowns
   const statusBreakdown = {
-    "Service Pending": 0,
-    "Monitoring": 0,
-    "NCM 1": 0,
-    "NCM 2": 0,
-    "PNS": 0
-  };
+     "Service Pending": 0,
+     "Monitoring": 0,
+     "Escalated / Elevated": 0,
+     "Service Arranged": 0,
+     "Pending Closure": 0,
+     "NCM 1": 0,
+     "NCM 2": 0,
+     "PNS": 0
+   };
 
   followedUpCases.forEach(r => {
     if (statusBreakdown[r.status] !== undefined) {
@@ -4236,6 +4279,9 @@ Not Met: ${notMet} (${pct(notMet)}%)
    
 Service Pending: ${statusBreakdown["Service Pending"]}
 Monitoring: ${statusBreakdown["Monitoring"]}
+Escalated / Elevated: ${statusBreakdown["Escalated / Elevated"]}
+Service Arranged: ${statusBreakdown["Service Arranged"]}
+Pending Closure: ${statusBreakdown["Pending Closure"]}
 NCM 1: ${statusBreakdown["NCM 1"]}
 NCM 2: ${statusBreakdown["NCM 2"]}
 PNS: ${statusBreakdown["PNS"]}

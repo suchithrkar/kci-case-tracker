@@ -1489,11 +1489,6 @@ function buildStatusPanel() {
    el.statusPanel.innerHTML += `
      <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
    `;
-
-   // ✅ Divider
-   el.statusPanel.innerHTML += `
-     <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
-   `;
    
    // ✅ Show All NCM Cases option (override flag)
    el.statusPanel.innerHTML += `

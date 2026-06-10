@@ -1090,25 +1090,67 @@ async function applyExcelChanges() {
         let data = { ...ex, teamId: excelState.teamId };
       
         if (!overwrite && existing) {
-          const preserve = [
-            "status",
-            "followDate",
-            "followTime",
-            "flagged",
-            "notes",
-            "pns",
-            "surveyPrediction",
-            "predictionComment",
-            "lastActionedOn",
-            "lastActionedBy",
-            "statusChangedOn",
-            "statusChangedBy"
-          ];
-      
-          preserve.forEach(f => {
-            if (existing[f] !== undefined) data[f] = existing[f];
-          });
-        }
+
+           const teamCfg = adminState.allTeams.find(
+             t => t.id === excelState.teamId
+           );
+         
+           const todayISO = getTeamToday(teamCfg);
+         
+           // ==========================================
+           // AUTO RESET PREVIOUS-DAY SERVICE ARRANGED
+           // ==========================================
+           if (
+             existing.status === "Service Arranged" &&
+             existing.statusChangedOn &&
+             existing.statusChangedOn !== todayISO
+           ) {
+         
+             data.status = "";
+             data.followDate = "";
+             data.followTime = "";
+         
+             data.flagged = false;
+             data.pns = false;
+         
+             data.surveyPrediction = "";
+             data.predictionComment = "";
+             data.notes = "";
+         
+             data.lastActionedOn = "";
+             data.lastActionedBy = "";
+         
+             data.statusChangedOn = "";
+             data.statusChangedBy = "";
+           }
+         
+           // ==========================================
+           // NORMAL PRESERVE LOGIC
+           // ==========================================
+           else {
+         
+             const preserve = [
+               "status",
+               "followDate",
+               "followTime",
+               "flagged",
+               "notes",
+               "pns",
+               "surveyPrediction",
+               "predictionComment",
+               "lastActionedOn",
+               "lastActionedBy",
+               "statusChangedOn",
+               "statusChangedBy"
+             ];
+         
+             preserve.forEach(f => {
+               if (existing[f] !== undefined) {
+                 data[f] = existing[f];
+               }
+             });
+           }
+         }
       
          return setDoc(
            doc(db, "cases", excelState.teamId, "casesList", ex.id),

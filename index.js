@@ -1490,25 +1490,8 @@ function buildStatusPanel() {
      <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
    `;
 
+   // ✅ Divider
    el.statusPanel.innerHTML += `
-     <label>
-       <input type="checkbox" data-status="Escalated / Elevated"
-         ${uiState.statusList.includes("Escalated / Elevated") ? "checked" : ""}/>
-       Escalated / Elevated
-     </label>
-   
-     <label>
-       <input type="checkbox" data-status="Service Arranged"
-         ${uiState.statusList.includes("Service Arranged") ? "checked" : ""}/>
-       Service Arranged
-     </label>
-   
-     <label>
-       <input type="checkbox" data-status="Pending Closure"
-         ${uiState.statusList.includes("Pending Closure") ? "checked" : ""}/>
-       Pending Closure
-     </label>
-   
      <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
    `;
    

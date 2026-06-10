@@ -1001,11 +1001,11 @@ async function applyExcelChanges() {
    // AUTO RESET PREVIOUS-DAY SERVICE ARRANGED CASES
    // ======================================================
    
-   const teamCfg = adminState.allTeams.find(
+   const resetTeamCfg = adminState.allTeams.find(
      t => t.id === excelState.teamId
    );
    
-   const resetTodayISO = getTeamToday(teamCfg);
+   const resetTodayISO = getTeamToday(resetTeamCfg);
    
    const serviceArrangedCases =
      excelState.firestoreCases.filter(c =>
@@ -1153,9 +1153,6 @@ async function applyExcelChanges() {
      await runBatches(
      updated.map(ex => {
         const existing = excelState.firestoreCases.find(c => c.id === ex.id);
-        const overwrite =
-          excelState.isBackupImport &&
-          $("overwriteUserActions")?.checked;
       
         let data = { ...ex, teamId: excelState.teamId };
       

@@ -3582,8 +3582,9 @@ function updateSaveButtonState() {
         );
 
   const needsFollow =
-    effectiveStatus === "Service Pending" ||
-    effectiveStatus === "Monitoring";
+     effectiveStatus === "Service Pending" ||
+     effectiveStatus === "Monitoring" ||
+     effectiveStatus === "Escalated / Elevated";
 
    if (needsFollow && !follow) {
      btnModalSave.disabled = true;

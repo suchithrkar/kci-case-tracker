@@ -38,6 +38,7 @@ const el = {
   userFullName: document.getElementById("userFullName"),
   btnTheme: document.getElementById("btnTheme"),
   btnAdmin: document.getElementById("btnAdmin"),
+  btnReports: document.getElementById("btnReports"), 
   btnLogout: document.getElementById("btnLogout"),
   hamburger: document.getElementById("btnHamburger"),
   sidebar: document.getElementById("sidebar"),
@@ -466,13 +467,26 @@ el.btnTheme.onclick = () => {
 };
 
 
-  /* Admin button */
-  if (isPrimary(data) || isSecondary(data)) {
-    el.btnAdmin.style.display = "inline-block";
-    el.btnAdmin.onclick = () => (location.href = "admin.html");
-  } else {
-    el.btnAdmin.style.display = "none";
-  }
+   /* Admin Dashboard — PRIMARY ONLY */
+   if (isPrimary(data)) {
+     el.btnAdmin.style.display = "inline-block";
+     el.btnAdmin.onclick = () => (location.href = "admin.html");
+   } else {
+     el.btnAdmin.style.display = "none";
+     el.btnAdmin.disabled = true;
+   }
+
+   /* Reports button — PRIMARY + SECONDARY */
+   if (isPrimary(data) || isSecondary(data)) {
+     el.btnReports.style.display = "inline-block";
+   
+     el.btnReports.onclick = () => {
+       window.location.href = "report.html";
+     };
+   } else {
+     el.btnReports.style.display = "none";
+     el.btnReports.disabled = true;
+   }
 
    /* =====================================================
       RFC REPORT → VIEW DETAILED REPORT BUTTON (ADMINS ONLY)

@@ -612,7 +612,11 @@ async function parseBackupFile(data) {
   }
 
   // 🔒 TEAM SAFETY CHECK
-  if (backup.teamId && backup.teamId !== excelState.teamId) {
+  if (
+    backup.teamId &&
+    backup.teamId.toUpperCase() !==
+    excelState.teamId.toUpperCase()
+  ) {
     showPopup(
       `This backup belongs to another team.\n\nBackup Team: ${backup.teamId}`
     );

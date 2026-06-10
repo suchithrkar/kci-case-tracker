@@ -1451,7 +1451,17 @@ function setupStatusPanel() {
 }
 
 function buildStatusPanel() {
-  const statuses = ["Closed", "NCM 1", "NCM 2", "PNS", "Service Pending", "Monitoring"];
+  const statuses = [
+     "Closed",
+     "NCM 1",
+     "NCM 2",
+     "PNS",
+     "Service Pending",
+     "Monitoring",
+     "Escalated / Elevated",
+     "Service Arranged",
+     "Pending Closure"
+   ];
 
    el.statusPanel.innerHTML = statuses.map(s => {
    

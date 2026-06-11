@@ -399,6 +399,14 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+   if (
+     data.role !== "primary" &&
+     data.groupId !== "DST"
+   ) {
+     location.href = "../index.html";
+     return;
+   }
+
   trackerState.user = { uid: user.uid, ...data };
   trackerState.teamId = getCurrentTrackerTeam(trackerState.user);
   applyFilters();

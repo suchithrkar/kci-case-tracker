@@ -3,14 +3,25 @@
    ====================================================== */
 
 import {
+  auth,
+  onAuthStateChanged,
   db,
   collection,
-  getDocs,
+  addDoc,
   doc,
   getDoc,
+  getDocs,
   setDoc,
-  deleteDoc
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  onSnapshot
 } from "../js/firebase.js";
+
+import { isPrimary, isSecondary, toggleTheme } from "./js/userProfile.js";
+import { showPopup } from "./js/utils.js";
+import { cleanupDailyReports } from "./js/utils.js";
 
 export const excelState = {
   teamId: null,

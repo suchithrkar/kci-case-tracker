@@ -5,7 +5,9 @@
 import {
   db,
   collection,
-  getDocs
+  getDocs,
+  doc,
+  getDoc
 } from "../js/firebase.js";
 
 export const excelState = {
@@ -47,6 +49,53 @@ function excelColLetter(index) {
   }
 
   return col;
+}
+
+function getTeamToday(teamConfig) {
+  const timezone =
+    teamConfig?.resetTimezone || "UTC";
+
+  const resetHour =
+    typeof teamConfig?.resetHour === "number"
+      ? teamConfig.resetHour
+      : 0;
+
+  const now = new Date();
+
+  const formatter =
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      hour12: false
+    });
+
+  const parts = Object.fromEntries(
+    formatter.formatToParts(now)
+      .map(p => [p.type, p.value])
+  );
+
+  let teamDate =
+    `${parts.year}-${parts.month}-${parts.day}`;
+
+  const teamHour =
+    Number(parts.hour);
+
+  if (teamHour < resetHour) {
+    const d =
+      new Date(`${teamDate}T00:00:00Z`);
+
+    d.setUTCDate(
+      d.getUTCDate() - 1
+    );
+
+    teamDate =
+      d.toISOString().split("T")[0];
+  }
+
+  return teamDate;
 }
 
 function validateReadyState() {
@@ -461,6 +510,189 @@ function bindUploadTeamSelection() {
   );
 }
 
+async function loadFirestoreCasesForTeam(teamId) {
+  updateProgress(
+    "Loading existing Firestore cases..."
+  );
+
+  try {
+    const colRef =
+      collection(
+        db,
+        "cases",
+        teamId,
+        "casesList"
+      );
+
+    const snap =
+      await getDocs(colRef);
+
+    excelState.firestoreCases =
+      snap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      }));
+
+  } catch (err) {
+    console.error(
+      "Firestore read failed:",
+      err
+    );
+
+    alert(
+      "Could not load Firestore cases."
+    );
+  }
+}
+
+// ======================================================
+// COMPARE EXCEL CASES vs FIRESTORE CASES
+// ======================================================
+function computeDiff() {
+  const excelMap = new Map();
+  excelState.excelCases.forEach(c => excelMap.set(c.id, c));
+
+  const fsMap = new Map();
+  excelState.firestoreCases.forEach(c => fsMap.set(c.id, c));
+
+  const diff = {
+    new: [],
+    updated: [],
+    deleted: []
+  };
+
+  // Detect new + updated
+  for (const ex of excelState.excelCases) {
+     const fs = fsMap.get(ex.id);
+   
+     if (!fs) {
+       diff.new.push(ex);
+       continue;
+     }
+   
+     // 🔥 BACKUP FULL RESTORE MODE:
+     // Treat ALL existing cases as updated
+     if (excelState.isBackupImport && $("overwriteUserActions")?.checked) {
+       diff.updated.push(ex);
+       continue;
+     }
+   
+     const changed =
+       ex.customerName !== fs.customerName ||
+       ex.createdOn !== fs.createdOn ||
+       ex.createdBy !== fs.createdBy ||
+       ex.country !== fs.country ||
+       ex.caseResolutionCode !== fs.caseResolutionCode ||
+       ex.caseOwner !== fs.caseOwner ||
+       ex.otcCode !== fs.otcCode ||
+       ex.caGroup !== fs.caGroup ||
+       ex.tl !== fs.tl ||
+       ex.sbd !== fs.sbd ||
+       ex.onsiteRFC !== fs.onsiteRFC ||
+       ex.csrRFC !== fs.csrRFC ||
+       ex.benchRFC !== fs.benchRFC ||
+       ex.market !== fs.market ||
+       ex.excelOrder !== fs.excelOrder ||
+       ex.woClosureNotes !== fs.woClosureNotes ||
+       ex.trackingStatus !== fs.trackingStatus ||
+       ex.partNumber !== fs.partNumber ||
+       ex.partName !== fs.partName ||
+       ex.serialNumber !== fs.serialNumber ||
+       ex.productName !== fs.productName ||
+       ex.emailStatus !== fs.emailStatus ||
+       ex.dnap !== fs.dnap;
+   
+     if (changed) diff.updated.push(ex);
+   }
+
+  // Detect deleted
+  for (const fs of excelState.firestoreCases) {
+    if (!excelMap.has(fs.id)) diff.deleted.push(fs);
+  }
+
+  excelState.diff = diff;
+}
+
+// ======================================================
+// PREVIEW CHANGES MODAL
+// ======================================================
+async function openPreviewModal() {
+  const d = excelState.diff;
+
+  $("previewCounts").innerHTML = `
+    <strong>New Cases:</strong> ${d.new.length}<br>
+    <strong>Updated Cases:</strong> ${d.updated.length}<br>
+    <strong>Deleted Cases:</strong> ${d.deleted.length}
+  `;
+
+  // show preview section
+  $("previewSection").style.display = "block";
+
+   // ==========================================
+   // Auto-toggle Daily Report checkbox
+   // ==========================================
+   try {
+     const teamSnap = await getDoc(doc(db, "teams", excelState.teamId));
+     const teamCfg = teamSnap.exists()
+       ? {
+           resetTimezone: teamSnap.data().resetTimezone,
+           resetHour: teamSnap.data().resetHour
+         }
+       : { resetTimezone: "UTC", resetHour: 0 };
+   
+     const todayISO = getTeamToday(teamCfg);
+   
+      const reportRef = doc(
+        db,
+        "cases",
+        excelState.teamId,
+        "reports",
+        todayISO
+      );
+   
+     const reportSnap = await getDoc(reportRef);
+   
+     // First upload of the day → checked
+     if (!reportSnap.exists()) {
+       $("updateDailyReport").checked = true;
+     } else {
+       // Already generated today → unchecked
+       $("updateDailyReport").checked = false;
+     }
+   
+   } catch (err) {
+     console.warn("Could not determine daily report state:", err);
+     $("updateDailyReport").checked = false;
+   }
+
+  // show checkbox only when needed
+  $("deleteCheckboxWrap").style.display = d.deleted.length > 0 ? "block" : "none";
+
+  $("allowDeletion").checked = false;
+  $("btnConfirmImport").disabled = (d.deleted.length > 0);
+
+  if (d.deleted.length > 0) {
+    $("allowDeletion").onchange = () => {
+      $("btnConfirmImport").disabled = !$("allowDeletion").checked;
+    };
+  } else {
+    $("btnConfirmImport").disabled = false;
+  }
+}
+
+$("btnPreviewCancel").onclick = () => {
+  $("previewSection").style.display =
+    "none";
+
+  clearProgress();
+
+  excelState.diff = {
+    new: [],
+    updated: [],
+    deleted: []
+  };
+};
+
 export function initializeUploadModule() {
   const btnUpdateData = document.getElementById("btnUpdateData");
   const btnUpdateDone = document.getElementById("btnUpdateDone"); 
@@ -512,6 +744,44 @@ export function initializeUploadModule() {
    
        validateReadyState();
      };
-   } 
+   }
+
+   const btnPreviewChanges = document.getElementById("btnPreviewChanges");
+   
+   if (btnPreviewChanges) {
+     btnPreviewChanges.onclick =
+       async () => {
+   
+         clearProgress();
+   
+         updateProgress(
+           "Preparing preview..."
+         );
+   
+         if (!excelState.teamId) {
+           return alert(
+             "Select a team."
+           );
+         }
+   
+         if (!excelState.file) {
+           return alert(
+             "Select an Excel file."
+           );
+         }
+   
+         await loadFirestoreCasesForTeam(
+           excelState.teamId
+         );
+   
+         updateProgress(
+           "Comparing Excel → Firestore..."
+         );
+   
+         computeDiff();
+   
+         await openPreviewModal();
+       };
+   }
    
 }

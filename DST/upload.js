@@ -2,6 +2,12 @@
    DST Upload Engine
    ====================================================== */
 
+import {
+  db,
+  collection,
+  getDocs
+} from "./firebase.js";
+
 export const excelState = {
   teamId: null,
   file: null,
@@ -13,6 +19,7 @@ export const excelState = {
 };
 
 let processing = false;
+let uploadTeams = [];
 
 const $ = (id) => document.getElementById(id);
 
@@ -361,21 +368,108 @@ async function parseExcelFile(file) {
   });
 }
 
+async function populateUpdateDataTeams() {
+  const updateTeamList =
+    document.getElementById("updateTeamList");
+
+  if (!updateTeamList) return;
+
+  updateTeamList.innerHTML = "";
+
+  uploadTeams
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach(t => {
+      const row = document.createElement("div");
+
+      row.style.marginBottom = "0.4rem";
+
+      row.innerHTML = `
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          padding:0.4rem 0;
+        ">
+          <div><strong>${t.name}</strong></div>
+
+          <div>
+            <button
+              class="action-btn btn-boxed"
+              data-action="upload"
+              data-id="${t.id}"
+              style="
+                padding:0.35rem 0.6rem;
+                font-size:13px;
+                height:32px;
+              "
+            >
+              Upload Excel
+            </button>
+          </div>
+        </div>
+      `;
+
+      updateTeamList.appendChild(row);
+    });
+}
+
+async function loadUploadTeams() {
+  uploadTeams = [];
+
+  const snap =
+    await getDocs(collection(db, "teams"));
+
+  snap.forEach(d => {
+    uploadTeams.push({
+      id: d.id,
+      ...d.data()
+    });
+  });
+
+  await populateUpdateDataTeams();
+}
+
+function bindUploadTeamSelection() {
+  const updateTeamList =
+    document.getElementById("updateTeamList");
+
+  if (!updateTeamList) return;
+
+  updateTeamList.addEventListener(
+    "click",
+    async (e) => {
+      const btn =
+        e.target.closest("button");
+
+      if (!btn) return;
+
+      const action =
+        btn.dataset.action;
+
+      const teamId =
+        btn.dataset.id;
+
+      if (action !== "upload") return;
+
+      excelState.teamId = teamId;
+
+      $("uploadSummary").innerHTML =
+        `<strong>Selected Team:</strong> ${teamId}`;
+
+      validateReadyState();
+    }
+  );
+}
+
 export function initializeUploadModule() {
-  const btnUpdateData =
-    document.getElementById("btnUpdateData");
+  const btnUpdateData = document.getElementById("btnUpdateData");
+  const btnUpdateDone = document.getElementById("btnUpdateDone"); 
+  const modalUpdateData = document.getElementById("modalUpdateData");
+  const btnUpdateClose = document.getElementById("btnUpdateClose");
+  const excelInput = document.getElementById("excelInput");
 
-  const btnUpdateDone =
-     document.getElementById("btnUpdateDone"); 
-
-  const modalUpdateData =
-    document.getElementById("modalUpdateData");
-
-  const btnUpdateClose =
-    document.getElementById("btnUpdateClose");
-
-  const excelInput =
-     document.getElementById("excelInput"); 
+  loadUploadTeams();
+  bindUploadTeamSelection(); 
 
   if (btnUpdateData) {
     btnUpdateData.addEventListener("click", () => {

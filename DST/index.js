@@ -61,9 +61,7 @@ const el = {
 
   badgeDue: document.getElementById("badgeDue"),
   badgeFlag: document.getElementById("badgeFlag"),
-  badgePNS: document.getElementById("badgePNS"),
-   
-  btnUpdateData: document.getElementById("btnUpdateData") 
+   badgePNS: document.getElementById("badgePNS"),
 };
 
 // ================================
@@ -311,16 +309,6 @@ const pendingStatusOverride = new Set();
 const followUpTimers = new Map(); // caseId → timeoutId
 
 /* =========================================================
-   UPDATE DATA MODAL
-   ========================================================= */
-
-const updateDataModal =
-  document.getElementById("updateDataModal");
-
-const btnCloseUpdateData =
-  document.getElementById("btnCloseUpdateData");
-
-/* =========================================================
    FOLLOW-UP REMINDER MODAL (PHASE 3A)
    ========================================================= */
 
@@ -479,25 +467,13 @@ el.btnTheme.onclick = () => {
 };
 
 
-   /* Admin Dashboard — PRIMARY ONLY *//* Admin buttons */
+   /* Admin Dashboard — PRIMARY ONLY */
    if (isPrimary(data)) {
-   
      el.btnAdmin.style.display = "inline-block";
-     el.btnUpdateData.style.display = "inline-block";
-   
-     el.btnAdmin.onclick = () => {
-       location.href = "admin.html";
-     };
-   
-     el.btnUpdateData.onclick = () => {
-       updateDataModal.classList.add("show");
-     };
-   
+     el.btnAdmin.onclick = () => (location.href = "admin.html");
    } else {
-   
      el.btnAdmin.style.display = "none";
-     el.btnUpdateData.style.display = "none";
-   
+     el.btnAdmin.disabled = true;
    }
 
    /* Reports button — PRIMARY + SECONDARY */
@@ -549,12 +525,6 @@ if (isSecondary(data)) {
 
 
   el.btnLogout.onclick = () => auth.signOut().then(() => (location.href = "login.html"));
-
-  if (btnCloseUpdateData) {
-    btnCloseUpdateData.onclick = () => {
-      updateDataModal.classList.remove("show");
-    };
-  } 
 
   setupSidebarControls();
   setupFilterControls();

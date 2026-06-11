@@ -250,12 +250,21 @@ tabSignup.onclick = () => {
 watchAuth((user) => {
   if (user && user.status === "approved") {
 
+    // Primary Admin always goes to Admin page
     if (user.role === "primary") {
       location.href = "admin.html";
+      return;
+    }
 
-    } else if (user.role === "secondary") {
+    // DST users
+    if (user.groupId === "DST") {
+      location.href = "DST/index.html";
+      return;
+    }
+
+    // Normal users
+    if (user.role === "secondary") {
       location.href = "report.html";
-
     } else {
       location.href = "index.html";
     }

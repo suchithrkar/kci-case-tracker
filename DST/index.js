@@ -486,20 +486,6 @@ el.btnTheme.onclick = () => {
      el.btnAdmin.disabled = true;
    }
 
-   /* Update Data — PRIMARY ONLY */
-   if (isPrimary(data)) {
-     el.btnUpdateData.style.display = "inline-block";
-   
-     el.btnUpdateData.onclick = () => {
-       document
-         .getElementById("updateDataOverlay")
-         ?.classList.add("show");
-     };
-   } else {
-     el.btnUpdateData.style.display = "none";
-     el.btnUpdateData.disabled = true;
-   }
-
    /* Reports button — PRIMARY + SECONDARY */
    if (isPrimary(data) || isSecondary(data)) {
      el.btnReports.style.display = "inline-block";
@@ -547,13 +533,25 @@ el.btnTheme.onclick = () => {
      infoBtn.disabled = true;            // disable interaction
    }
 
+   /* =====================================================
+   UPDATE DATA BUTTON — PRIMARY ADMIN ONLY
+   ===================================================== */
+   
+   if (isPrimary(data)) {
+     el.btnUpdateData.style.display = "inline-block";
+     el.btnUpdateData.disabled = false;
+   } else {
+     el.btnUpdateData.style.display = "none";
+     el.btnUpdateData.disabled = true;
+   }
+
 
   el.btnLogout.onclick = () => auth.signOut().then(() => (location.href = "../login.html"));
 
   setupSidebarControls();
   setupFilterControls();
   setupStatusPanel();
-
+  initializeUploadModule();
   setupRealtimeCases(trackerState.teamId);
 });
 

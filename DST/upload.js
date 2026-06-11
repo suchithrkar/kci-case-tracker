@@ -7,7 +7,9 @@ import {
   collection,
   getDocs,
   doc,
-  getDoc
+  getDoc,
+  setDoc,
+  deleteDoc
 } from "../js/firebase.js";
 
 export const excelState = {
@@ -22,6 +24,11 @@ export const excelState = {
 
 let processing = false;
 let uploadTeams = [];
+let adminUserId = null;
+
+export function setUploadUser(uid) {
+  adminUserId = uid;
+}
 
 const $ = (id) => document.getElementById(id);
 
@@ -693,6 +700,591 @@ $("btnPreviewCancel").onclick = () => {
     deleted: []
   };
 };
+
+// ======================================================
+// CONFIRM IMPORT BUTTON → START FIRESTORE WRITE PROCESS
+// ======================================================
+
+
+$("btnConfirmImport").onclick = async () => {
+  if (processing) {
+    showPopup("Update already in progress. Please wait.");
+    return;
+  }
+
+  processing = true;
+
+  const d = excelState.diff;
+
+  // Safety: deletions require checkbox
+  if (d.deleted.length > 0 && !$("allowDeletion").checked) {
+    return showPopup("Enable 'Allow deletion' to continue.");
+  }
+
+  // Disable UI while processing
+  $("btnConfirmImport").disabled = true;
+  $("allowDeletion").disabled = true;
+
+  clearProgress();
+  updateProgress("Starting update…");
+
+   if (excelState.isFullRestore) {
+     await applyFullRestore();
+   } else {
+     await applyExcelChanges();
+   }  // main engine
+
+  updateProgress("\nDONE.\nYou may close this window.");
+
+};
+
+// ======================================================
+// MAIN ENGINE — APPLY EXCEL CHANGES (batch write + progress)
+// ======================================================
+async function applyExcelChanges() {
+  const { new: newCases, updated, deleted } = excelState.diff;
+
+  updateProgress(`Preparing to write data...`);
+  updateProgress(`New: ${newCases.length}`);
+  updateProgress(`Updated: ${updated.length}`);
+  updateProgress(`Deleted: ${deleted.length}`);
+
+  const batchLimit = 400; // Safe threshold below Firestore 500 limit
+
+  // Utility to run batches safely
+  async function runBatches(tasks, label) {
+    let batch = [];
+    let processed = 0;
+
+    for (const t of tasks) {
+      batch.push(t);
+      processed++;
+
+      if (batch.length >= batchLimit) {
+        updateProgress(`${label}: writing batch (${processed - batch.length} to ${processed})...`);
+        await Promise.all(batch);
+        batch = [];
+      }
+    }
+
+    if (batch.length > 0) {
+      updateProgress(`${label}: writing final batch...`);
+      await Promise.all(batch);
+    }
+
+    updateProgress(`${label}: ✔ completed (${processed})`);
+  }
+
+  try {
+     // ======================================================
+     // NEW CASES → setDoc
+     // ======================================================
+     updateProgress("\nCreating NEW cases...");
+     await runBatches(
+     newCases.map(ex =>
+       setDoc(doc(db, "cases", excelState.teamId, "casesList", ex.id),{
+         id: ex.id,
+         teamId: excelState.teamId,
+   
+         excelOrder: ex.excelOrder, 
+   
+         customerName: ex.customerName,
+         createdOn: ex.createdOn,
+         createdBy: ex.createdBy,
+         country: ex.country,
+         caseResolutionCode: ex.caseResolutionCode,
+         caseOwner: ex.caseOwner,
+         otcCode: ex.otcCode,
+         caGroup: ex.caGroup,
+         tl: ex.tl,
+         sbd: ex.sbd,
+         onsiteRFC: ex.onsiteRFC,
+         csrRFC: ex.csrRFC,
+         benchRFC: ex.benchRFC,
+         market: ex.market,
+         woClosureNotes: ex.woClosureNotes,
+         trackingStatus: ex.trackingStatus,
+         partNumber: ex.partNumber,
+         partName: ex.partName,
+         serialNumber: ex.serialNumber,
+         productName: ex.productName,
+         emailStatus: ex.emailStatus,
+         dnap: ex.dnap,
+   
+         // default fields
+         status: "",
+         followDate: "",
+         followTime: "",                 // ✅ NEW
+         flagged: false,
+         pns: false,                     // ✅ NEW
+         surveyPrediction: "",           // ✅ NEW
+         predictionComment: "",          // ✅ NEW
+         notes: "",
+         lastActionedOn: "",
+         lastActionedBy: "",
+         statusChangedOn: "",
+         statusChangedBy: ""
+       })
+     ),
+     "New"
+   );
+   
+   
+     // ======================================================
+     // UPDATED CASES → updateDoc (only changed fields)
+     // ======================================================
+     updateProgress("\nUpdating existing cases...");
+   
+     await runBatches(
+     updated.map(ex => {
+        const existing = excelState.firestoreCases.find(c => c.id === ex.id);
+        const overwrite =
+          excelState.isBackupImport &&
+          $("overwriteUserActions")?.checked;
+      
+        let data = { ...ex, teamId: excelState.teamId };
+      
+        if (!overwrite && existing) {
+          const preserve = [
+            "status",
+            "followDate",
+            "followTime",
+            "flagged",
+            "notes",
+            "pns",
+            "surveyPrediction",
+            "predictionComment",
+            "lastActionedOn",
+            "lastActionedBy",
+            "statusChangedOn",
+            "statusChangedBy"
+          ];
+      
+          preserve.forEach(f => {
+            if (existing[f] !== undefined) data[f] = existing[f];
+          });
+        }
+      
+         return setDoc(
+           doc(db, "cases", excelState.teamId, "casesList", ex.id),
+           data,
+           { merge: true }
+         );
+      }),
+     "Updated"
+   );
+   
+   
+     // ======================================================
+     // DELETED CASES → deleteDoc
+     // ======================================================
+     if (deleted.length > 0) {
+       updateProgress("\nDeleting missing cases...");
+       await runBatches(
+         deleted.map(c => deleteDoc(doc(db, "cases", excelState.teamId, "casesList", c.id))),
+         "Deleted"
+       );
+     }
+   } catch (err) {
+     console.error("Case update failed:", err);
+     showPopup("❌ Case update failed. Report was NOT generated.");
+     processing = false;
+     return; // ⛔ STOP HERE
+   }
+
+  // ======================================================
+  // SUMMARY
+  // ======================================================
+  updateProgress("\n-----------------------------------");
+  updateProgress("UPDATE COMPLETE");
+  updateProgress(`New: ${newCases.length}`);
+  updateProgress(`Updated: ${updated.length}`);
+  updateProgress(`Deleted: ${deleted.length}`);
+  updateProgress("-----------------------------------");
+
+   // 🔒 Always fetch correct team config for Excel upload
+   const teamSnap = await getDoc(doc(db, "teams", excelState.teamId));
+   const teamCfg = teamSnap.exists()
+     ? {
+         resetTimezone: teamSnap.data().resetTimezone,
+         resetHour: teamSnap.data().resetHour
+       }
+     : { resetTimezone: "UTC", resetHour: 0 };
+   
+   const todayISO = getTeamToday(teamCfg);
+   
+   if ($("updateDailyReport")?.checked) {
+   
+     updateProgress("\nGenerating Daily Repair Report...");
+   
+     await generateDailyRepairReport({
+       teamId: excelState.teamId,
+       cases: excelState.excelCases,
+       todayISO,
+       generatedBy: adminUserId,
+
+       newCasesCount: newCases.length,
+       deletedCasesCount: deleted.length
+     });
+   
+     updateProgress("Daily report updated.");
+   
+   } else {
+     updateProgress("\nDaily report update skipped.");
+   }
+
+   // ==========================================
+   // Sync Closed Cases (Batched + Cleanup)
+   // ==========================================
+   updateProgress("\n-----------------------------------");
+   updateProgress("SYNCING CLOSED CASES ARCHIVE");
+   updateProgress("-----------------------------------");
+   
+   const closedColRef = collection(
+     db,
+     "cases",
+     excelState.teamId,
+     "closedCases"
+   );
+   
+   // 1️⃣ Load existing closed cases from Firestore
+   updateProgress("Loading existing closed cases from Firestore...");
+   const closedSnap = await getDocs(closedColRef);
+   
+   const existingClosedMap = new Map();
+   closedSnap.forEach(d => {
+     existingClosedMap.set(d.id, d.data());
+   });
+   
+   const excelClosedMap = new Map();
+   excelState.closedCases.forEach(c => {
+     excelClosedMap.set(c.id, c);
+   });
+   
+   // 2️⃣ Detect NEW + DELETE
+   const toCreate = [];
+   const toDelete = [];
+   
+   for (const c of excelState.closedCases) {
+     if (!existingClosedMap.has(c.id)) {
+       toCreate.push(c);
+     }
+   }
+   
+   for (const d of closedSnap.docs) {
+     if (!excelClosedMap.has(d.id)) {
+       toDelete.push(d.id);
+     }
+   }
+   
+   updateProgress(`New Closed Cases: ${toCreate.length}`);
+   updateProgress(`Removed Closed Cases: ${toDelete.length}`);
+   
+   // Utility batch runner
+   async function runClosedBatches(tasks, label) {
+     let batch = [];
+     let processed = 0;
+   
+     for (const t of tasks) {
+       batch.push(t);
+       processed++;
+   
+       if (batch.length >= batchLimit) {
+         updateProgress(`${label}: writing batch (${processed - batch.length} to ${processed})...`);
+         await Promise.all(batch);
+         batch = [];
+       }
+     }
+   
+     if (batch.length > 0) {
+       updateProgress(`${label}: writing final batch...`);
+       await Promise.all(batch);
+     }
+   
+     updateProgress(`${label}: ✔ completed (${processed})`);
+   }
+   
+   // 3️⃣ CREATE NEW
+   if (toCreate.length > 0) {
+     updateProgress("\nCreating new closed cases...");
+     await runClosedBatches(
+       toCreate.map(c =>
+         setDoc(
+           doc(db, "cases", excelState.teamId, "closedCases", c.id),
+           {
+             ...c,
+             teamId: excelState.teamId,
+             archivedAt: new Date()
+           }
+         )
+       ),
+       "Closed Create"
+     );
+   }
+   
+   // 4️⃣ DELETE MISSING
+   if (toDelete.length > 0) {
+     updateProgress("\nRemoving missing closed cases...");
+     await runClosedBatches(
+       toDelete.map(id =>
+         deleteDoc(
+           doc(db, "cases", excelState.teamId, "closedCases", id)
+         )
+       ),
+       "Closed Delete"
+     );
+   }
+   
+   updateProgress("\nClosed Cases Sync Complete.");
+   
+   showPopup("Excel update complete!");
+   processing = false;
+}
+
+async function applyFullRestore() {
+  const teamId = excelState.teamId;
+  const data = excelState.fullBackupData;
+
+  updateProgress("Starting FULL RESTORE...");
+
+  const batchLimit = 400;
+
+  async function wipeCollection(colRef, label) {
+    const snap = await getDocs(colRef);
+
+    let batch = [];
+    let count = 0;
+
+    for (const d of snap.docs) {
+      batch.push(deleteDoc(d.ref));
+      count++;
+
+      if (batch.length >= batchLimit) {
+        await Promise.all(batch);
+        batch = [];
+      }
+    }
+
+    if (batch.length) await Promise.all(batch);
+
+    updateProgress(`${label} wiped (${count})`);
+  }
+
+  async function writeCollection(colPath, docs, label) {
+    let batch = [];
+    let count = 0;
+
+    for (const d of docs) {
+      const ref = doc(db, ...colPath, d.id);
+      batch.push(setDoc(ref, d));
+      count++;
+
+      if (batch.length >= batchLimit) {
+        await Promise.all(batch);
+        batch = [];
+      }
+    }
+
+    if (batch.length) await Promise.all(batch);
+
+    updateProgress(`${label} restored (${count})`);
+  }
+
+  try {
+    // WIPE EXISTING DATA
+    await wipeCollection(
+      collection(db, "cases", teamId, "casesList"),
+      "casesList"
+    );
+
+    await wipeCollection(
+      collection(db, "cases", teamId, "closedCases"),
+      "closedCases"
+    );
+
+    await wipeCollection(
+      collection(db, "cases", teamId, "reports"),
+      "reports"
+    );
+
+    // RESTORE
+    await writeCollection(
+      ["cases", teamId, "casesList"],
+      data.casesList || [],
+      "casesList"
+    );
+
+    await writeCollection(
+      ["cases", teamId, "closedCases"],
+      data.closedCases || [],
+      "closedCases"
+    );
+
+    await writeCollection(
+      ["cases", teamId, "reports"],
+      data.reports || [],
+      "reports"
+    );
+
+    showPopup("Full backup restore completed.");
+  } catch (err) {
+    console.error("Full restore failed:", err);
+    showPopup("Full restore failed.");
+  }
+
+  processing = false;
+}
+
+async function generateDailyRepairReport({
+     teamId,
+     cases,
+     todayISO,
+     generatedBy,
+     newCasesCount,
+     deletedCasesCount
+   }) {
+     // ===============================
+     // TOTAL OPEN
+     // ===============================
+     const onsiteAll = cases.filter(
+       c => c.caseResolutionCode === "Onsite Solution"
+     );
+     const offsiteAll = cases.filter(
+       c => c.caseResolutionCode === "Offsite Solution"
+     );
+     const csrAll = cases.filter(
+       c => c.caseResolutionCode === "Parts Shipped"
+     );
+   
+     // ===============================
+     // READY FOR CLOSURE
+     // ===============================
+     const onsiteRFC = onsiteAll.filter(c =>
+       ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
+         .includes(c.onsiteRFC)
+     );
+   
+     const offsiteRFC = offsiteAll.filter(c =>
+       ["Delivered", "Order cancelled, not to be reopened"].includes(c.benchRFC)
+     );
+   
+     const csrRFC = csrAll.filter(c =>
+       ["Cancelled", "Closed", "POD"].includes(c.csrRFC)
+     );
+   
+     const rfcIds = new Set(
+       [...onsiteRFC, ...offsiteRFC, ...csrRFC].map(c => c.id)
+     );
+   
+     // ===============================
+     // OVERDUE (NEGATIVE LOGIC)
+     // ===============================
+     let overdue = cases.filter(c => !rfcIds.has(c.id));
+   
+     overdue = overdue.filter(c => !(
+       c.caseResolutionCode === "Onsite Solution" &&
+       ["0-3 Days", "3-5 Days"].includes(c.caGroup)
+     ));
+   
+     overdue = overdue.filter(c => !(
+       c.caseResolutionCode === "Offsite Solution" &&
+       ["0-3 Days", "3-5 Days", "5-10 Days"].includes(c.caGroup)
+     ));
+   
+     overdue = overdue.filter(c => !(
+       c.caseResolutionCode === "Parts Shipped" &&
+       c.caGroup === "0-3 Days"
+     ));
+   
+     // ===============================
+     // WRITE REPORT
+     // ===============================
+   
+      // ===============================
+      // CA GROUP DISTRIBUTION (ALL CASES)
+      // ===============================
+      const caGroups = {
+        "0-3 Days": 0,
+        "3-5 Days": 0,
+        "5-10 Days": 0,
+        "10-15 Days": 0,
+        "15-30 Days": 0,
+        "30-60 Days": 0,
+        "60-90 Days": 0,
+        "> 90 Days": 0
+      };
+      
+      cases.forEach(c => {
+        if (caGroups[c.caGroup] !== undefined) {
+          caGroups[c.caGroup]++;
+        }
+      });
+      
+      // Total cases > 30 days
+      const caAbove30Total =
+        caGroups["30-60 Days"] +
+        caGroups["60-90 Days"] +
+        caGroups["> 90 Days"];
+      
+      const reportRef = doc(
+        db,
+        "cases",
+        teamId,
+        "reports",
+        todayISO
+      );
+   
+      await setDoc(
+        reportRef,
+        {
+          // TOTAL OPEN
+          totalOpen: cases.length,
+          totalOpenOnsite: onsiteAll.length,
+          totalOpenOffsite: offsiteAll.length,
+          totalOpenCSR: csrAll.length,
+      
+          // READY FOR CLOSURE
+          readyForClosureTotal: rfcIds.size,
+          readyForClosureOnsite: onsiteRFC.length,
+          readyForClosureOffsite: offsiteRFC.length,
+          readyForClosureCSR: csrRFC.length,
+      
+          // OVERDUE
+          overdueTotal: overdue.length,
+          overdueOnsite: overdue.filter(c =>
+            c.caseResolutionCode === "Onsite Solution"
+          ).length,
+          overdueOffsite: overdue.filter(c =>
+            c.caseResolutionCode === "Offsite Solution"
+          ).length,
+          overdueCSR: overdue.filter(c =>
+            c.caseResolutionCode === "Parts Shipped"
+          ).length,
+      
+          // CA GROUP
+          ca_0_3: caGroups["0-3 Days"],
+          ca_3_5: caGroups["3-5 Days"],
+          ca_5_10: caGroups["5-10 Days"],
+          ca_10_15: caGroups["10-15 Days"],
+          ca_15_30: caGroups["15-30 Days"],
+          ca_30_60: caGroups["30-60 Days"],
+          ca_60_90: caGroups["60-90 Days"],
+          ca_gt_90: caGroups["> 90 Days"],
+          ca_gt_30_total: caAbove30Total,
+
+          newCasesCount: newCasesCount || 0,
+          deletedCasesCount: deletedCasesCount || 0,
+           
+          generatedAt: new Date(),
+          generatedBy
+        },
+        { merge: true }
+      );
+      
+      await cleanupDailyReports(teamId, todayISO);
+      
+      showPopup(`Daily repair report generated for ${todayISO}`);
+}
 
 export function initializeUploadModule() {
   const btnUpdateData = document.getElementById("btnUpdateData");

@@ -435,6 +435,113 @@ async function parseExcelFile(file) {
   });
 }
 
+/* ============================================================
+   BACKUP EXPORT / IMPORT
+   ============================================================ */
+async function exportBackup(teamId) {
+  try {
+    showPopup("Preparing full backup...");
+
+    // Load casesList
+    const casesSnap = await getDocs(
+      collection(db, "cases", teamId, "casesList")
+    );
+    const casesList = casesSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
+    // Load closedCases
+    const closedSnap = await getDocs(
+      collection(db, "cases", teamId, "closedCases")
+    );
+    const closedCases = closedSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
+    // Load reports
+    const reportsSnap = await getDocs(
+      collection(db, "cases", teamId, "reports")
+    );
+    const reports = reportsSnap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+
+    const today = getTeamToday(teamConfig);
+
+    const backup = {
+      version: 3,
+      app: "KCI Case Tracker",
+      exportedAt: new Date().toISOString(),
+      teamId,
+      casesList,
+      closedCases,
+      reports
+    };
+
+    const blob = new Blob(
+      [JSON.stringify(backup, null, 2)],
+      { type: "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = `${teamId}_backup_v3_${today}.json`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+    showPopup("Full backup exported.");
+  } catch (err) {
+    console.error("Backup export failed:", err);
+    showPopup("Backup export failed.");
+  }
+}
+
+function importBackupPrompt(teamId) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
+
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    resetExcelUI();               // 🔁 reuse Excel UI
+    excelState.teamId = teamId;
+    $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> ${teamId}`;
+    excelState.file = file;
+
+   // ✅ Import backup mode
+   excelState.isBackupImport = true;
+   
+   // Show overwrite checkbox ONLY for import
+   const overwriteWrap = document.getElementById("overwriteWrap");
+   if (overwriteWrap) {
+     overwriteWrap.style.display = "block";
+     $("overwriteUserActions").checked = true; // sensible default for restore
+   }
+
+    clearProgress();
+    updateProgress("Reading backup file...");
+
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    await parseBackupFile(data);  // NEW
+
+    updateProgress("Import mode: Backup restore");
+     
+    validateReadyState();
+  };
+
+  input.click();
+}
+
 async function populateUpdateDataTeams() {
   const updateTeamList =
     document.getElementById("updateTeamList");
@@ -460,20 +567,48 @@ async function populateUpdateDataTeams() {
         ">
           <div><strong>${t.name}</strong></div>
 
-          <div>
-            <button
-              class="action-btn btn-boxed"
-              data-action="upload"
-              data-id="${t.id}"
-              style="
-                padding:0.35rem 0.6rem;
-                font-size:13px;
-                height:32px;
-              "
-            >
-              Upload Excel
-            </button>
-          </div>
+          <div style="display:flex; gap:0.4rem;">
+
+              <button
+                class="action-btn btn-boxed"
+                data-action="upload"
+                data-id="${t.id}"
+                style="
+                  padding:0.35rem 0.6rem;
+                  font-size:13px;
+                  height:32px;
+                "
+              >
+                Upload Excel
+              </button>
+            
+              <button
+                class="action-btn btn-boxed"
+                data-action="export"
+                data-id="${t.id}"
+                style="
+                  padding:0.35rem 0.6rem;
+                  font-size:13px;
+                  height:32px;
+                "
+              >
+                Export
+              </button>
+            
+              <button
+                class="action-btn btn-boxed"
+                data-action="import"
+                data-id="${t.id}"
+                style="
+                  padding:0.35rem 0.6rem;
+                  font-size:13px;
+                  height:32px;
+                "
+              >
+                Import
+              </button>
+            
+            </div>
         </div>
       `;
 
@@ -517,14 +652,26 @@ function bindUploadTeamSelection() {
       const teamId =
         btn.dataset.id;
 
-      if (action !== "upload") return;
-
-      excelState.teamId = teamId;
-
-      $("uploadSummary").innerHTML =
-        `<strong>Selected Team:</strong> ${teamId}`;
-
-      validateReadyState();
+      if (action === "upload") {
+      
+        excelState.teamId = teamId;
+      
+        $("uploadSummary").innerHTML =
+          `<strong>Selected Team:</strong> ${teamId}`;
+      
+        validateReadyState();
+        return;
+      }
+       
+      if (action === "export") {
+        exportBackup(teamId);
+        return;
+      }
+      
+      if (action === "import") {
+        importBackupPrompt(teamId);
+        return;
+      } 
     }
   );
 }

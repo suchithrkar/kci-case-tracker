@@ -490,7 +490,9 @@ el.btnTheme.onclick = () => {
      el.btnUpdateData.style.display = "inline-block";
    
      el.btnUpdateData.onclick = () => {
-       window.location.href = "../update-data.html";
+       document
+         .getElementById("updateDataOverlay")
+         ?.classList.add("show");
      };
    } else {
      el.btnUpdateData.style.display = "none";

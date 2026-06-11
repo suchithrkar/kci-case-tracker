@@ -6,7 +6,7 @@ import {
   db,
   collection,
   getDocs
-} from "./firebase.js";
+} from "../js/firebase.js";
 
 export const excelState = {
   teamId: null,

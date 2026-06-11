@@ -11,23 +11,24 @@ export const uploadState = {
 };
 
 export function initializeUploadModule() {
-  bindUploadEvents();
-}
+  const btnUpdateData =
+    document.getElementById("btnUpdateData");
 
-function bindUploadEvents() {
-  const btn = document.getElementById("btnUpdateData");
-  const modal = document.getElementById("modalUpdateData");
-  const closeBtn = document.getElementById("btnUpdateClose");
+  const modalUpdateData =
+    document.getElementById("modalUpdateData");
 
-  if (btn) {
-    btn.addEventListener("click", () => {
-      modal.classList.add("show");
+  const btnUpdateClose =
+    document.getElementById("btnUpdateClose");
+
+  if (btnUpdateData) {
+    btnUpdateData.addEventListener("click", () => {
+      modalUpdateData.classList.add("show");
     });
   }
 
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
-      modal.classList.remove("show");
+  if (btnUpdateClose) {
+    btnUpdateClose.addEventListener("click", () => {
+      modalUpdateData.classList.remove("show");
     });
   }
 }

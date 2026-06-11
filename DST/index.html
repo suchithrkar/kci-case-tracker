@@ -714,29 +714,32 @@ tr.active-row {
 /* ============================================
    Upload Excel Button (theme-consistent)
    ============================================ */
-.update-modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.55);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:200;
-}  
-.update-modal-body{
-  padding:1rem;
-  max-height:60vh;
-  overflow-y:auto;
-  overflow-x:visible;
-  position:relative;
+#modalUpdateData {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
 }
-.update-modal-card{
-  width:min(600px, 92vw);
-  background:var(--panel);
-  border-radius:16px;
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  overflow: visible; /* ✅ allow dropdown escape */
+#modalUpdateData.show {
+  display: flex;
+}
+#modalUpdateData .modal-body {
+  padding: 1rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: visible;
+  position: relative;
+}
+#modalUpdateData > .modal-card {
+  width: min(600px, 92vw);
+  background: var(--panel);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: visible;
 }
 .tpl-btn.upload-btn {
   background: var(--email-copy-btn);
@@ -2229,14 +2232,14 @@ tr.active-row {
 <!-- ============================================================
      UPDATE DATA MODAL (EXCEL UPLOAD PER TEAM)
      ============================================================ -->
-<div class="update-modal" id="modalUpdateData">
-  <div class="update-modal-card">
+<div class="modal" id="modalUpdateData">
+  <div class="modal-card">
     <div class="modal-head">
       <div class="modal-title">Update Case Data</div>
       <button class="modal-btn" id="btnUpdateClose">Close</button>
     </div>
 
-    <div class="update-modal-body">
+    <div class="modal-body">
 
       <p>Select a team to upload data for:</p>
       <div id="updateTeamList"></div>

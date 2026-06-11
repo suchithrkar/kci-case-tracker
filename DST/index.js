@@ -17,19 +17,19 @@ import {
   updateDoc,
   setDoc,
   increment
-} from "./js/firebase.js";
+} from "../js/firebase.js";
 
 import {
   isPrimary,
   isSecondary,
   getCurrentTrackerTeam,
   toggleTheme
-} from "./js/userProfile.js";
+} from "../js/userProfile.js";
 
-import { listenToTeamCases, updateCase } from "./js/firestore-api.js";
-import { showPopup } from "./js/utils.js";
-import { cleanupClosedCases } from "./js/utils.js";
-import { templates } from "./templates.js";
+import { listenToTeamCases, updateCase } from "../js/firestore-api.js";
+import { showPopup } from "../js/utils.js";
+import { cleanupClosedCases } from "../js/utils.js";
+import { templates } from "../templates.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -387,10 +387,10 @@ document
    AUTH STATE LISTENER
    ======================================================================= */
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return (location.href = "login.html");
+  if (!user) return (location.href = "../login.html");
 
   const userSnap = await getDoc(doc(db, "users", user.uid));
-  if (!userSnap.exists()) return (location.href = "login.html");
+  if (!userSnap.exists()) return (location.href = "../login.html");
 
   const data = userSnap.data();
   if (data.status !== "approved") {
@@ -470,7 +470,7 @@ el.btnTheme.onclick = () => {
    /* Admin Dashboard — PRIMARY ONLY */
    if (isPrimary(data)) {
      el.btnAdmin.style.display = "inline-block";
-     el.btnAdmin.onclick = () => (location.href = "admin.html");
+     el.btnAdmin.onclick = () => (location.href = "../admin.html");
    } else {
      el.btnAdmin.style.display = "none";
      el.btnAdmin.disabled = true;
@@ -481,7 +481,7 @@ el.btnTheme.onclick = () => {
      el.btnReports.style.display = "inline-block";
    
      el.btnReports.onclick = () => {
-       window.location.href = "report.html";
+       window.location.href = "../report.html";
      };
    } else {
      el.btnReports.style.display = "none";
@@ -517,14 +517,14 @@ el.btnTheme.onclick = () => {
    }
 
    // HIDE INFO BUTTON FOR SECONDARY USERS
-if (isSecondary(data)) {
-  const infoBtn = document.getElementById("btnInfo");
-  infoBtn.style.display = "none";     // hide button
-  infoBtn.disabled = true;            // disable interaction
-}
+   if (isSecondary(data)) {
+     const infoBtn = document.getElementById("btnInfo");
+     infoBtn.style.display = "none";     // hide button
+     infoBtn.disabled = true;            // disable interaction
+   }
 
 
-  el.btnLogout.onclick = () => auth.signOut().then(() => (location.href = "login.html"));
+  el.btnLogout.onclick = () => auth.signOut().then(() => (location.href = "../login.html"));
 
   setupSidebarControls();
   setupFilterControls();

@@ -19,9 +19,9 @@ import {
   onSnapshot
 } from "../js/firebase.js";
 
-import { isPrimary, isSecondary, toggleTheme } from "./js/userProfile.js";
-import { showPopup } from "./js/utils.js";
-import { cleanupDailyReports } from "./js/utils.js";
+import { isPrimary, isSecondary, toggleTheme } from "../js/userProfile.js";
+import { showPopup } from "../js/utils.js";
+import { cleanupDailyReports } from "../js/utils.js";
 
 export const excelState = {
   teamId: null,

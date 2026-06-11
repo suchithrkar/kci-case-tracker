@@ -426,6 +426,7 @@ async function populateUpdateDataTeams() {
   updateTeamList.innerHTML = "";
 
   uploadTeams
+    .slice()
     .sort((a, b) => a.name.localeCompare(b.name))
     .forEach(t => {
       const row = document.createElement("div");

@@ -30,6 +30,7 @@ import {
 import { isPrimary, isSecondary, toggleTheme } from "./js/userProfile.js";
 import { showPopup } from "./js/utils.js";
 import { cleanupDailyReports } from "./js/utils.js";
+import { setUploadUser } from "./DST/upload.js";
 
 // Tooltip edge protection for admin page
 document.addEventListener("mouseover", (e) => {
@@ -1717,10 +1718,12 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   adminState.user = { uid: user.uid, ...data };
-   // EXCEL IMPORT is disabled until Auth is ready
-   document.body.dataset.authready = "true";
+  setUploadUser(user.uid);
+   
+  // EXCEL IMPORT is disabled until Auth is ready
+  document.body.dataset.authready = "true";
 
-   document.body.dataset.role = data.role;
+  document.body.dataset.role = data.role;
 
 
   // Display user name

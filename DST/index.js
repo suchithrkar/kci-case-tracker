@@ -38,7 +38,8 @@ const el = {
   userFullName: document.getElementById("userFullName"),
   btnTheme: document.getElementById("btnTheme"),
   btnAdmin: document.getElementById("btnAdmin"),
-  btnReports: document.getElementById("btnReports"), 
+  btnUpdateData: document.getElementById("btnUpdateData"),
+  btnReports: document.getElementById("btnReports"),
   btnLogout: document.getElementById("btnLogout"),
   hamburger: document.getElementById("btnHamburger"),
   sidebar: document.getElementById("sidebar"),
@@ -482,6 +483,18 @@ el.btnTheme.onclick = () => {
    } else {
      el.btnAdmin.style.display = "none";
      el.btnAdmin.disabled = true;
+   }
+
+   /* Update Data — PRIMARY ONLY */
+   if (isPrimary(data)) {
+     el.btnUpdateData.style.display = "inline-block";
+   
+     el.btnUpdateData.onclick = () => {
+       window.location.href = "../update-data.html";
+     };
+   } else {
+     el.btnUpdateData.style.display = "none";
+     el.btnUpdateData.disabled = true;
    }
 
    /* Reports button — PRIMARY + SECONDARY */

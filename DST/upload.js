@@ -592,7 +592,7 @@ async function populateUpdateDataTeams() {
                   height:32px;
                 "
               >
-                Export
+                Export Backup
               </button>
             
               <button
@@ -605,7 +605,7 @@ async function populateUpdateDataTeams() {
                   height:32px;
                 "
               >
-                Import
+                Import Backup
               </button>
             
             </div>

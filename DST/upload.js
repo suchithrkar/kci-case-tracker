@@ -1298,6 +1298,7 @@ async function generateDailyRepairReport({
 }
 
 export function initializeUploadModule() {
+  console.log("initializeUploadModule started"); 
   const btnUpdateData = document.getElementById("btnUpdateData");
   const btnUpdateDone = document.getElementById("btnUpdateDone"); 
   const modalUpdateData = document.getElementById("modalUpdateData");
@@ -1307,6 +1308,7 @@ export function initializeUploadModule() {
   loadUploadTeams();
   bindUploadTeamSelection(); 
 
+  console.log("btnUpdateData found:", !!btnUpdateData); 
   if (btnUpdateData) {
     btnUpdateData.addEventListener("click", () => {
       resetExcelUI();

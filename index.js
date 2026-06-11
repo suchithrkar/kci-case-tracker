@@ -399,6 +399,15 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+   // DST users must use DST tracker
+   if (
+     data.role !== "primary" &&
+     data.groupId === "DST"
+   ) {
+     location.href = "DST/index.html";
+     return;
+   }
+
   trackerState.user = { uid: user.uid, ...data };
   trackerState.teamId = getCurrentTrackerTeam(trackerState.user);
   applyFilters();

@@ -18,6 +18,23 @@ export function listenToTeamCases(teamId, callback) {
   });
 }
 
+export function listenToTeamDST(teamId, callback) {
+  const colRef = collection(db, "DST", teamId, "3wList");
+
+  return onSnapshot(colRef, (snap) => {
+    const rows = [];
+
+    snap.forEach((d) => {
+      rows.push({
+        id: d.id,
+        ...d.data()
+      });
+    });
+
+    callback(rows);
+  });
+}
+
 // ======================================
 // UPDATE CASE MANUAL FIELDS
 // (rules restrict what general users can update)
@@ -25,6 +42,13 @@ export function listenToTeamCases(teamId, callback) {
 export async function updateCase(teamId, caseId, fields) {
   return updateDoc(
     doc(db, "cases", teamId, "casesList", caseId),
+    fields
+  );
+}
+
+export async function updateDST(teamId, caseId, fields) {
+  return updateDoc(
+    doc(db, "DST", teamId, "3wList", caseId),
     fields
   );
 }

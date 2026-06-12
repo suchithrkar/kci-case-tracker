@@ -30,7 +30,7 @@ import { listenToTeamCases, updateCase } from "../js/firestore-api.js";
 import { showPopup } from "../js/utils.js";
 import { cleanupClosedCases } from "../js/utils.js";
 import { templates } from "../templates.js";
-import { initializeUploadModule } from "./upload.js";
+import { initializeUploadModule, setUploadUser } from "./upload.js";
 
 /* =======================================================================
    DOM REFERENCES
@@ -410,6 +410,7 @@ onAuthStateChanged(auth, async (user) => {
    }
 
   trackerState.user = { uid: user.uid, ...data };
+  setUploadUser(user.uid); 
   trackerState.teamId = getCurrentTrackerTeam(trackerState.user);
   applyFilters();
 

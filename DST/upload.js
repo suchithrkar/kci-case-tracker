@@ -341,7 +341,7 @@ async function parseExcelFile(file) {
       for (let i = 1; i < rows.length; i++) {
         const r = rows[i];
         if (!r) continue;
-        const id = String( r[15] || "").trim();
+        const id = String(r[15] || "").trim();
         if (!id) continue;
         parsed.push({
           id,
@@ -888,16 +888,19 @@ $("btnConfirmImport").onclick = async () => {
 // MAIN ENGINE — APPLY EXCEL CHANGES (batch write + progress)
 // ======================================================
 async function applyExcelChanges() {
-  const { new: newCases, updated, deleted } = excelState.diff;
+  const {
+    new: newCases,
+    updated,
+    deleted
+  } = excelState.diff;
 
   updateProgress(`Preparing to write data...`);
   updateProgress(`New: ${newCases.length}`);
   updateProgress(`Updated: ${updated.length}`);
   updateProgress(`Deleted: ${deleted.length}`);
 
-  const batchLimit = 400; // Safe threshold below Firestore 500 limit
+  const batchLimit = 400;
 
-  // Utility to run batches safely
   async function runBatches(tasks, label) {
     let batch = [];
     let processed = 0;
@@ -922,75 +925,77 @@ async function applyExcelChanges() {
   }
 
   try {
-     // ======================================================
-     // NEW CASES → setDoc
-     // ======================================================
-     updateProgress("\nCreating NEW cases...");
-     await runBatches(
-     newCases.map(ex =>
-       setDoc(doc(db, "cases", excelState.teamId, "casesList", ex.id),{
-         id: ex.id,
-         teamId: excelState.teamId,
-   
-         excelOrder: ex.excelOrder, 
-   
-         customerName: ex.customerName,
-         createdOn: ex.createdOn,
-         createdBy: ex.createdBy,
-         country: ex.country,
-         caseResolutionCode: ex.caseResolutionCode,
-         caseOwner: ex.caseOwner,
-         otcCode: ex.otcCode,
-         caGroup: ex.caGroup,
-         tl: ex.tl,
-         sbd: ex.sbd,
-         onsiteRFC: ex.onsiteRFC,
-         csrRFC: ex.csrRFC,
-         benchRFC: ex.benchRFC,
-         market: ex.market,
-         woClosureNotes: ex.woClosureNotes,
-         trackingStatus: ex.trackingStatus,
-         partNumber: ex.partNumber,
-         partName: ex.partName,
-         serialNumber: ex.serialNumber,
-         productName: ex.productName,
-         emailStatus: ex.emailStatus,
-         dnap: ex.dnap,
-   
-         // default fields
-         status: "",
-         followDate: "",
-         followTime: "",                 // ✅ NEW
-         flagged: false,
-         pns: false,                     // ✅ NEW
-         surveyPrediction: "",           // ✅ NEW
-         predictionComment: "",          // ✅ NEW
-         notes: "",
-         lastActionedOn: "",
-         lastActionedBy: "",
-         statusChangedOn: "",
-         statusChangedBy: ""
-       })
-     ),
-     "New"
-   );
-   
-   
-     // ======================================================
-     // UPDATED CASES → updateDoc (only changed fields)
-     // ======================================================
-     updateProgress("\nUpdating existing cases...");
-   
-     await runBatches(
-     updated.map(ex => {
-        const existing = excelState.firestoreCases.find(c => c.id === ex.id);
+
+    // ======================================================
+    // NEW CASES
+    // ======================================================
+    updateProgress("\nCreating NEW cases...");
+
+    await runBatches(
+      newCases.map(ex =>
+        setDoc(
+          doc(
+            db,
+            "DST",
+            excelState.teamId,
+            "3wList",
+            ex.id
+          ),
+          {
+            ...ex,
+
+            id: ex.id,
+
+            teamId:
+              excelState.teamId,
+
+            status: "",
+            followDate: "",
+            followTime: "",
+            flagged: false,
+            pns: false,
+            surveyPrediction: "",
+            predictionComment: "",
+            notes: "",
+            lastActionedOn: "",
+            lastActionedBy: "",
+            statusChangedOn: "",
+            statusChangedBy: ""
+          }
+        )
+      ),
+      "New"
+    );
+
+    // ======================================================
+    // UPDATED CASES
+    // ======================================================
+    updateProgress("\nUpdating existing cases...");
+
+    await runBatches(
+      updated.map(ex => {
+
+        const existing =
+          excelState.firestoreCases.find(
+            c => c.id === ex.id
+          );
+
         const overwrite =
           excelState.isBackupImport &&
-          $("overwriteUserActions")?.checked;
-      
-        let data = { ...ex, teamId: excelState.teamId };
-      
-        if (!overwrite && existing) {
+          $("overwriteUserActions")
+            ?.checked;
+
+        let data = {
+          ...ex,
+          teamId:
+            excelState.teamId
+        };
+
+        if (
+          !overwrite &&
+          existing
+        ) {
+
           const preserve = [
             "status",
             "followDate",
@@ -1005,38 +1010,60 @@ async function applyExcelChanges() {
             "statusChangedOn",
             "statusChangedBy"
           ];
-      
+
           preserve.forEach(f => {
-            if (existing[f] !== undefined) data[f] = existing[f];
+            if (
+              existing[f] !== undefined
+            ) {
+              data[f] =
+                existing[f];
+            }
           });
         }
-      
-         return setDoc(
-           doc(db, "cases", excelState.teamId, "casesList", ex.id),
-           data,
-           { merge: true }
-         );
+
+        return setDoc(
+          doc(
+            db,
+            "DST",
+            excelState.teamId,
+            "3wList",
+            ex.id
+          ),
+          data,
+          { merge: true }
+        );
       }),
-     "Updated"
-   );
-   
-   
-     // ======================================================
-     // DELETED CASES → deleteDoc
-     // ======================================================
-     if (deleted.length > 0) {
-       updateProgress("\nDeleting missing cases...");
-       await runBatches(
-         deleted.map(c => deleteDoc(doc(db, "cases", excelState.teamId, "casesList", c.id))),
-         "Deleted"
-       );
-     }
-   } catch (err) {
-     console.error("Case update failed:", err);
-     showPopup("❌ Case update failed. Report was NOT generated.");
-     processing = false;
-     return; // ⛔ STOP HERE
-   }
+      "Updated"
+    );
+
+    // ======================================================
+    // DELETED CASES
+    // ======================================================
+    if (deleted.length > 0) {
+      updateProgress("\nDeleting missing cases...");
+
+      await runBatches(
+        deleted.map(c =>
+          deleteDoc(
+            doc(
+              db,
+              "DST",
+              excelState.teamId,
+              "3wList",
+              c.id
+            )
+          )
+        ),
+        "Deleted"
+      );
+    }
+
+  } catch (err) {
+    console.error("Case update failed:",err);
+    showPopup("❌ Case update failed.");
+    processing = false;
+    return;
+  }
 
   // ======================================================
   // SUMMARY
@@ -1047,145 +1074,9 @@ async function applyExcelChanges() {
   updateProgress(`Updated: ${updated.length}`);
   updateProgress(`Deleted: ${deleted.length}`);
   updateProgress("-----------------------------------");
+  showPopup("Excel update complete!");
 
-   // 🔒 Always fetch correct team config for Excel upload
-   const teamSnap = await getDoc(doc(db, "teams", excelState.teamId));
-   const teamCfg = teamSnap.exists()
-     ? {
-         resetTimezone: teamSnap.data().resetTimezone,
-         resetHour: teamSnap.data().resetHour
-       }
-     : { resetTimezone: "UTC", resetHour: 0 };
-   
-   const todayISO = getTeamToday(teamCfg);
-   
-   if ($("updateDailyReport")?.checked) {
-   
-     updateProgress("\nGenerating Daily Repair Report...");
-
-     console.log("REPORT USER =", adminUserId); 
-     await generateDailyRepairReport({
-       teamId: excelState.teamId,
-       cases: excelState.excelCases,
-       todayISO,
-       generatedBy: adminUserId, 
-
-       newCasesCount: newCases.length,
-       deletedCasesCount: deleted.length
-     });
-   
-     updateProgress("Daily report updated.");
-   
-   } else {
-     updateProgress("\nDaily report update skipped.");
-   }
-
-   // ==========================================
-   // Sync Closed Cases (Batched + Cleanup)
-   // ==========================================
-   updateProgress("\n-----------------------------------");
-   updateProgress("SYNCING CLOSED CASES ARCHIVE");
-   updateProgress("-----------------------------------");
-   
-   const closedColRef = collection(
-     db,
-     "cases",
-     excelState.teamId,
-     "closedCases"
-   );
-   
-   // 1️⃣ Load existing closed cases from Firestore
-   updateProgress("Loading existing closed cases from Firestore...");
-   const closedSnap = await getDocs(closedColRef);
-   
-   const existingClosedMap = new Map();
-   closedSnap.forEach(d => {
-     existingClosedMap.set(d.id, d.data());
-   });
-   
-   const excelClosedMap = new Map();
-   excelState.closedCases.forEach(c => {
-     excelClosedMap.set(c.id, c);
-   });
-   
-   // 2️⃣ Detect NEW + DELETE
-   const toCreate = [];
-   const toDelete = [];
-   
-   for (const c of excelState.closedCases) {
-     if (!existingClosedMap.has(c.id)) {
-       toCreate.push(c);
-     }
-   }
-   
-   for (const d of closedSnap.docs) {
-     if (!excelClosedMap.has(d.id)) {
-       toDelete.push(d.id);
-     }
-   }
-   
-   updateProgress(`New Closed Cases: ${toCreate.length}`);
-   updateProgress(`Removed Closed Cases: ${toDelete.length}`);
-   
-   // Utility batch runner
-   async function runClosedBatches(tasks, label) {
-     let batch = [];
-     let processed = 0;
-   
-     for (const t of tasks) {
-       batch.push(t);
-       processed++;
-   
-       if (batch.length >= batchLimit) {
-         updateProgress(`${label}: writing batch (${processed - batch.length} to ${processed})...`);
-         await Promise.all(batch);
-         batch = [];
-       }
-     }
-   
-     if (batch.length > 0) {
-       updateProgress(`${label}: writing final batch...`);
-       await Promise.all(batch);
-     }
-   
-     updateProgress(`${label}: ✔ completed (${processed})`);
-   }
-   
-   // 3️⃣ CREATE NEW
-   if (toCreate.length > 0) {
-     updateProgress("\nCreating new closed cases...");
-     await runClosedBatches(
-       toCreate.map(c =>
-         setDoc(
-           doc(db, "cases", excelState.teamId, "closedCases", c.id),
-           {
-             ...c,
-             teamId: excelState.teamId,
-             archivedAt: new Date()
-           }
-         )
-       ),
-       "Closed Create"
-     );
-   }
-   
-   // 4️⃣ DELETE MISSING
-   if (toDelete.length > 0) {
-     updateProgress("\nRemoving missing closed cases...");
-     await runClosedBatches(
-       toDelete.map(id =>
-         deleteDoc(
-           doc(db, "cases", excelState.teamId, "closedCases", id)
-         )
-       ),
-       "Closed Delete"
-     );
-   }
-   
-   updateProgress("\nClosed Cases Sync Complete.");
-   
-   showPopup("Excel update complete!");
-   processing = false;
+  processing = false;
 }
 
 async function applyFullRestore() {

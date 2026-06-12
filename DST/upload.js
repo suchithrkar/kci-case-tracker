@@ -254,8 +254,8 @@ async function parseBackupFile(data) {
   updateProgress(`Backup loaded (v${backup.version}).`);
   updateProgress(`Cases: ${backup.casesList.length}`);
 
-  excelState.fullBackupData =backup;
-  excelState.isFullRestore =true;
+  excelState.fullBackupData = backup;
+  excelState.isFullRestore = true;
   excelState.isBackupImport = true;
 }
 
@@ -824,14 +824,14 @@ $("btnConfirmImport").onclick = async () => {
     return;
   }
 
-  processing = true;
-
   const d = excelState.diff;
-
+   
   // Safety: deletions require checkbox
   if (d.deleted.length > 0 && !$("allowDeletion").checked) {
     return showPopup("Enable 'Allow deletion' to continue.");
   }
+   
+  processing = true;
 
   // Disable UI while processing
   $("btnConfirmImport").disabled = true;

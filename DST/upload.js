@@ -23,6 +23,8 @@ import { isPrimary, isSecondary, toggleTheme } from "../js/userProfile.js";
 import { showPopup } from "../js/utils.js";
 import { cleanupDailyReports } from "../js/utils.js";
 
+console.log("DST upload.js loaded");
+
 export const excelState = {
   teamId: null,
   file: null,

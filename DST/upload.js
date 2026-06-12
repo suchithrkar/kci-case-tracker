@@ -37,8 +37,9 @@ let processing = false;
 let uploadTeams = [];
 let adminUserId = null;
 
-export function setUploadUser(uid) {
+export function setUploadUser(uid) { 
   adminUserId = uid;
+  console.log("SET USER =", uid); 
 }
 
 const $ = (id) => document.getElementById(id);
@@ -1084,6 +1085,7 @@ async function applyExcelChanges() {
        cases: excelState.excelCases,
        todayISO,
        generatedBy: adminUserId,
+       console.log("REPORT USER =", adminUserId); 
 
        newCasesCount: newCases.length,
        deletedCasesCount: deleted.length

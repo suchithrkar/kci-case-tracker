@@ -1079,13 +1079,13 @@ async function applyExcelChanges() {
    if ($("updateDailyReport")?.checked) {
    
      updateProgress("\nGenerating Daily Repair Report...");
-   
+
+     console.log("REPORT USER =", adminUserId); 
      await generateDailyRepairReport({
        teamId: excelState.teamId,
        cases: excelState.excelCases,
        todayISO,
-       generatedBy: adminUserId,
-       console.log("REPORT USER =", adminUserId); 
+       generatedBy: adminUserId, 
 
        newCasesCount: newCases.length,
        deletedCasesCount: deleted.length

@@ -692,9 +692,9 @@ async function loadFirestoreCasesForTeam(teamId) {
     const colRef =
       collection(
         db,
-        "cases",
+        "DST",
         teamId,
-        "casesList"
+        "3wList"
       );
 
     const snap =
@@ -721,12 +721,35 @@ async function loadFirestoreCasesForTeam(teamId) {
 // ======================================================
 // COMPARE EXCEL CASES vs FIRESTORE CASES
 // ======================================================
+function stripUserFields(obj) {
+  const clone = { ...obj };
+
+  delete clone.status;
+  delete clone.followDate;
+  delete clone.followTime;
+  delete clone.flagged;
+  delete clone.pns;
+  delete clone.surveyPrediction;
+  delete clone.predictionComment;
+  delete clone.notes;
+  delete clone.lastActionedOn;
+  delete clone.lastActionedBy;
+  delete clone.statusChangedOn;
+  delete clone.statusChangedBy;
+
+  return clone;
+}
+
 function computeDiff() {
   const excelMap = new Map();
-  excelState.excelCases.forEach(c => excelMap.set(c.id, c));
+  excelState.excelCases.forEach(c =>
+    excelMap.set(c.id, c)
+  );
 
   const fsMap = new Map();
-  excelState.firestoreCases.forEach(c => fsMap.set(c.id, c));
+  excelState.firestoreCases.forEach(c =>
+    fsMap.set(c.id, c)
+  );
 
   const diff = {
     new: [],
@@ -734,53 +757,40 @@ function computeDiff() {
     deleted: []
   };
 
-  // Detect new + updated
   for (const ex of excelState.excelCases) {
-     const fs = fsMap.get(ex.id);
-   
-     if (!fs) {
-       diff.new.push(ex);
-       continue;
-     }
-   
-     // 🔥 BACKUP FULL RESTORE MODE:
-     // Treat ALL existing cases as updated
-     if (excelState.isBackupImport && $("overwriteUserActions")?.checked) {
-       diff.updated.push(ex);
-       continue;
-     }
-   
-     const changed =
-       ex.customerName !== fs.customerName ||
-       ex.createdOn !== fs.createdOn ||
-       ex.createdBy !== fs.createdBy ||
-       ex.country !== fs.country ||
-       ex.caseResolutionCode !== fs.caseResolutionCode ||
-       ex.caseOwner !== fs.caseOwner ||
-       ex.otcCode !== fs.otcCode ||
-       ex.caGroup !== fs.caGroup ||
-       ex.tl !== fs.tl ||
-       ex.sbd !== fs.sbd ||
-       ex.onsiteRFC !== fs.onsiteRFC ||
-       ex.csrRFC !== fs.csrRFC ||
-       ex.benchRFC !== fs.benchRFC ||
-       ex.market !== fs.market ||
-       ex.excelOrder !== fs.excelOrder ||
-       ex.woClosureNotes !== fs.woClosureNotes ||
-       ex.trackingStatus !== fs.trackingStatus ||
-       ex.partNumber !== fs.partNumber ||
-       ex.partName !== fs.partName ||
-       ex.serialNumber !== fs.serialNumber ||
-       ex.productName !== fs.productName ||
-       ex.emailStatus !== fs.emailStatus ||
-       ex.dnap !== fs.dnap;
-   
-     if (changed) diff.updated.push(ex);
-   }
+    const fs = fsMap.get(ex.id);
 
-  // Detect deleted
+    if (!fs) {
+      diff.new.push(ex);
+      continue;
+    }
+
+    // Full backup restore mode
+    if (
+      excelState.isBackupImport &&
+      $("overwriteUserActions")?.checked
+    ) {
+      diff.updated.push(ex);
+      continue;
+    }
+
+    const changed =
+      JSON.stringify(
+        stripUserFields(ex)
+      ) !==
+      JSON.stringify(
+        stripUserFields(fs)
+      );
+
+    if (changed) {
+      diff.updated.push(ex);
+    }
+  }
+
   for (const fs of excelState.firestoreCases) {
-    if (!excelMap.has(fs.id)) diff.deleted.push(fs);
+    if (!excelMap.has(fs.id)) {
+      diff.deleted.push(fs);
+    }
   }
 
   excelState.diff = diff;

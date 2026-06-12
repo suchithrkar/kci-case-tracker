@@ -21,7 +21,6 @@ import {
 
 import { isPrimary, isSecondary, toggleTheme } from "../js/userProfile.js";
 import { showPopup } from "../js/utils.js";
-import { cleanupDailyReports } from "../js/utils.js";
 
 console.log("DST upload.js loaded");
 
@@ -149,7 +148,9 @@ function resetExcelUI() {
   $("uploadSummary").innerHTML = `<strong>Selected Team:</strong> -`;
   $("btnPreviewChanges").disabled = true;
   $("allowDeletion").checked = false;
-  $("updateDailyReport").checked = false;
+  if ($("updateDailyReport")) {
+    $("updateDailyReport").checked = false;
+  }
 
   clearProgress();
 
@@ -231,33 +232,30 @@ function excelToDateTime(value) {
 async function parseBackupFile(data) {
   let backup;
 
-  if (Array.isArray(data)) {
-    backup = {
-      version: 1,
-      teamId: null,
-      cases: data
-    };
-  } else if (data.version === 3 && data.casesList) {
+  if (
+    data.version === 4 &&
+    data.casesList
+  ) {
     backup = data;
   } else {
-    alert("Invalid backup format.");
+    alert("Invalid DST backup format.");
     return;
   }
 
-  if (backup.teamId && backup.teamId !== excelState.teamId) {
-    alert(
-      `This backup belongs to another team.\n\nBackup Team: ${backup.teamId}`
-    );
+  if (
+    backup.teamId &&
+    backup.teamId !==
+      excelState.teamId
+  ) {
+    alert(`This backup belongs to another team.\n\nBackup Team: ${backup.teamId}`);
     return;
   }
 
   updateProgress(`Backup loaded (v${backup.version}).`);
-  updateProgress(`Open Cases: ${backup.casesList?.length || 0}`);
-  updateProgress(`Closed Cases: ${backup.closedCases?.length || 0}`);
-  updateProgress(`Reports: ${backup.reports?.length || 0}`);
+  updateProgress(`Cases: ${backup.casesList.length}`);
 
-  excelState.fullBackupData = backup;
-  excelState.isFullRestore = true;
+  excelState.fullBackupData =backup;
+  excelState.isFullRestore =true;
   excelState.isBackupImport = true;
 }
 
@@ -414,62 +412,63 @@ async function parseExcelFile(file) {
    ============================================================ */
 async function exportBackup(teamId) {
   try {
-    showPopup("Preparing full backup...");
+    showPopup("Preparing DST backup...");
 
-    // Load casesList
-    const casesSnap = await getDocs(
-      collection(db, "cases", teamId, "casesList")
-    );
-    const casesList = casesSnap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    }));
+    const snap =
+      await getDocs(
+        collection(
+          db,
+          "DST",
+          teamId,
+          "3wList"
+        )
+      );
 
-    // Load closedCases
-    const closedSnap = await getDocs(
-      collection(db, "cases", teamId, "closedCases")
-    );
-    const closedCases = closedSnap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    }));
+    const casesList =
+      snap.docs.map(d => ({
+        id: d.id,
+        ...d.data()
+      }));
 
-    // Load reports
-    const reportsSnap = await getDocs(
-      collection(db, "cases", teamId, "reports")
-    );
-    const reports = reportsSnap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    }));
-
-    const today = getTeamToday(teamConfig);
+    const today =
+      new Date()
+        .toISOString()
+        .split("T")[0];
 
     const backup = {
-      version: 3,
-      app: "KCI Case Tracker",
-      exportedAt: new Date().toISOString(),
+      version: 4,
+      app: "DST Tracker",
+      exportedAt:
+        new Date().toISOString(),
       teamId,
-      casesList,
-      closedCases,
-      reports
+      casesList
     };
 
-    const blob = new Blob(
-      [JSON.stringify(backup, null, 2)],
-      { type: "application/json" }
-    );
+    const blob =
+      new Blob(
+        [
+          JSON.stringify(
+            backup,
+            null,
+            2
+          )
+        ],
+        {
+          type: "application/json"
+        }
+      );
 
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
 
     a.href = url;
-    a.download = `${teamId}_backup_v3_${today}.json`;
+    a.download = `${teamId}_DST_Backup_${today}.json`;
     a.click();
 
     URL.revokeObjectURL(url);
 
-    showPopup("Full backup exported.");
+    showPopup("DST backup exported.");
+
   } catch (err) {
     console.error("Backup export failed:", err);
     showPopup("Backup export failed.");
@@ -779,55 +778,22 @@ async function openPreviewModal() {
     <strong>Deleted Cases:</strong> ${d.deleted.length}
   `;
 
-  // show preview section
   $("previewSection").style.display = "block";
 
-   // ==========================================
-   // Auto-toggle Daily Report checkbox
-   // ==========================================
-   try {
-     const teamSnap = await getDoc(doc(db, "teams", excelState.teamId));
-     const teamCfg = teamSnap.exists()
-       ? {
-           resetTimezone: teamSnap.data().resetTimezone,
-           resetHour: teamSnap.data().resetHour
-         }
-       : { resetTimezone: "UTC", resetHour: 0 };
-   
-     const todayISO = getTeamToday(teamCfg);
-   
-      const reportRef = doc(
-        db,
-        "cases",
-        excelState.teamId,
-        "reports",
-        todayISO
-      );
-   
-     const reportSnap = await getDoc(reportRef);
-   
-     // First upload of the day → checked
-     if (!reportSnap.exists()) {
-       $("updateDailyReport").checked = true;
-     } else {
-       // Already generated today → unchecked
-       $("updateDailyReport").checked = false;
-     }
-   
-   } catch (err) {
-     console.warn("Could not determine daily report state:", err);
-     $("updateDailyReport").checked = false;
-   }
-
-  // show checkbox only when needed
-  $("deleteCheckboxWrap").style.display = d.deleted.length > 0 ? "block" : "none";
+  $("deleteCheckboxWrap").style.display =
+    d.deleted.length > 0
+      ? "block"
+      : "none";
 
   $("allowDeletion").checked = false;
-  $("btnConfirmImport").disabled = (d.deleted.length > 0);
+
+  $("btnConfirmImport").disabled =
+    d.deleted.length > 0;
 
   if (d.deleted.length > 0) {
     $("allowDeletion").onchange = () => {
-      $("btnConfirmImport").disabled = !$("allowDeletion").checked;
+      $("btnConfirmImport").disabled =
+        !$("allowDeletion").checked;
     };
   } else {
     $("btnConfirmImport").disabled = false;
@@ -1083,7 +1049,7 @@ async function applyFullRestore() {
   const teamId = excelState.teamId;
   const data = excelState.fullBackupData;
 
-  updateProgress("Starting FULL RESTORE...");
+  updateProgress("Starting FULL DST RESTORE...");
 
   const batchLimit = 400;
 
@@ -1097,14 +1063,18 @@ async function applyFullRestore() {
       batch.push(deleteDoc(d.ref));
       count++;
 
-      if (batch.length >= batchLimit) {
+      if (
+        batch.length >=
+        batchLimit
+      ) {
         await Promise.all(batch);
         batch = [];
       }
     }
 
-    if (batch.length) await Promise.all(batch);
-
+    if (batch.length) {
+      await Promise.all(batch);
+    }
     updateProgress(`${label} wiped (${count})`);
   }
 
@@ -1113,215 +1083,60 @@ async function applyFullRestore() {
     let count = 0;
 
     for (const d of docs) {
-      const ref = doc(db, ...colPath, d.id);
+      const ref =
+        doc(
+          db,
+          ...colPath,
+          d.id
+        );
+
       batch.push(setDoc(ref, d));
       count++;
 
-      if (batch.length >= batchLimit) {
+      if (
+        batch.length >= batchLimit
+      ) {
         await Promise.all(batch);
         batch = [];
       }
     }
 
-    if (batch.length) await Promise.all(batch);
-
+    if (batch.length) {
+      await Promise.all(batch);
+    }
+     
     updateProgress(`${label} restored (${count})`);
   }
 
   try {
-    // WIPE EXISTING DATA
-    await wipeCollection(
-      collection(db, "cases", teamId, "casesList"),
-      "casesList"
-    );
 
     await wipeCollection(
-      collection(db, "cases", teamId, "closedCases"),
-      "closedCases"
+      collection(
+        db,
+        "DST",
+        teamId,
+        "3wList"
+      ),
+      "3wList"
     );
 
-    await wipeCollection(
-      collection(db, "cases", teamId, "reports"),
-      "reports"
-    );
-
-    // RESTORE
     await writeCollection(
-      ["cases", teamId, "casesList"],
+      [
+        "DST",
+        teamId,
+        "3wList"
+      ],
       data.casesList || [],
-      "casesList"
+      "3wList"
     );
 
-    await writeCollection(
-      ["cases", teamId, "closedCases"],
-      data.closedCases || [],
-      "closedCases"
-    );
-
-    await writeCollection(
-      ["cases", teamId, "reports"],
-      data.reports || [],
-      "reports"
-    );
-
-    showPopup("Full backup restore completed.");
+    showPopup("DST backup restore completed.");
   } catch (err) {
     console.error("Full restore failed:", err);
     showPopup("Full restore failed.");
   }
 
   processing = false;
-}
-
-async function generateDailyRepairReport({
-     teamId,
-     cases,
-     todayISO,
-     generatedBy,
-     newCasesCount,
-     deletedCasesCount
-   }) {
-     // ===============================
-     // TOTAL OPEN
-     // ===============================
-     const onsiteAll = cases.filter(
-       c => c.caseResolutionCode === "Onsite Solution"
-     );
-     const offsiteAll = cases.filter(
-       c => c.caseResolutionCode === "Offsite Solution"
-     );
-     const csrAll = cases.filter(
-       c => c.caseResolutionCode === "Parts Shipped"
-     );
-   
-     // ===============================
-     // READY FOR CLOSURE
-     // ===============================
-     const onsiteRFC = onsiteAll.filter(c =>
-       ["Closed - Canceled", "Closed - Posted", "Open - Completed"]
-         .includes(c.onsiteRFC)
-     );
-   
-     const offsiteRFC = offsiteAll.filter(c =>
-       ["Delivered", "Order cancelled, not to be reopened"].includes(c.benchRFC)
-     );
-   
-     const csrRFC = csrAll.filter(c =>
-       ["Cancelled", "Closed", "POD"].includes(c.csrRFC)
-     );
-   
-     const rfcIds = new Set(
-       [...onsiteRFC, ...offsiteRFC, ...csrRFC].map(c => c.id)
-     );
-   
-     // ===============================
-     // OVERDUE (NEGATIVE LOGIC)
-     // ===============================
-     let overdue = cases.filter(c => !rfcIds.has(c.id));
-   
-     overdue = overdue.filter(c => !(
-       c.caseResolutionCode === "Onsite Solution" &&
-       ["0-3 Days", "3-5 Days"].includes(c.caGroup)
-     ));
-   
-     overdue = overdue.filter(c => !(
-       c.caseResolutionCode === "Offsite Solution" &&
-       ["0-3 Days", "3-5 Days", "5-10 Days"].includes(c.caGroup)
-     ));
-   
-     overdue = overdue.filter(c => !(
-       c.caseResolutionCode === "Parts Shipped" &&
-       c.caGroup === "0-3 Days"
-     ));
-   
-     // ===============================
-     // WRITE REPORT
-     // ===============================
-   
-      // ===============================
-      // CA GROUP DISTRIBUTION (ALL CASES)
-      // ===============================
-      const caGroups = {
-        "0-3 Days": 0,
-        "3-5 Days": 0,
-        "5-10 Days": 0,
-        "10-15 Days": 0,
-        "15-30 Days": 0,
-        "30-60 Days": 0,
-        "60-90 Days": 0,
-        "> 90 Days": 0
-      };
-      
-      cases.forEach(c => {
-        if (caGroups[c.caGroup] !== undefined) {
-          caGroups[c.caGroup]++;
-        }
-      });
-      
-      // Total cases > 30 days
-      const caAbove30Total =
-        caGroups["30-60 Days"] +
-        caGroups["60-90 Days"] +
-        caGroups["> 90 Days"];
-      
-      const reportRef = doc(
-        db,
-        "cases",
-        teamId,
-        "reports",
-        todayISO
-      );
-   
-      await setDoc(
-        reportRef,
-        {
-          // TOTAL OPEN
-          totalOpen: cases.length,
-          totalOpenOnsite: onsiteAll.length,
-          totalOpenOffsite: offsiteAll.length,
-          totalOpenCSR: csrAll.length,
-      
-          // READY FOR CLOSURE
-          readyForClosureTotal: rfcIds.size,
-          readyForClosureOnsite: onsiteRFC.length,
-          readyForClosureOffsite: offsiteRFC.length,
-          readyForClosureCSR: csrRFC.length,
-      
-          // OVERDUE
-          overdueTotal: overdue.length,
-          overdueOnsite: overdue.filter(c =>
-            c.caseResolutionCode === "Onsite Solution"
-          ).length,
-          overdueOffsite: overdue.filter(c =>
-            c.caseResolutionCode === "Offsite Solution"
-          ).length,
-          overdueCSR: overdue.filter(c =>
-            c.caseResolutionCode === "Parts Shipped"
-          ).length,
-      
-          // CA GROUP
-          ca_0_3: caGroups["0-3 Days"],
-          ca_3_5: caGroups["3-5 Days"],
-          ca_5_10: caGroups["5-10 Days"],
-          ca_10_15: caGroups["10-15 Days"],
-          ca_15_30: caGroups["15-30 Days"],
-          ca_30_60: caGroups["30-60 Days"],
-          ca_60_90: caGroups["60-90 Days"],
-          ca_gt_90: caGroups["> 90 Days"],
-          ca_gt_30_total: caAbove30Total,
-
-          newCasesCount: newCasesCount || 0,
-          deletedCasesCount: deletedCasesCount || 0,
-           
-          generatedAt: new Date(),
-          generatedBy
-        },
-        { merge: true }
-      );
-      
-      await cleanupDailyReports(teamId, todayISO);
-      
-      showPopup(`Daily repair report generated for ${todayISO}`);
 }
 
 export function initializeUploadModule() {

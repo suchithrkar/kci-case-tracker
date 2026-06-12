@@ -619,15 +619,19 @@ async function populateUpdateDataTeams() {
 async function loadUploadTeams() {
   uploadTeams = [];
 
-  const snap =
-    await getDocs(collection(db, "teams"));
-
+  const snap = await getDocs(collection(db, "teams"));
+   
   snap.forEach(d => {
-    uploadTeams.push({
+    const team = {
       id: d.id,
       ...d.data()
-    });
-  });
+    };
+   
+    // Only DST teams
+    if (team.groupId === "DST") {
+      uploadTeams.push(team);
+    }
+   });
 
   await populateUpdateDataTeams();
 }

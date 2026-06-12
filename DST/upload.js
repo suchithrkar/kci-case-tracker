@@ -272,81 +272,66 @@ async function parseExcelFile(file) {
       const data = evt.target.result;
       const wb = XLSX.read(data, { type: "binary" });
 
-      // ==========================================
-      // Read required sheets by NAME
-      // ==========================================
-      const repairSheet = wb.Sheets["Repair Cases"];
-      const closedSheet = wb.Sheets["Closed Cases Data"];
-      
-      if (!repairSheet) {
-        alert("Repair Cases sheet not found.");
+      const sheetName = wb.SheetNames[0];
+
+      const dstSheet =
+        wb.Sheets[sheetName];
+
+      if (!dstSheet) {
+        alert("DST worksheet not found.");
         resolve();
         return;
       }
-      
-      const rows = XLSX.utils.sheet_to_json(repairSheet, { header: 1 });
 
-      // ======================================================
-      // OPTIONAL SAFETY GUARD — EXCEL HEADER VALIDATION
-      // ======================================================
-      
-      // Expected headers by position (0-based index)
-      // We only check for KEY PHRASES, not full header text
+      const rows = XLSX.utils.sheet_to_json(dstSheet, { header: 1 });
+
       const expectedHeaders = {
-        0: "case id",
-        1: "customer name",
-        2: "created on",
-        3: "created by",
-        4: "country",
-        5: "resolution",
-        6: "owner",
-        7: "otc",
-        8: "ca group",
-        9: "tl",
-        10: "sbd",
-        11: "onsite",
-        12: "csr",
-        13: "bench",
-        14: "market",
-        15: "closure",
-        16: "tracking",
-        17: "part number",
-        18: "part name",
-        19: "serial",
-        20: "product",
-        21: "email",
-        22: "dnap"
+        3: "Ticket Number",
+        15: "Case ID",
+        40: "Status",
+        48: "Notes History",
+        49: "Product Name"
       };
 
       const headerRow = rows[0] || [];
       const headerErrors = [];
-      
-      Object.entries(expectedHeaders).forEach(([index, expected]) => {
-        const actual = String(headerRow[index] || "").trim();
-      
-        if (!actual || !actual.toLowerCase().includes(expected.toLowerCase())) {
-          headerErrors.push(
-            `Column ${excelColLetter(Number(index))}: expected "${expected}", found "${actual || "EMPTY"}"`
-          );
+
+      Object.entries(expectedHeaders).forEach(
+        ([index, expected]) => {
+
+          const actual =
+            String(
+              headerRow[index] || ""
+            ).trim();
+
+          if (
+            !actual ||
+            !actual
+              .toLowerCase()
+              .includes(
+                expected.toLowerCase()
+              )
+          ) {
+            headerErrors.push(
+              `Column ${excelColLetter(Number(index))}: expected "${expected}", found "${actual || "EMPTY"}"`
+            );
+          }
         }
-      });
-      
+      );
+
       if (headerErrors.length > 0) {
+
         clearProgress();
-      
-         alert(
-           "Excel format validation failed.\n\n" +
-           headerErrors.join("\n") +
-           "\n\nPlease upload the correct Excel template."
-         );
-      
+
+        alert("DST Excel format validation failed.\n\n" + headerErrors.join("\n"));
+
         excelState.excelCases = [];
         excelState.rawRows = [];
-      
-        resolve(); // stop parsing
+
+        resolve();
         return;
       }
-       
+
       excelState.rawRows = rows;
 
       updateProgress("Excel loaded. Processing rows...");
@@ -355,82 +340,68 @@ async function parseExcelFile(file) {
 
       for (let i = 1; i < rows.length; i++) {
         const r = rows[i];
-        if (!r || !r[0]) continue;
-
-        const id = String(r[0]).trim();
+        if (!r) continue;
+        const id = String( r[15] || "").trim();
         if (!id) continue;
-
         parsed.push({
-           id: String(r[0] || "").trim(),              // A
-           customerName: String(r[1] || "").trim(),   // B
-           createdOn: excelToDate(r[2]),              // C
-           createdBy: String(r[3] || "").trim(),      // D
-           country: String(r[4] || "").trim(),        // E
-           caseResolutionCode: String(r[5] || "").trim(), // F
-           caseOwner: String(r[6] || "").trim(),      // G
-           otcCode: String(r[7] || "").trim(),        // H
-           caGroup: String(r[8] || "").trim(),        // I
-           tl: String(r[9] || "").trim(),             // J
-           sbd: String(r[10] || "").trim(),           // K
-           onsiteRFC: String(r[11] || "").trim(),     // L
-           csrRFC: String(r[12] || "").trim(),        // M
-           benchRFC: String(r[13] || "").trim(),      // N
-           market: String(r[14] || "").trim(),        // O
-         
-           // ==========================
-           // NEW FIELDS
-           // ==========================
-           woClosureNotes: String(r[15] || "").trim(), // P
-           trackingStatus: String(r[16] || "").trim(), // Q
-           partNumber: String(r[17] || "").trim(),     // R
-           partName: String(r[18] || "").trim(),       // S
-           serialNumber: String(r[19] || "").trim(),   // T
-           productName: String(r[20] || "").trim(),    // U
-           emailStatus: String(r[21] || "").trim(),    // V
-           dnap: String(r[22] || "").trim(),           // W         
-           excelOrder: i
-         });
+          id,
+          ticketNumber: String(r[3] || "").trim(),
+          createdOn: excelToDate(r[4]),
+          category: String(r[5] || "").trim(),
+          subCategory: String(r[6] || "").trim(),
+          ticketStatus: String(r[7] || "").trim(),
+          ticketUrl: String(r[8] || "").trim(),
+          threeWNotes: String(r[9] || "").trim(),
+          createdBy: String(r[10] || "").trim(),
+          materialOrder: String(r[11] || "").trim(),
+          materialOrderLineItem: String(r[12] || "").trim(),
+          owner: String(r[13] || "").trim(),
+          owningBusinessUnit: String(r[14] || "").trim(),
+          caseIdMaterialOrder: String(r[15] || "").trim(),
+          countryMaterialOrder: String(r[16] || "").trim(),
+          materialOrderCreatedOn: excelToDate(r[17]),
+          orderStatus: String(r[18] || "").trim(),
+          orderType: String(r[19] || "").trim(),
+          salesOrderNumber: String(r[20] || "").trim(),
+          materialOrderStatus: String(r[21] || "").trim(),
+          materialOrderStatusReason: String(r[22] || "").trim(),
+          modifiedOn: excelToDateTime(r[23]),
+          atpStatus: String(r[24] || "").trim(),
+          lineItemCreatedOn: excelToDate(r[25]),
+          expectedDeliveryDate: excelToDate(r[26]),
+          expectedShipDate: excelToDate(r[27]),
+          promisedDateDifferent: String(r[28] || "").trim(),
+          isEscalated: String(r[29] || "").trim(),
+          lineNumber: String(r[30] || "").trim(),
+          lineItemMaterialOrder: String(r[31] || "").trim(),
+          moLineItemsName: String(r[32] || "").trim(),
+          lineItemModifiedOn: excelToDateTime(r[33]),
+          promisedDate: excelToDate(r[34]),
+          shipPlant: String(r[35] || "").trim(),
+          lineItemStatus: String(r[36] || "").trim(),
+          lineItemStatusReason: String(r[37] || "").trim(),
+          trackingNumber: String(r[38] || "").trim(),
+          workOrder: String(r[39] || "").trim(),
+          statusExcel: String(r[40] || "").trim(),
+          statusReasonExcel: String(r[41] || "").trim(),
+          workgroup: String(r[42] || "").trim(),
+          queue: String(r[43] || "").trim(),
+          ticketOwner3W: String(r[44] || "").trim(),
+          is3WComment: String(r[45] || "").trim(),
+          latest3WStatusChangeDateTime: excelToDateTime(r[46]),
+          latestNotesUpdateDateTime: excelToDateTime(r[47]),
+          notesHistory: String(r[48] || "").trim(),
+          productName: String(r[49] || "").trim(),
+
+          excelOrder: i
+        });
       }
 
       excelState.excelCases = parsed;
 
-       // ==========================================
-      // Parse Closed Cases Data sheet (archival)
-      // ==========================================
+      // DST has no closed cases sheet
       excelState.closedCases = [];
-      
-      if (closedSheet) {
-        const closedRows = XLSX.utils.sheet_to_json(closedSheet, { header: 1 });
-      
-        for (let i = 1; i < closedRows.length; i++) {
-          const r = closedRows[i];
-          if (!r || !r[0]) continue;
-      
-          excelState.closedCases.push({
-            id: String(r[0] || "").trim(),
-            customerName: String(r[1] || "").trim(),
-            createdOn: excelToDate(r[2]),
-            createdBy: String(r[3] || "").trim(),
-            modifiedBy: String(r[4] || "").trim(),
-            modifiedOn: excelToDate(r[5]),
-            caseClosedDate: excelToDateTime(r[6]),
-            closedBy: String(r[7] || "").trim(),
-            country: String(r[8] || "").trim(),
-            caseResolutionCode: String(r[9] || "").trim(),
-            caseOwner: String(r[10] || "").trim(),
-            otcCode: String(r[11] || "").trim(),
-            tl: String(r[12] || "").trim(),
-            sbd: String(r[13] || "").trim(),
-            market: String(r[14] || "").trim()
-          });
-        }
-      }
-
       updateProgress(`Excel loaded.\nTotal valid rows: ${parsed.length}`);
-      // Do NOT call validateReadyState() here.
-      // It is called AFTER parseExcelFile() in the onchange handler.
-
-
       resolve();
     };
 

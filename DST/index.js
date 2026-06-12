@@ -26,7 +26,7 @@ import {
   toggleTheme
 } from "../js/userProfile.js";
 
-import { listenToTeamCases, updateCase } from "../js/firestore-api.js";
+import { listenToTeamDST, updateDST } from "../js/firestore-api.js";
 import { showPopup } from "../js/utils.js";
 import { cleanupClosedCases } from "../js/utils.js";
 import { templates } from "../templates.js";
@@ -566,7 +566,7 @@ let unsubscribe = null;
 function setupRealtimeCases(teamId) {
   if (unsubscribe) unsubscribe();
 
-  unsubscribe = listenToTeamCases(teamId, (cases) => {
+  unsubscribe = listenToTeamDST(teamId, (cases) => {
     const incoming = cases.map(c => ({
         id: c.id,
         customerName: c.customerName || "",
@@ -3089,7 +3089,7 @@ async function firestoreUpdateCase(caseId, fields) {
       throw new Error("Team ID not available");
     }
 
-    await updateCase(trackerState.teamId, caseId, fields);
+    await updateDST(trackerState.teamId, caseId, fields);
 
   } catch (err) {
 

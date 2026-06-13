@@ -1068,6 +1068,20 @@ tr.active-row {
   filter: brightness(1.1);
 }
 
+.rfc-summary-strip-actions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+
+  margin-left: auto;
+}
+
+.rfc-lock {
+  cursor: pointer;
+  padding: 4px 6px;
+  user-select: none;
+}
+
 
 /* =========================================================
    RFC SUMMARY ROW
@@ -1789,21 +1803,12 @@ tr.active-row {
         Total Cases:
         <span id="rfcTotalCount">—</span>
       </div>
-
-      <span id="rfcLock"
-            style="cursor:pointer;padding:4px 6px;user-select:none;">
-          🔓
-      </span>
-      
-      <button id="rfcClear"
-              class="rfcClearBtn">
-          Clear All
-      </button>
     
-      <button id="rfcReportBtn" 
-              class="rfc-summary-strip-btn">
-        Report
-      </button>
+      <div class="rfc-summary-strip-actions">
+        <span id="rfcLock" class="rfc-lock">🔓</span>
+        <button id="rfcClear" class="rfcClearBtn">Clear All</button>
+        <button id="rfcReportBtn" class="rfc-summary-strip-btn">Report</button>
+      </div>
     
     </div>
 

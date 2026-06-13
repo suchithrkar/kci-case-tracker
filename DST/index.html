@@ -1053,7 +1053,8 @@ tr.active-row {
 }
 
 /* Report button */
-.rfc-summary-strip-btn {
+.rfc-summary-strip-btn,
+.rfcClearBtn{
   border: 1px solid var(--border);
   background: var(--panel-2);
   border-radius: 8px;
@@ -1062,7 +1063,8 @@ tr.active-row {
   cursor: pointer;
 }
 
-.rfc-summary-strip-btn:hover {
+.rfc-summary-strip-btn:hover,
+.rfcClearBtn:hover{
   filter: brightness(1.1);
 }
 
@@ -1800,11 +1802,22 @@ tr.active-row {
     <div class="rfc-summary-strip">
     
       <div class="rfc-summary-strip-text">
-        Total Open Repair Cases:
+        Total Cases:
         <span id="rfcTotalCount">—</span>
       </div>
+
+      <span id="rfcLock"
+            style="cursor:pointer;padding:4px 6px;user-select:none;">
+          🔓
+      </span>
+      
+      <button id="rfcClear"
+              class="rfcClearBtn">
+          Clear All
+      </button>
     
-      <button id="rfcReportBtn" class="rfc-summary-strip-btn">
+      <button id="rfcReportBtn" 
+              class="rfc-summary-strip-btn">
         Report
       </button>
     

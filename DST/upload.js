@@ -1039,6 +1039,29 @@ async function applyExcelChanges() {
   updateProgress(`New: ${newCases.length}`);
   updateProgress(`Updated: ${updated.length}`);
   updateProgress(`Deleted: ${deleted.length}`);
+
+   // ======================================================
+   // VERIFY ACTUAL FIRESTORE DOCUMENT COUNT
+   // ======================================================
+   
+   const verifySnap = await getDocs(
+     collection(
+       db,
+       "DST",
+       excelState.teamId,
+       "3wList"
+     )
+   );
+   
+   updateProgress(
+     `Firestore Documents: ${verifySnap.size}`
+   );
+   
+   console.log(
+     "POST-UPLOAD FIRESTORE COUNT:",
+     verifySnap.size
+   );
+   
   updateProgress("-----------------------------------");
   showPopup("Excel update complete!");
 

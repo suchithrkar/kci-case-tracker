@@ -428,6 +428,17 @@ async function parseExcelFile(file) {
       
       updateProgress(`Cases With Multiple Rows: ${multiCases}`);
 
+      const maxRows =
+        Math.max(
+          ...excelState.excelCases.map(
+            c => c.rowCount
+          )
+        );
+      
+      updateProgress(
+        `Maximum Rows In Single Case: ${maxRows}`
+      ); 
+
       // DST has no closed cases sheet
       excelState.closedCases = [];
       updateProgress(`Excel loaded.\nTotal valid rows: ${parsed.length}`);

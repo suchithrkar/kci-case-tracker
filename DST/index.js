@@ -2685,7 +2685,7 @@ function setupRealtimeCases(teamId) {
      const tr = cell.closest("tr");
      if (tr) setActiveRow(tr);
    
-     const text = cell.textContent.trim();
+     const text = cell.dataset.id || "";
      navigator.clipboard.writeText(text);
    
      const toast = document.getElementById("toast");

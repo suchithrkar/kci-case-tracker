@@ -395,7 +395,38 @@ async function parseExcelFile(file) {
         });
       }
 
-      excelState.excelCases = parsed;
+      // =====================================================
+      // GROUP ROWS BY CASE ID
+      // =====================================================
+      
+      const caseMap = new Map();
+       
+      parsed.forEach(row => {
+        if (!caseMap.has(row.id)) {
+          caseMap.set(row.id, {
+            id: row.id,
+            rowCount: 1,
+            hasMultipleRows: false,
+            rows: [row]
+          });
+        } else {
+          const existing = caseMap.get(row.id);
+          existing.rows.push(row);
+          existing.rowCount = existing.rows.length;
+          existing.hasMultipleRows = existing.rows.length > 1;
+        }
+      });
+      
+      excelState.excelCases = Array.from(caseMap.values());
+      
+      updateProgress(`Unique Cases: ${excelState.excelCases.length}`);
+      
+      const multiCases =
+        excelState.excelCases.filter(
+          c => c.hasMultipleRows
+        ).length;
+      
+      updateProgress(`Cases With Multiple Rows: ${multiCases}`);
 
       // DST has no closed cases sheet
       excelState.closedCases = [];

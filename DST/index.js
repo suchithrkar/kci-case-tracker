@@ -568,44 +568,138 @@ function setupRealtimeCases(teamId) {
 
   unsubscribe = listenToTeamDST(teamId, (cases) => {
     const incoming = cases.map(c => ({
-        id: c.id,
-        customerName: c.customerName || "",
-        createdOn: c.createdOn || "",
-        createdBy: c.createdBy || "",
-        excelOrder: typeof c.excelOrder === "number" ? c.excelOrder : 999999,
-        country: c.country || "",
-        caseResolutionCode: c.caseResolutionCode || "",
-        caseOwner: c.caseOwner || "",
-        caGroup: c.caGroup || "",
-        tl: c.tl || "",
-        sbd: c.sbd || "",
-        onsiteRFC: c.onsiteRFC || "",
-        csrRFC: c.csrRFC || "",
-        benchRFC: c.benchRFC || "",
-        status: c.status || "",
-        followDate: c.followDate || "",
-        followTime: c.followTime || "",
-        flagged: !!c.flagged,
-        PNS: !!c.PNS,
-        surveyPrediction: typeof c.surveyPrediction === "number" ? c.surveyPrediction : null,
-        predictionComment: c.predictionComment || "",
-        otcCode: c.otcCode || "",
-        market: c.market || "",
-        notes: c.notes || "",
-        lastActionedOn: c.lastActionedOn || "",
-        lastActionedBy: c.lastActionedBy || "",
-        statusChangedOn: c.statusChangedOn || "",
-        statusChangedBy: c.statusChangedBy || "",
-
-        // NEW TEMPLATE FIELDS
-        woClosureNotes: c.woClosureNotes || "",
-        trackingStatus: c.trackingStatus || "",
-        partNumber: c.partNumber || "",
-        partName: c.partName || "",
-        serialNumber: c.serialNumber || "",
-        productName: c.productName || "",
-        emailStatus: c.emailStatus || "",
-        dnap: c.dnap || ""
+          id: c.id,
+         
+          // =====================================================
+          // DST SOURCE FIELDS
+          // =====================================================
+         
+          ticketNumber: c.ticketNumber || "",
+          createdOn: c.createdOn || "",
+          category: c.category || "",
+          subCategory: c.subCategory || "",
+          ticketStatus: c.ticketStatus || "",
+          ticketUrl: c.ticketUrl || "",
+          threeWNotes: c.threeWNotes || "",
+          createdBy: c.createdBy || "",
+         
+          materialOrder: c.materialOrder || "",
+          materialOrderLineItem: c.materialOrderLineItem || "",
+          owner: c.owner || "",
+          owningBusinessUnit: c.owningBusinessUnit || "",
+          caseIdMaterialOrder: c.caseIdMaterialOrder || "",
+          countryMaterialOrder: c.countryMaterialOrder || "",
+          materialOrderCreatedOn: c.materialOrderCreatedOn || "",
+         
+          orderStatus: c.orderStatus || "",
+          orderType: c.orderType || "",
+          salesOrderNumber: c.salesOrderNumber || "",
+          materialOrderStatus: c.materialOrderStatus || "",
+          materialOrderStatusReason: c.materialOrderStatusReason || "",
+         
+          modifiedOn: c.modifiedOn || "",
+          atpStatus: c.atpStatus || "",
+         
+          lineItemCreatedOn: c.lineItemCreatedOn || "",
+          expectedDeliveryDate: c.expectedDeliveryDate || "",
+          expectedShipDate: c.expectedShipDate || "",
+          promisedDateDifferent: c.promisedDateDifferent || "",
+         
+          isEscalated: c.isEscalated || "",
+          lineNumber: c.lineNumber || "",
+          lineItemMaterialOrder: c.lineItemMaterialOrder || "",
+          moLineItemsName: c.moLineItemsName || "",
+          lineItemModifiedOn: c.lineItemModifiedOn || "",
+          promisedDate: c.promisedDate || "",
+          shipPlant: c.shipPlant || "",
+         
+          lineItemStatus: c.lineItemStatus || "",
+          lineItemStatusReason: c.lineItemStatusReason || "",
+         
+          trackingNumber: c.trackingNumber || "",
+          workOrder: c.workOrder || "",
+         
+          statusExcel: c.statusExcel || "",
+          statusReasonExcel: c.statusReasonExcel || "",
+         
+          workgroup: c.workgroup || "",
+          queue: c.queue || "",
+          ticketOwner3W: c.ticketOwner3W || "",
+          is3WComment: c.is3WComment || "",
+         
+          latest3WStatusChangeDateTime: c.latest3WStatusChangeDateTime || "",
+          latestNotesUpdateDateTime: c.latestNotesUpdateDateTime || "",
+          notesHistory: c.notesHistory || "",
+          productName: c.productName || "",
+         
+          excelOrder:
+            typeof c.excelOrder === "number"
+              ? c.excelOrder
+              : 999999,
+      
+          // =====================================================
+          // EXISTING TRACKER FIELDS
+          // =====================================================
+          status: c.status || "",
+          followDate: c.followDate || "",
+          followTime: c.followTime || "",
+          flagged: !!c.flagged,
+          PNS: !!c.PNS,
+          surveyPrediction:
+            typeof c.surveyPrediction === "number"
+              ? c.surveyPrediction
+              : null,
+          predictionComment:
+            c.predictionComment || "",
+          notes: c.notes || "",
+          lastActionedOn:
+            c.lastActionedOn || "",
+          lastActionedBy:
+            c.lastActionedBy || "",
+          statusChangedOn:
+            c.statusChangedOn || "",
+          statusChangedBy:
+            c.statusChangedBy || "",
+      
+          // =====================================================
+          // LEGACY KCI PLACEHOLDERS
+          // (temporary until Phase 3)
+          // =====================================================
+          customerName:
+            c.customerName || c.ticketNumber || "",
+          country:
+            c.country || "",
+          caseResolutionCode:
+            c.caseResolutionCode || "",
+          caseOwner:
+            c.caseOwner || c.owner || "",
+          caGroup:
+            c.caGroup || c.workgroup || "",
+          tl:
+            c.tl || "",
+          sbd:
+            c.sbd || "",
+          onsiteRFC:
+            c.onsiteRFC || "",
+          csrRFC:
+            c.csrRFC || "",
+          benchRFC:
+            c.benchRFC || "",
+      
+          woClosureNotes:
+            c.woClosureNotes || "",
+          trackingStatus:
+            c.trackingStatus || "",
+          partNumber:
+            c.partNumber || "",
+          partName:
+            c.partName || "",
+          serialNumber:
+            c.serialNumber || "",
+          emailStatus:
+            c.emailStatus || "",
+          dnap:
+            c.dnap || ""
       }));
       
       // 🔥 Preserve protected rows during status override

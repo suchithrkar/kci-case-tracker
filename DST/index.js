@@ -567,6 +567,7 @@ function setupRealtimeCases(teamId) {
   if (unsubscribe) unsubscribe();
 
   unsubscribe = listenToTeamDST(teamId, (cases) => {
+    console.log("DST RAW CASES", cases); 
     const incoming = cases.map(c => ({
           id: c.id,
          

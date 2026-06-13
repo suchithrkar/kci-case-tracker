@@ -1265,11 +1265,6 @@ tr.active-row {
   gap: .6rem;
 }
 
-/* Force-hide PNS block even inside closure modal grid */
-#closureModal #pnsResolutionBlock.hidden-force {
-  display: none !important;
-}
-
 /* Comment row needs top alignment */
 #closureModal .row textarea {
   align-self: stretch;
@@ -1760,17 +1755,6 @@ tr.active-row {
         <span class="tooltip">Flagged Cases</span>
       </button>
   
-      <button class="icon-btn" id="btnPNS">
-        <span>📌</span>
-        <span class="badge" id="badgePNS">0</span>
-        <span class="tooltip">PNS Marked Cases</span>
-      </button>
-
-      <button class="icon-btn" id="btnRepeating">
-        <span>👥</span>
-        <span class="tooltip">Repeating Customers</span>
-      </button>
-  
       <button class="icon-btn" id="btnSortDate">
         <span id="sortClock">🕑</span>
         <span class="badge" id="sortArrow" style="display:none;"></span>
@@ -1908,13 +1892,6 @@ tr.active-row {
           <div style="display:flex;align-items:center;gap:6px;">
             <span>Flag</span>
             <div id="optFlag" class="switch"
-                 role="switch" aria-checked="false" tabindex="0"></div>
-          </div>
-      
-          <!-- PNS -->
-          <div style="display:flex;align-items:center;gap:6px;margin-left:22px;">
-            <span>PNS</span>
-            <div id="optPNS" class="switch"
                  role="switch" aria-checked="false" tabindex="0"></div>
           </div>
 
@@ -2177,70 +2154,6 @@ tr.active-row {
       <button class="btn" id="btnReminderFollowUp">Follow Up</button>
     </div>
 
-  </div>
-</div>
-
-
-<div class="modal" id="closureModal">
-  <div class="modal-card">
-  <div class="modal-head">
-    <div class="modal-title" id="closureModalTitle">
-      Case Closure Survey
-    </div>
-    <button class="btn" id="btnClosureClose">Close</button>
-  </div>
-
-    <div class="modal-body" style="gap:1rem;">
-
-      <!-- PNS Resolution (conditional) -->
-      <div class="row hidden-force" id="pnsResolutionBlock">
-        <div>PNS Resolution</div>
-      
-        <div>
-          <div style="font-size:13px; margin-bottom:.45rem;">
-            As PNS was marked for this case, is the issue resolved?
-          </div>
-      
-          <div style="display:flex; gap:16px;">
-            <label>
-              <input type="radio" name="pnsResolved" value="yes">
-              Yes
-            </label>
-      
-            <label>
-              <input type="radio" name="pnsResolved" value="no">
-              No
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Survey -->
-      <div class="row">
-        <div>Survey Prediction</div>
-        <div id="starRating" class="star-rating">
-          <span data-star="1">★</span>
-          <span data-star="2">★</span>
-          <span data-star="3">★</span>
-          <span data-star="4">★</span>
-          <span data-star="5">★</span>
-        </div>
-      </div>
-
-      <!-- Comment -->
-      <div class="row" style="align-items:start;">
-        <div>Comment</div>
-        <textarea id="predictionComment"
-          class="notes"
-          placeholder="Please enter your comment on the sample prediction provided..">
-        </textarea>
-      </div>
-
-    </div>
-
-    <div class="modal-foot">
-      <button class="btn" id="btnClosureSubmit">Submit</button>
-    </div>
   </div>
 </div>
 

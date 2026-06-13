@@ -2394,6 +2394,21 @@ function getEmptyStateMessage() {
   return "📭 No cases available for your team.";
 }
 
+/* =========================================================
+   DST TABLE HELPERS
+   ========================================================= */
+
+function getMaterialOrderDisplay(materialOrder = "") {
+  return materialOrder.split(" for ")[0].trim();
+}
+
+function getEtaFromNotes(notesHistory = "") {
+  const match = notesHistory.match(
+    /ETA\s+(\d{1,2}\/[A-Za-z]{3}\/\d{4})/i
+  );
+
+  return match ? match[1] : "";
+}
 
 /* Render Table — Clean, optimized */
 export function renderTable() {
@@ -2434,12 +2449,12 @@ export function renderTable() {
     tr.innerHTML = `
       <td>${index + 1}</td>
       <td class="caseid" data-id="${escapeHtml(r.id)}">${escapeHtml(r.id)}</td>
-      <td>${escapeHtml(r.customerName)}</td>
-      <td>${escapeHtml(r.country)}</td>
-      <td>${escapeHtml(r.caseResolutionCode)}</td>
-      <td>${escapeHtml(r.caseOwner)}</td>
-      <td>${escapeHtml(r.caGroup)}</td>
-      <td>${escapeHtml(r.sbd)}</td>
+      <td>${escapeHtml(r.countryMaterialOrder || "")}</td>
+      <td>${escapeHtml(getMaterialOrderDisplay(r.materialOrder || ""))}</td>
+      <td>${escapeHtml(r.orderStatus || "")}</td>
+      <td>${escapeHtml(r.atpStatus || "")}</td>
+      <td>${escapeHtml(getEtaFromNotes(r.notesHistory || ""))}</td>
+      <td>${escapeHtml(r.ticketStatus || "")}</td>
       <td>${renderStatusSelect(r)}</td>
       <td>${renderGearButton(r.id)}</td>
     `;

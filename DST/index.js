@@ -802,12 +802,6 @@ function setupRealtimeCases(teamId) {
            infoModal.classList.remove("show");
          }
          
-         // Case Closure Survey modal
-         const closureModal = document.getElementById("closureModal");
-         if (closureModal?.classList.contains("show")) {
-           closureModal.classList.remove("show");
-         }
-         
          /* Follow-up reminder modal
          const reminderModal = document.getElementById("followUpReminderModal");
          if (reminderModal?.classList.contains("show")) {
@@ -912,20 +906,11 @@ function setupRealtimeCases(teamId) {
    function updateDynamicPrimaryOptions() {
      const data = trackerState.allCases || [];
    
-     PRIMARY_OPTIONS.country =
-       getUniqueValues(data, "countryMaterialOrder");
-   
-     PRIMARY_OPTIONS.orderStatus =
-       getUniqueValues(data, "orderStatus");
-   
-     PRIMARY_OPTIONS.atpStatus =
-       getUniqueValues(data, "atpStatus");
-   
-     PRIMARY_OPTIONS.ticketStatus =
-       getUniqueValues(data, "ticketStatus");
-   
-     PRIMARY_OPTIONS.orderType =
-       getUniqueValues(data, "orderType");
+     PRIMARY_OPTIONS.country = getUniqueValues(data, "countryMaterialOrder");
+     PRIMARY_OPTIONS.orderStatus = getUniqueValues(data, "orderStatus");
+     PRIMARY_OPTIONS.atpStatus = getUniqueValues(data, "atpStatus");
+     PRIMARY_OPTIONS.ticketStatus = getUniqueValues(data, "ticketStatus");
+     PRIMARY_OPTIONS.orderType = getUniqueValues(data, "orderType");
    }
    
    /* Filter options (fixed order & labels) */
@@ -970,7 +955,7 @@ function setupRealtimeCases(teamId) {
            </div>
          </div>
          <div class="filter-body" id="filter-body-${key}">
-           <div class="chips ${key === "benchRFC" ? "single-column" : ""}" id="chips-${key}">
+           <div class="chips ${key === "orderType" ? "single-column" : ""}" id="chips-${key}">
              ${PRIMARY_OPTIONS[key].map(opt => `
                <label style="display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem;">
                  <input type="checkbox" data-key="${key}" data-value="${escapeHtml(opt)}"/>

@@ -574,6 +574,8 @@ function setupRealtimeCases(teamId) {
        const rows = Array.isArray(c.rows)
          ? c.rows
          : [];
+
+       const firstRow = rows[0] || {}; 
    
        // =====================================================
        // SUMMARY HELPERS
@@ -640,64 +642,64 @@ function setupRealtimeCases(teamId) {
              // DST SOURCE FIELDS
              // =====================================================
             
-             ticketNumber: c.ticketNumber || "",
-             createdOn: c.createdOn || "",
-             category: c.category || "",
-             subCategory: c.subCategory || "",
+             ticketNumber: firstRow.ticketNumber || "",
+             createdOn: firstRow.createdOn || "",
+             category: firstRow.category || "",
+             subCategory: firstRow.subCategory || "",
              ticketStatus: getUnifiedValue("ticketStatus"),
-             ticketUrl: c.ticketUrl || "",
-             threeWNotes: c.threeWNotes || "",
-             createdBy: c.createdBy || "",
+             ticketUrl: firstRow.ticketUrl || "",
+             threeWNotes: firstRow.threeWNotes || "",
+             createdBy: firstRow.createdBy || "",
             
              materialOrder: getMaterialOrderSummary(),
-             materialOrderLineItem: c.materialOrderLineItem || "",
-             owner: c.owner || "",
-             owningBusinessUnit: c.owningBusinessUnit || "",
-             caseIdMaterialOrder: c.caseIdMaterialOrder || "",
+             materialOrderLineItem: firstRow.materialOrderLineItem || "",
+             owner: firstRow.owner || "",
+             owningBusinessUnit: firstRow.owningBusinessUnit || "",
+             caseIdMaterialOrder: firstRow.caseIdMaterialOrder || "",
              countryMaterialOrder: getUnifiedValue("countryMaterialOrder"),
-             materialOrderCreatedOn: c.materialOrderCreatedOn || "",
+             materialOrderCreatedOn: firstRow.materialOrderCreatedOn || "",
             
              orderStatus: getUnifiedValue("orderStatus"),
-             orderType: c.orderType || "",
-             salesOrderNumber: c.salesOrderNumber || "",
-             materialOrderStatus: c.materialOrderStatus || "",
-             materialOrderStatusReason: c.materialOrderStatusReason || "",
+             orderType: firstRow.orderType || "",
+             salesOrderNumber: firstRow.salesOrderNumber || "",
+             materialOrderStatus: firstRow.materialOrderStatus || "",
+             materialOrderStatusReason: firstRow.materialOrderStatusReason || "",
             
-             modifiedOn: c.modifiedOn || "",
+             modifiedOn: firstRow.modifiedOn || "",
              atpStatus: getUnifiedValue("atpStatus"),
             
-             lineItemCreatedOn: c.lineItemCreatedOn || "",
-             expectedDeliveryDate: c.expectedDeliveryDate || "",
-             expectedShipDate: c.expectedShipDate || "",
-             promisedDateDifferent: c.promisedDateDifferent || "",
+             lineItemCreatedOn: firstRow.lineItemCreatedOn || "",
+             expectedDeliveryDate: firstRow.expectedDeliveryDate || "",
+             expectedShipDate: firstRow.expectedShipDate || "",
+             promisedDateDifferent: firstRow.promisedDateDifferent || "",
             
-             isEscalated: c.isEscalated || "",
-             lineNumber: c.lineNumber || "",
-             lineItemMaterialOrder: c.lineItemMaterialOrder || "",
-             moLineItemsName: c.moLineItemsName || "",
-             lineItemModifiedOn: c.lineItemModifiedOn || "",
-             promisedDate: c.promisedDate || "",
-             shipPlant: c.shipPlant || "",
+             isEscalated: firstRow.isEscalated || "",
+             lineNumber: firstRow.lineNumber || "",
+             lineItemMaterialOrder: firstRow.lineItemMaterialOrder || "",
+             moLineItemsName: firstRow.moLineItemsName || "",
+             lineItemModifiedOn: firstRow.lineItemModifiedOn || "",
+             promisedDate: firstRow.promisedDate || "",
+             shipPlant: firstRow.shipPlant || "",
             
-             lineItemStatus: c.lineItemStatus || "",
-             lineItemStatusReason: c.lineItemStatusReason || "",
+             lineItemStatus: firstRow.lineItemStatus || "",
+             lineItemStatusReason: firstRow.lineItemStatusReason || "",
             
-             trackingNumber: c.trackingNumber || "",
-             workOrder: c.workOrder || "",
+             trackingNumber: firstRow.trackingNumber || "",
+             workOrder: firstRow.workOrder || "",
             
-             statusExcel: c.statusExcel || "",
-             statusReasonExcel: c.statusReasonExcel || "",
+             statusExcel: firstRow.statusExcel || "",
+             statusReasonExcel: firstRow.statusReasonExcel || "",
             
-             workgroup: c.workgroup || "",
-             queue: c.queue || "",
-             ticketOwner3W: c.ticketOwner3W || "",
-             is3WComment: c.is3WComment || "",
+             workgroup: firstRow.workgroup || "",
+             queue: firstRow.queue || "",
+             ticketOwner3W: firstRow.ticketOwner3W || "",
+             is3WComment: firstRow.is3WComment || "",
             
-             latest3WStatusChangeDateTime: c.latest3WStatusChangeDateTime || "",
-             latestNotesUpdateDateTime: c.latestNotesUpdateDateTime || "",
-             notesHistory: c.notesHistory || "",
+             latest3WStatusChangeDateTime: firstRow.latest3WStatusChangeDateTime || "",
+             latestNotesUpdateDateTime: firstRow.latestNotesUpdateDateTime || "",
+             notesHistory: firstRow.notesHistory || "",
              etaSummary: getEtaSummary(),
-             productName: c.productName || "",
+             productName: firstRow.productName || "",
             
              excelOrder:
                typeof c.excelOrder === "number"

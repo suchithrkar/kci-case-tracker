@@ -2488,20 +2488,6 @@ function setupRealtimeCases(teamId) {
        renderEmptyState(getEmptyStateMessage());
        return;
      }
-
-     // =====================================================
-     // CASE ID OCCURRENCE COUNT
-     // =====================================================
-      
-     const caseIdCounts = {};
-      
-     rows.forEach(row => {
-       const id = String(row.id || "").trim();
-      
-       if (!id) return;
-      
-       caseIdCounts[id] = (caseIdCounts[id] || 0) + 1;
-     }); 
    
      // 🔁 Clear existing follow-up timers before re-render
      followUpTimers.forEach(clearTimeout);
@@ -2512,11 +2498,9 @@ function setupRealtimeCases(teamId) {
      rows.forEach((r, index) => {
        const tr = document.createElement("tr");
 
-       console.log("ROW DEBUG", {id: r.id, caseId: r.caseId, ticketNumber: r.ticketNumber, row: r}); 
-
-       const duplicateCount = caseIdCounts[String(r.id || "").trim()] || 0;
-
-       console.log("CASE", r.id, "COUNT", caseIdCounts[String(r.id || "").trim()]); 
+       const duplicateCount = Number(r.rowCount || 1);
+        
+       console.log("CASE", r.id, "ROWCOUNT", r.rowCount); 
          
        const duplicateBadge =
          duplicateCount > 1

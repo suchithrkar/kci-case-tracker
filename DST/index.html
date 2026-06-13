@@ -556,9 +556,12 @@ tr.active-row {
   border-radius:16px;
   box-shadow:var(--shadow);
 }
-#modal .modal-card{
+/*#modal .modal-card{
   width:auto;
   max-width:none;
+}*/
+#modal .modal-card{
+  width:min(600px,94vw);
 }
 #modal textarea.notes,
 #emailPreviewModal textarea.notes{
@@ -720,6 +723,10 @@ tr.active-row {
    TEMPLATE TOOLBAR
    ========================================================= */
 
+.template-toolbar {
+  display: none !important;
+}
+  
 .template-toolbar {
   display: flex;
   align-items: center;

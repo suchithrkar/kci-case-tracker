@@ -1325,16 +1325,6 @@ function setupRealtimeCases(teamId) {
             clearSet2: true         // 🔥 fixes your bug
           });
       
-          // Restore RFC highlight
-          setTimeout(() => {
-            document.querySelectorAll(".rfcBtn").forEach(b => {
-              b.classList.toggle(
-                "active",
-                b.dataset.type === uiState.rfcMode
-              );
-            });
-          }, 0);
-      
           return;
         }
       
@@ -1426,15 +1416,7 @@ function setupRealtimeCases(teamId) {
      clearSet2 = true
    } = {}) {
    
-     // 1️⃣ RFC
-     if (clearRFC) {
-       lastRfcMode = null;
-       uiState.rfcMode = "normal";
-       document.querySelectorAll(".rfcBtn")
-         .forEach(b => b.classList.remove("active"));
-     }
-   
-     // 2️⃣ Primary filters
+     // 1️⃣ Primary filters
       if (clearPrimaries) {
         Object.keys(uiState.primaries).forEach(k => {
       
@@ -1451,7 +1433,7 @@ function setupRealtimeCases(teamId) {
         });
       }
    
-     // 3️⃣ Set 1 (Search + Status)
+     // 2️⃣ Set 1 (Search + Status)
      if (clearSet1) {
        uiState.search = "";
        uiState.statusList = [];
@@ -1459,7 +1441,7 @@ function setupRealtimeCases(teamId) {
        buildStatusPanel();
      }
    
-     // 4️⃣ Set 2 (Mode buttons)
+     // 3️⃣ Set 2 (Mode buttons)
      if (clearSet2) {
        uiState.set2Mode = "normal";
        uiState.repeatActive = false;
@@ -1468,7 +1450,7 @@ function setupRealtimeCases(teamId) {
        updateSortIcon();
      }
    
-     // 5️⃣ Safety clears
+     // 4️⃣ Safety clears
      pendingUnupdated.clear();
      pendingStatusOverride.clear();
      unupdatedProtect = false;
@@ -2216,7 +2198,6 @@ function setupRealtimeCases(teamId) {
         (uiState.statusList && uiState.statusList.length > 0) ||
         uiState.unupdatedActive ||
         uiState.repeatActive ||       // ✅ FIXED (was repeatingActive)
-        (uiState.rfcMode && uiState.rfcMode !== "normal") ||         // ✅ RFC mode (anything other than default)
         (uiState.set2Mode && uiState.set2Mode !== "normal") ||         // ✅ Set2 filters (Due / Flagged / PNS) 
         Object.values(uiState.primaries).some(arr => arr && arr.length > 0) ||      // ✅ Primary filters (any selected)
         uiState.countryInvert ||            // ✅ Country invert toggle
@@ -4329,29 +4310,6 @@ function setupRealtimeCases(teamId) {
    
    // GLOBAL tooltip container
    const globalTooltip = document.getElementById("globalTooltip");
-   
-   // Tooltip text for Overdue Cases button
-   const negativeTooltipText = `
-   <b>Overdue Cases = Total Open Repair Cases</b><br>
-   EXCLUDING:<br>
-   • Ready for Closure Cases (Onsite + Offsite + CSR)<br>
-   • Onsite Cases ≤ 5 Days<br>
-   • Offsite Cases ≤ 10 Days<br>
-   • CSR Cases ≤ 3 Days
-   `;
-   ;
-   
-   // SIMPLE hover: show/hide only (no positioning)
-   const negBtn = document.getElementById("rfcNegativeBtn");
-   
-   negBtn.addEventListener("mouseenter", () => {
-       globalTooltip.innerHTML = negativeTooltipText;
-       globalTooltip.classList.add("show-tooltip");
-   });
-   
-   negBtn.addEventListener("mouseleave", () => {
-       globalTooltip.classList.remove("show-tooltip");
-   });
    
    /* =========================================================
       TEMPLATE TOOLBAR BUTTONS

@@ -260,20 +260,18 @@ const uiState = {
   sortByDateAsc: null,
 
   primaries: {
-    caseResolutionCode: [],
-    tl: [],
-    sbd: [],
-    caGroup: [],
-    onsiteRFC: [],
-    csrRFC: [],
-    benchRFC: [],
-    country: []
+    country: [],
+    orderStatus: [],
+    atpStatus: [],
+    ticketStatus: [],
+    orderType: []
   },
 
   countryInvert: false
 };
 
 let unupdatedProtect = false;
+
 // track specific caseIds that are being updated while in Unupdated mode
 const pendingUnupdated = new Set();
 
@@ -754,30 +752,25 @@ function setupRealtimeCases(teamId) {
    
          trackerState.dataLoaded = true;
    
-         const prevTL = JSON.stringify(PRIMARY_OPTIONS.tl);
-         const prevCountry = JSON.stringify(PRIMARY_OPTIONS.country);
-         
+         const before =JSON.stringify(PRIMARY_OPTIONS);
          updateDynamicPrimaryOptions();
+         const after =JSON.stringify(PRIMARY_OPTIONS);
          
-         const newTL = JSON.stringify(PRIMARY_OPTIONS.tl);
-         const newCountry = JSON.stringify(PRIMARY_OPTIONS.country);
-         
-         // 🔥 Only rebuild if options actually changed
-         if (prevTL !== newTL || prevCountry !== newCountry) {
+         if (before !== after) {
            buildPrimaryFilters();
          }
    
-       // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
-       if (uiState.unupdatedActive && unupdatedProtect) {
-         return;
-       }
-      
-       // Normal realtime refresh
-         requestAnimationFrame(() => {
-           applyFilters();
-         });
-        
-     });
+          // 🚫 Prevent auto-refresh hiding the row during Unupdated mode
+          if (uiState.unupdatedActive && unupdatedProtect) {
+            return;
+          }
+         
+          // Normal realtime refresh
+            requestAnimationFrame(() => {
+              applyFilters();
+            });
+           
+        });
    }
    
    /* =======================================================================
@@ -895,14 +888,11 @@ function setupRealtimeCases(teamId) {
       ======================================================================= */
    if (!uiState.primaryLocks) {
      uiState.primaryLocks = {
-       caseResolutionCode: false,
-       tl: false,
-       sbd: false,
-       caGroup: false,
-       onsiteRFC: false,
-       csrRFC: false,
-       benchRFC: false,
-       country: false
+       country: false,
+       orderStatus: false,
+       atpStatus: false,
+       ticketStatus: false,
+       orderType: false
      };
    }
    
@@ -922,23 +912,29 @@ function setupRealtimeCases(teamId) {
    function updateDynamicPrimaryOptions() {
      const data = trackerState.allCases || [];
    
-     // 🔥 Dynamic TL
-     PRIMARY_OPTIONS.tl = getUniqueValues(data, "tl");
+     PRIMARY_OPTIONS.country =
+       getUniqueValues(data, "countryMaterialOrder");
    
-     // 🔥 Dynamic Country
-     PRIMARY_OPTIONS.country = getUniqueValues(data, "country");
+     PRIMARY_OPTIONS.orderStatus =
+       getUniqueValues(data, "orderStatus");
+   
+     PRIMARY_OPTIONS.atpStatus =
+       getUniqueValues(data, "atpStatus");
+   
+     PRIMARY_OPTIONS.ticketStatus =
+       getUniqueValues(data, "ticketStatus");
+   
+     PRIMARY_OPTIONS.orderType =
+       getUniqueValues(data, "orderType");
    }
    
    /* Filter options (fixed order & labels) */
    const PRIMARY_OPTIONS = {
-     caseResolutionCode: ["Onsite Solution", "Offsite Solution", "Parts Shipped"],
-     tl: [],         // ✅ dynamic
-     sbd: ["Met", "Not Met", "NA"],
-     caGroup: ["0-3 Days","3-5 Days","5-10 Days","10-15 Days","15-30 Days","30-60 Days","60-90 Days","> 90 Days"],
-     onsiteRFC: ["Closed - Canceled","Closed - Posted","Open - Completed","Open - In Progress","Open - Scheduled","Open - Unscheduled"],
-     csrRFC: ["Cancelled","Closed","POD","New","Order Pending","Ordered","Shipped"],
-     benchRFC: ["Delivered","Repair pending","Order cancelled, not to be reopened","Order processing hold","Parts shortage","Pick up needed by courier","Defective collected","Ship complete"],
-     country: []    // ✅ dynamic
+     country: [],
+     orderStatus: [],
+     atpStatus: [],
+     ticketStatus: [],
+     orderType: []
    };
    
    /* Build sidebar markup for all primary filters and attach handlers */
@@ -1017,87 +1013,37 @@ function setupRealtimeCases(teamId) {
          
          const body = block.querySelector(".filter-body");
         
-       head.onclick = (e) => {
-         // clicking lock should not toggle body
-         if (e.target.classList.contains("lock")) return;
-         body.classList.toggle("open");
-       };
+          head.onclick = (e) => {
+            // clicking lock should not toggle body
+            if (e.target.classList.contains("lock")) return;
+            body.classList.toggle("open");
+          };
    
-       // lock toggle
-       // lock removed → skip lock logic entirely
-   const lockSpan = block.querySelector(".lock");
-   if (lockSpan) {
-     lockSpan.onclick = (e) => {
-       e.stopPropagation();
-       const k = lockSpan.dataset.key;
-       uiState.primaryLocks[k] = !uiState.primaryLocks[k];
-       updateFilterLockedUI(k);
-     };
-   }
+                // lock toggle
+                // lock removed → skip lock logic entirely
+            const lockSpan = block.querySelector(".lock");
+            if (lockSpan) {
+              lockSpan.onclick = (e) => {
+                e.stopPropagation();
+                const k = lockSpan.dataset.key;
+                uiState.primaryLocks[k] = !uiState.primaryLocks[k];
+                updateFilterLockedUI(k);
+              };
+            }
    
    
-       // checkbox changes
-       block.querySelectorAll("input[type='checkbox']").forEach(cb => {
-         cb.onchange = () => {
-       const k = cb.dataset.key;
-       const val = cb.dataset.value;
-   
-       // Normal update
-       const set = new Set(uiState.primaries[k] || []);
-       cb.checked ? set.add(val) : set.delete(val);
-       uiState.primaries[k] = [...set];
-   
-       /* =======================================================
-          AUTO RFC LOGIC — YOUR 3 SPECIAL RULES
-          Applies ONLY when selecting inside:
-          onsiteRFC, csrRFC, benchRFC
-          ======================================================= */
-       /* =======================================================
-      AUTO RFC LOGIC — YOUR 3 SPECIAL RULES
-      ======================================================= */
-   const rfcKeys = ["onsiteRFC", "csrRFC", "benchRFC"];
-   
-   if (rfcKeys.includes(k) && cb.checked) {
-   
-       // 1) Remember currently open filter bodies
-       const openFilters = Array.from(
-           document.querySelectorAll(".filter-body.open")
-       ).map(el => el.id.replace("filter-body-", ""));
-   
-       // 2) Clear the other RFC filters
-       rfcKeys.forEach(rk => {
-           if (rk !== k) uiState.primaries[rk] = [];
-       });
-   
-       // 3) Clear Case Resolution Code completely
-       uiState.primaries.caseResolutionCode = [];
-   
-       // 4) Apply mapping
-       if (k === "onsiteRFC") {
-           uiState.primaries.caseResolutionCode = ["Onsite Solution"];
-       }
-       if (k === "csrRFC") {
-           uiState.primaries.caseResolutionCode = ["Parts Shipped"];
-       }
-       if (k === "benchRFC") {
-           uiState.primaries.caseResolutionCode = ["Offsite Solution"];
-       }
-   
-       // Delay rebuild so the checkbox click completes first
-   setTimeout(() => {
-       // Rebuild filters
-       buildPrimaryFilters();
-   
-       // Re-open previously open filters
-       openFilters.forEach(key => {
-           const body = document.getElementById(`filter-body-${key}`);
-           if (body) body.classList.add("open");
-       });
-   }, 0);
-   
-   }
-   
-   };
+             // checkbox changes
+             block.querySelectorAll("input[type='checkbox']").forEach(cb => {
+               cb.onchange = () => {
+             const k = cb.dataset.key;
+             const val = cb.dataset.value;
+         
+             // Normal update
+             const set = new Set(uiState.primaries[k] || []);
+             cb.checked ? set.add(val) : set.delete(val);
+             uiState.primaries[k] = [...set];
+         
+         };
    
        });
    
@@ -1222,14 +1168,11 @@ function setupRealtimeCases(teamId) {
    /* Utility: convert key to human label */
    function keyToLabel(k) {
      const map = {
-       caseResolutionCode: "Case Resolution Code",
-       tl: "TL",
-       sbd: "SBD",
-       caGroup: "CA Group",
-       onsiteRFC: "Onsite RFC Status",
-       csrRFC: "CSR RFC Status",
-       benchRFC: "Bench RFC Status",
-       country: "Country"
+       country: "Country",
+       orderStatus: "Order Status",
+       atpStatus: "ATP Status",
+       ticketStatus: "Ticket Status",
+       orderType: "Order Type"
      };
      return map[k] || k;
    }
@@ -1624,13 +1567,13 @@ function setupRealtimeCases(teamId) {
         MODE OVERRIDES (Option A)
         =============================================================== */
      if (uiState.set2Mode === "due") {
-     rows = rows.filter(r =>
-       r.lastActionedBy === trackerState.user.uid &&
-       r.followDate &&
-       r.followDate <= today &&
-       r.status !== "Closed"
-     );
-   }
+        rows = rows.filter(r =>
+          r.lastActionedBy === trackerState.user.uid &&
+          r.followDate &&
+          r.followDate <= today &&
+          r.status !== "Closed"
+        );
+      }
    
    
      if (uiState.set2Mode === "flagged") {
@@ -1688,19 +1631,22 @@ function setupRealtimeCases(teamId) {
         const sel = uiState.primaries[key] || [];
         if (!sel || sel.length === 0) return;
       
-        if (key === "country" && uiState.countryInvert) {
-          // EXCLUDE MODE
-          rows = rows.filter(r => {
-            const val = (r[key] || "").toString().trim();
-            return !sel.includes(val);
-          });
-        } else {
-          // NORMAL MODE
-          rows = rows.filter(r => {
-            const val = (r[key] || "").toString().trim();
-            return sel.includes(val);
-          });
-        }
+        const field =
+           key === "country"
+             ? "countryMaterialOrder"
+             : key;
+         
+         if (key === "country" && uiState.countryInvert) {
+           rows = rows.filter(r => {
+             const val = (r[field] || "").toString().trim();
+             return !sel.includes(val);
+           });
+         } else {
+           rows = rows.filter(r => {
+             const val = (r[field] || "").toString().trim();
+             return sel.includes(val);
+           });
+         }
       });
     
    /* ===============================================================

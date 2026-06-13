@@ -1648,13 +1648,19 @@ function setupRealtimeCases(teamId) {
      if (uiState.search) {
        const q = uiState.search;
        rows = rows.filter(r =>
-         r.id.toLowerCase().includes(q) ||
-         (r.customerName || "").toLowerCase().includes(q) ||
-         (r.country || "").toLowerCase().includes(q) ||
-         (r.caseResolutionCode || "").toLowerCase().includes(q) ||
-         (r.caseOwner || "").toLowerCase().includes(q) ||
-         (r.caGroup || "").toLowerCase().includes(q) ||
-         (r.sbd || "").toLowerCase().includes(q)
+         (r.id || "").toLowerCase().includes(q) ||
+         (r.ticketNumber || "").toLowerCase().includes(q) ||
+         (r.countryMaterialOrder || "").toLowerCase().includes(q) ||
+         (r.materialOrder || "").toLowerCase().includes(q) ||
+         (r.orderStatus || "").toLowerCase().includes(q) ||
+         (r.atpStatus || "").toLowerCase().includes(q) ||
+         (r.etaSummary || "").toLowerCase().includes(q) ||
+         (r.ticketStatus || "").toLowerCase().includes(q) ||
+         (r.status || "").toLowerCase().includes(q) ||
+         (r.owner || "").toLowerCase().includes(q) ||
+         (r.workOrder || "").toLowerCase().includes(q) ||
+         (r.notesHistory || "").toLowerCase().includes(q) ||
+         (r.trackingNumber || "").toLowerCase().includes(q)
        );
      }
    

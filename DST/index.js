@@ -56,14 +56,11 @@ const el = {
 
   btnDueToday: document.getElementById("btnDueToday"),
   btnFlagged: document.getElementById("btnFlagged"),
-  btnPNS: document.getElementById("btnPNS"),
-  btnRepeating: document.getElementById("btnRepeating"),
   btnUnupdated: document.getElementById("btnUnupdated"),
   btnSortDate: document.getElementById("btnSortDate"),
 
   badgeDue: document.getElementById("badgeDue"),
   badgeFlag: document.getElementById("badgeFlag"),
-   badgePNS: document.getElementById("badgePNS"),
 };
 
 // ================================
@@ -278,7 +275,7 @@ const uiState = {
   search: "",
   statusList: [],
   rfcMode: "normal",     // RFC buttons only
-  set2Mode: "normal",    // Due / Flagged / PNS only
+  set2Mode: "normal",    // Due / Flagged only
   unupdatedActive: false,
   sortByDateAsc: null,
 
@@ -712,7 +709,6 @@ function setupRealtimeCases(teamId) {
              followDate: c.followDate || "",
              followTime: c.followTime || "",
              flagged: !!c.flagged,
-             PNS: !!c.PNS,
              notes: c.notes || "",
              lastActionedOn:
                c.lastActionedOn || "",
@@ -1334,7 +1330,6 @@ function setupRealtimeCases(teamId) {
      /* MODE BUTTONS — Direct override (Option A behavior) */
      el.btnDueToday.onclick = () => { uiState.set2Mode = "due"; applyFilters(); };
      el.btnFlagged.onclick = () => { uiState.set2Mode = "flagged"; applyFilters(); };
-     el.btnPNS.onclick = () => { uiState.set2Mode = "pns"; applyFilters(); };
      el.btnUnupdated.onclick = () => {
         uiState.unupdatedActive = !uiState.unupdatedActive;
         applyFilters();
@@ -1384,7 +1379,6 @@ function setupRealtimeCases(teamId) {
    function updateSet2Highlights() {
      el.btnDueToday.classList.toggle("active", uiState.set2Mode === "due");
      el.btnFlagged.classList.toggle("active", uiState.set2Mode === "flagged");
-     el.btnPNS.classList.toggle("active", uiState.set2Mode === "pns");
      el.btnUnupdated.classList.toggle("active", uiState.unupdatedActive);
      el.btnSortDate.classList.toggle(
        "active",
@@ -1482,7 +1476,6 @@ function setupRealtimeCases(teamId) {
         "Closed",
         "NCM 1",
         "NCM 2",
-        "PNS",
         "Service Pending",
         "Monitoring",
         "Escalated / Elevated",
@@ -1747,13 +1740,6 @@ function setupRealtimeCases(teamId) {
        );
      }
    
-      if (uiState.set2Mode === "pns") {
-        rows = rows.filter(r =>
-          r.PNS === true &&
-          r.lastActionedBy === trackerState.user.uid
-        );
-      }
-   
      /* ===============================================================
         NORMAL MODE — APPLY FULL FILTER PIPELINE
         =============================================================== */
@@ -1883,12 +1869,6 @@ function setupRealtimeCases(teamId) {
        r.lastActionedBy === trackerState.user.uid &&
        r.flagged
      ).length;
-   
-      el.badgePNS.textContent = trackerState.allCases.filter(r =>
-        r.PNS === true &&
-        r.lastActionedBy === trackerState.user.uid
-      ).length;
-   
    
      // RFC — Total Open Repair Cases (team-wide)
      const rfcTotalEl = document.getElementById("rfcTotalCount");
@@ -2146,7 +2126,7 @@ function setupRealtimeCases(teamId) {
         uiState.search ||
         (uiState.statusList && uiState.statusList.length > 0) ||
         uiState.unupdatedActive ||
-        (uiState.set2Mode && uiState.set2Mode !== "normal") ||         // ✅ Set2 filters (Due / Flagged / PNS) 
+        (uiState.set2Mode && uiState.set2Mode !== "normal") ||         // ✅ Set2 filters (Due / Flagged ) 
         Object.values(uiState.primaries).some(arr => arr && arr.length > 0) ||      // ✅ Primary filters (any selected)
         uiState.countryInvert ||            // ✅ Country invert toggle
         uiState.sortByDateAsc !== null;      // ✅ Sorting (if applied)
@@ -2272,7 +2252,6 @@ function setupRealtimeCases(teamId) {
         "Closed",
         "NCM 1",
         "NCM 2",
-        "PNS",
         "Service Pending",
         "Monitoring",
         "Escalated / Elevated",
@@ -2461,12 +2440,10 @@ function setupRealtimeCases(teamId) {
    
    /* Modal References (shared with Phase 4) */
    const modal = document.getElementById("modal");
-   const pnsBlock = document.getElementById("pnsResolutionBlock");
    const modalTitle = document.getElementById("modalTitle");
    const modalWarning = document.getElementById("modalWarning");
    const optDate = document.getElementById("optDate");
    const optFlag = document.getElementById("optFlag");
-   const optPNS = document.getElementById("optPNS");
    const optNotes = document.getElementById("optNotes");
    let notesHeightLocked = false;
    const optLastActioned = document.getElementById("optLastActioned");
@@ -2838,30 +2815,6 @@ function setupRealtimeCases(teamId) {
         newStatus === "Escalated / Elevated"
       );
    
-      // ✅ AUTO-PNS: If status is set to PNS, auto-enable PNS flag
-      if (newStatus === "PNS") {
-        row.status = "PNS";   // 🔥 CRITICAL FIX
-        row.PNS = true;   // ✅ immediate local update 
-        firestoreUpdateCase(caseId, {
-          status: "PNS",
-          PNS: true,
-          lastActionedOn: today,
-          lastActionedBy: trackerState.user.uid,
-          statusChangedOn: today,
-          statusChangedBy: trackerState.user.uid
-        }).then(() => {
-          pendingUnupdated.delete(caseId);
-          pendingStatusOverride.delete(caseId);
-          applyFilters();
-        }).catch(err => {
-          pendingUnupdated.delete(caseId);
-          showPopup("Failed to update case.");
-          console.error(err);
-        });
-      
-        return; // ⛔ stop further processing
-      }
-   
       if (newStatus === "Closed") {
         firestoreUpdateCase(caseId, {
           status: "Closed",
@@ -3073,7 +3026,6 @@ function setupRealtimeCases(teamId) {
                     "Closed",
                     "NCM 1",
                     "NCM 2",
-                    "PNS",
                     "Service Pending",
                     "Monitoring",
                     "Escalated / Elevated",
@@ -3146,10 +3098,7 @@ function setupRealtimeCases(teamId) {
          }
    
      /* Flag */
-     setFlagUI(r.flagged);
-     /* PNS */
-     setPNSUI(!!r.PNS);
-   
+     setFlagUI(r.flagged);  
    
      /* Notes */
      optNotes.value = r.notes || "";
@@ -3213,20 +3162,6 @@ function setupRealtimeCases(teamId) {
    optFlag.onclick = () => {
      setFlagUI(!optFlag.classList.contains("on"));
    };
-   
-   function setPNSUI(on) {
-     optPNS.classList.toggle("on", on);
-     optPNS.setAttribute("aria-checked", on ? "true" : "false");
-   }
-   optPNS.onclick = () => {
-     setPNSUI(!optPNS.classList.contains("on"));
-   };
-   
-   
-   /* =======================================================================
-      MODAL — SAVE BUTTON
-      ======================================================================= */
-   
    
    
    /* =======================================================================
@@ -3625,7 +3560,6 @@ function setupRealtimeCases(teamId) {
         "Follow Time": r.followTime || "",
       
         "Flagged": r.flagged ? "Yes" : "No",
-        "PNS": r.PNS ? "Yes" : "No",
       
         "Notes": r.notes || "",
       
@@ -3760,19 +3694,16 @@ function setupRealtimeCases(teamId) {
       
       hideModalWarning();
    
-     r.followDate = follow;
-     r.flagged = optFlag.classList.contains("on");
-     r.notes = optNotes.value.trim();
-     r.lastActionedOn = today;
-     r.lastActionedBy = trackerState.user.uid;
-   
-      r.PNS = optPNS.classList.contains("on");
+      r.followDate = follow;
+      r.flagged = optFlag.classList.contains("on");
+      r.notes = optNotes.value.trim();
+      r.lastActionedOn = today;
+      r.lastActionedBy = trackerState.user.uid;
       
       const updateObj = {
         followDate: r.followDate,
         followTime: r.followTime || null,
         flagged: r.flagged,
-        PNS: r.PNS,
         notes: r.notes,
         lastActionedOn: today,
         lastActionedBy: trackerState.user.uid
@@ -3916,7 +3847,6 @@ function setupRealtimeCases(teamId) {
         "Pending Closure": 0,
         "NCM 1": 0,
         "NCM 2": 0,
-        "PNS": 0
       };
    
      followedUpCases.forEach(r => {
@@ -3968,7 +3898,6 @@ function setupRealtimeCases(teamId) {
    Pending Closure: ${statusBreakdown["Pending Closure"]}
    NCM 1: ${statusBreakdown["NCM 1"]}
    NCM 2: ${statusBreakdown["NCM 2"]}
-   PNS: ${statusBreakdown["PNS"]}
       
    Total Followed Up Cases: ${totalFollowedUp}
    Total Updated Cases: ${totalUpdated}

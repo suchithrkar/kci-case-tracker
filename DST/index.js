@@ -695,7 +695,8 @@ function setupRealtimeCases(teamId) {
             
              latest3WStatusChangeDateTime: c.latest3WStatusChangeDateTime || "",
              latestNotesUpdateDateTime: c.latestNotesUpdateDateTime || "",
-             notesHistory: getEtaSummary(),
+             notesHistory: c.notesHistory || "",
+             etaSummary: getEtaSummary(),
              productName: c.productName || "",
             
              excelOrder:
@@ -764,9 +765,10 @@ function setupRealtimeCases(teamId) {
                c.serialNumber || "",
              emailStatus:
                c.emailStatus || "",
-             dnap:
-               c.dnap || ""
-         }));
+                   dnap:
+                    c.dnap || ""
+              };
+            });
    
          console.log("DST MAPPED CASE", incoming[0]);
          
@@ -2518,7 +2520,7 @@ function setupRealtimeCases(teamId) {
          <td>${escapeHtml(getMaterialOrderDisplay(r.materialOrder || ""))}</td>
          <td>${escapeHtml(r.orderStatus || "")}</td>
          <td>${escapeHtml(r.atpStatus || "")}</td>
-         <td>${escapeHtml(r.notesHistory || "")}</td>
+         <td>${escapeHtml(r.etaSummary || "")}</td>
          <td>${escapeHtml(r.ticketStatus || "")}</td>
          <td>${renderStatusSelect(r)}</td>
          <td>${renderGearButton(r.id)}</td>

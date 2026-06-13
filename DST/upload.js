@@ -749,9 +749,6 @@ function stripUserFields(obj) {
   delete clone.followDate;
   delete clone.followTime;
   delete clone.flagged;
-  delete clone.pns;
-  delete clone.surveyPrediction;
-  delete clone.predictionComment;
   delete clone.notes;
   delete clone.lastActionedOn;
   delete clone.lastActionedBy;
@@ -974,9 +971,6 @@ async function applyExcelChanges() {
             followDate: "",
             followTime: "",
             flagged: false,
-            pns: false,
-            surveyPrediction: "",
-            predictionComment: "",
             notes: "",
             lastActionedOn: "",
             lastActionedBy: "",
@@ -1025,9 +1019,6 @@ async function applyExcelChanges() {
             "followTime",
             "flagged",
             "notes",
-            "pns",
-            "surveyPrediction",
-            "predictionComment",
             "lastActionedOn",
             "lastActionedBy",
             "statusChangedOn",

@@ -702,6 +702,8 @@ function setupRealtimeCases(teamId) {
           dnap:
             c.dnap || ""
       }));
+
+      console.log("DST MAPPED CASE", incoming[0]);
       
       // 🔥 Preserve protected rows during status override
       trackerState.allCases = incoming.map(newRow => {

@@ -15,8 +15,7 @@ import {
   where,
   onSnapshot,
   updateDoc,
-  setDoc,
-  increment
+  setDoc
 } from "../js/firebase.js";
 
 import {
@@ -28,7 +27,6 @@ import {
 
 import { listenToTeamDST, updateDST } from "../js/firestore-api.js";
 import { showPopup } from "../js/utils.js";
-import { cleanupClosedCases } from "../js/utils.js";
 import { templates } from "../templates.js";
 import { initializeUploadModule, setUploadUser } from "./upload.js";
 
@@ -187,24 +185,6 @@ function getTeamToday(teamConfig) {
   }
 
   return teamDate;
-}
-
-async function incrementDailyClosedCount(teamId, todayISO) {
-   const reportRef = doc(
-     db,
-     "cases",
-     teamId,
-     "reports",
-     todayISO
-   );
-
-  await setDoc(
-    reportRef,
-    {
-      closedCount: increment(1)
-    },
-    { merge: true }
-  );
 }
 
 function scheduleFollowUpReminder(r) {
@@ -2826,9 +2806,6 @@ function setupRealtimeCases(teamId) {
           pendingUnupdated.delete(caseId);
           pendingStatusOverride.delete(caseId);
       
-          handleClosedCaseArchival(caseId)
-            .catch(err => console.warn(err));
-      
           applyFilters();
         }).catch(err => {
           pendingUnupdated.delete(caseId);
@@ -2941,34 +2918,6 @@ function setupRealtimeCases(teamId) {
        }
    
        throw err;
-     }
-   }
-   
-   async function handleClosedCaseArchival(caseId) {
-     // 1️⃣ Read final case state (ALLOWED — cases read is permitted)
-     const caseRef = doc(db, "cases", caseId);
-     const snap = await getDoc(caseRef);
-     if (!snap.exists()) return;
-   
-     const caseData = snap.data();
-   
-     // 2️⃣ Team-aware closed date
-     const todayISO = getTeamToday(trackerState.teamConfig);
-   
-     // 3️⃣ Archive snapshot (WRITE-ONLY for general users)
-     const historyRef = doc(db, "closedCasesHistory", caseId);
-   
-     await setDoc(historyRef, {
-       ...caseData,
-       teamId: caseData.teamId,
-       closedDate: todayISO,
-       archivedAt: new Date().toISOString(),
-       archivedBy: trackerState.user.uid
-     });
-   
-     // 4️⃣ Cleanup (primary admin only)
-     if (trackerState.user.role === "primary") {
-       await cleanupClosedCases(todayISO);
      }
    }
    

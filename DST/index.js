@@ -280,7 +280,6 @@ const uiState = {
   rfcMode: "normal",     // RFC buttons only
   set2Mode: "normal",    // Due / Flagged / PNS only
   unupdatedActive: false,
-  repeatActive: false,
   sortByDateAsc: null,
 
   primaries: {
@@ -714,12 +713,6 @@ function setupRealtimeCases(teamId) {
              followTime: c.followTime || "",
              flagged: !!c.flagged,
              PNS: !!c.PNS,
-             surveyPrediction:
-               typeof c.surveyPrediction === "number"
-                 ? c.surveyPrediction
-                 : null,
-             predictionComment:
-               c.predictionComment || "",
              notes: c.notes || "",
              lastActionedOn:
                c.lastActionedOn || "",
@@ -1342,10 +1335,6 @@ function setupRealtimeCases(teamId) {
      el.btnDueToday.onclick = () => { uiState.set2Mode = "due"; applyFilters(); };
      el.btnFlagged.onclick = () => { uiState.set2Mode = "flagged"; applyFilters(); };
      el.btnPNS.onclick = () => { uiState.set2Mode = "pns"; applyFilters(); };
-     el.btnRepeating.onclick = () => {
-        uiState.repeatActive = !uiState.repeatActive;
-        applyFilters();
-      };
      el.btnUnupdated.onclick = () => {
         uiState.unupdatedActive = !uiState.unupdatedActive;
         applyFilters();
@@ -1353,7 +1342,6 @@ function setupRealtimeCases(teamId) {
    
      /* SORT BY DATE BUTTON */
      el.btnSortDate.onclick = () => {
-        if (uiState.repeatActive) return; // ⛔ ignore during repeat
      // Toggle only between DESC ↔ ASC
      uiState.sortByDateAsc =
        uiState.sortByDateAsc === true ? false : true;
@@ -1397,7 +1385,6 @@ function setupRealtimeCases(teamId) {
      el.btnDueToday.classList.toggle("active", uiState.set2Mode === "due");
      el.btnFlagged.classList.toggle("active", uiState.set2Mode === "flagged");
      el.btnPNS.classList.toggle("active", uiState.set2Mode === "pns");
-     el.btnRepeating.classList.toggle("active", uiState.repeatActive);
      el.btnUnupdated.classList.toggle("active", uiState.unupdatedActive);
      el.btnSortDate.classList.toggle(
        "active",
@@ -1444,7 +1431,6 @@ function setupRealtimeCases(teamId) {
      // 3️⃣ Set 2 (Mode buttons)
      if (clearSet2) {
        uiState.set2Mode = "normal";
-       uiState.repeatActive = false;
        uiState.unupdatedActive = false;
        uiState.sortByDateAsc = null;
        updateSortIcon();
@@ -1824,36 +1810,7 @@ function setupRealtimeCases(teamId) {
           });
         }
       });
-   
-   /* ===============================================================
-      REPEAT CUSTOMERS — OVERLAY FILTER
-      Applies on CURRENT filtered table view
-      =============================================================== */
-   if (uiState.repeatActive) {
-   
-     const freq = {};
-   
-     rows.forEach(r => {
-       const key = normalizeCustomerName(r.customerName);
-       if (!key) return;
-       freq[key] = (freq[key] || 0) + 1;
-     });
-   
-     rows = rows.filter(r => {
-       const key = normalizeCustomerName(r.customerName);
-       return key && freq[key] > 1;
-     });
-   
-     // Always sort A → Z for repeat view
-     rows.sort((a, b) =>
-       (a.customerName || "").localeCompare(
-         b.customerName || "",
-         undefined,
-         { sensitivity: "base" }
-       )
-     );
-   }
-   
+    
    /* ===============================================================
       UNUPDATED CASES — OVERLAY FILTER
       Applies on CURRENT filtered table view
@@ -1866,14 +1823,6 @@ function setupRealtimeCases(teamId) {
        // True unupdated cases
        return !r.status || r.status.trim() === "";
      });
-   }
-   
-   
-   /* SORT */
-   
-   // ⛔ Repeat view owns its sorting (Customer A → Z)
-   if (uiState.repeatActive) {
-     // already sorted in repeat overlay — do nothing
    }
    
    // Explicit date sort (🕑 button)
@@ -2197,7 +2146,6 @@ function setupRealtimeCases(teamId) {
         uiState.search ||
         (uiState.statusList && uiState.statusList.length > 0) ||
         uiState.unupdatedActive ||
-        uiState.repeatActive ||       // ✅ FIXED (was repeatingActive)
         (uiState.set2Mode && uiState.set2Mode !== "normal") ||         // ✅ Set2 filters (Due / Flagged / PNS) 
         Object.values(uiState.primaries).some(arr => arr && arr.length > 0) ||      // ✅ Primary filters (any selected)
         uiState.countryInvert ||            // ✅ Country invert toggle
@@ -2861,32 +2809,6 @@ function setupRealtimeCases(teamId) {
       }
    }
    
-   
-   // =====================================================
-   // CLOSURE SURVEY — STAR RATING STATE
-   // =====================================================
-   
-   let selectedStars = 0;
-   
-   const starContainer = document.getElementById("starRating");
-   
-   if (starContainer) {
-     starContainer.querySelectorAll("span").forEach(star => {
-       star.onclick = () => {
-         selectedStars = Number(star.dataset.star);
-   
-         starContainer.querySelectorAll("span").forEach(s => {
-           s.classList.toggle(
-             "active",
-             Number(s.dataset.star) <= selectedStars
-           );
-         });
-       };
-     });
-   }
-   
-   
-   
    /* =======================================================================
       STATUS CHANGE HANDLER
       ======================================================================= */
@@ -2941,16 +2863,26 @@ function setupRealtimeCases(teamId) {
       }
    
       if (newStatus === "Closed") {
-        // store previous status so UI can revert if modal is cancelled
-        prevStatusBeforeModal = row.status || "";
-        row.status = "Closed";  // 🔥 ensure dropdown reflects change
-        // 🔹 Track current case for revert logic
-        currentModalCaseId = caseId;
-        // mark pending "Closed" (same concept as SP / Monitoring)
-        pendingStatusForModal = "Closed";
-        closureSurveyCompleted = false; // 🔒 reset until survey submits
+        firestoreUpdateCase(caseId, {
+          status: "Closed",
+          lastActionedOn: today,
+          lastActionedBy: trackerState.user.uid,
+          statusChangedOn: today,
+          statusChangedBy: trackerState.user.uid
+        }).then(() => {
+          pendingUnupdated.delete(caseId);
+          pendingStatusOverride.delete(caseId);
       
-        openClosureModal(row);
+          handleClosedCaseArchival(caseId)
+            .catch(err => console.warn(err));
+      
+          applyFilters();
+        }).catch(err => {
+          pendingUnupdated.delete(caseId);
+          showPopup("Failed to update case.");
+          console.error(err);
+        });
+      
         return;
       }
    
@@ -3086,103 +3018,6 @@ function setupRealtimeCases(teamId) {
        await cleanupClosedCases(todayISO);
      }
    }
-   
-   // =====================================================
-   // SUBMIT CASE CLOSURE (MANDATORY SURVEY)
-   // =====================================================
-   async function submitClosure(caseId, hadPNS) {
-   
-      const submitBtn = document.getElementById("btnClosureSubmit");
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Submitting...";
-   
-      
-     const comment =
-       document.getElementById("predictionComment").value.trim();
-   
-     if (!selectedStars || !comment) {
-       alert("Survey prediction and comment are mandatory.");
-        submitBtn.disabled = false;
-         submitBtn.textContent = "Submit";
-       return;
-     }
-   
-     const today = getTeamToday(trackerState.teamConfig);
-   
-     const update = {
-       status: "Closed",
-       surveyPrediction: selectedStars,
-       predictionComment: comment,
-       lastActionedOn: today,
-       lastActionedBy: trackerState.user.uid,
-       statusChangedOn: today,
-       statusChangedBy: trackerState.user.uid
-     };
-   
-     // Conditional PNS resolution
-     if (hadPNS === true) {
-       const resolved =
-         document.querySelector(
-           'input[name="pnsResolved"]:checked'
-         );
-   
-       if (!resolved) {
-         alert("Please confirm if the PNS issue was resolved.");
-          submitBtn.disabled = false;
-   submitBtn.textContent = "Submit";
-         return;
-       }
-   
-       if (resolved.value === "yes") {
-         update.PNS = false;
-       }
-     }
-   
-      try {
-        await firestoreUpdateCase(caseId, update);
-      
-        const todayISO = getTeamToday(trackerState.teamConfig);
-      
-        try {
-           await handleClosedCaseArchival(caseId);
-         } catch (err) {
-           console.warn(
-             "Closed case archival failed, closure still succeeded:",
-             err
-           );
-         }
-      
-        // ✅ Clear closure warning after successful submission
-        const warn = document.getElementById("closureWarning");
-        if (warn) warn.remove();
-      
-        closureSurveyCompleted = true;
-        pendingStatusForModal = null;
-      
-        document
-          .getElementById("closureModal")
-          .classList.remove("show");
-      
-        applyFilters();
-      
-      } catch (err) {
-        console.error("Case closure failed:", err);
-        showPopup("Case closure failed. Please try again.");
-      
-      } finally {
-        // 🔐 ALWAYS reset button
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Submit";
-      }
-   
-   
-     document
-       .getElementById("closureModal")
-       .classList.remove("show");
-   
-     applyFilters();
-   }
-   
    
    /* =======================================================================
       OPEN CASE MODAL
@@ -3347,77 +3182,6 @@ function setupRealtimeCases(teamId) {
    
    }
    
-   // =====================================================
-   // CLOSURE SURVEY MODAL
-   // =====================================================
-   function openClosureModal(row) {
-     const modal = document.getElementById("closureModal");
-     modal.classList.add("show");
-   
-     // 🔹 Update modal title with Case ID
-     document.getElementById("closureModalTitle").textContent =
-       `Case Closure Survey — ${row.id}`;
-   
-     // reset state
-     selectedStars = 0;
-   
-     selectedStars = 0;
-      document
-        .querySelectorAll("#starRating span")
-        .forEach(s => s.classList.remove("active"));
-   
-   
-     document.getElementById("predictionComment").value = "";
-   
-     // Conditional PNS block
-      if (row.PNS === true) {
-        pnsBlock.classList.remove("hidden-force");
-      } else {
-        pnsBlock.classList.add("hidden-force");
-      }
-   
-     // reset PNS radios
-      document
-        .querySelectorAll('input[name="pnsResolved"]')
-        .forEach(r => r.checked = false);
-   
-     document.getElementById("btnClosureSubmit").onclick = () =>
-       submitClosure(row.id, row.PNS);
-   }
-   
-   const btnClosureClose = document.getElementById("btnClosureClose");
-   
-   if (btnClosureClose) {
-     btnClosureClose.onclick = () => {
-   
-       const modalEl = document.getElementById("closureModal");
-   
-       // 🧹 Clear closure warning if present
-       const warn = document.getElementById("closureWarning");
-       if (warn) warn.remove();
-   
-       // 🔒 REVERT LOGIC (only if survey NOT completed)
-       if (!closureSurveyCompleted && pendingStatusForModal === "Closed") {
-   
-         const row = trackerState.allCases.find(
-           r => r.id === currentModalCaseId
-         );
-   
-         if (row) {
-           row.status = prevStatusBeforeModal || "";
-         }
-   
-         pendingStatusForModal = null;
-         prevStatusBeforeModal = null;
-   
-         applyFilters(); // refresh dropdown UI
-       }
-   
-       modalEl.classList.remove("show");
-     };
-   }
-   
-   
    /* =======================================================================
       LAST ACTIONED BY NAME LOOKUP
       ======================================================================= */
@@ -3581,26 +3345,6 @@ function setupRealtimeCases(teamId) {
         // ✅ Remove tooltip when enabled
         btnModalSave.title = "";
       }
-   }
-   
-   function showClosureWarning(msg) {
-     let warn = document.getElementById("closureWarning");
-     if (!warn) {
-       warn = document.createElement("div");
-       warn.id = "closureWarning";
-       warn.style.cssText = `
-         background: rgba(255,107,107,0.2);
-         border: 1px solid var(--danger);
-         padding: .5rem;
-         border-radius: 10px;
-         color: var(--danger);
-         font-weight: 600;
-         margin-bottom: .5rem;
-       `;
-       const body = document.querySelector("#closureModal .modal-body");
-       body.prepend(warn);
-     }
-     warn.textContent = msg;
    }
    
    /* =======================================================================
@@ -3883,8 +3627,6 @@ function setupRealtimeCases(teamId) {
         "Flagged": r.flagged ? "Yes" : "No",
         "PNS": r.PNS ? "Yes" : "No",
       
-        "Survey Prediction": r.surveyPrediction ?? "",
-        "Prediction Comment": r.predictionComment ?? "",
         "Notes": r.notes || "",
       
         "Last Actioned On": r.lastActionedOn || "",
@@ -4035,24 +3777,6 @@ function setupRealtimeCases(teamId) {
         lastActionedOn: today,
         lastActionedBy: trackerState.user.uid
       };
-   
-      // If the user selected Service Pending / Monitoring earlier, persist the status now
-      // ⛔ BLOCK Closed unless survey was submitted
-      if (pendingStatusForModal === "Closed" && !closureSurveyCompleted) {
-        const row = trackerState.allCases.find(
-          c => c.id === currentModalCaseId
-        );
-      
-        if (row) {
-          openClosureModal(row);
-        }
-      
-        showClosureWarning(
-          "Please complete the Case Closure Survey before closing this case."
-        );
-      
-        return false;
-      }
       
       // Persist pending status (SP / Monitoring / Closed-after-survey)
       if (pendingStatusForModal) {
@@ -4095,26 +3819,6 @@ function setupRealtimeCases(teamId) {
      unupdatedProtect = false;
    
      return true;
-   }
-   
-   /* ====================================================================
-      REPEATING CUSTOMERS LOGIC
-      --------------------------------------------------------------------
-      A case is "repeating" if the SAME CUSTOMER NAME appears 2+ times
-      in the CURRENT table (filtered or full set).
-      -------------------------------------------------------------------- */
-   
-   function computeRepeatingCases(rows) {
-     const count = {};
-     rows.forEach(r => {
-       const name = (r.customerName || "").trim().toLowerCase();
-       if (!name) return;
-       count[name] = (count[name] || 0) + 1;
-     });
-   
-     return rows.filter(r =>
-       count[(r.customerName || "").trim().toLowerCase()] > 1
-     );
    }
    
    /* ====================================================================
@@ -4298,14 +4002,6 @@ function setupRealtimeCases(teamId) {
    
    function normalizeDate(v) {
      return v || "";
-   }
-   
-   // Normalize customer name for repeat detection
-   function normalizeCustomerName(name) {
-     return (name || "")
-       .toLowerCase()
-       .replace(/[^a-z0-9]/g, "") // remove spaces & special characters
-       .trim();
    }
    
    // GLOBAL tooltip container

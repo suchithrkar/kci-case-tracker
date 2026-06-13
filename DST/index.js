@@ -2512,7 +2512,11 @@ function setupRealtimeCases(teamId) {
      rows.forEach((r, index) => {
        const tr = document.createElement("tr");
 
-       const duplicateCount = caseIdCounts[r.id] || 0;
+       console.log("ROW DEBUG", {id: r.id, caseId: r.caseId, ticketNumber: r.ticketNumber, row: r}); 
+
+       const duplicateCount = caseIdCounts[String(r.id || "").trim()] || 0;
+
+       console.log("CASE", r.id, "COUNT", caseIdCounts[String(r.id || "").trim()]); 
          
        const duplicateBadge =
          duplicateCount > 1

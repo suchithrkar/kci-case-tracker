@@ -2488,6 +2488,20 @@ function setupRealtimeCases(teamId) {
        renderEmptyState(getEmptyStateMessage());
        return;
      }
+
+     // =====================================================
+     // CASE ID OCCURRENCE COUNT
+     // =====================================================
+      
+     const caseIdCounts = {};
+      
+     rows.forEach(row => {
+       const id = String(row.id || "").trim();
+      
+       if (!id) return;
+      
+       caseIdCounts[id] = (caseIdCounts[id] || 0) + 1;
+     }); 
    
      // 🔁 Clear existing follow-up timers before re-render
      followUpTimers.forEach(clearTimeout);
@@ -2497,6 +2511,13 @@ function setupRealtimeCases(teamId) {
    
      rows.forEach((r, index) => {
        const tr = document.createElement("tr");
+
+       const duplicateCount = caseIdCounts[r.id] || 0;
+         
+       const duplicateBadge =
+         duplicateCount > 1
+           ? `<span class="caseid-badge">${duplicateCount}</span>`
+           : ""; 
    
       /* Row Styling Logic */
       if (r.followDate && r.followDate <= today && r.status !== "Closed") {
@@ -2517,7 +2538,12 @@ function setupRealtimeCases(teamId) {
        /* Build row */
        tr.innerHTML = `
          <td>${index + 1}</td>
-         <td class="caseid" data-id="${escapeHtml(r.id)}">${escapeHtml(r.id)}</td>
+         <td class="caseid" data-id="${escapeHtml(r.id)}">
+           <span class="caseid-wrapper">
+             ${escapeHtml(r.id)}
+             ${duplicateBadge}
+           </span>
+         </td>
          <td>${escapeHtml(r.countryMaterialOrder || "")}</td>
          <td>${escapeHtml(getMaterialOrderDisplay(r.materialOrder || ""))}</td>
          <td>${escapeHtml(r.orderStatus || "")}</td>

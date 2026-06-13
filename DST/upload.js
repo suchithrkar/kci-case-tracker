@@ -713,11 +713,20 @@ async function loadFirestoreCasesForTeam(teamId) {
       await getDocs(colRef);
 
     excelState.firestoreCases =
-      snap.docs.map(d => ({
-        id: d.id,
-        ...d.data()
-      }));
-
+      snap.docs.map(d => {
+        const data = d.data();
+        return {
+          id: d.id,
+          ...data,
+          rowCount: data.rowCount || 1,
+          hasMultipleRows: data.hasMultipleRows || false,
+          rows:
+            Array.isArray(data.rows)
+              ? data.rows
+              : []
+        };
+      });
+     
   } catch (err) {
     console.error(
       "Firestore read failed:",
@@ -749,6 +758,7 @@ function stripUserFields(obj) {
   delete clone.statusChangedOn;
   delete clone.statusChangedBy;
 
+  delete clone.teamId; 
   return clone;
 }
 
@@ -950,13 +960,16 @@ async function applyExcelChanges() {
             ex.id
           ),
           {
-            ...ex,
-
             id: ex.id,
-
-            teamId:
-              excelState.teamId,
-
+          
+            rowCount: ex.rowCount || 1,
+         
+            hasMultipleRows: ex.hasMultipleRows || false,
+         
+            rows: ex.rows || [],
+         
+            teamId: excelState.teamId,
+         
             status: "",
             followDate: "",
             followTime: "",
@@ -994,9 +1007,11 @@ async function applyExcelChanges() {
             ?.checked;
 
         let data = {
-          ...ex,
-          teamId:
-            excelState.teamId
+          id: ex.id,
+          rowCount: ex.rowCount || 1,
+          hasMultipleRows: ex.hasMultipleRows || false,
+          rows: ex.rows || [],
+          teamId: excelState.teamId
         };
 
         if (

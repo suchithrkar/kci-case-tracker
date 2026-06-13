@@ -2198,6 +2198,18 @@ function setupRealtimeCases(teamId) {
    
      setActiveRow(tr);
    });
+
+   /* CASE ID CLICK → DST DETAILS MODAL */
+   tbody.addEventListener("click", (e) => {
+   
+     const cell = e.target.closest(".caseid");
+     if (!cell) return;
+   
+     openDSTCaseDetailsModal(
+       cell.dataset.id
+     );
+   
+   });
    
    
    /* DOUBLE CLICK → COPY CASE ID */
@@ -2309,6 +2321,22 @@ function setupRealtimeCases(teamId) {
    
    const btnUploadExcel = document.getElementById("btnUploadExcel");
    const excelFileInput = document.getElementById("excelFileInput");
+
+   /* =========================================================
+      DST CASE DETAILS MODAL
+      ========================================================= */
+   
+   const dstCaseDetailsModal = document.getElementById("dstCaseDetailsModal");
+   const dstCaseDetailsTitle = document.getElementById("dstCaseDetailsTitle");
+   const dstCaseDetailsTable = document.getElementById("dstCaseDetailsTable");
+   const btnDSTCaseDetailsClose = document.getElementById("btnDSTCaseDetailsClose");
+
+   btnDSTCaseDetailsClose?.addEventListener(
+     "click",
+     () => {
+       dstCaseDetailsModal.classList.remove("show");
+     }
+   );
    
    if (btnUploadExcel && excelFileInput) {
      btnUploadExcel.addEventListener("click", () => {
@@ -2776,6 +2804,92 @@ function setupRealtimeCases(teamId) {
    
        throw err;
      }
+   }
+
+   function openDSTCaseDetailsModal(caseId) {
+      
+     const caseData =
+       trackerState.allCases.find(
+         r => r.id === caseId
+       );
+   
+     if (!caseData) return;
+   
+     const rows =
+       Array.isArray(caseData.rows)
+         ? caseData.rows
+         : [];
+   
+     if (rows.length === 0) {
+       showPopup("No row data available.");
+       return;
+     }
+   
+     dstCaseDetailsTitle.textContent = `DST Case Details — ${caseId}`;
+   
+     const fields = Object.keys(rows[0]);
+   
+     let html = `
+       <table style="
+         width:100%;
+         border-collapse:collapse;
+         white-space:nowrap;
+       ">
+         <thead>
+           <tr>
+             <th>Field Name</th>
+     `;
+   
+     rows.forEach((r, index) => {
+       html += `<th>Row ${index + 1}</th>`;
+     });
+   
+     html += `
+           </tr>
+         </thead>
+         <tbody>
+     `;
+   
+     fields.forEach(field => {
+   
+       html += `
+         <tr>
+           <td><strong>${escapeHtml(field)}</strong></td>
+       `;
+   
+       rows.forEach(row => {
+   
+         let value = row[field];
+   
+         if (
+           value === null ||
+           value === undefined
+         ) {
+           value = "";
+         }
+   
+         if (typeof value === "object") {
+           value = JSON.stringify(value);
+         }
+   
+         html += `
+           <td>${escapeHtml(value)}</td>
+         `;
+       });
+   
+       html += `
+         </tr>
+       `;
+     });
+   
+     html += `
+         </tbody>
+       </table>
+     `;
+   
+     dstCaseDetailsTable.innerHTML = html;
+   
+     dstCaseDetailsModal.classList.add("show");
    }
    
    /* =======================================================================

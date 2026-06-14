@@ -2967,7 +2967,7 @@ function setupRealtimeCases(teamId) {
          <table class="dst-details-table">
          <thead>
          <tr>
-         <th>Field</th>
+         <th class="dst-label-col">Field</th>
          `;
             
             rows.forEach((r, index) => {

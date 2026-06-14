@@ -2039,17 +2039,32 @@ function setupRealtimeCases(teamId) {
            : ""; 
    
       /* Row Styling Logic */
-      if (r.followDate && r.followDate <= today && r.status !== "Closed") {
+      const notesHistory =
+        (r.notesHistory || "").toLowerCase();
+      
+      if (notesHistory.includes("previous eta will be missed")) {
+        tr.classList.add("eta-missed");
+      }
+      else if (notesHistory.includes("can be used")) {
+        tr.classList.add("can-be-used");
+      }
+      else if (notesHistory.includes("part allocated")) {
+        tr.classList.add("part-allocated");
+      }
+      else if (
+        r.followDate &&
+        r.followDate <= today &&
+        r.status !== "Closed"
+      ) {
         tr.classList.add("due-today");
       
-        // ⏰ Subtle emphasis if follow-up time is set for today
         if (r.followTime && r.followDate === today) {
           tr.classList.add("due-today-time");
         }
-      } 
+      }
       else if (r.flagged) {
         tr.classList.add("flagged");
-      } 
+      }
       else if (r.notes && r.notes.trim() !== "") {
         tr.classList.add("has-notes");
       }

@@ -3046,8 +3046,9 @@ function setupRealtimeCases(teamId) {
                       href="${value}"
                       target="_blank"
                       rel="noopener noreferrer"
+                      class="dst-ticket-link"
                     >
-                      Open Ticket
+                      Open Ticket ↗
                     </a>
                   `;
                 }

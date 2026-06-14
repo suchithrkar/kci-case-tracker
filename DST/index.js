@@ -2905,17 +2905,9 @@ function setupRealtimeCases(teamId) {
       ];
 
      let html = `
-      <div style="
-        margin-bottom:16px;
-        padding:12px;
-        border:1px solid var(--border);
-        border-radius:10px;
-      ">
+      <div class="dst-summary-card">
       
-        <table style="
-          width:100%;
-          border-collapse:collapse;
-        ">
+        <table class="dst-summary-table">
       
           <tbody>
       
@@ -2970,100 +2962,101 @@ function setupRealtimeCases(teamId) {
         </table>
       
       </div>
-      
-      <table style="
-        width:100%;
-        border-collapse:collapse;
-      ">
-      <thead>
-      <tr>
-      <th>Field</th>
-      `;
-         
-         rows.forEach((r, index) => {
-           html += `<th>Row ${index + 1}</th>`;
-         });
-         
-         html += `
-         </tr>
-         </thead>
-         <tbody>
+
+      <div class="dst-table-scroll">
+         <table class="dst-details-table">
+         <thead>
+         <tr>
+         <th>Field</th>
          `;
-         
-         displayFields.forEach(item => {
-           if (item.separator) {
-             html += `
-               <tr>
-                 <td colspan="${rows.length + 1}"
-                     style="
-                       height:14px;
-                       border:none;
-                       background:transparent;
-                     ">
-                 </td>
-               </tr>
-             `;
-             return;
-           }
-         
-           html += `
-             <tr>
-               <td
-                 style="
-                   font-weight:600;
-                   text-align:left;
-                   vertical-align:top;
-                   padding:8px;
-                   border:1px solid var(--border);
-                 "
-               >
-                 ${item.label}
-               </td>
-           `;
-         
-           rows.forEach(r => {
-             let value = formatFirestoreDateTime(r[item.field]);
-         
-             // Ticket URL
-             if (item.field === "ticketUrl" && value) {
-               value = `
-                 <a
-                   href="${value}"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                 >
-                   Open Ticket
-                 </a>
-               `;
-             }
-         
-             // Notes History
-             if (item.field === "notesHistory" && value) {
-               value = escapeHtml(String(value)).replace(/\n/g, "<br>");
-             }
-         
-             html += `
-               <td
-                 style="
-                   text-align:left;
-                   vertical-align:top;
-                   padding:8px;
-                   border:1px solid var(--border);
-                   white-space:normal;
-                   word-break:break-word;
-                 "
-               >
-                 ${value}
-               </td>
-             `;
-           });
-         
-           html += `</tr>`;
-         });
-         
-         html += `
-         </tbody>
-         </table>
+            
+            rows.forEach((r, index) => {
+              html += `<th>Row ${index + 1}</th>`;
+            });
+            
+            html += `
+            </tr>
+            </thead>
+            <tbody>
+            `;
+            
+            displayFields.forEach(item => {
+              if (item.separator) {
+                html += `
+                  <tr>
+                    <td colspan="${rows.length + 1}"
+                        style="
+                          height:14px;
+                          border:none;
+                          background:transparent;
+                        ">
+                    </td>
+                  </tr>
+                `;
+                return;
+              }
+            
+              html += `
+                <tr>
+                  <td
+                      class="dst-label-col"
+                      style="
+                        font-weight:600;
+                        text-align:left;
+                        vertical-align:top;
+                        padding:5px;
+                        border:1px solid var(--border);
+                      "
+                    >
+                    ${item.label}
+                  </td>
+              `;
+            
+              rows.forEach(r => {
+                let value = formatFirestoreDateTime(r[item.field]);
+            
+                // Ticket URL
+                if (item.field === "ticketUrl" && value) {
+                  value = `
+                    <a
+                      href="${value}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Open Ticket
+                    </a>
+                  `;
+                }
+            
+                // Notes History
+                if (item.field === "notesHistory" && value) {
+                  value = escapeHtml(String(value)).replace(/\n/g, "<br>");
+                }
+            
+                html += `
+                  <td
+                    class="dst-row-col"
+                    style="
+                      text-align:left;
+                      vertical-align:top;
+                      padding:5px;
+                      border:1px solid var(--border);
+                      white-space:normal;
+                      word-break:break-word;
+                    "
+                  >
+                    ${value}
+                  </td>
+                `;
+              });
+            
+              html += `</tr>`;
+            });
+            
+            html += `
+            </tbody>
+            </table>
+          </div>  
          `;
          
      dstCaseDetailsTable.innerHTML = html;

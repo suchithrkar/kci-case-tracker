@@ -41,9 +41,9 @@
   --upload-btn-hover: rgba(79,140,240,0.18);
 }
 
-/* ======================================================
+/* =======================================================
    THEME VARIABLES — CUSTOM SELECT
-   ====================================================== */
+   ======================================================= */
 
 :root[data-theme="dark"] {
   --select-bg: #1A1F2B;
@@ -945,8 +945,6 @@ tr.active-row {
 #dstCaseDetailsModal td{
   padding:5px;
   white-space:nowrap;
-
-  border:1px solid var(--border);
 }
 
 #dstCaseDetailsModal .dst-summary-table{
@@ -967,82 +965,18 @@ tr.active-row {
 }
 
 #dstCaseDetailsModal .dst-table-scroll{
-  max-width:1001.6px;
-  max-height:400px;
-
-  overflow:auto;
-
-  border:1px solid var(--border);
-  border-radius:10px;
+  overflow-x:auto;
 }
 
 #dstCaseDetailsModal .dst-label-col{
   width:200px;
   min-width:200px;
   max-width:200px;
-
-  background:var(--panel-2);
-  font-weight:600;
-
-  position:sticky;
-  left:0;
-  z-index:3;
 }
 
 #dstCaseDetailsModal .dst-row-col{
   width:400px;
   min-width:400px;
-}
-
-#dstCaseDetailsModal .dst-ticket-link{
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-#dstCaseDetailsModal .dst-ticket-link:hover{
-  text-decoration: underline;
-}
-
-#dstCaseDetailsModal thead th{
-  position:sticky;
-  top:0;
-  z-index:2;
-
-  background:var(--panel-2);
-}
-
-#dstCaseDetailsModal thead .dst-label-col{
-  position:sticky;
-  top:0;
-  left:0;
-
-  z-index:5;
-
-  background:var(--panel-2);
-}
-
-/* remove outer edge borders */
-#dstCaseDetailsModal tr:first-child th{
-  border-top:none !important;
-}
-
-#dstCaseDetailsModal th:first-child,
-#dstCaseDetailsModal td:first-child{
-  border-left:none !important;
-}
-
-#dstCaseDetailsModal th:last-child,
-#dstCaseDetailsModal td:last-child{
-  border-right:none !important;
-}
-
-#dstCaseDetailsModal tbody tr:last-child td{
-  border-bottom:none !important;
-}
-
-#dstCaseDetailsModal .dst-summary-table tr:hover{
-  background: transparent !important;
 }
 
 /* Toast */

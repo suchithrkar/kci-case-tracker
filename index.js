@@ -2914,7 +2914,7 @@ function setupRealtimeCases(teamId) {
             <tr>
               <td style="
                 font-weight:600;
-                width:200px;
+                width:180px;
                 padding:6px;
               ">
                 Case ID
@@ -2967,7 +2967,7 @@ function setupRealtimeCases(teamId) {
          <table class="dst-details-table">
          <thead>
          <tr>
-         <th class="dst-label-col">Field</th>
+         <th>Field</th>
          `;
             
             rows.forEach((r, index) => {
@@ -2981,23 +2981,6 @@ function setupRealtimeCases(teamId) {
             `;
             
             displayFields.forEach(item => {
-               
-              /* Hide Work Order row if all rows are blank */
-              if (item.field === "workOrder") {
-               
-                const hasWorkOrder = rows.some(r => {
-                  const value = String(
-                    r.workOrder ?? ""
-                  ).trim();
-               
-                  return value !== "";
-                });
-               
-                if (!hasWorkOrder) {
-                  return;
-                }
-              } 
-               
               if (item.separator) {
                 html += `
                   <tr>
@@ -3031,13 +3014,6 @@ function setupRealtimeCases(teamId) {
             
               rows.forEach(r => {
                 let value = formatFirestoreDateTime(r[item.field]);
-
-                /* Material Order: Show only MO number */
-                if (item.field === "materialOrder" && value) {
-                  value = String(value)
-                    .split(" for WO-")[0]
-                    .trim();
-                } 
             
                 // Ticket URL
                 if (item.field === "ticketUrl" && value) {
@@ -3046,9 +3022,8 @@ function setupRealtimeCases(teamId) {
                       href="${value}"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="dst-ticket-link"
                     >
-                      Open Ticket ↗
+                      Open Ticket
                     </a>
                   `;
                 }
@@ -3085,17 +3060,7 @@ function setupRealtimeCases(teamId) {
          `;
          
      dstCaseDetailsTable.innerHTML = html;
-     dstCaseDetailsModal.classList.add("show");
-      
-     const scrollContainer =
-       dstCaseDetailsTable.querySelector(
-         ".dst-table-scroll"
-       );
-      
-     if (scrollContainer) {
-       scrollContainer.scrollTop = 0;
-       scrollContainer.scrollLeft = 0;
-     }
+     dstCaseDetailsModal.classList.add("show"); 
    }
    
    /* =======================================================================

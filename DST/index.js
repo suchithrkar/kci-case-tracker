@@ -1450,17 +1450,26 @@ function setupRealtimeCases(teamId) {
       });
    
      /* Record selections but DO NOT apply yet */
-      el.statusPanel.onchange = (e) => {
+     el.statusPanel.onchange = (e) => {
         const c = e.target.closest("input");
         if (!c) return;
       
         const val = c.dataset.status;
-   
-         const showAllNcm = uiState.statusList.includes("SHOW_ALL_NCM");
-   
-         el.statusPanel.querySelectorAll(".ncm-own-tag").forEach(tag => {
-           tag.style.display = showAllNcm ? "none" : "inline";
-         });
+      
+        const set = new Set(uiState.statusList);
+      
+        c.checked
+          ? set.add(val)
+          : set.delete(val);
+      
+        uiState.statusList = [...set];
+      
+        const showAllNcm =
+          uiState.statusList.includes("SHOW_ALL_NCM");
+      
+        el.statusPanel.querySelectorAll(".ncm-own-tag").forEach(tag => {
+          tag.style.display = showAllNcm ? "none" : "inline";
+        });
       
         updateStatusLabel();
       };

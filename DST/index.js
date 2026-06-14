@@ -2914,7 +2914,7 @@ function setupRealtimeCases(teamId) {
             <tr>
               <td style="
                 font-weight:600;
-                width:180px;
+                width:200px;
                 padding:6px;
               ">
                 Case ID
@@ -3084,7 +3084,17 @@ function setupRealtimeCases(teamId) {
          `;
          
      dstCaseDetailsTable.innerHTML = html;
-     dstCaseDetailsModal.classList.add("show"); 
+     dstCaseDetailsModal.classList.add("show");
+      
+     const scrollContainer =
+       dstCaseDetailsTable.querySelector(
+         ".dst-table-scroll"
+       );
+      
+     if (scrollContainer) {
+       scrollContainer.scrollTop = 0;
+       scrollContainer.scrollLeft = 0;
+     }
    }
    
    /* =======================================================================

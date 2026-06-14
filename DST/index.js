@@ -1380,18 +1380,16 @@ function setupRealtimeCases(teamId) {
    function buildStatusPanel() {
      const statuses = [
         "Closed",
-        "NCM 1",
-        "NCM 2",
-        "Service Pending",
+        "KCI 1",
+        "KCI 2",
+        "Pending",
         "Monitoring",
-        "Escalated / Elevated",
-        "Service Arranged",
-        "Pending Closure"
-      ];
+        "Part Allocated"
+     ];
    
       el.statusPanel.innerHTML = statuses.map(s => {
       
-        if (s === "NCM 1" || s === "NCM 2") {
+        if (s === "KCI 1" || s === "KCI 2") {
           return `
             <label style="display:flex;align-items:center;">
               <input type="checkbox" data-status="${s}"
@@ -1509,8 +1507,8 @@ function setupRealtimeCases(teamId) {
      // Secondary admin → no restriction
      if (!isPrimary && !isGeneral) return rows;
    
-     const ncm1Selected = uiState.statusList.includes("NCM 1");
-     const ncm2Selected = uiState.statusList.includes("NCM 2");
+     const ncm1Selected = uiState.statusList.includes("KCI 1");
+     const ncm2Selected = uiState.statusList.includes("KCI 2");
    
       // ✅ NEW: Override — Show all NCM cases
       if (uiState.statusList.includes("SHOW_ALL_NCM")) {
@@ -1521,10 +1519,10 @@ function setupRealtimeCases(teamId) {
      if (!ncm1Selected && !ncm2Selected) return rows;
    
      return rows.filter(r => {
-       if (r.status === "NCM 1" && ncm1Selected)
+       if (r.status === "KCI 1" && ncm1Selected)
          return r.statusChangedBy === user.uid;
    
-       if (r.status === "NCM 2" && ncm2Selected)
+       if (r.status === "KCI 2" && ncm2Selected)
          return r.statusChangedBy === user.uid;
    
        return true; // all other statuses remain unaffected
@@ -2087,14 +2085,12 @@ function setupRealtimeCases(teamId) {
      const statuses = [
         "",
         "Closed",
-        "NCM 1",
-        "NCM 2",
-        "Service Pending",
+        "KCI 1",
+        "KCI 2",
+        "Pending",
         "Monitoring",
-        "Escalated / Elevated",
-        "Service Arranged",
-        "Pending Closure"
-      ];
+        "Part Allocated"
+     ];
    
      return `
        <div class="custom-select" data-id="${row.id}">
@@ -2620,9 +2616,8 @@ function setupRealtimeCases(teamId) {
    
      const needsFollow =
       (
-        newStatus === "Service Pending" ||
-        newStatus === "Monitoring" ||
-        newStatus === "Escalated / Elevated"
+        newStatus === "Pending" ||
+        newStatus === "Monitoring"
       );
    
       if (newStatus === "Closed") {
@@ -2709,9 +2704,8 @@ function setupRealtimeCases(teamId) {
       
       // 🔄 If switching to NON follow-up status, clear enforcement
       if (
-        value !== "Service Pending" &&
-        value !== "Monitoring" &&
-        value !== "Escalated / Elevated"
+        value !== "Pending" &&
+        value !== "Monitoring"
       ) {
         pendingStatusForModal = null;
         requireFollowUp = false;
@@ -3095,13 +3089,11 @@ function setupRealtimeCases(teamId) {
                 ${[
                     "",
                     "Closed",
-                    "NCM 1",
-                    "NCM 2",
-                    "Service Pending",
+                    "KCI 1",
+                    "KCI 2",
+                    "Pending",
                     "Monitoring",
-                    "Escalated / Elevated",
-                    "Service Arranged",
-                    "Pending Closure"
+                    "Part Allocated"
                   ].map(s => `
                   <div class="custom-option" data-value="${s}">
                     ${s || "&nbsp;"}
@@ -3331,9 +3323,8 @@ function setupRealtimeCases(teamId) {
            );
    
      const needsFollow =
-        effectiveStatus === "Service Pending" ||
-        effectiveStatus === "Monitoring" ||
-        effectiveStatus === "Escalated / Elevated";
+        effectiveStatus === "Pending" ||
+        effectiveStatus === "Monitoring";
    
       if (needsFollow && !follow) {
         btnModalSave.disabled = true;
@@ -3786,9 +3777,8 @@ function setupRealtimeCases(teamId) {
         (
           window.__fromReminder &&
           (
-            effectiveStatus === "Service Pending" ||
-            effectiveStatus === "Monitoring" ||
-            effectiveStatus === "Escalated / Elevated"
+            effectiveStatus === "Pending" ||
+            effectiveStatus === "Monitoring"
           )
         );
       
@@ -3947,14 +3937,12 @@ function setupRealtimeCases(teamId) {
    
      // Other status breakdowns
      const statusBreakdown = {
-        "Service Pending": 0,
+        "Pending": 0,
         "Monitoring": 0,
-        "Escalated / Elevated": 0,
-        "Service Arranged": 0,
-        "Pending Closure": 0,
-        "NCM 1": 0,
-        "NCM 2": 0,
-      };
+        "Part Allocated": 0,
+        "KCI 1": 0,
+        "KCI 2": 0,
+     };
    
      followedUpCases.forEach(r => {
        if (statusBreakdown[r.status] !== undefined) {
@@ -3995,21 +3983,19 @@ function setupRealtimeCases(teamId) {
         --------------------------------------------- */
      infoModalBody.textContent =
       `Total Cases Closed: ${closedCount}
-   Met: ${met} (${pct(met)}%)
-   Not Met: ${notMet} (${pct(notMet)}%)
+Met: ${met} (${pct(met)}%)
+Not Met: ${notMet} (${pct(notMet)}%)
       
-   Service Pending: ${statusBreakdown["Service Pending"]}
-   Monitoring: ${statusBreakdown["Monitoring"]}
-   Escalated / Elevated: ${statusBreakdown["Escalated / Elevated"]}
-   Service Arranged: ${statusBreakdown["Service Arranged"]}
-   Pending Closure: ${statusBreakdown["Pending Closure"]}
-   NCM 1: ${statusBreakdown["NCM 1"]}
-   NCM 2: ${statusBreakdown["NCM 2"]}
+Pending: ${statusBreakdown["Pending"]}
+Monitoring: ${statusBreakdown["Monitoring"]}
+Part Allocated: ${statusBreakdown["Part Allocated"]}
+KCI 1: ${statusBreakdown["KCI 1"]}
+KCI 2: ${statusBreakdown["KCI 2"]}
       
-   Total Followed Up Cases: ${totalFollowedUp}
-   Total Updated Cases: ${totalUpdated}
+Total Followed Up Cases: ${totalFollowedUp}
+Total Updated Cases: ${totalUpdated}
       
-   Total Actioned Cases: ${totalActioned}`;
+Total Actioned Cases: ${totalActioned}`;
    
       // If sidebar is open → close it using the official sidebar close logic
       if (el.sidebar.classList.contains("open")) {

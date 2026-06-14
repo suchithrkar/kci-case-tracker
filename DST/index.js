@@ -1380,22 +1380,24 @@ function setupRealtimeCases(teamId) {
    function buildStatusPanel() {
      const statuses = [
         "Closed",
-        "KCI 1",
-        "KCI 2",
-        "Pending",
+        "NCM 1",
+        "NCM 2",
+        "Service Pending",
         "Monitoring",
-        "Part Allocated"
-     ];
+        "Escalated / Elevated",
+        "Service Arranged",
+        "Pending Closure"
+      ];
    
       el.statusPanel.innerHTML = statuses.map(s => {
       
-        if (s === "KCI 1" || s === "KCI 2") {
+        if (s === "NCM 1" || s === "NCM 2") {
           return `
             <label style="display:flex;align-items:center;">
               <input type="checkbox" data-status="${s}"
                 ${uiState.statusList.includes(s) ? "checked" : ""}/>
               <span style="flex:1">${s}</span>
-              <span class="kci-own-tag" style="font-size:11px;opacity:0.6;">Own</span>
+              <span class="ncm-own-tag" style="font-size:11px;opacity:0.6;">Own</span>
             </label>
           `;
         }
@@ -1414,12 +1416,12 @@ function setupRealtimeCases(teamId) {
         <div style="border-top:1px solid var(--border); margin:6px 0;"></div>
       `;
       
-      // ✅ Show All KCI Cases option (override flag)
+      // ✅ Show All NCM Cases option (override flag)
       el.statusPanel.innerHTML += `
         <label>
-          <input type="checkbox" data-status="SHOW_ALL_KCI"
-            ${uiState.statusList.includes("SHOW_ALL_KCI") ? "checked" : ""}/>
-          Show All KCI Cases
+          <input type="checkbox" data-status="SHOW_ALL_NCM"
+            ${uiState.statusList.includes("SHOW_ALL_NCM") ? "checked" : ""}/>
+          Show All NCM Cases
         </label>
       `;
    
@@ -1443,10 +1445,10 @@ function setupRealtimeCases(teamId) {
    
       updateStatusLabel();
    
-      const showAllKci = uiState.statusList.includes("SHOW_ALL_KCI");
+      const showAllNcm = uiState.statusList.includes("SHOW_ALL_NCM");
    
-      el.statusPanel.querySelectorAll(".kci-own-tag").forEach(tag => {
-        tag.style.display = showAllKci ? "none" : "inline";
+      el.statusPanel.querySelectorAll(".ncm-own-tag").forEach(tag => {
+        tag.style.display = showAllNcm ? "none" : "inline";
       });
    
      /* Record selections but DO NOT apply yet */
@@ -1456,10 +1458,10 @@ function setupRealtimeCases(teamId) {
       
         const val = c.dataset.status;
    
-         const showAllKci = uiState.statusList.includes("SHOW_ALL_KCI");
+         const showAllNcm = uiState.statusList.includes("SHOW_ALL_NCM");
    
-         el.statusPanel.querySelectorAll(".kci-own-tag").forEach(tag => {
-           tag.style.display = showAllKci ? "none" : "inline";
+         el.statusPanel.querySelectorAll(".ncm-own-tag").forEach(tag => {
+           tag.style.display = showAllNcm ? "none" : "inline";
          });
       
         updateStatusLabel();
@@ -1475,13 +1477,13 @@ function setupRealtimeCases(teamId) {
    
      const displayList = uiState.statusList
        .filter(s => 
-         s !== "SHOW_ALL_KCI" && 
+         s !== "SHOW_ALL_NCM" && 
          s !== "EMAIL_NEW" && 
          s !== "NOT_ACTIONED_TODAY"
        );
    
-     if (uiState.statusList.includes("SHOW_ALL_KCI")) {
-       displayList.push("All KCI");
+     if (uiState.statusList.includes("SHOW_ALL_NCM")) {
+       displayList.push("All NCM");
      }
    
      if (uiState.statusList.includes("EMAIL_NEW")) {
@@ -1500,29 +1502,29 @@ function setupRealtimeCases(teamId) {
       FILTER ENGINE (REBUILT CLEANLY)
       ======================================================================= */
    
-   function restrictKciCasesForUser(rows, user) {
+   function restrictNcmCasesForUser(rows, user) {
      const isPrimary = user.role === "primary";
      const isGeneral = user.role === "general";
    
      // Secondary admin → no restriction
      if (!isPrimary && !isGeneral) return rows;
    
-     const kci1Selected = uiState.statusList.includes("KCI 1");
-     const kci2Selected = uiState.statusList.includes("KCI 2");
+     const ncm1Selected = uiState.statusList.includes("NCM 1");
+     const ncm2Selected = uiState.statusList.includes("NCM 2");
    
-      // ✅ NEW: Override — Show All KCI Cases
-      if (uiState.statusList.includes("SHOW_ALL_KCI")) {
+      // ✅ NEW: Override — Show all NCM cases
+      if (uiState.statusList.includes("SHOW_ALL_NCM")) {
         return rows;
       }
    
      // If neither selected → return normally
-     if (!kci1Selected && !kci2Selected) return rows;
+     if (!ncm1Selected && !ncm2Selected) return rows;
    
      return rows.filter(r => {
-       if (r.status === "KCI 1" && kci1Selected)
+       if (r.status === "NCM 1" && ncm1Selected)
          return r.statusChangedBy === user.uid;
    
-       if (r.status === "KCI 2" && kci2Selected)
+       if (r.status === "NCM 2" && ncm2Selected)
          return r.statusChangedBy === user.uid;
    
        return true; // all other statuses remain unaffected
@@ -1593,7 +1595,7 @@ function setupRealtimeCases(teamId) {
      /* STATUS MULTI-SELECT */
       const selectedStatuses = uiState.statusList.filter(
         s =>
-          s !== "SHOW_ALL_KCI" &&
+          s !== "SHOW_ALL_NCM" &&
           s !== "EMAIL_NEW" &&
           s !== "NOT_ACTIONED_TODAY"
       );
@@ -1660,8 +1662,8 @@ function setupRealtimeCases(teamId) {
      rows.sort((a, b) => a.excelOrder - b.excelOrder);
    }
    
-   /* APPLY SPECIAL KCI FILTERING */
-   rows = restrictKciCasesForUser(rows, trackerState.user);
+   /* APPLY SPECIAL NCM FILTERING */
+   rows = restrictNcmCasesForUser(rows, trackerState.user);
    
    // ✅ Email Status New filter (AND condition)
    if (uiState.statusList.includes("EMAIL_NEW")) {
@@ -2085,12 +2087,14 @@ function setupRealtimeCases(teamId) {
      const statuses = [
         "",
         "Closed",
-        "KCI 1",
-        "KCI 2",
-        "Pending",
+        "NCM 1",
+        "NCM 2",
+        "Service Pending",
         "Monitoring",
-        "Part Allocated"
-     ];
+        "Escalated / Elevated",
+        "Service Arranged",
+        "Pending Closure"
+      ];
    
      return `
        <div class="custom-select" data-id="${row.id}">
@@ -2195,15 +2199,15 @@ function setupRealtimeCases(teamId) {
      setActiveRow(tr);
    });
 
-   /* RIGHT CLICK → DST DETAILS MODAL */
-   tbody.addEventListener("contextmenu", (e) => {
+   /* CASE ID CLICK → DST DETAILS MODAL */
+   tbody.addEventListener("click", (e) => {
    
      const cell = e.target.closest(".caseid");
      if (!cell) return;
    
-     e.preventDefault();
-   
-     openDSTCaseDetailsModal(cell.dataset.id);
+     openDSTCaseDetailsModal(
+       cell.dataset.id
+     );
    
    });
    
@@ -2222,6 +2226,61 @@ function setupRealtimeCases(teamId) {
      const toast = document.getElementById("toast");
      toast.classList.add("show");
      setTimeout(() => toast.classList.remove("show"), 800);
+   });
+   
+   // ✅ RIGHT-CLICK → COPY KCI NOTES
+   tbody.addEventListener("contextmenu", async (e) => {
+   
+     const cell = e.target.closest(".caseid");
+     if (!cell) return;
+   
+     e.preventDefault(); // 🚫 disable default right-click menu
+   
+     try {
+       // 🔍 Get row
+       const caseId = cell.textContent.trim();
+   
+         if (!caseId) {
+           showPopup("Invalid case ID");
+           return;
+         }
+         
+         const caseData = trackerState.allCases.find(
+           c => String(c.id) === String(caseId)
+         );
+         
+         if (!caseData) {
+           showPopup("Unable to fetch case data");
+           return;
+         }
+         
+         // ✅ FIXED TEMPLATE ACCESS
+         const tplDef = templates["kci"];
+         
+         if (!tplDef || typeof tplDef.getTemplate !== "function") {
+           showPopup("Template not available");
+           return;
+         }
+         
+         const template = tplDef.getTemplate(caseData);
+         
+         if (!template || !template.body) {
+           showPopup("Template not available");
+           return;
+         }
+         
+         // ✅ APPLY VARIABLES (IMPORTANT)
+         const notes = applyTemplateVariables(template.body, caseData, "kci");
+         
+         await navigator.clipboard.writeText(notes);
+         
+         showPopup("KCI Notes copied");
+   
+     } catch (err) {
+       console.error(err);
+       showPopup("Failed to copy KCI Notes");
+     }
+   
    });
    
    /* =======================================================================
@@ -2616,8 +2675,9 @@ function setupRealtimeCases(teamId) {
    
      const needsFollow =
       (
-        newStatus === "Pending" ||
-        newStatus === "Monitoring"
+        newStatus === "Service Pending" ||
+        newStatus === "Monitoring" ||
+        newStatus === "Escalated / Elevated"
       );
    
       if (newStatus === "Closed") {
@@ -2704,8 +2764,9 @@ function setupRealtimeCases(teamId) {
       
       // 🔄 If switching to NON follow-up status, clear enforcement
       if (
-        value !== "Pending" &&
-        value !== "Monitoring"
+        value !== "Service Pending" &&
+        value !== "Monitoring" &&
+        value !== "Escalated / Elevated"
       ) {
         pendingStatusForModal = null;
         requireFollowUp = false;
@@ -3089,11 +3150,13 @@ function setupRealtimeCases(teamId) {
                 ${[
                     "",
                     "Closed",
-                    "KCI 1",
-                    "KCI 2",
-                    "Pending",
+                    "NCM 1",
+                    "NCM 2",
+                    "Service Pending",
                     "Monitoring",
-                    "Part Allocated"
+                    "Escalated / Elevated",
+                    "Service Arranged",
+                    "Pending Closure"
                   ].map(s => `
                   <div class="custom-option" data-value="${s}">
                     ${s || "&nbsp;"}
@@ -3323,8 +3386,9 @@ function setupRealtimeCases(teamId) {
            );
    
      const needsFollow =
-        effectiveStatus === "Pending" ||
-        effectiveStatus === "Monitoring";
+        effectiveStatus === "Service Pending" ||
+        effectiveStatus === "Monitoring" ||
+        effectiveStatus === "Escalated / Elevated";
    
       if (needsFollow && !follow) {
         btnModalSave.disabled = true;
@@ -3777,8 +3841,9 @@ function setupRealtimeCases(teamId) {
         (
           window.__fromReminder &&
           (
-            effectiveStatus === "Pending" ||
-            effectiveStatus === "Monitoring"
+            effectiveStatus === "Service Pending" ||
+            effectiveStatus === "Monitoring" ||
+            effectiveStatus === "Escalated / Elevated"
           )
         );
       
@@ -3937,12 +4002,14 @@ function setupRealtimeCases(teamId) {
    
      // Other status breakdowns
      const statusBreakdown = {
-        "Pending": 0,
+        "Service Pending": 0,
         "Monitoring": 0,
-        "Part Allocated": 0,
-        "KCI 1": 0,
-        "KCI 2": 0,
-     };
+        "Escalated / Elevated": 0,
+        "Service Arranged": 0,
+        "Pending Closure": 0,
+        "NCM 1": 0,
+        "NCM 2": 0,
+      };
    
      followedUpCases.forEach(r => {
        if (statusBreakdown[r.status] !== undefined) {
@@ -3983,19 +4050,21 @@ function setupRealtimeCases(teamId) {
         --------------------------------------------- */
      infoModalBody.textContent =
       `Total Cases Closed: ${closedCount}
-Met: ${met} (${pct(met)}%)
-Not Met: ${notMet} (${pct(notMet)}%)
+   Met: ${met} (${pct(met)}%)
+   Not Met: ${notMet} (${pct(notMet)}%)
       
-Pending: ${statusBreakdown["Pending"]}
-Monitoring: ${statusBreakdown["Monitoring"]}
-Part Allocated: ${statusBreakdown["Part Allocated"]}
-KCI 1: ${statusBreakdown["KCI 1"]}
-KCI 2: ${statusBreakdown["KCI 2"]}
+   Service Pending: ${statusBreakdown["Service Pending"]}
+   Monitoring: ${statusBreakdown["Monitoring"]}
+   Escalated / Elevated: ${statusBreakdown["Escalated / Elevated"]}
+   Service Arranged: ${statusBreakdown["Service Arranged"]}
+   Pending Closure: ${statusBreakdown["Pending Closure"]}
+   NCM 1: ${statusBreakdown["NCM 1"]}
+   NCM 2: ${statusBreakdown["NCM 2"]}
       
-Total Followed Up Cases: ${totalFollowedUp}
-Total Updated Cases: ${totalUpdated}
+   Total Followed Up Cases: ${totalFollowedUp}
+   Total Updated Cases: ${totalUpdated}
       
-Total Actioned Cases: ${totalActioned}`;
+   Total Actioned Cases: ${totalActioned}`;
    
       // If sidebar is open → close it using the official sidebar close logic
       if (el.sidebar.classList.contains("open")) {
@@ -4340,8 +4409,8 @@ Total Actioned Cases: ${totalActioned}`;
      const resolution = caseData.caseResolutionCode;
    
      const buttons = [
-       "kci1",
-       "kci2",
+       "ncm1",
+       "ncm2",
        "closure",
        "confirmation",
        "unresolved",
@@ -4367,9 +4436,9 @@ Total Actioned Cases: ${totalActioned}`;
        btn.className = "tpl-btn";
    
        const labelMap = {
-         kci1: "KCI 1",
-         kci2: "KCI 2",
-         closure: "KCI Closure",
+         ncm1: "NCM 1",
+         ncm2: "NCM 2",
+         closure: "NCM Closure",
          confirmation: "Confirmation",
          unresolved: "Unresolved",
          resolved: "Resolved",

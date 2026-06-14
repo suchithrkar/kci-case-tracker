@@ -2199,15 +2199,15 @@ function setupRealtimeCases(teamId) {
      setActiveRow(tr);
    });
 
-   /* CASE ID CLICK → DST DETAILS MODAL */
-   tbody.addEventListener("click", (e) => {
+   /* RIGHT CLICK → DST DETAILS MODAL */
+   tbody.addEventListener("contextmenu", (e) => {
    
      const cell = e.target.closest(".caseid");
      if (!cell) return;
    
-     openDSTCaseDetailsModal(
-       cell.dataset.id
-     );
+     e.preventDefault();
+   
+     openDSTCaseDetailsModal(cell.dataset.id);
    
    });
    
@@ -2226,61 +2226,6 @@ function setupRealtimeCases(teamId) {
      const toast = document.getElementById("toast");
      toast.classList.add("show");
      setTimeout(() => toast.classList.remove("show"), 800);
-   });
-   
-   // ✅ RIGHT-CLICK → COPY KCI NOTES
-   tbody.addEventListener("contextmenu", async (e) => {
-   
-     const cell = e.target.closest(".caseid");
-     if (!cell) return;
-   
-     e.preventDefault(); // 🚫 disable default right-click menu
-   
-     try {
-       // 🔍 Get row
-       const caseId = cell.textContent.trim();
-   
-         if (!caseId) {
-           showPopup("Invalid case ID");
-           return;
-         }
-         
-         const caseData = trackerState.allCases.find(
-           c => String(c.id) === String(caseId)
-         );
-         
-         if (!caseData) {
-           showPopup("Unable to fetch case data");
-           return;
-         }
-         
-         // ✅ FIXED TEMPLATE ACCESS
-         const tplDef = templates["kci"];
-         
-         if (!tplDef || typeof tplDef.getTemplate !== "function") {
-           showPopup("Template not available");
-           return;
-         }
-         
-         const template = tplDef.getTemplate(caseData);
-         
-         if (!template || !template.body) {
-           showPopup("Template not available");
-           return;
-         }
-         
-         // ✅ APPLY VARIABLES (IMPORTANT)
-         const notes = applyTemplateVariables(template.body, caseData, "kci");
-         
-         await navigator.clipboard.writeText(notes);
-         
-         showPopup("KCI Notes copied");
-   
-     } catch (err) {
-       console.error(err);
-       showPopup("Failed to copy KCI Notes");
-     }
-   
    });
    
    /* =======================================================================

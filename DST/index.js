@@ -1423,14 +1423,14 @@ function setupRealtimeCases(teamId) {
         </label>
       `;
    
-      // ✅ Email Status New filter
+      /* // ✅ Email Status New filter
       el.statusPanel.innerHTML += `
         <label>
           <input type="checkbox" data-status="EMAIL_NEW"
             ${uiState.statusList.includes("EMAIL_NEW") ? "checked" : ""}/>
           Email Status New
         </label>
-      `;
+      `; */
    
       // ✅ Not Actioned Today filter
       el.statusPanel.innerHTML += `

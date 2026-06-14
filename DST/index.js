@@ -2937,9 +2937,7 @@ function setupRealtimeCases(teamId) {
          `;
          
          displayFields.forEach(item => {
-         
            if (item.separator) {
-         
              html += `
                <tr>
                  <td colspan="${rows.length + 1}"
@@ -2951,7 +2949,6 @@ function setupRealtimeCases(teamId) {
                  </td>
                </tr>
              `;
-         
              return;
            }
          
@@ -2971,16 +2968,10 @@ function setupRealtimeCases(teamId) {
            `;
          
            rows.forEach(r => {
-         
-             let value =
-               r[item.field] ?? "";
+             let value = formatFirestoreDateTime(r[item.field]);
          
              // Ticket URL
-             if (
-               item.field === "ticketUrl" &&
-               value
-             ) {
-         
+             if (item.field === "ticketUrl" && value) {
                value = `
                  <a
                    href="${value}"
@@ -2993,13 +2984,8 @@ function setupRealtimeCases(teamId) {
              }
          
              // Notes History
-             if (
-               item.field === "notesHistory" &&
-               value
-             ) {
-         
-               value = String(value)
-                 .replace(/\n/g, "<br>");
+             if (item.field === "notesHistory" && value) {
+               value = escapeHtml(String(value)).replace(/\n/g, "<br>");
              }
          
              html += `
@@ -3026,10 +3012,8 @@ function setupRealtimeCases(teamId) {
          </table>
          `;
          
-         dstCaseDetailsTable.innerHTML = html;
-         dstCaseDetailsModal.classList.add("show"); 
-   
-     dstCaseDetailsModal.classList.add("show");
+     dstCaseDetailsTable.innerHTML = html;
+     dstCaseDetailsModal.classList.add("show"); 
    }
    
    /* =======================================================================
@@ -3349,6 +3333,42 @@ function setupRealtimeCases(teamId) {
    function formatDMY(iso) {
      const [y, m, d] = iso.split("-");
      return `${d}-${m}-${y}`;
+   }
+
+   function formatFirestoreDateTime(value) {
+     if (!value) return "";
+   
+     // Firestore Timestamp
+     if (
+       typeof value === "object" &&
+       typeof value.toDate === "function"
+     ) {
+   
+       const d = value.toDate();
+   
+       return d.toLocaleString("en-GB", {
+         day: "2-digit",
+         month: "short",
+         year: "numeric",
+         hour: "2-digit",
+         minute: "2-digit"
+       });
+     }
+   
+     // Native JS Date
+     if (value instanceof Date) {
+   
+       return value.toLocaleString("en-GB", {
+         day: "2-digit",
+         month: "2-digit",
+         year: "numeric",
+         hour: "2-digit",
+         minute: "2-digit",
+         second: "2-digit"
+       });
+     }
+   
+     return value;
    }
    
    /* =========================================================

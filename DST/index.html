@@ -511,19 +511,15 @@ tr.empty-state-row.active-row {
   margin-left: 6px;
 }
 
-.due-today{
-  background:rgba(255,209,102,.15)!important;
+.due-today,
+.flagged,
+.has-notes {
+  background: rgba(79, 140, 240, .15) !important;
 }
-/* Due today WITH follow-up time — slightly darker shade */
 .due-today.due-today-time {
-  background: rgba(255, 209, 102, 0.22) !important;
+  background: rgba(79, 140, 240, .22) !important;
 }
-.flagged{
-  background:rgba(255,107,107,.15)!important;
-}
-.has-notes{
-  background:rgba(79,140,240,0.15)!important;
-}
+  
 /* ACTIVE ROW HIGHLIGHT */
 tr.active-row {
   outline: 2px solid rgba(79,140,240,0.55);

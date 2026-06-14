@@ -2827,67 +2827,207 @@ function setupRealtimeCases(teamId) {
    
      dstCaseDetailsTitle.textContent = `DST Case Details — ${caseId}`;
    
-     const fields = Object.keys(rows[0]);
-   
+     const displayFields = [
+        // SECTION 1
+        {
+          label: "Case ID",
+          field: "caseIdMaterialOrder"
+        },{
+          label: "Country",
+          field: "countryMaterialOrder"
+        },{
+          label: "Product Name",
+          field: "productName"
+        },
+        { separator: true },
+      
+        // SECTION 2
+        {
+          label: "3W Ticket Number",
+          field: "ticketNumber"
+        },{
+          label: "Ticket Created On",
+          field: "createdOn"
+        },{
+          label: "Ticket Status",
+          field: "ticketStatus"
+        },{
+          label: "Last Status Change On",
+          field: "latest3WStatusChangeDateTime"
+        },{
+          label: "Ticket Url",
+          field: "ticketUrl"
+        },{
+          label: "Created By",
+          field: "createdBy"
+        },{
+          label: "3W Ticket Owner",
+          field: "ticketOwner3W"
+        },{
+          label: "Notes History",
+          field: "notesHistory"
+        },{
+          label: "Last Notes Update On",
+          field: "latestNotesUpdateDateTime"
+        },
+        { separator: true },
+      
+        // SECTION 3
+        {
+          label: "Work Order",
+          field: "workOrder"
+        },{
+          label: "Material Order",
+          field: "materialOrder"
+        },{
+          label: "MO Created On",
+          field: "materialOrderCreatedOn"
+        },{
+          label: "MO Order Type",
+          field: "orderType"
+        },{
+          label: "MO Status",
+          field: "materialOrderStatus"
+        },{
+          label: "MO Owner",
+          field: "owner"
+        },{
+          label: "MO Order Status",
+          field: "orderStatus"
+        },
+        { separator: true },
+      
+        // SECTION 4
+        {
+          label: "MO Line Item",
+          field: "materialOrderLineItem"
+        },{
+          label: "Status Reason",
+          field: "lineItemStatusReason"
+        },{
+          label: "ATP Status",
+          field: "atpStatus"
+        },{
+          label: "Sales Order Number",
+          field: "salesOrderNumber"
+        },{
+          label: "Is Escalated",
+          field: "isEscalated"
+        }
+      ];
+
      let html = `
-       <table style="
-         width:100%;
-         border-collapse:collapse;
-         white-space:nowrap;
-       ">
+         <table style="
+           width:100%;
+           border-collapse:collapse;
+         ">
          <thead>
-           <tr>
-             <th>Field Name</th>
-     `;
-   
-     rows.forEach((r, index) => {
-       html += `<th>Row ${index + 1}</th>`;
-     });
-   
-     html += `
-           </tr>
+         <tr>
+         <th>Field</th>
+         `;
+         
+         rows.forEach((r, index) => {
+           html += `<th>Row ${index + 1}</th>`;
+         });
+         
+         html += `
+         </tr>
          </thead>
          <tbody>
-     `;
-   
-     fields.forEach(field => {
-   
-       html += `
-         <tr>
-           <td><strong>${escapeHtml(field)}</strong></td>
-       `;
-   
-       rows.forEach(row => {
-   
-         let value = row[field];
-   
-         if (
-           value === null ||
-           value === undefined
-         ) {
-           value = "";
-         }
-   
-         if (typeof value === "object") {
-           value = JSON.stringify(value);
-         }
-   
-         html += `
-           <td>${escapeHtml(value)}</td>
          `;
-       });
-   
-       html += `
-         </tr>
-       `;
-     });
-   
-     html += `
+         
+         displayFields.forEach(item => {
+         
+           if (item.separator) {
+         
+             html += `
+               <tr>
+                 <td colspan="${rows.length + 1}"
+                     style="
+                       height:14px;
+                       border:none;
+                       background:transparent;
+                     ">
+                 </td>
+               </tr>
+             `;
+         
+             return;
+           }
+         
+           html += `
+             <tr>
+               <td
+                 style="
+                   font-weight:600;
+                   text-align:left;
+                   vertical-align:top;
+                   padding:8px;
+                   border:1px solid var(--border);
+                 "
+               >
+                 ${item.label}
+               </td>
+           `;
+         
+           rows.forEach(r => {
+         
+             let value =
+               r[item.field] ?? "";
+         
+             // Ticket URL
+             if (
+               item.field === "ticketUrl" &&
+               value
+             ) {
+         
+               value = `
+                 <a
+                   href="${value}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                 >
+                   Open Ticket
+                 </a>
+               `;
+             }
+         
+             // Notes History
+             if (
+               item.field === "notesHistory" &&
+               value
+             ) {
+         
+               value = String(value)
+                 .replace(/\n/g, "<br>");
+             }
+         
+             html += `
+               <td
+                 style="
+                   text-align:left;
+                   vertical-align:top;
+                   padding:8px;
+                   border:1px solid var(--border);
+                   white-space:normal;
+                   word-break:break-word;
+                 "
+               >
+                 ${value}
+               </td>
+             `;
+           });
+         
+           html += `</tr>`;
+         });
+         
+         html += `
          </tbody>
-       </table>
-     `;
-   
-     dstCaseDetailsTable.innerHTML = html;
+         </table>
+         `;
+         
+         dstCaseDetailsTable.innerHTML = html;
+         dstCaseDetailsModal.classList.add("show"); 
    
      dstCaseDetailsModal.classList.add("show");
    }

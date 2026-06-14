@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>KCI Case Tracker</title>
 
-<link rel="icon" type="image/x-icon" href="img/favicon.ico" />
+<link rel="icon" type="image/x-icon" href="../img/favicon.ico" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <style>
@@ -41,9 +41,9 @@
   --upload-btn-hover: rgba(79,140,240,0.18);
 }
 
-/* =======================================================
+/* ======================================================
    THEME VARIABLES — CUSTOM SELECT
-   ======================================================= */
+   ====================================================== */
 
 :root[data-theme="dark"] {
   --select-bg: #1A1F2B;
@@ -489,6 +489,28 @@ tr.empty-state-row.active-row {
   min-width:140px;
 }
 
+.caseid-wrapper {
+  position: relative;
+  display: inline-block;
+  padding-right: 14px;
+}
+
+.caseid-badge {
+  position: absolute;
+  top: -8px;
+  right: -2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: rgba(59,130,246,.15);
+  border: 1px solid rgba(59,130,246,.35);
+  color: #cbd5e1;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
 .due-today{
   background:rgba(255,209,102,.15)!important;
 }
@@ -525,7 +547,7 @@ tr.active-row {
 
   background:rgba(0,0,0,.55);
   z-index:60;
-}
+}  
 .modal.show{display:flex}
 .modal-card{
   width:min(560px,94vw);
@@ -534,14 +556,26 @@ tr.active-row {
   border-radius:16px;
   box-shadow:var(--shadow);
 }
-#modal .modal-card{
+/*#modal .modal-card{
   width:auto;
   max-width:none;
+}*/
+#modal .modal-card{
+  width:min(600px,94vw);
 }
 #modal textarea.notes,
 #emailPreviewModal textarea.notes{
   width:100%;
 }
+.action-btn{
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  cursor:pointer;
+  margin-right:0.35rem;
+}
+.action-btn:hover{
+  filter:brightness(1.08);
+}  
 .textarea-wrap{
   position:relative;
 }
@@ -690,6 +724,10 @@ tr.active-row {
    ========================================================= */
 
 .template-toolbar {
+  display: none !important;
+}
+  
+.template-toolbar {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -714,6 +752,33 @@ tr.active-row {
 /* ============================================
    Upload Excel Button (theme-consistent)
    ============================================ */
+#modalUpdateData {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+#modalUpdateData.show {
+  display: flex;
+}
+#modalUpdateData .modal-body {
+  padding: 1rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: visible;
+  position: relative;
+}
+#modalUpdateData > .modal-card {
+  width: min(600px, 92vw);
+  background: var(--panel);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: visible;
+}
 .tpl-btn.upload-btn {
   background: var(--email-copy-btn);
   border: none;
@@ -857,6 +922,129 @@ tr.active-row {
   font-weight: 600;
 }
 
+/* =========================================================
+   DST CASE DETAILS MODAL
+   ========================================================= */
+
+#dstCaseDetailsModal .modal-card{
+  width:auto;
+  max-width:1040px; /* 200 + 400 + 400 + borders */
+}
+
+#dstCaseDetailsModal .modal-body{
+  overflow:auto;
+}
+
+#dstCaseDetailsModal table{
+  font-size:12px;
+  border-collapse:collapse;
+  width:auto;
+}
+
+#dstCaseDetailsModal th,
+#dstCaseDetailsModal td{
+  padding:5px;
+  white-space:nowrap;
+
+  border:1px solid var(--border);
+}
+
+#dstCaseDetailsModal .dst-summary-table{
+  width:100%;
+}
+
+#dstCaseDetailsModal .dst-summary-card{
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  padding: 8px;
+  margin-bottom:14px;
+}
+
+#dstCaseDetailsModal .dst-summary-table td{
+  border:none !important;
+  text-align:left;
+}
+
+#dstCaseDetailsModal .dst-table-scroll{
+  max-width:1001.6px;
+  max-height:400px;
+
+  overflow:auto;
+
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+
+#dstCaseDetailsModal .dst-label-col{
+  width:200px;
+  min-width:200px;
+  max-width:200px;
+
+  background:var(--panel-2);
+  font-weight:600;
+
+  position:sticky;
+  left:0;
+  z-index:3;
+}
+
+#dstCaseDetailsModal .dst-row-col{
+  width:400px;
+  min-width:400px;
+}
+
+#dstCaseDetailsModal .dst-ticket-link{
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+#dstCaseDetailsModal .dst-ticket-link:hover{
+  text-decoration: underline;
+}
+
+#dstCaseDetailsModal thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+
+  background:var(--panel-2);
+}
+
+#dstCaseDetailsModal thead .dst-label-col{
+  position:sticky;
+  top:0;
+  left:0;
+
+  z-index:5;
+
+  background:var(--panel-2);
+}
+
+/* remove outer edge borders */
+#dstCaseDetailsModal tr:first-child th{
+  border-top:none !important;
+}
+
+#dstCaseDetailsModal th:first-child,
+#dstCaseDetailsModal td:first-child{
+  border-left:none !important;
+}
+
+#dstCaseDetailsModal th:last-child,
+#dstCaseDetailsModal td:last-child{
+  border-right:none !important;
+}
+
+#dstCaseDetailsModal tbody tr:last-child td{
+  border-bottom:none !important;
+}
+
+#dstCaseDetailsModal .dst-summary-table tr:hover{
+  background: transparent !important;
+}
+
 /* Toast */
 .toast{
   position:fixed;bottom:20px;right:20px;
@@ -995,7 +1183,8 @@ tr.active-row {
 }
 
 /* Report button */
-.rfc-summary-strip-btn {
+.rfc-summary-strip-btn,
+.rfcClearBtn{
   border: 1px solid var(--border);
   background: var(--panel-2);
   border-radius: 8px;
@@ -1004,8 +1193,23 @@ tr.active-row {
   cursor: pointer;
 }
 
-.rfc-summary-strip-btn:hover {
+.rfc-summary-strip-btn:hover,
+.rfcClearBtn:hover{
   filter: brightness(1.1);
+}
+
+.rfc-summary-strip-actions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+
+  margin-left: auto;
+}
+
+.rfc-lock {
+  cursor: pointer;
+  padding: 4px 6px;
+  user-select: none;
 }
 
 
@@ -1203,11 +1407,6 @@ tr.active-row {
   grid-template-columns: 140px 1fr;
   align-items: center;
   gap: .6rem;
-}
-
-/* Force-hide PNS block even inside closure modal grid */
-#closureModal #pnsResolutionBlock.hidden-force {
-  display: none !important;
 }
 
 /* Comment row needs top alignment */
@@ -1552,6 +1751,81 @@ tr.active-row {
 .time-dropdown div:hover {
   background: var(--option-hover);
 }
+
+/* ============================================================
+   PREVIEW MODAL + PROGRESS UI
+   ============================================================ */
+
+#excelProgress {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  white-space: pre-line;
+}
+
+#previewCounts strong {
+  font-size: 16px;
+}
+
+#deleteCheckboxWrap input {
+  transform: scale(1.2);
+}
+
+.modal-btn {
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  cursor:pointer;
+}
+
+.modal-btn:hover{
+  filter:brightness(1.08);
+}
+
+.action-btn,
+.hdr-btn,
+.modal-btn {
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}  
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: .6rem;
+}
+
+/* Custom file input button */
+.file-input-label {
+  padding: .55rem 1rem;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--text);
+}
+
+.file-input-label:hover {
+  filter: brightness(1.08);
+}
+
+/* Hide actual input */
+.file-input-label input[type="file"] {
+  display: none;
+}
+
+.btn-boxed {
+  border-radius: 10px;
+}
+
+
   
 </style>
 </head>
@@ -1574,6 +1848,9 @@ tr.active-row {
 
   <!-- ADMIN DASHBOARD -->
   <button class="hdr-btn" id="btnAdmin" style="display:none;">Admin Dashboard</button>
+
+  <!-- UPDATE DATA -->
+  <button class="hdr-btn" id="btnUpdateData" style="display:none;">Update Data</button>
   
   <!-- REPORTS -->
   <button class="hdr-btn" id="btnReports" style="display:none;">Reports</button>
@@ -1622,17 +1899,6 @@ tr.active-row {
         <span class="tooltip">Flagged Cases</span>
       </button>
   
-      <button class="icon-btn" id="btnPNS">
-        <span>📌</span>
-        <span class="badge" id="badgePNS">0</span>
-        <span class="tooltip">PNS Marked Cases</span>
-      </button>
-
-      <button class="icon-btn" id="btnRepeating">
-        <span>👥</span>
-        <span class="tooltip">Repeating Customers</span>
-      </button>
-  
       <button class="icon-btn" id="btnSortDate">
         <span id="sortClock">🕑</span>
         <span class="badge" id="sortArrow" style="display:none;"></span>
@@ -1651,12 +1917,12 @@ tr.active-row {
 <div class="overlay" id="overlay"></div>
 <aside class="sidebar" id="sidebar">
   <div class="side-head">
-  <div class="side-title">Case Workspace</div>
-  <div class="side-actions">
-    <button id="btnSideApply" class="btn small">Apply</button>
-    <button id="btnSideClose" class="btn small">Close</button>
+    <div class="side-title">Case Workspace</div>
+    <div class="side-actions">
+      <button id="btnSideApply" class="btn small">Apply</button>
+      <button id="btnSideClose" class="btn small">Close</button>
+    </div>
   </div>
-</div>
 
   <div class="side">
 
@@ -1664,51 +1930,16 @@ tr.active-row {
     <div class="rfc-summary-strip">
     
       <div class="rfc-summary-strip-text">
-        Total Open Repair Cases:
+        Total Cases:
         <span id="rfcTotalCount">—</span>
       </div>
     
-      <button id="rfcReportBtn" class="rfc-summary-strip-btn">
-        Report
-      </button>
+      <div class="rfc-summary-strip-actions">
+        <span id="rfcLock" class="rfc-lock">🔓</span>
+        <button id="rfcClear" class="rfcClearBtn">Clear All</button>
+        <button id="rfcReportBtn" class="rfc-summary-strip-btn">Report</button>
+      </div>
     
-    </div>
-
-    <!-- READY FOR CLOSURE FILTER BLOCK -->
-    <div class="filter" style="margin-bottom:1.2rem;">
-        <div class="filter-head" style="background:var(--panel-2); cursor:default; align-items:center;">
-    <div style="font-weight:600; padding-top:2px;">Ready for Closure</div>
-
-    <div style="display:flex; gap:.5rem; align-items:center; padding-top:2px;">
-                <!-- Order: Lock (icon-only text) | Clear All (small button) -->
-<span id="rfcLock" style="
-    cursor:pointer;
-    padding:4px 6px;
-    user-select:none;
-">🔓</span>
-
-<button id="rfcClear" class="rfcClearBtn"
-    style="padding:.25rem .6rem;font-size:12px;border-radius:8px;">
-    Clear All
-</button>
-
-            </div>
-        </div>
-
-        <div class="filter-body open" style="max-height:none; padding:1rem; display:flex; flex-direction:column; gap:.6rem;">       
-          <!-- RFC SEGMENTED CONTROL -->
-          <div class="rfc-segmented">
-            <button class="rfcBtn rfcMainBtn" data-type="onsite">Onsite</button>
-            <button class="rfcBtn rfcMainBtn" data-type="offsite">Offsite</button>
-            <button class="rfcBtn rfcMainBtn" data-type="csr">CSR</button>
-            <button class="rfcBtn rfcMainBtn" data-type="total">Total</button>
-            <button class="rfcBtn rfcMainBtn" data-type="negative" id="rfcNegativeBtn">
-              Overdue
-            </button>
-          </div>
-          
-        </div>
-
     </div>
 
     <div id="filtersContainer"></div>
@@ -1723,13 +1954,13 @@ tr.active-row {
     <thead>
       <tr>
         <th class="sno">S.No</th>
-        <th>Case Id</th>
-        <th>Customer Name</th>
+        <th>Case ID</th>
         <th>Country</th>
-        <th>Case Resolution Code</th>
-        <th>Case Owner</th>
-        <th>CA Group</th>
-        <th>SBD</th>
+        <th>Material Order</th>
+        <th>Order Status</th>
+        <th>ATP Status</th>
+        <th>ETA</th>
+        <th>Ticket Status</th>
         <th>Status</th>
         <th class="right" style="text-align:left">Action</th>
       </tr>
@@ -1796,13 +2027,6 @@ tr.active-row {
           <div style="display:flex;align-items:center;gap:6px;">
             <span>Flag</span>
             <div id="optFlag" class="switch"
-                 role="switch" aria-checked="false" tabindex="0"></div>
-          </div>
-      
-          <!-- PNS -->
-          <div style="display:flex;align-items:center;gap:6px;margin-left:22px;">
-            <span>PNS</span>
-            <div id="optPNS" class="switch"
                  role="switch" aria-checked="false" tabindex="0"></div>
           </div>
 
@@ -2019,6 +2243,7 @@ tr.active-row {
 <div class="toast" id="toast">Copied!</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   
 <!-- MAIN TRACKER LOGIC (WILL BE SECTION 2 + SECTION 3) -->
 <script type="module" src="./index.js?v=9"></script>
@@ -2038,6 +2263,29 @@ tr.active-row {
        pointer-events: none;
        box-shadow: var(--shadow);
      ">
+</div>
+
+<!-- =========================================================
+     DST CASE DETAILS MODAL
+     ========================================================= -->
+<div class="modal" id="dstCaseDetailsModal">
+  <div class="modal-card" style="max-height:90vh;">
+    
+    <div class="modal-head">
+      <div class="modal-title" id="dstCaseDetailsTitle">
+        DST Case Details
+      </div>
+
+      <button class="btn" id="btnDSTCaseDetailsClose">
+        Close
+      </button>
+    </div>
+
+    <div class="modal-body" style=" overflow:auto; max-height:75vh;">
+      <div id="dstCaseDetailsTable"></div>
+    </div>
+
+  </div>
 </div>
 
 <!-- FOLLOW-UP REMINDER MODAL (PHASE 3A) -->
@@ -2067,66 +2315,103 @@ tr.active-row {
   </div>
 </div>
 
-
-<div class="modal" id="closureModal">
+<!-- ============================================================
+     UPDATE DATA MODAL (EXCEL UPLOAD PER TEAM)
+     ============================================================ -->
+<div class="modal" id="modalUpdateData">
   <div class="modal-card">
-  <div class="modal-head">
-    <div class="modal-title" id="closureModalTitle">
-      Case Closure Survey
+    <div class="modal-head">
+      <div class="modal-title">Update Case Data</div>
+      <button class="modal-btn btn" id="btnUpdateClose">Close</button>
     </div>
-    <button class="btn" id="btnClosureClose">Close</button>
-  </div>
 
-    <div class="modal-body" style="gap:1rem;">
+    <div class="modal-body">
 
-      <!-- PNS Resolution (conditional) -->
-      <div class="row hidden-force" id="pnsResolutionBlock">
-        <div>PNS Resolution</div>
+      <p>Select a team to upload data for:</p>
+      <div id="updateTeamList"></div>
+
+      <hr style="margin:1rem 0;border-color:var(--border);">
+
+      <h3>Data Upload (XLSX)</h3>
+
+      <!-- Upload Row -->
+      <div class="upload-row">
       
-        <div>
-          <div style="font-size:13px; margin-bottom:.45rem;">
-            As PNS was marked for this case, is the issue resolved?
-          </div>
+        <!-- Custom File Selector -->
+        <label class="file-input-label">
+          <span>📄 Choose File</span>
+          <input type="file" id="excelInput" accept=".xlsx,.xls">
+        </label>
       
-          <div style="display:flex; gap:16px;">
-            <label>
-              <input type="radio" name="pnsResolved" value="yes">
-              Yes
-            </label>
+        <!-- Selected file name -->
+        <div id="selectedFileName" style="opacity:0.8; font-size:13px;">No file selected</div>
       
-            <label>
-              <input type="radio" name="pnsResolved" value="no">
-              No
-            </label>
-          </div>
-        </div>
+        <!-- PREVIEW CHANGES button -->
+        <button class="modal-btn btn-boxed" id="btnPreviewChanges" style="padding: 0.55rem 1rem;border-radius: 999px;font-size: 13px;" disabled>
+          PREVIEW CHANGES
+        </button>
+      
       </div>
-
-      <!-- Survey -->
-      <div class="row">
-        <div>Survey Prediction</div>
-        <div id="starRating" class="star-rating">
-          <span data-star="1">★</span>
-          <span data-star="2">★</span>
-          <span data-star="3">★</span>
-          <span data-star="4">★</span>
-          <span data-star="5">★</span>
-        </div>
+      
+      <!-- Summary Area -->
+      <div id="uploadSummary" style="margin-top:1rem;">
+        <strong>Selected Team:</strong> -
       </div>
-
-      <!-- Comment -->
-      <div class="row" style="align-items:start;">
-        <div>Comment</div>
-        <textarea id="predictionComment"
-          class="notes"
-          placeholder="Please enter your comment on the sample prediction provided..">
-        </textarea>
+      
+      <!-- Progress Area (hidden until needed) -->
+      <div id="excelProgress" style="margin-top:1rem; display:none; font-size:14px; line-height:1.5;"></div>
+      
+             <!-- Preview Results (hidden until PREVIEW CHANGES is clicked) -->
+      <div id="previewSection" style="display:none; margin-top:1.5rem;">
+      
+        <h3>Preview Changes</h3>
+      
+        <div id="previewCounts" style="font-size:15px; line-height:1.7; margin-top:0.5rem;">
+          <!-- filled by JS -->
+        </div>
+      
+        <!-- Deletion Checkbox -->
+        <div id="deleteCheckboxWrap" style="margin-top:1rem; display:none;">
+          <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer;">
+            <input type="checkbox" id="allowDeletion">
+            <span>Allow deletion of missing cases</span>
+          </label>
+        </div>
+      
+         <!-- Daily Report Update Option -->
+         <div id="dailyReportWrap" style="margin-top:1rem;">
+           <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer;">
+             <input type="checkbox" id="updateDailyReport">
+             <span>Update daily repair report data</span>
+           </label>
+         </div>
+      
+         <!-- Import-only option -->
+         <div id="overwriteWrap" style="margin-top:1rem; display:none;">
+           <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+             <input type="checkbox" id="overwriteUserActions">
+             <span>
+               Overwrite user action fields
+               <br>
+               <small style="opacity:.7;">
+                 (status, notes, follow-ups, PNS, survey, timestamps)
+               </small>
+             </span>
+           </label>
+         </div>
+      
+        <!-- Preview Buttons -->
+        <div style="margin-top:1rem; display:flex; gap:0.6rem;">
+          <button class="modal-btn btn-boxed" id="btnConfirmImport" disabled>Confirm Update</button>
+          <button class="modal-btn" id="btnPreviewCancel">Cancel Preview</button>
+        </div>
+      
       </div>
 
     </div>
 
     <div class="modal-foot">
-      <button class="btn" id="btnClosureSubmit">Submit</button>
+      <button class="modal-btn btn" id="btnUpdateDone">Done</button>
     </div>
   </div>
 </div>

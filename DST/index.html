@@ -922,6 +922,50 @@ tr.active-row {
   font-weight: 600;
 }
 
+/* =========================================================
+   DST CASE DETAILS MODAL
+   ========================================================= */
+
+#dstCaseDetailsModal .modal-card{
+  width:auto;
+  max-width:1040px; /* 200 + 400 + 400 + borders */
+}
+
+#dstCaseDetailsModal .modal-body{
+  overflow:auto;
+}
+
+#dstCaseDetailsModal table{
+  font-size:12px;
+  border-collapse:collapse;
+  width:auto;
+}
+
+#dstCaseDetailsModal th,
+#dstCaseDetailsModal td{
+  padding:5px;
+  white-space:nowrap;
+}
+
+#dstCaseDetailsModal .dst-summary-table{
+  width:100%;
+}
+
+#dstCaseDetailsModal .dst-table-scroll{
+  overflow-x:auto;
+}
+
+#dstCaseDetailsModal .dst-label-col{
+  width:200px;
+  min-width:200px;
+  max-width:200px;
+}
+
+#dstCaseDetailsModal .dst-row-col{
+  width:400px;
+  min-width:400px;
+}
+
 /* Toast */
 .toast{
   position:fixed;bottom:20px;right:20px;
@@ -2146,7 +2190,7 @@ tr.active-row {
      DST CASE DETAILS MODAL
      ========================================================= -->
 <div class="modal" id="dstCaseDetailsModal">
-  <div class="modal-card" style=" width:min(1400px,96vw); max-height:90vh;">
+  <div class="modal-card" style="max-height:90vh;">
     
     <div class="modal-head">
       <div class="modal-title" id="dstCaseDetailsTitle">

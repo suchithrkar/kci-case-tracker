@@ -967,7 +967,7 @@ tr.active-row {
 }
 
 #dstCaseDetailsModal .dst-table-scroll{
-  max-width:1000px;
+  max-width:1001.6px;
   max-height:400px;
 
   overflow:auto;
@@ -980,6 +980,13 @@ tr.active-row {
   width:200px;
   min-width:200px;
   max-width:200px;
+
+  background:var(--panel-2);
+  font-weight:600;
+
+  position:sticky;
+  left:0;
+  z-index:3;
 }
 
 #dstCaseDetailsModal .dst-row-col{
@@ -995,23 +1002,27 @@ tr.active-row {
   background:var(--panel-2);
 }
 
+#dstCaseDetailsModal thead .dst-label-col{
+  z-index:4;
+}
+
 /* remove outer edge borders */
 #dstCaseDetailsModal tr:first-child th{
-  border-top:none;
+  border-top:none !important;
 }
 
 #dstCaseDetailsModal th:first-child,
 #dstCaseDetailsModal td:first-child{
-  border-left:none;
+  border-left:none !important;
 }
 
 #dstCaseDetailsModal th:last-child,
 #dstCaseDetailsModal td:last-child{
-  border-right:none;
+  border-right:none !important;
 }
 
 #dstCaseDetailsModal tbody tr:last-child td{
-  border-bottom:none;
+  border-bottom:none !important;
 }
 
 /* Toast */

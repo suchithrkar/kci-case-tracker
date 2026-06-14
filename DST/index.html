@@ -510,6 +510,13 @@ tr.empty-state-row.active-row {
   font-weight: 600;
   margin-left: 6px;
 }
+  
+/* ROW HIGHLIGHT */
+tr.active-row {
+  outline: 2px solid rgba(79,140,240,0.55);
+  outline-offset: -2px;
+  background: rgba(79,140,240,0.08) !important;
+}
 
 .due-today,
 .flagged,
@@ -519,12 +526,17 @@ tr.empty-state-row.active-row {
 .due-today.due-today-time {
   background: rgba(79, 140, 240, .22) !important;
 }
-  
-/* ACTIVE ROW HIGHLIGHT */
-tr.active-row {
-  outline: 2px solid rgba(79,140,240,0.55);
-  outline-offset: -2px;
-  background: rgba(79,140,240,0.08) !important;
+
+.eta-missed{
+  background:rgba(255,107,107,.15)!important;
+}
+
+.can-be-used{
+  background:rgba(255,209,102,.15)!important;
+}
+
+.part-allocated{
+  background:rgba(56,217,169,.15)!important;
 }
 
 

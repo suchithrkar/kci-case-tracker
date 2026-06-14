@@ -2981,6 +2981,23 @@ function setupRealtimeCases(teamId) {
             `;
             
             displayFields.forEach(item => {
+               
+              /* Hide Work Order row if all rows are blank */
+              if (item.field === "workOrder") {
+               
+                const hasWorkOrder = rows.some(r => {
+                  const value = String(
+                    r.workOrder ?? ""
+                  ).trim();
+               
+                  return value !== "";
+                });
+               
+                if (!hasWorkOrder) {
+                  return;
+                }
+              } 
+               
               if (item.separator) {
                 html += `
                   <tr>
@@ -3014,6 +3031,13 @@ function setupRealtimeCases(teamId) {
             
               rows.forEach(r => {
                 let value = formatFirestoreDateTime(r[item.field]);
+
+                /* Material Order: Show only MO number */
+                if (item.field === "materialOrder" && value) {
+                  value = String(value)
+                    .split(" for WO-")[0]
+                    .trim();
+                } 
             
                 // Ticket URL
                 if (item.field === "ticketUrl" && value) {

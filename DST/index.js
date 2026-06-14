@@ -2826,22 +2826,10 @@ function setupRealtimeCases(teamId) {
      }
    
      dstCaseDetailsTitle.textContent = `DST Case Details — ${caseId}`;
+     const firstRow = rows[0] || {}; 
    
      const displayFields = [
         // SECTION 1
-        {
-          label: "Case ID",
-          field: "caseIdMaterialOrder"
-        },{
-          label: "Country",
-          field: "countryMaterialOrder"
-        },{
-          label: "Product Name",
-          field: "productName"
-        },
-        { separator: true },
-      
-        // SECTION 2
         {
           label: "3W Ticket Number",
           field: "ticketNumber"
@@ -2872,7 +2860,7 @@ function setupRealtimeCases(teamId) {
         },
         { separator: true },
       
-        // SECTION 3
+        // SECTION 2
         {
           label: "Work Order",
           field: "workOrder"
@@ -2897,7 +2885,7 @@ function setupRealtimeCases(teamId) {
         },
         { separator: true },
       
-        // SECTION 4
+        // SECTION 3
         {
           label: "MO Line Item",
           field: "materialOrderLineItem"
@@ -2917,14 +2905,80 @@ function setupRealtimeCases(teamId) {
       ];
 
      let html = `
-         <table style="
-           width:100%;
-           border-collapse:collapse;
-         ">
-         <thead>
-         <tr>
-         <th>Field</th>
-         `;
+      <div style="
+        margin-bottom:16px;
+        padding:12px;
+        border:1px solid var(--border);
+        border-radius:10px;
+      ">
+      
+        <table style="
+          width:100%;
+          border-collapse:collapse;
+        ">
+      
+          <tbody>
+      
+            <tr>
+              <td style="
+                font-weight:600;
+                width:180px;
+                padding:6px;
+              ">
+                Case ID
+              </td>
+      
+              <td style="padding:6px;">
+                ${escapeHtml(
+                  firstRow.caseIdMaterialOrder || ""
+                )}
+              </td>
+            </tr>
+      
+            <tr>
+              <td style="
+                font-weight:600;
+                padding:6px;
+              ">
+                Country
+              </td>
+      
+              <td style="padding:6px;">
+                ${escapeHtml(
+                  firstRow.countryMaterialOrder || ""
+                )}
+              </td>
+            </tr>
+      
+            <tr>
+              <td style="
+                font-weight:600;
+                padding:6px;
+              ">
+                Product Name
+              </td>
+      
+              <td style="padding:6px;">
+                ${escapeHtml(
+                  firstRow.productName || ""
+                )}
+              </td>
+            </tr>
+      
+          </tbody>
+      
+        </table>
+      
+      </div>
+      
+      <table style="
+        width:100%;
+        border-collapse:collapse;
+      ">
+      <thead>
+      <tr>
+      <th>Field</th>
+      `;
          
          rows.forEach((r, index) => {
            html += `<th>Row ${index + 1}</th>`;

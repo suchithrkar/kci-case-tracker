@@ -4007,8 +4007,6 @@ function setupRealtimeCases(teamId) {
         --------------------------------------------- */
      infoModalBody.textContent =
       `Total Cases Closed: ${closedCount}
-Met: ${met} (${pct(met)}%)
-Not Met: ${notMet} (${pct(notMet)}%)
       
 Pending: ${statusBreakdown["Pending"]}
 Monitoring: ${statusBreakdown["Monitoring"]}

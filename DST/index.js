@@ -2934,7 +2934,7 @@ function setupRealtimeCases(teamId) {
          `;
             
             rows.forEach((r, index) => {
-              html += `<th>Row ${index + 1}</th>`;
+              html += `<th>Ticket ${index + 1}</th>`;
             });
             
             html += `

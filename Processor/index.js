@@ -1,4 +1,9 @@
 import {
+    auth,
+    onAuthStateChanged
+} from "../js/firebase.js";
+
+import {
     watchAuth,
     logout
 } from "../js/auth.js";
@@ -17,6 +22,9 @@ watchAuth((user) => {
 
     // Continue loading Processor...
 });
+
+const el = { userFullName: document.getElementById("userFullName") };
+export const trackerState = { user: null };
 
 let kciFile = null;
 let csoFile = null;
@@ -199,6 +207,22 @@ const TABLE_SCHEMAS = {
     "Team"
   ]
 };
+
+onAuthStateChanged(auth, async (user) => {
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    if (!userSnap.exists()) return (location.href = "../login.html");
+
+    if (
+      data.role !== "primary" &&
+      data.groupId !== "Processor"
+    ) {
+      location.href = "../index.html";
+      return;
+    }
+    
+    const data = userSnap.data();
+    el.userFullName.textContent = `${data.firstName} ${data.lastName}`;
+});
 
 function resetInlineTeamAdd() {
   if (isAddingTeamInline) {
@@ -4302,6 +4326,15 @@ function completeImportOverlay(message = "Import Complete") {
     overlay.style.display = "none";
   };
 }
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+
+    if (!confirm("Are you sure you want to log out?")) {
+        return;
+    }
+
+    await logout();
+});
 
 // ===============================
 // EXPORT BACKUP

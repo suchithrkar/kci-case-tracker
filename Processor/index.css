@@ -1599,7 +1599,6 @@ table.dataTable th {
 
 .team-selector {
   position: relative;
-  margin-left: auto;          /* push to right in header */
 }
 
 /* Reuse agent toggle style */
@@ -1801,6 +1800,20 @@ header .team-selector .cc-agent-toggle {
 
 .team-confirm-inline:hover span {
   color: #1b5e20;
+}
+
+/* ===== USER NAME ===== */
+
+.user-name {
+  margin-left: auto;      /* Pushes this element to the right */
+  text-align: right;
+
+  font-weight: 600;
+  font-size: 14px;
+
+  padding: 0 .75rem;
+
+  white-space: nowrap;
 }
 
 

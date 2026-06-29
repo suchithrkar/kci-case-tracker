@@ -570,8 +570,11 @@ function initEmptyTables() {
   tabsDiv.appendChild(leftTabsDiv);
   tabsDiv.appendChild(rightTabsDiv);
 
-  const downloadActiveSheetBtn = document.getElementById("downloadActiveSheetBtn");  
-  rightTabsDiv.appendChild(downloadActiveSheetBtn);  
+  const downloadActiveSheetBtn = document.createElement("button"); 
+  downloadActiveSheetBtn.id = "downloadActiveSheetBtn";
+  downloadActiveSheetBtn.title = "Download Active Sheet";
+  downloadActiveSheetBtn.textContent = "⭳";
+  downloadActiveSheetBtn.addEventListener("click", downloadActiveSheet);
 
   let first = true;
 
@@ -678,9 +681,14 @@ function initEmptyTables() {
     
     // Right-aligned tabs
     if (sheetName === "Repair Cases" || sheetName === "Closed Cases Data") {
-      rightTabsDiv.appendChild(tab);
+        rightTabsDiv.appendChild(tab);
+    
+        // Add download button immediately after the last right-side tab
+        if (sheetName === "Closed Cases Data") {
+            rightTabsDiv.appendChild(downloadActiveSheetBtn);
+        }
     } else {
-      leftTabsDiv.appendChild(tab);
+        leftTabsDiv.appendChild(tab);
     }
 
     first = false;
@@ -4259,9 +4267,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 document.getElementById("downloadUploadExcelBtn")
   .addEventListener("click", downloadUploadExcel);
-
-document.getElementById("downloadActiveSheetBtn")
-  .addEventListener("click", downloadActiveSheet);
 
 document.getElementById("workgroupBtn").onclick = async () => {
   if (!requireTeamSelected()) return;

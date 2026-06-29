@@ -191,7 +191,7 @@ header {
 }
 
 .icon-tooltip-download-active::after {
-  content: attr(data-tooltip);
+  content: attr(data);
   position: absolute;
   /*bottom: calc(100% + 8px);*/
   top: 30px;

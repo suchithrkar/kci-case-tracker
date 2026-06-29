@@ -194,8 +194,8 @@ header {
   content: attr(data-tooltip);
   position: absolute;
   /*bottom: calc(100% + 8px);*/
-  top: 30px;
-  left: 40.5px;
+  top: 46px;
+  left: -47px;
   transform: translateX(-50%) translateY(4px);
   background: #151923;
   color: #ffffff;

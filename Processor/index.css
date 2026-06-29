@@ -61,7 +61,7 @@ header {
 
 .segmented-btn {
   border-radius: 0;
-  padding: 8px 12px;
+  padding: 4px 10px;
   min-width: 36px;
   display: flex;
   align-items: center;
@@ -78,7 +78,7 @@ header {
 }
 
 .material-symbols-outlined {
-  font-size: 18px;
+  font-size: 22px;
   line-height: 1;
   user-select: none;
 }

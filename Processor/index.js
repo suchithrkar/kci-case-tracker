@@ -264,7 +264,7 @@ const DB_NAME = "KCI_CASE_TRACKER_DB";
 const DB_VERSION = 3;
 const STORE_NAME = "sheets";
 
-let db = null;
+let indexedDb = null;
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -281,8 +281,8 @@ function openDB() {
     };
 
     request.onsuccess = function (e) {
-      db = e.target.result;
-      resolve(db);
+      indexedDb = e.target.result;
+      resolve(indexedDb);
     };
 
     request.onerror = function () {
@@ -292,7 +292,7 @@ function openDB() {
 }
 
 async function loadTeams() {
-  const tx = db.transaction(TEAM_STORE, "readonly");
+  const tx = indexedDb.transaction(TEAM_STORE, "readonly");
   const store = tx.objectStore(TEAM_STORE);
   return new Promise(res => {
     const req = store.getAll();
@@ -410,7 +410,7 @@ async function renderTeamDropdown() {
     
       isAddingTeamInline = false;
     
-      const tx = db.transaction(TEAM_STORE, "readwrite");
+      const tx = indexedDb.transaction(TEAM_STORE, "readwrite");
       tx.objectStore(TEAM_STORE).put({ name });
     
       await setCurrentTeam(name);
@@ -480,7 +480,7 @@ document.addEventListener("click", (e) => {
 
 async function deleteTeam(team) {
   // 1️⃣ Delete all team data from sheets store
-  const tx = db.transaction(STORE_NAME, "readwrite");
+  const tx = indexedDb.transaction(STORE_NAME, "readwrite");
   const store = tx.objectStore(STORE_NAME);
 
   const keysReq = store.getAllKeys();
@@ -491,7 +491,7 @@ async function deleteTeam(team) {
 
     // 2️⃣ Delete team from TEAM_STORE
     await new Promise(res => {
-      const ttx = db.transaction(TEAM_STORE, "readwrite");
+      const ttx = indexedDb.transaction(TEAM_STORE, "readwrite");
       ttx.objectStore(TEAM_STORE).delete(team).onsuccess = res;
     });
 
@@ -543,7 +543,7 @@ function getTeamKey(sheetName) {
 }
 
 function getStore(mode = "readonly") {
-  const tx = db.transaction(STORE_NAME, mode);
+  const tx = indexedDb.transaction(STORE_NAME, mode);
   return tx.objectStore(STORE_NAME);
 }
 
@@ -4385,7 +4385,7 @@ document.getElementById("exportBackupBtn").addEventListener("click", async () =>
 
 async function putRecord(record) {
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite");
+    const tx = indexedDb.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
 
     const req = store.put(record);

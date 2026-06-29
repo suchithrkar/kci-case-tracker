@@ -78,7 +78,7 @@ header {
 }
 
 .material-symbols-outlined {
-  font-size: 22px;
+  font-size: 22px !important;
   line-height: 1;
   user-select: none;
 }

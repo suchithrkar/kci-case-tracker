@@ -1,0 +1,1814 @@
+/* ===== THEME VARIABLES ====== */
+body {
+  --bg-app: #f2f2f2;
+  --bg-main: #f2f2f2;
+  --bg-card: #ffffff;
+  --bg-table: #ffffff;
+  --bg-header: #151923;
+  --bg-tab: #e0e0e0;
+
+  --text-main: #1f1f1f;
+  --text-dark: #1f1f1f;
+}
+
+/* ===== GLOBAL ===== */
+body {
+  margin: 0;
+  font-family: "Segoe UI", SegoeUI, Arial, sans-serif;
+  background: var(--bg-app);
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: var(--bg-header);
+  color: #ffffff;
+  padding: 20px 24px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+
+  display: flex;                 /* 🔥 REQUIRED */
+  align-items: center;
+  gap: 16px;
+}
+
+/* ===== HEADER BACKUP BUTTONS ===== */
+
+.header-btn {
+  background: #ffffff;
+  color: #151923;
+  border: none;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.header-btn:hover {
+  opacity: 0.9;
+}
+
+/* ===== CONTENT AREA ===== */
+.container {
+  background: var(--bg-main);
+  color: var(--text-main);
+  padding: 0; /* IMPORTANT */
+  /* min-height: calc(100vh - 64px); */
+}
+
+/* ===== CONTROL CENTER ===== */
+
+.control-center {
+  /* width: 100%; */
+  background: linear-gradient(
+    to bottom,
+    var(--bg-card),
+    var(--bg-main)
+  );
+  border-bottom: 1px solid #d6d6d6;
+  /* padding: 16px 16px 14px; */
+}
+
+/* ===== UPLOAD BAR ===== */
+.upload-box {
+  background: transparent;
+  border: none;
+  padding: 16px;
+  /* margin-bottom: 12px; */
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+/* Upload status area — no dead space when empty */
+.upload-status {
+  width: 100%;
+  margin-top: 8px;
+}
+
+#statusText:empty {
+  display: none;
+}
+
+#progressBarContainer {
+  margin-top: 6px;
+}
+
+input[type="file"] {
+  font-size: 12px;
+}
+
+/* ===== BUTTON ===== */
+#processBtn {
+  background: #151923;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#processBtn:disabled {
+  background: #8a8d93;
+  cursor: not-allowed;
+}
+
+/* ===== STATUS / PROGRESS ===== */
+#statusText {
+  width: 100%;
+  margin-top: 6px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+#progressBarContainer {
+  width: 100%;
+  height: 6px;
+  background: #d0d0d0;
+  margin-top: 6px;
+  display: none;
+}
+
+#progressBar {
+  height: 100%;
+  width: 0%;
+  background: #151923;
+}
+
+/* ===== SHEET TABS ===== */
+.sheet-tabs {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  background: var(--bg-main);
+}
+
+.sheet-tabs-left {
+  display: flex;
+  gap: 6px;
+}
+
+.sheet-tabs-right {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.sheet-tab {
+  display: inline-block;
+  padding: 5px 12px;
+  margin-right: 6px;
+  background: var(--bg-tab);
+  color: #222;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Remove right margin for last tab */
+.sheet-tabs .sheet-tab:last-child {
+  margin-right: 0;
+}
+
+.sheet-tab.active {
+  background: var(--bg-header);
+  color: #ffffff;
+}
+
+/* ===== TABLES ===== */
+table.dataTable {
+  background: var(--bg-table);
+  color: #1f1f1f;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+/* TABLE HEADER — EXACT KCI STYLE */
+table.dataTable thead th {
+  background: #f0f1f3;
+  color: #333;
+  text-transform: uppercase;         /* IMPORTANT */
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid #cfcfcf;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+/* TABLE BODY */
+table.dataTable tbody td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #e4e4e4;
+  white-space: nowrap;               /* Matches KCI */
+}
+
+/* DATATABLES CONTROLS */
+.dataTables_wrapper {
+  font-size: 12px;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  font-size: 12px;
+  padding: 3px;
+}
+
+.table-scroll-wrapper {
+  width: 100%;
+}
+
+.table-scroll-wrapper table {
+  min-width: max-content;
+}
+
+.upload-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-right: 14px;
+}
+
+.upload-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-main);
+  opacity: 0.85;
+}
+
+.action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  background: transparent;
+  border: none;
+  padding: 16px;
+
+  border-top: 1px solid #d6d6d6;
+}
+
+/* Right aligned action bar buttons */
+.action-bar-right,
+.upload-bar-right {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+}
+
+.upload-box button,
+.action-bar button {
+  background: #151923;
+  color: #fff;
+  border: none;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95); /* 🔥 darker overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal {
+  background: #ffffff;
+  padding: 16px;
+  width: 480px;
+  max-width: 90%;
+  border-radius: 4px;
+}
+
+.modal h3 {
+  margin-top: 0;
+  font-size: 14px;
+}
+
+.so-modal-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#soOutput {
+  width: 100%;
+  height: 220px;
+  font-family: monospace;
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-actions button {
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sbd-modal {
+  width: 95%;
+  max-width: 1200px;
+}
+
+.sbd-periods {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.sbd-period {
+  flex: 1;
+  border: 1px solid #d6d6d6;
+  padding: 10px;
+  background: var(--bg-card);
+}
+
+.sbd-period h4 {
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.sbd-dates {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.sbd-dates input {
+  width: 100%;
+}
+
+.sbd-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sbd-table th,
+.sbd-table td {
+  border: 1px solid #ccc;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.sbd-table input {
+  width: 100%;
+}
+
+.sbd-add {
+  margin-top: 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* ===== SBD TABLE SCROLL FIX ===== */
+
+/* Limit modal height so it never exceeds viewport */
+.sbd-modal {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Allow periods section to scroll if needed */
+.sbd-periods {
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Scroll container for table body */
+.sbd-tbody-scroll {
+  max-height: 260px; /* ~10 rows */
+  overflow-y: auto;
+}
+
+/* Keep table width aligned */
+.sbd-tbody-scroll .sbd-table {
+  width: 100%;
+  border-top: none;
+}
+
+/* Hide scrollbar but keep scrolling */
+.sbd-tbody-scroll::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.sbd-tbody-scroll {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* TL / Market Modals */
+.add-btn {
+  margin: 10px 0;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mapping-block {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.mapping-block h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+
+.mapping-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.mapping-row input {
+  flex: 1;
+  max-width: 250px;     /* ✅ limit input width */
+}
+
+.mapping-row button {
+  cursor: pointer;
+}
+
+/* ===== TL & MARKET DEFAULT SIZE REFERENCE ===== */
+
+.mapping-block.placeholder {
+  visibility: hidden;   /* occupies space but not visible */
+  pointer-events: none;
+}
+
+/* ===== TL & MARKET MODAL SCROLL FIX ===== */
+
+/* Limit modal height like SBD */
+#tlModal .modal,
+#marketModal .modal {
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollable content area */
+.tl-market-scroll {
+  overflow-y: auto;
+  padding-right: 4px;
+  flex: 1;
+  display: block;
+
+  /* 🔥 allow grid to expand horizontally */
+  align-items: flex-start;
+}
+
+/* Hide scrollbar but keep scroll */
+.tl-market-scroll::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.tl-market-scroll {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Fixed-width notes columns with ellipsis */
+table.dataTable td.fixed-notes-col,
+table.dataTable th.fixed-notes-col {
+  max-width: 300px;
+  width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;   /* REQUIRED for ellipsis */
+}
+
+/* ===== DATATABLE HORIZONTAL SCROLL (TABLE ONLY) ===== */
+
+/* --- DataTables layout --- */
+.dt-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 12px 16px;
+
+  position: sticky;
+  top: 50px;               /* below sheet-tabs */
+  z-index: 45;
+
+  background: var(--bg-main);
+  /*border-bottom: 1px solid #d6d6d6; */
+}
+
+.dt-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 12px 16px;
+
+  position: fixed;          /* 🔥 always stick to viewport */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+
+  background: var(--bg-card);
+  border-top: 1px solid #d6d6d6;
+}
+
+/* Vertically center DataTables info text */
+.dataTables_wrapper .dataTables_info {
+  padding-top: 0 !important;   /* remove DataTables default */
+  float: none;                 /* disable legacy float */
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.dt-middle {
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 57.6px; /* ✅ reserve space for fixed dt-bottom */
+}
+
+/* Let table fit container naturally unless it truly overflows */
+.dt-middle table {
+  width: 100%;
+  table-layout: auto;
+}
+
+/* Hide horizontal scrollbar but keep scroll */
+.dt-middle::-webkit-scrollbar {
+  height: 0;
+  background: transparent;
+}
+
+/* Prevent any accidental inline width causing overflow */
+table.dataTable th {
+  box-sizing: border-box;
+}
+
+/* ===== POLISHED MODAL SYSTEM ===== */
+
+.modal-polished {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+
+/* Modal size helpers */
+.modal-medium {
+  /* width: 640px; */
+  max-width: none;
+}
+
+.modal-large {
+  width: 95%;
+  max-width: 1200px;
+  max-height: 85vh;          /* 🔥 prevent overflow */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Closed Cases Report specific width */
+#closedCasesReportModal .modal {
+  width: 50%;
+  max-width: 50%;
+}
+
+/* Header */
+.modal-polished > h3 {
+  margin: 0;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  border-bottom: 1px solid #d6d6d6;
+  background: var(--bg-header);
+  color: #fff;
+}
+
+/* Body */
+.modal-polished .tl-market-scroll,
+.modal-polished .sbd-periods {
+  padding: 14px 16px;
+  flex: 1;
+}
+
+/* Footer */
+.modal-polished .modal-actions {
+  padding: 12px 16px;
+  border-top: 1px solid #d6d6d6;
+  background: var(--bg-card);
+  position: sticky;
+  bottom: 0;
+}
+
+/* ===== MODAL BUTTONS ===== */
+
+.modal-actions button,
+.add-btn {
+  background: #151923;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-actions button:hover,
+.add-btn:hover {
+  opacity: 0.9;
+}
+
+/* ===== TL & MARKET CARD STYLE ===== */
+
+.mapping-block {
+  background: #fff;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #d6d6d6;
+}
+
+.mapping-block h4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.mapping-block h4 input {
+  font-weight: 600;
+}
+
+.mapping-block h4 button {
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ===== INPUT POLISH ===== */
+
+.modal-polished input,
+.modal-polished textarea {
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.modal-polished input:focus,
+.modal-polished textarea:focus {
+  outline: none;
+  border-color: #151923;
+}
+
+/* ===== SBD PERIOD CARD POLISH ===== */
+
+.sbd-period {
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #d6d6d6;
+}
+
+.sbd-period h4 {
+  font-weight: 700;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 6px;
+}
+
+/* ===== SBD TABLE ALIGNMENT FIX ===== */
+
+/* Force both header & body tables to behave identically */
+.sbd-table {
+  table-layout: fixed;   /* 🔥 KEY FIX */
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Explicit column widths */
+.sbd-table th:nth-child(1),
+.sbd-table td:nth-child(1) {
+  width: 55%;
+}
+
+.sbd-table th:nth-child(2),
+.sbd-table td:nth-child(2) {
+  width: 30%;
+}
+
+.sbd-table th:nth-child(3),
+.sbd-table td:nth-child(3) {
+  width: 15%;
+  text-align: center;
+}
+
+/* Inputs must respect cell width */
+.sbd-table td input {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;   /* ✅ CENTER THE TIME TEXT */
+}
+
+/* Center Period headers */
+.sbd-period h4 {
+  text-align: center;
+}
+
+/* Remove extra top spacing inside SBD cards */
+.sbd-period {
+  padding-top: 6px;   /* was visually too large */
+}
+
+.sbd-period h4 {
+  margin: 0px 0 8px;   /* balanced vertical spacing */
+  padding-bottom: 6px;
+}
+
+/* Center delete button properly */
+.sbd-table td button.del {
+  padding: 2px 6px;
+  line-height: 1;
+  font-size: 13px;
+}
+
+/* ===== SBD FIRST ROW BORDER FIX ===== */
+
+/* Remove top border for first body row to visually join header */
+.sbd-tbody-scroll tbody tr:first-child td {
+  border-top: none;
+}
+
+/* ===== DYNAMIC WIDTH FOR TL & MARKET MODALS ===== */
+
+/* Allow modal to expand based on grid content */
+#tlModal .modal,
+#marketModal .modal {
+  width: fit-content;              /* 🔥 content-driven width */
+  max-width: calc(100vw - 80px);   /* viewport safety */
+}
+
+/* Fix Add TL / Market button width */
+#addTlBtn,
+#addMarketBtn {
+  width: fit-content;
+  align-self: flex-start;
+}
+
+/* ===== TL & MARKET GRID (FINAL, ROW-SAFE) ===== */
+
+#tlContainer,
+#marketContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 320px);
+  gap: 12px;
+}
+
+/* grid handles spacing */
+#tlContainer .mapping-block,
+#marketContainer .mapping-block {
+  margin-bottom: 0;
+}
+
+/* ===== TOTAL ROW (EXCEL-STYLE SEPARATOR) ===== */
+#ccSummaryTable tbody tr:last-child td,
+#ccDrillTable tbody tr:last-child td {
+  background: #f7f8fa;
+  font-weight: 700;
+
+  /* 🔥 reliable top border replacement */
+  box-shadow: inset 0 0.2px 0 #000;
+}
+
+/* Total row must always win over weekend styling */
+#ccSummaryTable tbody tr:last-child.cc-weekend td {
+  background: #f7f8fa;
+}
+
+/* Total row must override weekend styling */
+#ccSummaryTable tbody tr:last-child.cc-weekend td {
+  background: #f7f8fa;
+  border-bottom: none;
+}
+
+/* =========================================================
+   WORKGROUP MODAL — NEW STRUCTURED LAYOUT
+========================================================= */
+
+#workgroupModal .modal {
+  width: 50vw;
+
+  min-width: 900px;
+  max-width: 1400px;
+
+  max-height: 85vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* Container */
+.workgroup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Main card */
+.workgroup-team-card {
+  border: 1px solid #d6d6d6;
+  border-radius: 6px;
+  background: #fff;
+
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 22%)
+    minmax(320px, 1fr)
+    auto;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  align-items: stretch;
+}
+
+/* Shared column styling */
+.workgroup-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 12px;
+}
+
+/* Vertical separators */
+.workgroup-col:not(:last-child) {
+  position: relative;
+}
+
+.workgroup-col:not(:last-child)::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 1px;
+  background: #e2e2e2;
+}
+
+/* Team name column */
+.workgroup-team-name input {
+  width: min(100%, 240px);
+
+  box-sizing: border-box;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Workgroup list */
+.workgroup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Single workgroup row */
+.workgroup-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Input */
+.workgroup-item input {
+  flex: 1;
+
+  min-width: 180px;
+  width: auto;
+
+  box-sizing: border-box;
+}
+
+/* Remove button */
+.workgroup-remove-btn {
+  width: 28px;
+  height: 28px;
+
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+
+  background: #fff;
+  color: #cf222e;
+
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.workgroup-remove-btn:hover {
+  background: #fff1f2;
+  border-color: #cf222e;
+}
+
+.workgroup-remove-btn:active {
+  transform: scale(0.95);
+}
+
+/* Add workgroup button */
+.workgroup-add-btn {
+  width: 32px;
+  height: 32px;
+
+  background: #151923;
+  color: #fff;
+
+  border: none;
+  border-radius: 6px;
+
+  padding: 0;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Right actions */
+.workgroup-actions {
+  display: flex;
+  flex-direction: row;
+
+  align-items: flex-start;
+  justify-content: center;
+
+  gap: 8px;
+}
+
+/* Download */
+.workgroup-download-btn {
+  width: 32px;
+  height: 32px;
+  background: #151923;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Delete team */
+.workgroup-delete-team-btn {
+  width: 32px;
+  height: 32px;
+
+  background: rgba(229, 57, 53, 0.08);
+  color: #c62828;
+
+  border: 1px solid rgba(229, 57, 53, 0.15);
+  border-radius: 6px;
+
+  padding: 0;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.workgroup-delete-team-btn:hover {
+  background: rgba(229, 57, 53, 0.15);
+}
+
+/* Scroll area */
+.workgroup-scroll {
+  overflow-y: auto;
+}
+
+/* Hidden scrollbar */
+.workgroup-scroll::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+.workgroup-scroll {
+  scrollbar-width: none;
+  max-height: 65vh;
+}
+
+/* ===== GLOBAL PROGRESS OVERLAY ===== */
+
+.progress-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-card {
+  background: var(--bg-card);
+  padding: 24px 28px;
+  border-radius: 10px;
+  width: 420px;
+  max-width: 90%;
+  text-align: center;
+
+  box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+}
+
+.overlay-status {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* Progress bar container */
+.overlay-progress-bar {
+  width: 100%;
+  height: 25px;
+  background: #d0d0d0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#overlayProgressBar {
+  height: 100%;
+  width: 0%;
+  background: #151923;
+  transition: width 0.2s ease-out;
+}
+
+#overlayProgressBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Final confirmation button */
+.overlay-confirm {
+  margin-top: 18px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 700;
+
+  background: #151923;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Emphasize final status */
+.progress-complete .overlay-status {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ===== COPY SO / TRACKING MODAL ===== */
+
+.so-modal-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  /*gap: 8px; */
+}
+
+.so-count {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* ===== VALID / INVALID CSO TOGGLE BUTTON ===== */
+
+.cso-toggle-btn {
+  background: #151923;
+  color: #ffffff;
+
+  border: 1px solid #3a3a3a;
+  border-radius: 999px;
+
+  padding: 4px 12px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.cso-toggle-btn:hover {
+  background: #3a3a3a;
+}
+
+/* ===== ACTIVE INVALID MODE ===== */
+
+.cso-toggle-btn.invalid-active {
+  background: #151923;
+  border-color: #5a5a5a;
+}
+
+#soOutput {
+  width: 100%;
+  box-sizing: border-box;   /* 🔥 KEY FIX */
+  height: 260px;
+  resize: none;
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ===== HIDE SCROLLBAR — COPY SO / TRACKING TEXTAREA ===== */
+
+#soOutput {
+  overflow-y: auto;
+}
+
+/* Chrome / Edge / Safari */
+#soOutput::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* Firefox */
+#soOutput {
+  scrollbar-width: none;
+}
+
+.closed-report-top {
+  display: flex;
+  gap: 16px;
+}
+
+.closed-report-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  flex: 0 0 320px;   /* 🔥 fixed width */
+  max-width: 320px;
+}
+
+.closed-report-filters label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.closed-report-filters select {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.closed-report-drilldown {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #d6d6d6;
+  border-radius: 6px;
+  /* padding: 10px; */
+}
+
+.closed-report-drilldown h4 {
+  margin: 0;
+  font-size: 13px;
+}
+
+.closed-report-table {
+  /* margin-top: 16px; */
+  flex: 1;
+  overflow-y: auto; 
+}
+
+.cc-agent-box {
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  padding: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.cc-agent-box label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.cc-agent-selected {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.closed-report-top {
+  padding: 14px 16px;
+  background: #f7f8fa;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.closed-report-drilldown {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.cc-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cc-filter-row span {
+  min-width: 90px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Dropdown behavior */
+.cc-agent-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.cc-agent-toggle {
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  padding: 6px 28px 6px 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  position: relative;
+}
+
+/* Arrow */
+.cc-agent-toggle::after {
+  content: "▾";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: #555;
+}
+
+.cc-agent-box {
+  display: none;                /* 🔥 hidden by default */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  padding: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.cc-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.cc-select-wrapper select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  border: 1px solid #cfcfcf;
+  border-radius: 4px;
+  padding: 6px 28px 6px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  background: #fff;
+}
+
+/* Down arrow */
+.cc-select-wrapper::after {
+  content: "▾";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 11px;
+  color: #555;
+}
+
+.cc-agent-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.cc-agent-box::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+.cc-agent-box {
+  scrollbar-width: none; /* Firefox */
+}
+
+.closed-report-table::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+.closed-report-table {
+  scrollbar-width: none;
+}
+
+.cc-agent-box label {
+  cursor: pointer;
+}
+
+#ccSummaryTable th,
+#ccSummaryTable td,
+#ccDrillTable th,
+#ccDrillTable td {
+  text-align: center;
+}
+
+#ccSummaryTable thead th {
+  position: sticky;
+  top: 0;
+  background: #f0f1f3;
+  z-index: 2;
+}
+
+#ccSummaryTable tbody tr:last-child td {
+  position: sticky;
+  bottom: 0;
+  background: #f7f8fa;
+  font-weight: 700;
+}
+
+/* KCI cell behaves like a real clickable cell */
+#ccSummaryTable td:has(.cc-kci) {
+  cursor: pointer;
+}
+
+/* FULL CELL hover */
+#ccSummaryTable td:has(.cc-kci):hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* Inner content stays clean */
+.cc-kci {
+  display: block;
+}
+
+/* ===== WEEKEND ROWS (ONLY VISUAL DISTINCTION) ===== */
+#ccSummaryTable tbody tr.cc-weekend td {
+  background: #eef0f4;          /* distinct from white */
+}
+
+/* Drilldown header row */
+.cc-drill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+/* Total button */
+.cc-total-btn {
+  background: #151923;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cc-total-btn:hover {
+  opacity: 0.9;
+}
+
+/* ===== OPEN REPAIR CASES REPORT ===== */
+
+.orc-section {
+  padding: 14px 16px;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.orc-section:last-child {
+  border-bottom: none;
+}
+
+.orc-section h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.orc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  background: #fff;
+}
+
+/* ===== OPEN REPAIR CASES TABLE – FIXED COLUMN WIDTHS ===== */
+
+.orc-table {
+  table-layout: fixed;   /* 🔥 force equal distribution */
+}
+
+/* First column = 1.5x */
+.orc-table th:first-child,
+.orc-table td:first-child {
+  width: 15%;
+  text-align: left;
+}
+
+/* Remaining columns = equal width */
+.orc-table th:not(:first-child),
+.orc-table td:not(:first-child) {
+  width: calc(85% / 9);  /* 9 remaining columns */
+}
+
+.orc-table th,
+.orc-table td {
+  border: 1px solid #d6d6d6;
+  padding: 6px 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.orc-table th {
+  background: #f0f1f3;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.orc-table td.row-header {
+  font-weight: 600;
+  text-align: left;
+  background: #fafafa;
+}
+
+.orc-table tr.total-row td {
+  font-weight: 700;
+  background: #f7f8fa;
+}
+
+/* ===== OPEN REPAIR CASES HEADER ===== */
+
+.orc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #d6d6d6;
+  background: var(--bg-header);
+  color: #fff;
+}
+
+.orc-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.orc-sbd-summary {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+/* ===== SBD SUMMARY PILLS ===== */
+
+.orc-sbd-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sbd-label {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.sbd-pill {
+  padding: 2.5px 8px 3.5px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== SBD PILLS – DARK HEADER OPTIMIZED ===== */
+
+.sbd-met {
+  background: transparent;
+  color: #38e58d;                 /* vivid green */
+  border: 1px solid #38e58d;
+  box-shadow: inset 0 0 0 1px rgba(56, 229, 141, 0.15);
+}
+
+.sbd-not-met {
+  background: transparent;
+  color: #ff6b6b;                 /* vivid red */
+  border: 1px solid #ff6b6b;
+  box-shadow: inset 0 0 0 1px rgba(255, 107, 107, 0.15);
+}
+
+.sbd-na {
+  background: transparent;
+  color: #cfd4da;                 /* light neutral */
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+.team-row:hover {
+  background: #f0f0f0;
+}
+
+/* ===== TEAM SELECTOR (KCI STYLE) ===== */
+
+.team-selector {
+  position: relative;
+  margin-left: auto;          /* push to right in header */
+}
+
+/* Reuse agent toggle style */
+#teamToggle {
+  width: 120px;          /* 🔥 fixed width */
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Dropdown must align with toggle */
+#teamDropdown {
+  left: 0;              /* 🔥 anchor to toggle */
+  right: auto;          /* 🔥 remove stretch */
+  width: 157.6px;         /* 🔥 now width is respected */
+  box-sizing: border-box;
+  z-index: 300;
+  padding: 0;
+}
+
+/* Team row behavior */
+.team-row {
+  display: flex;
+  align-items: center;
+  padding: 0;                 /* 🔥 no row padding */
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.team-row:hover {
+  background: #f0f1f3;
+}
+
+/* Active team */
+.team-row.active {
+  background: rgba(21, 25, 35, 0.08);   /* slightly softer */
+  font-weight: 600;
+}
+
+.team-row.active:hover {
+  background: rgba(21, 25, 35, 0.10);
+}
+
+/* Add team row */
+.team-add {
+  padding: 6px 8px;
+  font-size: 12px;        /* match team-row */
+  font-weight: 600;       /* match toggle / rows */
+  text-align: center;     /* 🔥 center ONLY this row */
+  border-top: 1px solid #d6d6d6;
+  cursor: pointer;
+}
+
+.team-add:hover {
+  background: rgba(56, 229, 141, 0.18);   /* ✅ soft green */
+  color: #1b5e20;                         /* optional: darker green text */
+}
+
+/* ===== TEAM SELECTOR WIDTH FIX ===== */
+
+header .team-selector.cc-agent-dropdown {
+  width: auto;              /* 🔥 stop 100% width */
+  flex-shrink: 0;
+}
+
+/* ===== TEAM SELECTOR TEXT COLOR FIX ===== */
+
+header .team-selector .cc-agent-toggle {
+  color: #1f1f1f;            /* 🔥 force visible text */
+}
+
+/* ===== TEAM DROPDOWN VISIBILITY FIX ===== */
+
+header .team-selector .cc-agent-box {
+  /* min-width: 200px; */
+  color: #1f1f1f;
+}
+
+/* ===== FINAL TEAM SELECTOR WIDTH OVERRIDE ===== */
+
+header .team-selector.cc-agent-dropdown {
+  width: auto !important;        /* 🔥 force override */
+  flex: 0 0 auto;                /* 🔥 stop flex stretching */
+}
+
+header .team-selector .cc-agent-toggle {
+  width: auto;
+  white-space: nowrap;
+}
+
+header .team-selector .cc-agent-toggle {
+  background: #ffffff;
+  color: #1f1f1f;   /* 🔥 ensures readable in light-only mode */
+}
+
+/* ===== TEAM ROW SPLIT ACTIONS ===== */
+
+/* Team name padding only */
+.team-row > span:first-child {
+  padding: 6px 8px;           /* 🔥 same as old row padding */
+  flex: 1;                    /* keep name expanding */
+}
+
+/* Inline add row: remove padding from input wrapper span */
+.team-add-inline > span:first-child {
+  padding: 0;        /* 🔥 remove inherited padding */
+}
+
+/* ===== DELETE ZONE (| + ✕) ===== */
+
+/* Visual separator */
+.team-sep {
+  color: #aaa;
+  padding: 0;          /* no padding */
+  margin: 0;           /* 🔥 no margin */
+  cursor: default;
+}
+
+/* Delete click zone (✕ → right edge) */
+.team-del {
+  margin-left: auto;          /* push to edge */
+  padding: 6px 10px;           /* 🔥 its own padding */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.team-del:hover {
+  background: rgba(229, 57, 53, 0.08);
+}
+
+/* Override delete hover for inline confirm */
+.team-del.team-confirm-inline:hover {
+  background: rgba(56, 229, 141, 0.12);
+}
+
+.team-del.team-confirm-inline:hover span {
+  color: #1b5e20;
+}
+
+.team-del span {
+  padding: 0;            /* 🔥 no glyph padding */
+  margin: 0;
+  font-size: 13px;
+  color: #888;
+}
+
+.team-del:hover span {
+  color: #e53935;
+}
+
+.team-del .team-sep {
+  margin-right: 2px;
+  color: #aaa;
+  cursor: inherit;
+}
+
+/* ===== INLINE ADD TEAM (FINAL SPEC) ===== */
+
+.team-add-inline {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border-top: 1px solid #d6d6d6;   /* 🔥 required */
+  background: #f7f8fa;
+}
+
+/* Input sizing is EXACT incl padding */
+.team-add-inline input {
+  width: 121.63px;                /* 🔥 exact width */
+  box-sizing: border-box;         /* 🔥 includes padding */
+  padding: 6px 8px;
+
+  border: none;                   /* 🔥 no border */
+  border-radius: 0;               /* 🔥 no radius */
+  font-size: 12px;
+  background: transparent;
+  flex: 0 0 auto;   /* 🔒 lock width */
+}
+
+.team-add-inline input:focus {
+  outline: none;
+}
+
+/* Confirm uses same click zone as delete */
+.team-confirm-inline {
+  margin-left: auto;
+}
+
+/* ✔ default state */
+.team-confirm-inline span {
+  color: #2e7d32;                 /* muted green */
+  font-size: 13px;
+}
+
+/* ✔ hover state */
+.team-confirm-inline:hover {
+  background: rgba(56, 229, 141, 0.12);
+}
+
+.team-confirm-inline:hover span {
+  color: #1b5e20;
+}
+
+
+
+
+
+
+
+
+
+

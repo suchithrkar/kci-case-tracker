@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>KCI Case Tracker – Upload Excel Creation Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- DataTables CSS ---->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+</head>
+<body>
+
+<header class="app-header">
+  <span class="header-title">KCI Case Tracker – Upload Excel Creation Tool</span>
+  
+  <div class="team-selector cc-agent-dropdown">
+    <div id="teamToggle" class="cc-agent-toggle">
+      Select Team
+    </div>
+  
+    <div id="teamDropdown" class="team-dropdown cc-agent-box"></div>
+  </div>
+  
+  <button id="exportBackupBtn" class="header-btn">
+    Export Backup
+  </button>
+  
+  <button id="importBackupBtn" class="header-btn">
+    Import Backup
+  </button>
+  
+  <input type="file" id="importBackupInput" accept=".json" hidden>
+</header>
+
+<div class="container">
+
+  <!-- ✅ CONTROL CENTER -->
+  <div class="control-center">
+
+    <div class="upload-box">
+      <!-- emptyContainer REMOVED -->
+      
+      <div class="upload-group">
+        <label for="kciInput">KCI – Open Repair Case Data (Excel)</label>
+        <input type="file" id="kciInput" accept=".xlsx" />
+      </div>
+
+      <div class="upload-group">
+        <label for="csoInput">GNPro – CSO Status File (CSV)</label>
+        <input type="file" id="csoInput" accept=".csv" />
+      </div>
+
+      <div class="upload-group">
+        <label for="trackingInput">Tracking Results File (CSV)</label>
+        <input type="file" id="trackingInput" accept=".csv" />
+      </div>
+
+      <button id="processBtn" disabled>Process Excel</button>
+
+      <span class="upload-bar-right">
+        <button id="workgroupBtn">Workgroups</button>
+      </span>
+    </div>
+
+    <div class="action-bar">
+      <button id="openRepairCasesReportBtn">Open RC Report</button>
+      <button id="closedCasesReportBtn">Closed Report</button>
+      <button id="copySoBtn">Copy SO</button>
+      <button id="copyTrackingBtn">Copy Tracking</button>
+      <button id="sbdBtn">SBD Cut-Off</button>
+      <button id="tlBtn">TL</button>
+      <button id="marketBtn">Market</button>
+    
+      <span class="action-bar-right">
+        <button id="downloadActiveSheetBtn" title="Download Active Sheet">⭳</button>
+        <button id="processRepairBtn">Build Repair</button>
+        <button id="downloadUploadExcelBtn">Export Upload</button>
+      </span>
+    </div>
+
+  </div>
+  <!-- ✅ END CONTROL CENTER -->
+
+  <div id="tablesContainer"></div>
+</div>
+
+  <!-- Modal -->
+  <div id="soModal" class="modal-overlay" style="display:none;">
+    <div class="modal modal-polished modal-medium">
+  
+      <!-- Header -->
+      <h3 id="soModalTitle">Copy SO Orders Preview</h3>
+  
+      <!-- Body -->
+      <div class="so-modal-body">
+        <div class="so-modal-top-row">
+          <div id="soCount" class="so-count"></div>
+          <button
+            id="invalidCsoBtn"
+            class="cso-toggle-btn"
+            style="display:none;"
+          >
+            Invalid CSOs
+          </button>
+        </div>
+        <textarea id="soOutput" readonly></textarea>
+      </div>
+  
+      <!-- Footer -->
+      <div class="modal-actions">
+        <button id="copyToClipboardBtn">Copy to Clipboard</button>
+        <button id="closeModalBtn">Close</button>
+      </div>
+  
+    </div>
+  </div>
+
+  <div id="tlModal" class="modal-overlay" style="display:none;">
+    <div class="modal modal-polished modal-medium">
+    <h3>TL Assignment</h3>
+    
+    <div class="tl-market-scroll">
+      <div id="tlContainer" class="mapping-grid"></div>
+      <button class="add-btn" id="addTlBtn">+ Add TL</button>
+    </div>
+    
+    <div class="modal-actions">
+        <button id="saveTlBtn">Save</button>
+        <button onclick="closeModal('tlModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="marketModal" class="modal-overlay" style="display:none;">
+    <div class="modal modal-polished modal-medium">
+    <h3>Market Assignment</h3>
+    
+    <div class="tl-market-scroll">
+      <div id="marketContainer" class="mapping-grid"></div>
+      <button class="add-btn" id="addMarketBtn">+ Add Market</button>
+    </div>
+    
+    <div class="modal-actions">
+        <button id="saveMarketBtn">Save</button>
+        <button onclick="closeModal('marketModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="workgroupModal" class="modal-overlay" style="display:none;">
+    <div class="modal modal-polished modal-medium">
+  
+      <h3>Workgroup Assignment</h3>
+  
+      <div class="tl-market-scroll workgroup-scroll">
+
+        <div id="workgroupContainer" class="workgroup-container"></div>
+      
+        <button
+          class="add-btn"
+          id="addWorkgroupBtn"
+        >
+          + Add Workgroup Team
+        </button>
+      
+      </div>
+  
+      <div class="modal-actions">
+        <button id="saveWorkgroupBtn">Save</button>
+  
+        <button onclick="closeModal('workgroupModal')">
+          Close
+        </button>
+      </div>
+  
+    </div>
+  </div>
+
+<!-- Libraries -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<div id="sbdModal" class="modal-overlay" style="display:none;">
+  <div class="modal sbd-modal modal-polished modal-large">
+    <h3>SBD Cut Off Times</h3>
+
+    <div class="sbd-periods">
+      <!-- Periods injected by JS -->
+    </div>
+
+    <div class="modal-actions">
+      <button id="saveSbdBtn">Save</button>
+      <button id="closeSbdBtn">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="closedCasesReportModal" class="modal-overlay" style="display:none;">
+  <div class="modal modal-polished modal-large">
+
+    <h3>Closed Cases Report</h3>
+
+    <!-- Filters + Drilldown -->
+    <div class="closed-report-top">
+      <div class="closed-report-filters">
+        <div class="cc-filter-row">
+          <span>Month</span>
+          <div class="cc-select-wrapper">
+            <select id="ccMonthSelect"></select>
+          </div>
+        </div>
+
+        <div class="cc-filter-row">
+          <span>KCI Agents</span>
+          <div class="cc-agent-dropdown">
+            <div id="ccAgentToggle" class="cc-agent-toggle">
+              Select KCI Agents
+            </div>
+            <div id="ccAgentBox" class="cc-agent-box"></div>
+          </div>
+        </div>
+        
+        <div id="ccAgentSelected" class="cc-agent-selected"></div>
+      </div>
+
+      <div class="closed-report-drilldown">
+        <div class="cc-drill-header">
+          <h4 id="ccDrillTitle">Breakdown</h4>
+          <button id="ccDrillTotalBtn" class="cc-total-btn">Total</button>
+        </div>
+      
+        <table id="ccDrillTable" class="display compact">
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Cases Closed</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Primary table -->
+    <div class="closed-report-table">
+      <table id="ccSummaryTable" class="display">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Total Closed</th>
+            <th>KCI Closed</th>
+            <th>CRM Auto Closed</th>
+            <th>Agents RS Closed</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="modal-actions">
+      <button onclick="closeModal('closedCasesReportModal')">Close</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="openRepairCasesReportModal" class="modal-overlay" style="display:none;">
+  <div class="modal modal-polished modal-large">
+
+    <div class="orc-header">
+      <h3>Open Repair Cases Report</h3>
+      <div id="orcSbdSummary" class="orc-sbd-summary"></div>
+    </div>
+
+    <div class="orc-section">
+      <h4>Open Repair Cases</h4>
+      <div id="openRepairCasesTable"></div>
+    </div>
+
+    <div class="orc-section">
+      <h4>Ready for Closure</h4>
+      <div id="readyForClosureTable"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button onclick="closeModal('openRepairCasesReportModal')">
+        Close
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== GLOBAL PROGRESS OVERLAY ===== -->
+<div id="progressOverlay" class="progress-overlay" style="display:none;">
+  <div class="progress-card">
+    <div id="overlayStatusText" class="overlay-status"></div>
+
+    <div class="overlay-progress-bar">
+      <div id="overlayProgressBar">
+        <span id="overlayProgressText">0%</span>
+      </div>
+    </div>
+
+    <button
+      id="overlayConfirmBtn"
+      class="overlay-confirm"
+      style="display:none;"
+    >
+      OK
+    </button>
+  </div>
+</div>
+
+<!-- App JS -->
+<script src="index.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

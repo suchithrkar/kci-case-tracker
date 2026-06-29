@@ -90,15 +90,16 @@ header {
 
 /* ===== HEADER TOOLTIPS ===== */
 
-.icon-tooltip {
+.icon-tooltip-export {
   position: relative;
 }
 
-.icon-tooltip::after {
+.icon-tooltip-export::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
+  /*bottom: calc(100% + 8px);*/
+  top: 30px;
+  left: 40.5px;
   transform: translateX(-50%) translateY(4px);
   background: #151923;
   color: #ffffff;
@@ -115,7 +116,7 @@ header {
   z-index: 500;
 }
 
-.icon-tooltip::before {
+.icon-tooltip-export::before {
   content: "";
   position: absolute;
   bottom: calc(100% + 2px);
@@ -128,12 +129,60 @@ header {
   z-index: 500;
 }
 
-.icon-tooltip:hover::after,
-.icon-tooltip:hover::before {
+.icon-tooltip-export:hover::after,
+.icon-tooltip-export:hover::before {
   opacity: 1;
 }
 
-.icon-tooltip:hover::after {
+.icon-tooltip-export:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+.icon-tooltip-import {
+  position: relative;
+}
+
+.icon-tooltip-import::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  /*bottom: calc(100% + 8px);*/
+  top: 30px;
+  left: 0px;
+  transform: translateX(-50%) translateY(4px);
+  background: #151923;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity .18s ease,
+    transform .18s ease;
+  z-index: 500;
+}
+
+.icon-tooltip-import::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #151923;
+  opacity: 0;
+  transition: opacity .18s ease;
+  z-index: 500;
+}
+
+.icon-tooltip-import:hover::after,
+.icon-tooltip-import:hover::before {
+  opacity: 1;
+}
+
+.icon-tooltip-import:hover::after {
   transform: translateX(-50%) translateY(0);
 }
 

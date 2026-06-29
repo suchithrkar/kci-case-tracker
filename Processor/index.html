@@ -12,6 +12,7 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="./index.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0;1&display=swap"/>
   <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
 </head>
 <body>
@@ -35,18 +36,22 @@
   
     <button
       id="exportBackupBtn"
-      class="header-btn segmented-btn"
-      title="Export Backup"
+      class="header-btn segmented-btn icon-tooltip"
+      data-tooltip="Export Backup"
     >
-      📤
+      <span class="material-symbols-outlined">
+        upload
+      </span>
     </button>
   
     <button
       id="importBackupBtn"
-      class="header-btn segmented-btn"
-      title="Import Backup"
+      class="header-btn segmented-btn icon-tooltip"
+      data-tooltip="Import Backup"
     >
-      📥
+      <span class="material-symbols-outlined">
+        download
+      </span>
     </button>
   
   </div>

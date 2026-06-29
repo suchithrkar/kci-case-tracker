@@ -221,7 +221,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (
       data.role !== "primary" &&
-      data.groupId !== "Processor"
+      data.groupId !== "PROCESSOR"
     ) {
       location.href = "../index.html";
       return;

@@ -1,6 +1,8 @@
 import {
     auth,
-    onAuthStateChanged
+    onAuthStateChanged,
+    doc,
+    getDoc
 } from "../js/firebase.js";
 
 import {

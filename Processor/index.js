@@ -211,8 +211,12 @@ const TABLE_SCHEMAS = {
 };
 
 onAuthStateChanged(auth, async (user) => {
+    if (!user) return (location.href = "../login.html");
+    
     const userSnap = await getDoc(doc(db, "users", user.uid));
     if (!userSnap.exists()) return (location.href = "../login.html");
+
+    const data = userSnap.data();
 
     if (
       data.role !== "primary" &&
@@ -222,7 +226,6 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
     
-    const data = userSnap.data();
     el.userFullName.textContent = `${data.firstName} ${data.lastName}`;
 });
 

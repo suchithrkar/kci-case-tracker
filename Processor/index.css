@@ -51,6 +51,32 @@ header {
   opacity: 0.9;
 }
 
+/* ===== HEADER SEGMENTED BUTTONS ===== */
+
+.header-btn-group {
+  display: inline-flex;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.segmented-btn {
+  border-radius: 0;
+  padding: 8px 12px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.segmented-btn:first-child {
+  border-right: 1px solid #d6d6d6;
+}
+
+.segmented-btn:hover {
+  opacity: 1;
+  background: #f0f1f3;
+}
+
 /* ===== CONTENT AREA ===== */
 .container {
   background: var(--bg-main);

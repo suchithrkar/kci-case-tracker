@@ -186,6 +186,13 @@ input[type="file"] {
   color: #ffffff;
 }
 
+#downloadActiveSheetBtn {
+  padding: 0px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* ===== TABLES ===== */
 table.dataTable {
   background: var(--bg-table);

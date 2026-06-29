@@ -16,8 +16,12 @@
 
 <header class="app-header">
   <span class="header-title">KCI Case Tracker – Upload Excel Creation Tool</span>
+
+  <!-- USER FULL NAME -->
+  <div class="user-name" id="userFullName">Loading...</div>
   
   <div class="team-selector cc-agent-dropdown">
+    
     <div id="teamToggle" class="cc-agent-toggle">
       Select Team
     </div>
@@ -31,6 +35,10 @@
   
   <button id="importBackupBtn" class="header-btn">
     Import Backup
+  </button>
+
+  <button id="logoutBtn" class="header-btn">
+    Log Out
   </button>
   
   <input type="file" id="importBackupInput" accept=".json" hidden>

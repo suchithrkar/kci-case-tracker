@@ -262,6 +262,12 @@ watchAuth((user) => {
       return;
     }
 
+    // Processor users
+    if (user.groupId === "Processor") {
+      location.href = "Processor/index.html";
+      return;
+    }
+
     // Normal users
     if (user.role === "secondary") {
       location.href = "report.html";

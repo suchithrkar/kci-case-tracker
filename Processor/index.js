@@ -570,6 +570,9 @@ function initEmptyTables() {
   tabsDiv.appendChild(leftTabsDiv);
   tabsDiv.appendChild(rightTabsDiv);
 
+  const downloadActiveSheetBtn = document.getElementById("downloadActiveSheetBtn");  
+  rightTabsDiv.appendChild(downloadActiveSheetBtn);  
+
   let first = true;
 
   Object.keys(TABLE_SCHEMAS).forEach(sheetName => {

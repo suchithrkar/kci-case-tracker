@@ -572,8 +572,8 @@ function initEmptyTables() {
 
   const downloadActiveSheetBtn = document.createElement("button"); 
   downloadActiveSheetBtn.id = "downloadActiveSheetBtn";
-  downloadActiveSheetBtn.class = "icon-tooltip-download-active";
-  downloadActiveSheetBtn.data = "Download Active Sheet";
+  downloadActiveSheetBtn.classList.add("icon-tooltip-download-active");
+  downloadActiveSheetBtn.dataset.tooltip = "Download Active Sheet";
   downloadActiveSheetBtn.textContent = "⭳";
   downloadActiveSheetBtn.addEventListener("click", downloadActiveSheet);
 

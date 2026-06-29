@@ -1,5 +1,6 @@
 import {
     auth,
+    db,
     onAuthStateChanged,
     doc,
     getDoc

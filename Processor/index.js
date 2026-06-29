@@ -1,3 +1,23 @@
+import {
+    watchAuth,
+    logout
+} from "../js/auth.js";
+
+watchAuth((user) => {
+
+    if (!user) {
+        location.href = "../login.html";
+        return;
+    }
+
+    if (user.status !== "approved") {
+        location.href = "../login.html";
+        return;
+    }
+
+    // Continue loading Processor...
+});
+
 let kciFile = null;
 let csoFile = null;
 let trackingFile = null;

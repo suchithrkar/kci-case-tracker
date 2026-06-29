@@ -31,7 +31,7 @@ header {
 
   display: flex;                 /* 🔥 REQUIRED */
   align-items: center;
-  gap: 16px;
+  gap: 10px;
 }
 
 /* ===== HEADER BACKUP BUTTONS ===== */

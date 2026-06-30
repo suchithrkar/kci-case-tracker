@@ -234,6 +234,54 @@ header {
   transform: translateX(-50%) translateY(0);
 }
 
+.icon-tooltip-copy-active {
+  position: relative;
+}
+
+.icon-tooltip-copy-active::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  /*bottom: calc(100% + 8px);*/
+  top: 46px;
+  left: -47px;
+  transform: translateX(-50%) translateY(4px);
+  background: #151923;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity .18s ease,
+    transform .18s ease;
+  z-index: 500;
+}
+
+.icon-tooltip-copy-active::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #151923;
+  opacity: 0;
+  transition: opacity .18s ease;
+  z-index: 500;
+}
+
+.icon-tooltip-copy-active:hover::after,
+.icon-tooltip-copy-active:hover::before {
+  opacity: 1;
+}
+
+.icon-tooltip-copy-active:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
+
 /* ===== CONTENT AREA ===== */
 .container {
   background: var(--bg-main);
@@ -369,12 +417,14 @@ input[type="file"] {
   color: #ffffff;
 }
 
-#downloadActiveSheetBtn {
+#downloadActiveSheetBtn, 
+#copyActiveSheetBtn {
   padding: 0px 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
 }
+
 
 /* ===== TABLES ===== */
 table.dataTable {

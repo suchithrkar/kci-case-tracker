@@ -422,26 +422,28 @@ input[type="file"] {
 }
 
 #copyActiveSheetBtn{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:34px;
-    border:.5px solid gray;
-    border-right:none;
-    border-radius:4px;
-    border-top-right-radius:0;
-    border-bottom-right-radius:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  border:.5px solid gray;
+  border-right:none;
+  border-radius:4px;
+  border-top-right-radius:0;
+  border-bottom-right-radius:0;
+  cursor: pointer;
 }
 
 #downloadActiveSheetBtn{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:34px;
-    border:.5px solid gray;
-    border-radius:4px;
-    border-top-left-radius:0;
-    border-bottom-left-radius:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  border:.5px solid gray;
+  border-radius:4px;
+  border-top-left-radius:0;
+  border-bottom-left-radius:0;
+  cursor: pointer;
 }
 
 #copyActiveSheetBtn .material-symbols-outlined,

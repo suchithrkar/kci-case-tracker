@@ -1149,6 +1149,12 @@ function hideProgressOverlay() {
 function startProgressContext(label) {
   progressContext = { label };
   showProgressOverlay();
+
+  const spinner = document.getElementById("overlaySpinner");
+  spinner.textContent = "progress_activity";
+  spinner.style.animation = "overlaySpinnerRotate 1s linear infinite";
+  spinner.style.color = "#4da3ff";
+    
   document.getElementById("overlayStatusText").textContent = label;
 }
 
@@ -1162,10 +1168,14 @@ function updateProgressContext(current, total, text) {
 
 function endProgressContext(text = "Completed") {
   const status = document.getElementById("overlayStatusText");
+  const spinner = document.getElementById("overlaySpinner");  
   const confirmBtn = document.getElementById("overlayConfirmBtn");
   const overlay = document.getElementById("progressOverlay");
 
   status.textContent = text;
+  spinner.textContent = "check_circle";
+  spinner.style.animation = "none";
+  spinner.style.color = "#36c36b";  
   overlay.classList.add("progress-complete");
   confirmBtn.style.display = "inline-block";
 

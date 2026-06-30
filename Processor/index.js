@@ -11,6 +11,8 @@ import {
     logout
 } from "../js/auth.js";
 
+import { showPopup } from "./js/utils.js";
+
 watchAuth((user) => {
 
     if (!user) {
@@ -577,6 +579,13 @@ function initEmptyTables() {
   downloadActiveSheetBtn.textContent = "⭳";
   downloadActiveSheetBtn.addEventListener("click", downloadActiveSheet);
 
+  const copyActiveSheetBtn = document.createElement("button");
+  copyActiveSheetBtn.id = "copyActiveSheetBtn";
+  copyActiveSheetBtn.classList.add("icon-tooltip-copy-active");
+  copyActiveSheetBtn.dataset.tooltip = "Copy Active Sheet";
+  copyActiveSheetBtn.textContent = "📋";
+  copyActiveSheetBtn.addEventListener("click", copyActiveSheetToClipboard);  
+
   let first = true;
 
   Object.keys(TABLE_SCHEMAS).forEach(sheetName => {
@@ -686,6 +695,7 @@ function initEmptyTables() {
     
         // Add download button immediately after the last right-side tab
         if (sheetName === "Closed Cases Data") {
+            rightTabsDiv.appendChild(copyActiveSheetBtn);
             rightTabsDiv.appendChild(downloadActiveSheetBtn);
         }
     } else {
@@ -4735,33 +4745,27 @@ async function downloadActiveSheet() {
     // Find active sheet tab
     // ----------------------------------
 
-    const activeTab =
-      document.querySelector(".sheet-tab.active");
+    const activeTab = document.querySelector(".sheet-tab.active");
 
     if (!activeTab) {
       alert("No active sheet selected.");
       return;
     }
 
-    const sheetName =
-      activeTab.textContent.trim();
+    const sheetName = activeTab.textContent.trim();
 
     // ----------------------------------
     // Load sheet data from IndexedDB
     // ----------------------------------
 
     const record = await new Promise(resolve => {
-
       const req =
         getStore("readonly")
           .get(getTeamKey(sheetName));
-
       req.onsuccess = () =>
         resolve(req.result);
-
       req.onerror = () =>
         resolve(null);
-
     });
 
     if (!record) {
@@ -4782,8 +4786,7 @@ async function downloadActiveSheet() {
       ...rows
     ];
 
-    const ws =
-      XLSX.utils.aoa_to_sheet(sheetData);
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
 
     XLSX.utils.book_append_sheet(
       wb,
@@ -4797,33 +4800,120 @@ async function downloadActiveSheet() {
 
     const today = new Date();
 
-    const dd =
-      String(today.getDate()).padStart(2, "0");
-
-    const mm =
-      String(today.getMonth() + 1).padStart(2, "0");
-
-    const yyyy =
-      today.getFullYear();
-
-    const safeSheetName =
-      sheetName.replace(/[\\/:*?"<>|]/g, "_");
-
-    const fileName =
-      `${currentTeam}_${safeSheetName}_${dd}-${mm}-${yyyy}.xlsx`;
+    const dd = String(today.getDate()).padStart(2, "0");
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const yyyy = today.getFullYear();
+    const safeSheetName = sheetName.replace(/[\\/:*?"<>|]/g, "_");
+    const fileName = `${currentTeam}_${safeSheetName}_${dd}-${mm}-${yyyy}.xlsx`;
 
     // ----------------------------------
     // Download
     // ----------------------------------
 
     XLSX.writeFile(wb, fileName);
-
   } catch (err) {
-
     console.error(err);
-
-    alert(
-      "Failed to download active sheet."
-    );
+    alert("Failed to download active sheet.");
   }
+}
+
+async function copyActiveSheetToClipboard() {
+
+    if (!requireTeamSelected()) return;
+
+    try {
+        const activeTab = document.querySelector(".sheet-tab.active");
+
+        if (!activeTab) {
+            alert("No active sheet selected.");
+            return;
+        }
+
+        const sheetName = activeTab.textContent.trim();
+        
+        const record = await new Promise(resolve => {
+            const req =
+                getStore("readonly")
+                    .get(getTeamKey(sheetName));
+
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+        });
+
+        if (!record) {
+            alert(`No data found for "${sheetName}"`);
+            return;
+        }
+
+        const headers = TABLE_SCHEMAS[sheetName];
+        const rows = record.rows || [];
+
+        //--------------------------------------------------
+        // Build TSV
+        //--------------------------------------------------
+
+        const escapeTSV = value =>
+            String(value ?? "")
+                .replace(/\r?\n/g, " ");
+
+        const tsv = [
+            headers.join("\t"),
+            ...rows.map(row =>
+                row.map(escapeTSV).join("\t")
+            )
+        ].join("\n");
+
+        //--------------------------------------------------
+        // Build HTML
+        //--------------------------------------------------
+
+        const escapeHTML = str =>
+            String(str ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+
+        let html = "<table><thead><tr>";
+
+        headers.forEach(h => {
+            html += `<th>${escapeHTML(h)}</th>`;
+        });
+
+        html += "</tr></thead><tbody>";
+
+        rows.forEach(row => {
+            html += "<tr>";
+            row.forEach(cell => {
+                html += `<td>${escapeHTML(cell)}</td>`;
+            });
+            html += "</tr>";
+        });
+
+        html += "</tbody></table>";
+
+        //--------------------------------------------------
+        // Copy BOTH formats
+        //--------------------------------------------------
+
+        await navigator.clipboard.write([
+            new ClipboardItem({
+                "text/plain":
+                    new Blob([tsv], {
+                        type: "text/plain"
+                    }),
+
+                "text/html":
+                    new Blob([html], {
+                        type: "text/html"
+                    })
+            })
+        ]);
+
+        showPopup(`${sheetName} copied to clipboard.\n\n${rows.length} rows copied.`);
+    }
+    catch (err) {
+        console.error(err);
+        alert("Failed to copy active sheet.");
+    }
 }

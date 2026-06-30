@@ -572,18 +572,29 @@ function initEmptyTables() {
   tabsDiv.appendChild(leftTabsDiv);
   tabsDiv.appendChild(rightTabsDiv);
 
-  const downloadActiveSheetBtn = document.createElement("button"); 
+  const sheetBtnGroup = document.createElement("div");
+  sheetBtnGroup.className = "sheet-btn-group";  
+
+  const downloadActiveSheetBtn = document.createElement("button");
   downloadActiveSheetBtn.id = "downloadActiveSheetBtn";
-  downloadActiveSheetBtn.classList.add("icon-tooltip-download-active");
+  downloadActiveSheetBtn.className = "icon-tooltip-download-active";
   downloadActiveSheetBtn.dataset.tooltip = "Download Active Sheet";
-  downloadActiveSheetBtn.textContent = "⭳";
+  downloadActiveSheetBtn.innerHTML = `
+        <span class="material-symbols-outlined">
+            horizontal_align_left
+        </span>
+    `;
   downloadActiveSheetBtn.addEventListener("click", downloadActiveSheet);
 
-  const copyActiveSheetBtn = document.createElement("button");
+  const copyActiveSheetBtn = document.createElement("button"); 
   copyActiveSheetBtn.id = "copyActiveSheetBtn";
-  copyActiveSheetBtn.classList.add("icon-tooltip-copy-active");
+  copyActiveSheetBtn.className = "icon-tooltip-copy-active";
   copyActiveSheetBtn.dataset.tooltip = "Copy Active Sheet";
-  copyActiveSheetBtn.textContent = "📋";
+  copyActiveSheetBtn.innerHTML = `
+        <span class="material-symbols-outlined">
+            content_copy
+        </span>
+    `;
   copyActiveSheetBtn.addEventListener("click", copyActiveSheetToClipboard);  
 
   let first = true;
@@ -695,8 +706,9 @@ function initEmptyTables() {
     
         // Add download button immediately after the last right-side tab
         if (sheetName === "Closed Cases Data") {
-            rightTabsDiv.appendChild(copyActiveSheetBtn);
-            rightTabsDiv.appendChild(downloadActiveSheetBtn);
+            sheetBtnGroup.appendChild(copyActiveSheetBtn);
+            sheetBtnGroup.appendChild(downloadActiveSheetBtn);
+            rightTabsDiv.appendChild(sheetBtnGroup);
         }
     } else {
         leftTabsDiv.appendChild(tab);

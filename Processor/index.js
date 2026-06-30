@@ -11,7 +11,7 @@ import {
     logout
 } from "../js/auth.js";
 
-import { showPopup } from "./js/utils.js";
+import { showPopup } from "../js/utils.js";
 
 watchAuth((user) => {
 

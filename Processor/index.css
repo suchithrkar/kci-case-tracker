@@ -398,7 +398,6 @@ input[type="file"] {
 
 .sheet-btn-group{
     display:flex;
-    align-items:center;
 }
 
 .sheet-tab {
@@ -426,13 +425,9 @@ input[type="file"] {
     display:flex;
     align-items:center;
     justify-content:center;
-
     width:34px;
-    padding:0;
-
     border:.5px solid gray;
     border-right:none;
-
     border-radius:4px;
     border-top-right-radius:0;
     border-bottom-right-radius:0;
@@ -442,12 +437,8 @@ input[type="file"] {
     display:flex;
     align-items:center;
     justify-content:center;
-
     width:34px;
-    padding:0;
-
     border:.5px solid gray;
-
     border-radius:4px;
     border-top-left-radius:0;
     border-bottom-left-radius:0;
@@ -455,7 +446,7 @@ input[type="file"] {
 
 #copyActiveSheetBtn .material-symbols-outlined,
 #downloadActiveSheetBtn .material-symbols-outlined{
-    font-size:16px;
+    font-size:16px !important;
 }
 
 #downloadActiveSheetBtn .material-symbols-outlined{

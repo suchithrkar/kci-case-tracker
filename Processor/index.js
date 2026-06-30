@@ -1132,8 +1132,6 @@ function updateProcessButtonState() {
 }
 
 let progressContext = null;
-let displayedProgress = 0;
-let progressAnimFrame = null;
 
 function showProgressOverlay() {
   document.getElementById("progressOverlay").style.display = "flex";
@@ -1141,73 +1139,21 @@ function showProgressOverlay() {
 
 function hideProgressOverlay() {
   const overlay = document.getElementById("progressOverlay");
+
   overlay.style.display = "none";
   overlay.classList.remove("progress-complete");
 
   document.getElementById("overlayConfirmBtn").style.display = "none";
-  document.getElementById("overlayProgressBar").style.width = "0%";
-  document.getElementById("overlayProgressText").textContent = "0%";
 }
 
 function startProgressContext(label) {
-  progressContext = { label, value: 0 };
-  displayedProgress = 0;
-
+  progressContext = { label };
   showProgressOverlay();
-
   document.getElementById("overlayStatusText").textContent = label;
-  document.getElementById("overlayProgressBar").style.width = "0%";
-  document.getElementById("overlayProgressText").textContent = "0%";
-}
-
-function animateProgressTo(targetPercent, duration = 280) {
-  const bar = document.getElementById("overlayProgressBar");
-
-  if (progressAnimFrame) {
-    cancelAnimationFrame(progressAnimFrame);
-    progressAnimFrame = null;
-  }
-
-  const start = performance.now();
-  const startPercent = displayedProgress;
-  const delta = targetPercent - startPercent;
-
-  function step(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-
-    // Ease-out curve (feels natural)
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const current = startPercent + delta * eased;
-
-    displayedProgress = current;
-    bar.style.width = current.toFixed(2) + "%";
-    document.getElementById("overlayProgressText").textContent =
-      Math.round(current) + "%";
-
-    if (progress < 1) {
-      progressAnimFrame = requestAnimationFrame(step);
-    } else {
-      displayedProgress = targetPercent;
-      bar.style.width = targetPercent + "%";
-      document.getElementById("overlayProgressText").textContent =
-        targetPercent + "%";
-      progressAnimFrame = null;
-    }
-  }
-
-  progressAnimFrame = requestAnimationFrame(step);
 }
 
 function updateProgressContext(current, total, text) {
-  if (!progressContext || total === 0) return;
-
-  const percent = Math.min(
-    100,
-    Math.round((current / total) * 100)
-  );
-
-  animateProgressTo(percent);
+  if (!progressContext) return;
 
   if (text) {
     document.getElementById("overlayStatusText").textContent = text;
@@ -1215,14 +1161,11 @@ function updateProgressContext(current, total, text) {
 }
 
 function endProgressContext(text = "Completed") {
-  const bar = document.getElementById("overlayProgressBar");
   const status = document.getElementById("overlayStatusText");
   const confirmBtn = document.getElementById("overlayConfirmBtn");
   const overlay = document.getElementById("progressOverlay");
 
-  animateProgressTo(100, 200);
   status.textContent = text;
-
   overlay.classList.add("progress-complete");
   confirmBtn.style.display = "inline-block";
 
@@ -4324,29 +4267,17 @@ document.addEventListener("keydown", (e) => {
 function showImportOverlay(status = "Processing...") {
   const overlay = document.getElementById("progressOverlay");
   const statusText = document.getElementById("overlayStatusText");
-  const bar = document.getElementById("overlayProgressBar");
-  const percentText = document.getElementById("overlayProgressText");
   const confirmBtn = document.getElementById("overlayConfirmBtn");
 
   overlay.style.display = "flex";
   overlay.classList.remove("progress-complete");
-
   statusText.textContent = status;
-  bar.style.width = "0%";
-  percentText.textContent = "0%";
   confirmBtn.style.display = "none";
 }
 
 function updateImportProgress(percent, status) {
-  const bar = document.getElementById("overlayProgressBar");
-  const percentText = document.getElementById("overlayProgressText");
-  const statusText = document.getElementById("overlayStatusText");
-
-  bar.style.width = percent + "%";
-  percentText.textContent = percent + "%";
-
   if (status) {
-    statusText.textContent = status;
+    document.getElementById("overlayStatusText").textContent = status;
   }
 }
 

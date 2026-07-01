@@ -1245,14 +1245,10 @@ function buildSheetTables(workbook) {
       const dataTable = dataTablesMap[sheetName];
       dataTable.clear();
 
+      updateProgressContext(0, 0, `Loading ${sheetName}...`);
+    
       rows.forEach(r => {
-        dataTable.row.add(["", ...r]);
-        processedRows++;
-        updateProgressContext(
-          processedRows,
-          totalRows,
-          `Processing ${sheetName} (${processedRows}/${totalRows})`
-        );
+          dataTable.row.add(["", ...r]);
       });
 
       dataTable.draw(false);
@@ -1283,9 +1279,15 @@ function processExcelFile(file, allowedSheets) {
         Sheets: workbook.Sheets
       };
 
+    updateProgressContext(0,0,"Loading Excel sheets...");
     await buildSheetTables(filteredWorkbook);
+    
+    updateProgressContext(0,0,"Building Sorted table...");
     await buildSortedTable();
+    
+    updateProgressContext(0,0,"Syncing CSO Status...");
     await syncCSOStatusTable();
+        
     resolve();
     };
 
@@ -1410,58 +1412,36 @@ async function processGNProCSOFile(file) {
     req.onsuccess = () => res(req.result);
   });
 
-  const teamData =
-    allData.filter(r => r.team === currentTeam);
-
-  let csoRows =
-    teamData.find(r => r.sheetName === "CSO Status")?.rows || [];
-
-  let sortedRows =
-    teamData.find(r => r.sheetName === "Sorted")?.rows || [];
+  const teamData = allData.filter(r => r.team === currentTeam);
+  let csoRows = teamData.find(r => r.sheetName === "CSO Status")?.rows || [];
+  let sortedRows = teamData.find(r => r.sheetName === "Sorted")?.rows || [];
 
   // =====================================
   // PARSE GNPRO CSV
   // =====================================
 
   const csvText = await file.text();
-
-  const gnproMap =
-    parseGNProCSV(csvText);
+  const gnproMap = parseGNProCSV(csvText);
 
   // =====================================
   // COLUMN INDEXES
   // =====================================
 
-  const csoCaseIdx =
-    TABLE_SCHEMAS["CSO Status"].indexOf("Case ID");
-
-  const csoStatusIdx =
-    TABLE_SCHEMAS["CSO Status"].indexOf("Status");
-
-  const csoTrackingIdx =
-    TABLE_SCHEMAS["CSO Status"].indexOf("Tracking Number");
-
-  const csoRepairIdx =
-    TABLE_SCHEMAS["CSO Status"].indexOf("Repair Status");
-
-  const sortedCaseIdx =
-    TABLE_SCHEMAS["Sorted"].indexOf("Case ID");
-
-  const sortedOrderStatusIdx =
-    TABLE_SCHEMAS["Sorted"].indexOf("Order Status");
+  const csoCaseIdx = TABLE_SCHEMAS["CSO Status"].indexOf("Case ID");
+  const csoStatusIdx = TABLE_SCHEMAS["CSO Status"].indexOf("Status");
+  const csoTrackingIdx = TABLE_SCHEMAS["CSO Status"].indexOf("Tracking Number");
+  const csoRepairIdx = TABLE_SCHEMAS["CSO Status"].indexOf("Repair Status");
+  const sortedCaseIdx = TABLE_SCHEMAS["Sorted"].indexOf("Case ID");
+  const sortedOrderStatusIdx = TABLE_SCHEMAS["Sorted"].indexOf("Order Status");
 
   // =====================================
   // BUILD FAST SORTED LOOKUP
   // =====================================
 
   const sortedMap = new Map();
-
   sortedRows.forEach(row => {
-
     const caseId = row[sortedCaseIdx];
-
     if (!caseId) return;
-
     sortedMap.set(caseId, row);
   });
 
@@ -1469,27 +1449,14 @@ async function processGNProCSOFile(file) {
   // UPDATE EXISTING CSO ROWS
   // =====================================
 
-  let processed = 0;
-  const total = csoRows.length;
-
+  updateProgressContext(0,0,"Updating CSO Status...");  
   csoRows.forEach(csoRow => {
-
-    processed++;
-
-    updateProgressContext(
-      processed,
-      total,
-      `Updating CSO Status (${processed}/${total})`
-    );
-
-    const caseId =
-      csoRow[csoCaseIdx];
+    const caseId = csoRow[csoCaseIdx];
 
     if (!caseId) return;
 
     // CSV ENTRY NOT FOUND
-    const csvRow =
-      gnproMap.get(caseId);
+    const csvRow = gnproMap.get(caseId);
 
     if (!csvRow) {
       return;
@@ -1499,26 +1466,17 @@ async function processGNProCSOFile(file) {
     // UPDATE CSO STATUS TABLE
     // =====================================
 
-    csoRow[csoStatusIdx] =
-      csvRow.status || "";
-
-    csoRow[csoTrackingIdx] =
-      csvRow.tracking || "";
-
-    csoRow[csoRepairIdx] =
-      csvRow.repairStatus || "";
+    csoRow[csoStatusIdx] = csvRow.status || "";
+    csoRow[csoTrackingIdx] = csvRow.tracking || "";
+    csoRow[csoRepairIdx] = csvRow.repairStatus || "";
 
     // =====================================
     // UPDATE SORTED TABLE
     // =====================================
 
-    const sortedRow =
-      sortedMap.get(caseId);
-
+    const sortedRow = sortedMap.get(caseId);
     if (sortedRow) {
-
-      sortedRow[sortedOrderStatusIdx] =
-        csvRow.status || "";
+      sortedRow[sortedOrderStatusIdx] = csvRow.status || "";
     }
   });
 
@@ -1526,9 +1484,7 @@ async function processGNProCSOFile(file) {
   // UPDATE CSO STATUS UI
   // =====================================
 
-  const csoDT =
-    dataTablesMap["CSO Status"];
-
+  const csoDT = dataTablesMap["CSO Status"];
   csoDT.clear();
 
   csoRows.forEach(r => {
@@ -1541,8 +1497,7 @@ async function processGNProCSOFile(file) {
   // UPDATE SORTED UI
   // =====================================
 
-  const sortedDT =
-    dataTablesMap["Sorted"];
+  const sortedDT = dataTablesMap["Sorted"];
 
   sortedDT.clear();
 
@@ -1556,8 +1511,7 @@ async function processGNProCSOFile(file) {
   // SAVE CSO STATUS
   // =====================================
 
-  const writeStore =
-    getStore("readwrite");
+  const writeStore = getStore("readwrite");
 
   writeStore.put({
     id: getTeamKey("CSO Status"),
@@ -3053,72 +3007,32 @@ function parseTrackingResultsCSV(text) {
 
 async function processTrackingResultsFile(file) {
 
-  // =====================================
   // LOAD EXISTING DATA
-  // =====================================
-
   const store = getStore("readonly");
-
   const allData = await new Promise(res => {
     const req = store.getAll();
     req.onsuccess = () => res(req.result);
   });
 
-  const teamData =
-    allData.filter(r => r.team === currentTeam);
+  const teamData = allData.filter(r => r.team === currentTeam);
+  const oldDelivery = teamData.find(r => r.sheetName === "Delivery Details")?.rows || [];
 
-  const oldDelivery =
-    teamData.find(r => r.sheetName === "Delivery Details")?.rows || [];
-
-  // =====================================
   // COLUMN INDEXES
-  // =====================================
+  const delCaseIdx = TABLE_SCHEMAS["Delivery Details"].indexOf("CaseID");
+  const delStatusIdx = TABLE_SCHEMAS["Delivery Details"].indexOf("CurrentStatus");
 
-  const delCaseIdx =
-    TABLE_SCHEMAS["Delivery Details"].indexOf("CaseID");
-
-  const delStatusIdx =
-    TABLE_SCHEMAS["Delivery Details"].indexOf("CurrentStatus");
-
-  // =====================================
   // PARSE TRACKING RESULTS CSV
-  // =====================================
+  const csvText = await file.text();
+  const trackingCSVMap = parseTrackingResultsCSV(csvText);
 
-  const csvText =
-    await file.text();
-
-  const trackingCSVMap =
-    parseTrackingResultsCSV(csvText);
-
-  // =====================================
   // CLONE EXISTING DELIVERY DETAILS
-  // =====================================
+  const finalRows = oldDelivery.map(r => [...r]);
 
-  const finalRows =
-    oldDelivery.map(r => [...r]);
-
-  // =====================================
   // UPDATE MATCHING CASES ONLY
-  // =====================================
-
-  let processed = 0;
-
-  const total =
-    finalRows.length;
-
+  updateProgressContext(0,0,"Updating Delivery Details...");  
   finalRows.forEach(row => {
-
-    processed++;
-
-    updateProgressContext(
-      processed,
-      total,
-      `Updating Delivery Details (${processed}/${total})`
-    );
-
-    const caseId =
-      row[delCaseIdx];
-
+    const caseId = row[delCaseIdx];
+      
     if (!caseId) {
       return;
     }
@@ -3128,10 +3042,7 @@ async function processTrackingResultsFile(file) {
       return;
     }
 
-    const csvStatus =
-      normalizeTrackingStatus(
-        trackingCSVMap.get(caseId)
-      );
+    const csvStatus = normalizeTrackingStatus(trackingCSVMap.get(caseId));
 
     // SKIP BLANK CSV STATUS
     if (!csvStatus) {
@@ -3139,31 +3050,19 @@ async function processTrackingResultsFile(file) {
     }
 
     // UPDATE CURRENT STATUS
-    row[delStatusIdx] =
-      csvStatus;
+    row[delStatusIdx] = csvStatus;
   });
 
-  // =====================================
   // UPDATE UI TABLE
-  // =====================================
-
-  const dt =
-    dataTablesMap["Delivery Details"];
-
+  const dt = dataTablesMap["Delivery Details"];
   dt.clear();
-
   finalRows.forEach(r => {
     dt.row.add(["", ...r]);
   });
-
   dt.draw(false);
 
-  // =====================================
   // SAVE TO INDEXEDDB
-  // =====================================
-
-  const writeStore =
-    getStore("readwrite");
+  const writeStore = getStore("readwrite");
 
   writeStore.put({
     id: getTeamKey("Delivery Details"),
@@ -4179,26 +4078,10 @@ document.getElementById("processRepairBtn")
 
     const teamData = all.filter(r => r.team === currentTeam);
 
-    const dump = teamData.find(x => x.sheetName === "Dump")?.rows || [];
-    const validCases = dump.filter(r =>
-      ["parts shipped", "onsite solution", "offsite solution"]
-        .includes(normalizeText(r[8]))
-    );
-
-    let processed = 0;
-    const total = validCases.length;
-
-    for (const _ of validCases) {
-      processed++;
-      updateProgressContext(
-        processed,
-        total,
-        `Processing Repair Cases (${processed}/${total})`
-      );
-      await new Promise(requestAnimationFrame);
-    }
-
+    updateProgressContext(0, 0, "Building Repair Cases...");  
     await buildRepairCases();
+
+    updateProgressContext(0, 0, "Building Closed Cases...");  
     await buildClosedCasesReport();
 
     endProgressContext("Repair & Closed Case processing completed");

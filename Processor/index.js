@@ -1134,7 +1134,11 @@ function updateProcessButtonState() {
 let progressContext = null;
 
 function showProgressOverlay() {
-  document.getElementById("progressOverlay").style.display = "flex";
+  const confirmBtn = document.getElementById("overlayConfirmBtn");
+  confirmBtn.style.display = "none";
+  confirmBtn.disabled = true;  
+
+  document.getElementById("progressOverlay").style.display = "flex";  
 }
 
 function hideProgressOverlay() {
@@ -1147,7 +1151,7 @@ function hideProgressOverlay() {
 }
 
 function startProgressContext(label) {
-  progressContext = { label };
+  progressContext = {};
   showProgressOverlay();
 
   const spinner = document.getElementById("overlaySpinner");
@@ -1178,6 +1182,7 @@ function endProgressContext(text = "Completed") {
   spinner.style.color = "#36c36b";  
   overlay.classList.add("progress-complete");
   confirmBtn.style.display = "inline-block";
+  confirmBtn.disabled = false;  
 
   confirmBtn.onclick = () => {
     hideProgressOverlay();
@@ -4279,6 +4284,11 @@ function showImportOverlay(status = "Processing...") {
   const statusText = document.getElementById("overlayStatusText");
   const confirmBtn = document.getElementById("overlayConfirmBtn");
 
+  const spinner = document.getElementById("overlaySpinner");
+  spinner.textContent = "progress_activity";
+  spinner.style.animation = "overlaySpinnerRotate 1s linear infinite";
+  spinner.style.color = "#4da3ff";  
+
   overlay.style.display = "flex";
   overlay.classList.remove("progress-complete");
   statusText.textContent = status;
@@ -4295,6 +4305,11 @@ function completeImportOverlay(message = "Import Complete") {
   const overlay = document.getElementById("progressOverlay");
   const confirmBtn = document.getElementById("overlayConfirmBtn");
   const statusText = document.getElementById("overlayStatusText");
+
+  const spinner = document.getElementById("overlaySpinner");
+  spinner.textContent = "check_circle";
+  spinner.style.animation = "none";
+  spinner.style.color = "#36c36b";  
 
   overlay.classList.add("progress-complete");
   statusText.textContent = message;

@@ -4293,6 +4293,7 @@ function showImportOverlay(status = "Processing...") {
   overlay.classList.remove("progress-complete");
   statusText.textContent = status;
   confirmBtn.style.display = "none";
+  confirmBtn.disabled = true;
 }
 
 function updateImportProgress(percent, status) {
@@ -4318,6 +4319,7 @@ function completeImportOverlay(message = "Import Complete") {
   confirmBtn.onclick = () => {
     overlay.style.display = "none";
   };
+  confirmBtn.disabled = false;  
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
